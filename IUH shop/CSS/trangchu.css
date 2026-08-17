@@ -1016,46 +1016,138 @@ body {
 
 @media (max-width: 760px) {
 
-    .welcome-section {
-        padding: 50px 0;
+    /* =========================
+       TOP BAR MOBILE
+    ========================= */
+
+    .top-bar {
+        height: auto;
+        padding: 12px 0 14px;
     }
 
-    .welcome-container {
-        min-height: auto;
+    .top-bar-container {
+        width: 92%;
+        height: auto;              /* QUAN TRỌNG */
+        min-height: 0;             /* QUAN TRỌNG */
+
+        margin: 0 auto;
 
         display: flex;
         flex-direction: column;
 
-        padding-bottom: 35px;
+        align-items: center;
+        justify-content: center;   /* QUAN TRỌNG */
+
+        gap: 10px;
     }
 
-    .welcome-content {
+    /* Ẩn lời chào trên điện thoại */
+    .welcome-text {
+        display: none;
+    }
+
+    /* =========================
+       SEARCH + ACCOUNT
+    ========================= */
+
+    .top-actions {
         width: 100%;
 
-        padding: 45px 28px 20px;
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 10px;
     }
 
-    .welcome-content h2 {
-        font-size: 38px;
+    .search-box {
+        width: 100%;
+        max-width: 500px;
+        height: 46px;
+
+        border-radius: 9px;
     }
 
-    .welcome-text {
+    .search-box input {
+        font-size: 15px;
+        padding: 0 14px;
+    }
+
+    .search-button {
+        width: 48px;
+    }
+
+    .top-link {
+        font-size: 16px;
+    }
+
+    /* =========================
+       NAVIGATION MOBILE
+    ========================= */
+
+    .main-nav {
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        -webkit-overflow-scrolling: touch;
+
+        scrollbar-width: none;
+    }
+
+    .main-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-container {
+        width: max-content;
+        min-width: 100%;
+
+        min-height: 78px;
+
+        padding: 0 20px;
+    }
+
+    .brand {
+        min-width: auto;
+        margin-right: 25px;
+    }
+
+    .brand-logo {
+        width: 55px;
+    }
+
+    .brand-name {
+        font-size: 21px;
+    }
+
+    .brand-slogan {
+        display: none;
+    }
+
+    .navigation {
+        height: 78px;
+
+        justify-content: flex-start;
+
+        gap: 0;
+    }
+
+    .nav-item {
+        height: 78px;
+
+        flex: none;
+
+        padding: 0 18px;
+
         font-size: 14px;
     }
 
-    .welcome-image-wrapper {
-        position: relative;
-
-        right: auto;
-        bottom: auto;
-
-        width: 280px;
-        height: 280px;
-
-        margin: 25px auto -10px;
+    .nav-item.active::after {
+        bottom: 12px;
     }
 }
-
 
 /* =====================================================
    NÚT CHUYỂN SLIDE
