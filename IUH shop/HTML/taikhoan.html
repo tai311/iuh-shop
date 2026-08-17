@@ -1,0 +1,836 @@
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Tài khoản - IUH SHOP</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../CSS/taikhoan.css"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- HEADER -->
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="lienhe.html" class="nav-item">
+                        LIÊN HỆ
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+    </div>
+
+</div>
+
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+
+    <!-- NỘI DUNG -->
+
+    <main class="account-page">
+
+        <section class="account-container">
+
+
+            <!-- =================================
+                 THÔNG TIN TÀI KHOẢN
+            ================================== -->
+
+            <div class="account-profile">
+
+                <div class="profile-avatar-wrapper">
+
+    <div class="avatar-image-wrapper">
+
+        <img
+            id="accountAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="profile-avatar"
+        >
+
+        <!-- Input chọn ảnh -->
+        <input
+            type="file"
+            id="avatarInput"
+            accept="image/png,image/jpeg,image/webp"
+            style="display: none;"
+        >
+
+        <!-- Nút đổi ảnh -->
+        <button
+            type="button"
+            id="changeAvatarButton"
+            class="change-avatar-button"
+            title="Đổi ảnh đại diện"
+        >
+            ✎
+        </button>
+
+    </div>
+
+    <!-- Đặt ngay bên dưới avatar -->
+    <button
+        type="button"
+        id="resetAvatarButton"
+        class="reset-avatar-button"
+    >
+        Về ảnh mặc định
+    </button>
+
+</div>
+
+
+                <div class="profile-info">
+
+                    <span
+                        id="accountStatus"
+                        class="profile-status"
+                    >
+                        Chưa đăng nhập
+                    </span>
+
+                    <h1 id="accountName">
+                        Khách
+                    </h1>
+
+                    <p id="accountEmail">
+                        Đăng nhập để sử dụng đầy đủ
+                        các chức năng của IUH SHOP.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================
+                 ĐĂNG NHẬP / ĐĂNG KÝ
+            ================================== -->
+
+            <div
+                id="authSection"
+                class="auth-section"
+            >
+
+                <a
+                    href="dangnhap.html"
+                    class="auth-button login-button"
+                >
+                    Đăng nhập
+                </a>
+
+                <a
+                    href="dangky.html"
+                    class="auth-button register-button"
+                >
+                    Đăng ký
+                </a>
+
+            </div>
+
+
+
+            <!-- =================================
+                 CÁC CHỨC NĂNG
+            ================================== -->
+
+            <section class="account-menu-section">
+
+                <h2>
+                    Quản lý tài khoản
+                </h2>
+
+
+                <div class="account-menu">
+
+
+                    <!-- Đăng tin -->
+
+                    <a
+                        href="dangtin.html"
+                        class="account-menu-item"
+                    >
+
+                        <div class="menu-icon">
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M12 5v14"
+                                />
+                                <path
+                                    d="M5 12h14"
+                                />
+                            </svg>
+                        </div>
+
+                        <div class="menu-text">
+
+                            <strong>
+                                Đăng tin
+                            </strong>
+
+                            <span>
+                                Đăng sản phẩm lên IUH SHOP
+                            </span>
+
+                        </div>
+
+                        <span class="menu-arrow">
+                            ›
+                        </span>
+
+                    </a>
+
+
+
+                    <!-- Nâng cấp -->
+
+                    <a
+                        href="goidichvu.html"
+                        class="account-menu-item"
+                    >
+
+                        <div class="menu-icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M12 3l2.8 5.7L21 9.6l-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9L12 3z"
+                                />
+
+                            </svg>
+
+                        </div>
+
+                        <div class="menu-text">
+
+                            <strong>
+                                Nâng cấp gói dịch vụ
+                            </strong>
+
+                            <span>
+                                Mở rộng quyền lợi cho tài khoản
+                            </span>
+
+                        </div>
+
+                        <span class="menu-arrow">
+                            ›
+                        </span>
+
+                    </a>
+
+
+
+                    <!-- Kiểm tra đơn hàng -->
+
+                    <a
+                        href="donhang.html"
+                        class="account-menu-item"
+                    >
+
+                        <div class="menu-icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M4 5h16v14H4z"
+                                />
+
+                                <path
+                                    d="M8 9h8"
+                                />
+
+                                <path
+                                    d="M8 13h5"
+                                />
+
+                            </svg>
+
+                        </div>
+
+                        <div class="menu-text">
+
+                            <strong>
+                                Kiểm tra đơn hàng
+                            </strong>
+
+                            <span>
+                                Theo dõi các đơn hàng của bạn
+                            </span>
+
+                        </div>
+
+                        <span class="menu-arrow">
+                            ›
+                        </span>
+
+                    </a>
+
+
+
+                    <!-- Tin nhắn -->
+
+                    <a
+                        href="tinnhan.html"
+                        class="account-menu-item"
+                    >
+
+                        <div class="menu-icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M4 5h16v12H8l-4 4V5z"
+                                />
+
+                                <path
+                                    d="M8 9h8"
+                                />
+
+                                <path
+                                    d="M8 13h5"
+                                />
+
+                            </svg>
+
+                        </div>
+
+                        <div class="menu-text">
+
+                            <strong>
+                                Tin nhắn
+                            </strong>
+
+                            <span>
+                                Trao đổi với người mua và người bán
+                            </span>
+
+                        </div>
+
+                        <span class="menu-arrow">
+                            ›
+                        </span>
+
+                    </a>
+
+
+
+                    <!-- Giỏ hàng -->
+
+                    <a
+                        href="giohang.html"
+                        class="account-menu-item"
+                    >
+
+                        <div class="menu-icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+
+                                <path
+                                    d="M3 4h2l2.5 12h10L21 7H6"
+                                />
+
+                                <circle
+                                    cx="9"
+                                    cy="20"
+                                    r="1.5"
+                                />
+
+                                <circle
+                                    cx="17"
+                                    cy="20"
+                                    r="1.5"
+                                />
+
+                            </svg>
+
+                        </div>
+
+                        <div class="menu-text">
+
+                            <strong>
+                                Giỏ hàng
+                            </strong>
+
+                            <span>
+                                Xem các sản phẩm đã lưu
+                            </span>
+
+                        </div>
+
+                        <span class="menu-arrow">
+                            ›
+                        </span>
+
+                    </a>
+
+
+
+                    <!-- Đăng xuất -->
+
+                    <button
+                        type="button"
+                        id="accountLogout"
+                        class="account-menu-item logout-item"
+                    >
+
+                        <div class="menu-icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+
+                                <path
+                                    d="M10 4H5v16h5"
+                                />
+
+                                <path
+                                    d="M14 8l4 4-4 4"
+                                />
+
+                                <path
+                                    d="M18 12H9"
+                                />
+
+                            </svg>
+
+                        </div>
+
+                        <div class="menu-text">
+
+                            <strong>
+                                Đăng xuất
+                            </strong>
+
+                            <span>
+                                Thoát khỏi tài khoản hiện tại
+                            </span>
+
+                        </div>
+
+                        <span class="menu-arrow">
+                            ›
+                        </span>
+
+                    </button>
+
+
+                </div>
+
+            </section>
+
+
+        </section>
+
+    </main>
+
+
+
+
+    <footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="#">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="#">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="../HTML/lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+
+
+    <!-- SUPABASE -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+    <script
+        src="../JS/taikhoan.js"
+    ></script>
+
+</body>
+
+</html>

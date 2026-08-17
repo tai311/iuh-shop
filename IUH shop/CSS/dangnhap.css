@@ -1,0 +1,369 @@
+* {
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+
+    background: #f5f7fb;
+
+    color: #173f91;
+}
+
+
+.auth-page {
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+}
+
+
+.auth-container {
+    width: 100%;
+    max-width: 950px;
+
+    min-height: 560px;
+
+    display: grid;
+
+    grid-template-columns: 42% 58%;
+
+    background: #ffffff;
+
+    border-radius: 22px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 20px 50px rgba(20, 48, 105, 0.12);
+}
+
+
+/* =========================
+   BÊN TRÁI
+========================= */
+
+.auth-intro {
+    padding: 55px 45px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    background: #173f91;
+
+    color: #ffffff;
+}
+
+
+.auth-logo img {
+    width: 190px;
+
+    height: auto;
+
+    margin-bottom: 70px;
+}
+
+
+.auth-intro h1 {
+    font-size: 32px;
+
+    line-height: 1.25;
+
+    margin-bottom: 18px;
+}
+
+
+.auth-intro p {
+    font-size: 15px;
+
+    line-height: 1.8;
+
+    color: rgba(255, 255, 255, 0.85);
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+.auth-form {
+    padding: 55px 65px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+}
+
+
+.auth-form h2 {
+    font-size: 30px;
+
+    color: #173f91;
+
+    margin-bottom: 8px;
+}
+
+
+.auth-subtitle {
+    color: #7b8494;
+
+    font-size: 14px;
+
+    margin-bottom: 32px;
+}
+
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #303949;
+}
+
+
+.form-group input {
+    width: 100%;
+
+    height: 48px;
+
+    padding: 0 15px;
+
+    border: 1px solid #dfe4ec;
+
+    border-radius: 9px;
+
+    outline: none;
+
+    font-size: 14px;
+
+    transition: 0.2s;
+}
+
+
+.form-group input:focus {
+    border-color: #173f91;
+
+    box-shadow:
+        0 0 0 3px rgba(23, 63, 145, 0.08);
+}
+
+
+/* PASSWORD */
+
+.password-box {
+    position: relative;
+}
+
+
+.password-box input {
+    padding-right: 65px;
+}
+
+
+.password-toggle {
+    position: absolute;
+
+    right: 12px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    border: none;
+
+    background: none;
+
+    color: #173f91;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+/* OPTIONS */
+
+.form-options {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+
+    font-size: 12px;
+}
+
+
+.remember {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: #687386;
+}
+
+
+.form-options a {
+    color: #173f91;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+
+/* BUTTON */
+
+.auth-button {
+    width: 100%;
+
+    height: 48px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: #173f91;
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.25s;
+}
+
+
+.auth-button:hover {
+    background: #123578;
+
+    transform: translateY(-1px);
+}
+
+
+/* DIVIDER */
+
+.auth-divider {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin: 28px 0;
+
+    color: #a0a7b2;
+
+    font-size: 12px;
+}
+
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+
+    flex: 1;
+
+    height: 1px;
+
+    background: #e5e8ee;
+}
+
+
+/* SWITCH */
+
+.switch-auth {
+    text-align: center;
+
+    font-size: 13px;
+
+    color: #687386;
+}
+
+
+.switch-auth a {
+    color: #173f91;
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .auth-page {
+        padding: 15px;
+    }
+
+
+    .auth-container {
+        display: block;
+
+        max-width: 450px;
+    }
+
+
+    .auth-intro {
+        padding: 30px;
+
+        min-height: 220px;
+    }
+
+
+    .auth-logo img {
+        width: 150px;
+
+        margin-bottom: 30px;
+    }
+
+
+    .auth-intro h1 {
+        font-size: 25px;
+    }
+
+
+    .auth-intro p {
+        font-size: 13px;
+    }
+
+
+    .auth-form {
+        padding: 35px 28px;
+    }
+
+}

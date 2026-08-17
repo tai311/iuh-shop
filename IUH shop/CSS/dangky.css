@@ -1,0 +1,614 @@
+/* =========================================
+   RESET
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: "Be Vietnam Pro", Arial, sans-serif;
+
+    background: #f5f7fb;
+
+    color: #17233c;
+}
+
+
+/* =========================================
+   PAGE
+========================================= */
+
+.auth-page {
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 35px 20px;
+}
+
+
+/* =========================================
+   CONTAINER
+========================================= */
+
+.auth-container {
+    width: 100%;
+    max-width: 1050px;
+
+    display: grid;
+
+    grid-template-columns: 40% 60%;
+
+    background: #ffffff;
+
+    border-radius: 22px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 20px 55px rgba(20, 48, 105, 0.12);
+}
+
+
+/* =========================================
+   INTRO
+========================================= */
+
+.auth-intro {
+    min-height: 700px;
+
+    padding: 55px 45px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    background: #193f9e;
+
+    color: #ffffff;
+}
+
+
+.auth-logo {
+    display: inline-block;
+}
+
+
+.auth-logo img {
+    width: 185px;
+
+    height: auto;
+
+    display: block;
+}
+
+
+.intro-content {
+    padding-bottom: 50px;
+}
+
+
+.intro-content h1 {
+    font-size: 32px;
+
+    line-height: 1.3;
+
+    margin-bottom: 18px;
+}
+
+
+.intro-content p {
+    max-width: 320px;
+
+    color: rgba(255, 255, 255, 0.86);
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+
+/* =========================================
+   FORM AREA
+========================================= */
+
+.auth-form {
+    padding: 50px 65px;
+}
+
+
+.form-heading {
+    margin-bottom: 28px;
+}
+
+
+.form-heading h2 {
+    color: #193f9e;
+
+    font-size: 29px;
+
+    font-weight: 800;
+
+    margin-bottom: 7px;
+}
+
+
+.form-heading p {
+    color: #7a8495;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.register-form {
+    width: 100%;
+}
+
+
+.form-group {
+    margin-bottom: 17px;
+}
+
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #303949;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.form-group input,
+.form-group select {
+    width: 100%;
+
+    height: 45px;
+
+    padding: 0 14px;
+
+    border: 1px solid #dfe4ec;
+
+    border-radius: 8px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #17233c;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.form-group input::placeholder {
+    color: #9aa2af;
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+
+    border-color: #193f9e;
+
+    box-shadow:
+        0 0 0 3px rgba(25, 63, 158, 0.08);
+}
+
+
+/* =========================================
+   SELECT
+========================================= */
+
+.form-group select {
+    cursor: pointer;
+
+    appearance: auto;
+}
+
+
+.form-group select:invalid {
+    color: #9aa2af;
+}
+
+
+/* =========================================
+   PASSWORD
+========================================= */
+
+.password-wrapper {
+    position: relative;
+}
+
+
+.password-wrapper input {
+    padding-right: 60px;
+}
+
+
+.password-toggle {
+    position: absolute;
+
+    top: 50%;
+    right: 12px;
+
+    transform: translateY(-50%);
+
+    border: none;
+
+    background: transparent;
+
+    color: #193f9e;
+
+    font-family: inherit;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   TERMS
+========================================= */
+
+.terms {
+    margin: 20px 0;
+}
+
+
+.terms label {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 8px;
+
+    color: #70798a;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+    cursor: pointer;
+}
+
+
+.terms input {
+    width: 14px;
+    height: 14px;
+
+    margin-top: 1px;
+
+    accent-color: #193f9e;
+
+    cursor: pointer;
+}
+
+
+.terms a {
+    color: #193f9e;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+.form-message {
+    min-height: 18px;
+
+    margin-bottom: 8px;
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.auth-button {
+    width: 100%;
+
+    height: 46px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #193f9e;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.auth-button:hover {
+    background: #153586;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================
+   SWITCH
+========================================= */
+
+.switch-auth {
+    margin-top: 24px;
+
+    color: #747d8d;
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+
+.switch-auth a {
+    color: #193f9e;
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+
+.switch-auth a:hover {
+    color: #f5ca2e;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 850px) {
+
+    .auth-container {
+        grid-template-columns: 1fr;
+    }
+
+
+    .auth-intro {
+        min-height: 250px;
+
+        padding: 35px;
+    }
+
+
+    .auth-logo img {
+        width: 155px;
+    }
+
+
+    .intro-content {
+        padding-bottom: 0;
+    }
+
+
+    .intro-content h1 {
+        font-size: 26px;
+    }
+
+
+    .intro-content p {
+        max-width: 550px;
+    }
+
+
+    .auth-form {
+        padding: 40px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .auth-page {
+        padding: 0;
+    }
+
+
+    .auth-container {
+        min-height: 100vh;
+
+        border-radius: 0;
+
+        box-shadow: none;
+    }
+
+
+    .auth-intro {
+        min-height: 210px;
+
+        padding: 28px 25px;
+    }
+
+
+    .auth-form {
+        padding: 30px 25px;
+    }
+
+
+    .form-heading h2 {
+        font-size: 25px;
+    }
+
+}
+
+/* =========================================
+   HIỆU ỨNG CHUYỂN TRANG
+========================================= */
+
+.page-transition {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: #17439b;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    opacity: 0;
+
+    z-index: 999999;
+
+    transition:
+        opacity 0.3s ease;
+}
+
+
+.page-transition.active {
+    opacity: 1;
+}
+
+
+.transition-content {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 18px;
+
+    animation:
+        transitionContent 0.5s ease;
+}
+
+
+@keyframes transitionContent {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(15px)
+            scale(0.96);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+
+/* Logo */
+
+.transition-logo {
+
+    width: 95px;
+
+    height: auto;
+
+    object-fit: contain;
+}
+
+
+/* Loading */
+
+.transition-spinner {
+
+    width: 30px;
+
+    height: 30px;
+
+    border: 3px solid
+        rgba(255, 255, 255, 0.3);
+
+    border-top-color:
+        #ffffff;
+
+    border-radius: 50%;
+
+    animation:
+        transitionSpin 0.8s linear infinite;
+}
+
+
+@keyframes transitionSpin {
+
+    to {
+
+        transform:
+            rotate(360deg);
+
+    }
+
+}
+
+
+/* Chữ */
+
+.transition-text {
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    opacity: 0.9;
+
+}

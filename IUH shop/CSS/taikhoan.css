@@ -1,7 +1,3 @@
-/* =====================================================
-   RESET
-===================================================== */
-
 * {
     margin: 0;
     padding: 0;
@@ -430,46 +426,6 @@ body {
     border-radius: 10px;
 }
 
-
-/* =====================================================
-   CONTENT DEMO
-===================================================== */
-
-.page-content {
-    min-height: 75vh;
-
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-
-    padding: 40px;
-}
-
-
-.page-content h1 {
-    font-size: 42px;
-
-    color: var(--iuh-blue);
-
-    margin-bottom: 10px;
-}
-
-
-.page-content p {
-    color: var(--text-gray);
-
-    font-size: 16px;
-}
-
-
-/* =====================================================
-   RESPONSIVE - LAPTOP
-===================================================== */
-
 @media (max-width: 1250px) {
 
     .search-box {
@@ -615,11 +571,6 @@ body {
     }
 }
 
-
-/* =========================================
-   ACCOUNT AREA
-========================================= */
-
 .account-area {
     display: flex;
     align-items: center;
@@ -713,372 +664,6 @@ body {
 .account-nav:hover .nav-arrow svg {
     transform: rotate(180deg);
 }
-
-
-/* =====================================================
-   HERO SLIDER
-===================================================== */
-
-.hero-slider {
-    width: 100%;
-
-    padding: 25px 0 10px;
-
-    background: #f7f9fc;
-}
-
-
-.slider-container {
-    position: relative;
-
-    width: min(1440px, 94%);
-
-    height: 420px;
-
-    margin: 0 auto;
-
-    overflow: hidden;
-
-    border-radius: 12px;
-
-    box-shadow:
-        0 10px 30px rgba(20, 48, 105, 0.10);
-}
-
-
-/* =====================================================
-   SLIDE
-===================================================== */
-
-.slide {
-    position: absolute;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    transition:
-        opacity 0.6s ease,
-        visibility 0.6s ease;
-}
-
-
-.slide.active {
-    opacity: 1;
-
-    visibility: visible;
-}
-
-
-.slide img {
-    width: 100%;
-    height: 100%;
-
-    display: block;
-
-    object-fit: cover;
-}
-
-/* =====================================================
-   WELCOME SECTION
-===================================================== */
-
-.welcome-section {
-    width: 100%;
-
-    padding: 80px 0;
-
-    background: #ffffff;
-}
-
-
-.welcome-container {
-    width: min(1200px, 92%);
-    min-height: 480px;
-
-    margin: 0 auto;
-
-    position: relative;
-
-    background: #fffdf7;
-
-    border: 1px solid #eee7d4;
-
-    overflow: visible;
-
-    box-shadow:
-        0 12px 35px rgba(20, 48, 105, 0.07);
-}
-
-
-/* =====================================================
-   NỘI DUNG
-===================================================== */
-
-.welcome-content {
-    width: 68%;
-
-    margin-left: auto;
-
-    padding: 65px 80px 70px 60px;
-
-    position: relative;
-
-    z-index: 3;
-}
-
-
-/* =====================================================
-   ẢNH GÓC TRÁI
-===================================================== */
-
-.welcome-image-wrapper {
-    position: absolute;
-
-    width: 390px;
-    height: 390px;
-
-    left: -95px;
-    bottom: -90px;
-
-    z-index: 2;
-
-    pointer-events: none;
-}
-
-
-.welcome-image-frame {
-    width: 100%;
-    height: 100%;
-
-    padding: 12px;
-
-    background: var(--white);
-
-    box-shadow:
-        0 18px 40px rgba(20, 48, 105, 0.20);
-
-    transform: rotate(-8deg);
-
-    position: relative;
-}
-
-
-.welcome-image {
-    width: 100%;
-    height: 100%;
-
-    display: block;
-
-    object-fit: cover;
-}
-
-
-/* Đường vàng */
-
-.welcome-line {
-    width: 65px;
-    height: 4px;
-
-    margin: 20px 0 25px;
-
-    background: var(--iuh-yellow);
-
-    border-radius: 20px;
-}
-
-
-.welcome-text {
-    max-width: 640px;
-
-    margin-bottom: 18px;
-
-    font-size: 15px;
-
-    line-height: 1.9;
-
-    color: #59657a;
-}
-
-
-.welcome-text strong {
-    color: var(--iuh-blue);
-}
-
-
-/* =====================================================
-   NÚT
-===================================================== */
-
-.welcome-button {
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 12px;
-
-    margin-top: 10px;
-
-    min-width: 165px;
-    height: 46px;
-
-    padding: 0 22px;
-
-    background: var(--iuh-blue);
-
-    color: var(--white);
-
-    border-radius: 6px;
-
-    text-decoration: none;
-
-    font-size: 13px;
-
-    font-weight: 700;
-
-    transition:
-        background 0.25s ease,
-        transform 0.25s ease;
-}
-
-
-.welcome-button span {
-    font-size: 20px;
-
-    line-height: 1;
-}
-
-
-.welcome-button:hover {
-    background: var(--iuh-blue-dark);
-
-    transform: translateY(-2px);
-}
-
-
-/* =====================================================
-   KHUNG ẢNH
-===================================================== */
-
-.welcome-image-wrapper {
-    position: absolute;
-
-    left: -55px;
-    bottom: -70px;
-
-    width: 360px;
-    height: 480px;
-
-    z-index: 1;
-}
-
-
-.welcome-image-frame {
-    width: 100%;
-    height: 100%;
-
-    position: relative;
-
-    transform: rotate(-8deg);
-
-    background: var(--white);
-
-    padding: 12px;
-
-    box-shadow:
-        0 16px 35px rgba(20, 48, 105, 0.18);
-}
-
-/* Ảnh */
-
-.welcome-image {
-    width: 100%;
-    height: 100%;
-
-    display: block;
-
-    object-fit: cover;
-}
-
-/* =====================================================
-   TRANG TRÍ GÓC
-===================================================== */
-
-/* Hình tròn vàng góc trái */
-/* Hình tròn góc trái */
-.welcome-container::before {
-    content: "";
-
-    position: absolute;
-
-    width: 180px;
-    height: 180px;
-
-    left: 20px;
-    top: 20px;
-
-    border-radius: 50%;
-
-    background: rgba(245, 202, 46, 0.05);
-
-    z-index: 0;
-
-    pointer-events: none;
-}
-
-
-/* Hình tròn góc phải */
-.welcome-container::after {
-    content: "";
-
-    position: absolute;
-
-    width: 160px;
-    height: 160px;
-
-    right: 20px;
-    top: 20px;
-
-    border-radius: 50%;
-
-    background: rgba(25, 63, 158, 0.04);
-
-    z-index: 0;
-
-    pointer-events: none;
-}
-
-/* =====================================================
-   RESPONSIVE
-===================================================== */
-
-@media (max-width: 1000px) {
-
-    .welcome-content {
-        width: 65%;
-
-        padding: 50px 45px;
-    }
-
-    .welcome-content h2 {
-        font-size: 42px;
-    }
-
-    .welcome-image-wrapper {
-        width: 330px;
-        height: 330px;
-
-        right: -25px;
-        bottom: -25px;
-    }
-}
-
 
 @media (max-width: 760px) {
 
@@ -1215,711 +800,770 @@ body {
     }
 }
 
-/* =====================================================
-   NÚT CHUYỂN SLIDE
-===================================================== */
 
-.slider-button {
-    position: absolute;
+/* =========================================
+   PROFILE
+========================================= */
 
-    top: 50%;
-    transform: translateY(-50%);
+.account-profile {
 
-    width: 55px;
-    height: 75px;
-
-    border: none;
-    background: transparent;
-
-    padding: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: var(--iuh-yellow);
-
-    cursor: pointer;
-
-    z-index: 5;
-
-    transition: opacity 0.25s ease;
-}
-
-.slider-button svg {
-    width: 34px;
-    height: 34px;
-
-    fill: none;
-
-    stroke: currentColor;
-    stroke-width: 4;
-
-    stroke-linecap: round;
-    stroke-linejoin: round;
-
-    transition:
-        transform 0.25s ease,
-        stroke 0.25s ease;
-}
-
-
-/* Nút trái */
-
-.slider-prev {
-    left: 12px;
-}
-
-
-/* Nút phải */
-
-.slider-next {
-    right: 12px;
-}
-
-
-/* Hover */
-
-.slider-button:hover svg {
-    transform: scale(1.08);
-    color: var(--white);
-}
-
-
-/* =====================================================
-   DOTS
-===================================================== */
-
-.slider-dots {
-    position: absolute;
-
-    left: 50%;
-    bottom: 18px;
-
-    transform: translateX(-50%);
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    z-index: 5;
-}
-
-
-.slider-dot {
-    width: 9px;
-    height: 9px;
-
-    padding: 0;
-
-    border: none;
-
-    border-radius: 50%;
-
-    background: rgba(255, 255, 255, 0.65);
-
-    cursor: pointer;
-
-    transition:
-        width 0.25s ease,
-        background 0.25s ease;
-}
-
-
-.slider-dot.active {
-    width: 25px;
-
-    border-radius: 20px;
-
-    background: var(--iuh-yellow);
-}
-
-/* ================================
-   THỐNG KÊ IUH SHOP
-================================ */
-
-.stats-section {
-    width: 100%;
-    padding: 35px 0;
-    background: #f7f9fc;
-}
-
-
-.stats-container {
-    width: 90%;
-    max-width: 1250px;
-    margin: 0 auto;
-
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-
-    background: var(--white);
-
-    border-radius: 16px;
-
-    box-shadow:
-        0 8px 25px rgba(20, 48, 105, 0.08);
-
-    overflow: hidden;
-}
-
-
-/* ================================
-   TỪNG Ô
-================================ */
-
-.stat-item {
-    display: flex;
-    align-items: center;
-
-    padding: 22px 28px;
-
-    position: relative;
-}
-
-
-/* đường phân cách */
-
-.stat-item:not(:last-child)::after {
-    content: "";
-
-    position: absolute;
-
-    right: 0;
-    top: 25%;
-    height: 50%;
-
-    width: 1px;
-
-    background: #e5e8ef;
-}
-
-
-/* ================================
-   ICON
-================================ */
-
-.stat-icon {
-    width: 46px;
-    height: 46px;
-
-    flex-shrink: 0;
-
-    margin-right: 14px;
-
-    border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #f1f5fc;
-
-    color: #173f91;
-
-    font-size: 21px;
-    font-weight: 600;
-}
-
-
-/* ================================
-   NỘI DUNG
-================================ */
-
-.stat-content {
-    min-width: 0;
-}
-
-
-.stat-number {
-    color: #173f91;
-
-    font-size: 22px;
-
-    font-weight: 700;
-
-    line-height: 1.2;
-
-    white-space: nowrap;
-}
-
-
-.stat-label {
-    margin-top: 4px;
-
-    color: #7b8494;
-
-    font-size: 12px;
-
-    line-height: 1.3;
-
-    white-space: nowrap;
-}
-
-@media (max-width: 768px) {
-
-    .stats-container {
-        width: 92%;
-
-        grid-template-columns: repeat(2, 1fr);
-
-        border-radius: 14px;
-    }
-
-
-    .stat-item {
-        padding: 18px 15px;
-    }
-
-
-    .stat-item:nth-child(2)::after {
-        display: none;
-    }
-
-
-    .stat-item:nth-child(3)::after {
-        display: block;
-    }
-
-
-    .stat-icon {
-        width: 40px;
-        height: 40px;
-
-        font-size: 18px;
-
-        margin-right: 10px;
-    }
-
-
-    .stat-number {
-        font-size: 19px;
-    }
-
-
-    .stat-label {
-        font-size: 10px;
-
-        white-space: normal;
-    }
-
-}
-
-
-
-/* ================================
-   DANH MỤC PHỔ BIẾN
-================================ */
-
-.popular-categories {
-    width: 90%;
-    max-width: 1250px;
-
-    margin: 0 auto;
-
-    padding: 45px 0 30px;
-}
-
-
-/* ================================
-   HEADER
-================================ */
-
-.categories-header {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin-bottom: 22px;
-}
-
-
-.categories-header h2 {
-    margin: 0;
-
-    color: #173f91;
-
-    font-size: 18px;
-
-    font-weight: 700;
-}
-
-
-.categories-header a {
-    color: #173f91;
-
-    font-size: 12px;
-
-    font-weight: 500;
-
-    text-decoration: none;
-}
-
-
-.categories-header a:hover {
-    color: #f2c94c;
-}
-
-
-.categories-header a span {
-    font-size: 18px;
-
-    margin-left: 3px;
-}
-
-
-/* ================================
-   DANH SÁCH DANH MỤC
-================================ */
-
-.categories-list {
-    display: grid;
-
-    grid-template-columns: repeat(7, 1fr);
-
-    gap: 14px;
-}
-
-
-/* ================================
-   TỪNG DANH MỤC
-================================ */
-
-.category-item {
-    min-height: 125px;
-
-    padding: 16px 8px;
+    padding: 28px;
 
     background: #ffffff;
 
-    border: 1px solid #edf0f5;
+    border:
+        1px solid #e6ebf3;
 
-    border-radius: 12px;
+    border-radius: 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 22px;
+
+    box-shadow:
+        0 7px 25px
+        rgba(20, 48, 105, 0.06);
+
+}
+
+
+.profile-avatar-wrapper {
+
+    flex-shrink: 0;
+
+}
+
+
+.profile-avatar {
+
+    width: 86px;
+
+    height: 86px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    display: block;
+
+    border:
+        3px solid #ffffff;
+
+    box-shadow:
+        0 4px 14px
+        rgba(20, 48, 105, 0.15);
+
+}
+
+
+.profile-status {
+
+    display: inline-block;
+
+    padding:
+        5px 10px;
+
+    border-radius: 20px;
+
+    background: #f1f4f8;
+
+    color: #7b8798;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+}
+
+
+.profile-info h1 {
+
+    margin-top: 7px;
+
+    color: #173f91;
+
+    font-size: 23px;
+
+    font-weight: 800;
+
+}
+
+
+.profile-info p {
+
+    margin-top: 5px;
+
+    color: #7c8798;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+}
+
+
+
+/* =========================================
+   LOGIN / REGISTER
+========================================= */
+
+.auth-section {
+
+    margin-top: 18px;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 12px;
+
+}
+
+
+.auth-button {
+
+    height: 46px;
+
+    border-radius: 8px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+
+}
+
+
+.auth-button:hover {
+
+    transform:
+        translateY(-2px);
+
+}
+
+
+.login-button {
+
+    background: #173f91;
+
+    color: #ffffff;
+
+}
+
+
+.login-button:hover {
+
+    box-shadow:
+        0 6px 15px
+        rgba(23, 63, 145, 0.2);
+
+}
+
+
+.register-button {
+
+    background: #ffffff;
+
+    color: #173f91;
+
+    border:
+        1px solid #173f91;
+
+}
+
+
+.register-button:hover {
+
+    background: #f3f6ff;
+
+}
+
+
+
+/* =========================================
+   MENU SECTION
+========================================= */
+
+.account-menu-section {
+
+    margin-top: 30px;
+
+}
+
+
+.account-menu-section h2 {
+
+    margin-bottom: 14px;
+
+    color: #26344d;
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+}
+
+
+.account-menu {
 
     display: flex;
 
     flex-direction: column;
 
-    align-items: center;
+    gap: 10px;
 
-    justify-content: center;
-
-    text-align: center;
-
-    text-decoration: none;
-
-    box-shadow:
-        0 4px 12px rgba(20, 48, 105, 0.04);
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        border-color 0.25s ease;
 }
 
 
-.category-item:hover {
-    transform: translateY(-5px);
 
-    border-color: #d9e2f5;
+/* =========================================
+   MENU ITEM
+========================================= */
 
-    box-shadow:
-        0 10px 25px rgba(20, 48, 105, 0.10);
-}
+.account-menu-item {
 
+    position: relative;
 
-/* ================================
-   ICON
-================================ */
+    width: 100%;
 
-.category-icon {
-    width: 52px;
-    height: 52px;
+    min-height: 76px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding:
+        14px 18px;
 
-    background: #f8faff;
+    background: #ffffff;
 
-    border: 1px solid #edf1f8;
+    border:
+        1px solid #e7ebf2;
 
     border-radius: 11px;
 
-    margin-bottom: 12px;
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    color: #26344d;
+
+    text-decoration: none;
+
+    font-family: inherit;
+
+    text-align: left;
+
+    cursor: pointer;
 
     transition:
-        background 0.25s ease,
-        transform 0.25s ease;
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+
 }
 
 
-.category-icon svg {
-    width: 30px;
-    height: 30px;
+.account-menu-item:hover {
+
+    transform:
+        translateX(3px);
+
+    border-color:
+        #ccd8f1;
+
+    box-shadow:
+        0 6px 18px
+        rgba(20, 48, 105, 0.07);
+
+}
+
+
+.menu-icon {
+
+    width: 43px;
+
+    height: 43px;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+
+    background: #eef3ff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.menu-icon svg {
+
+    width: 21px;
+
+    height: 21px;
 
     fill: none;
 
     stroke: #173f91;
 
-    stroke-width: 1.7;
+    stroke-width: 1.8;
 
     stroke-linecap: round;
+
     stroke-linejoin: round;
 
+}
+
+
+.menu-text {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+}
+
+
+.menu-text strong {
+
+    color: #26344d;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+}
+
+
+.menu-text span {
+
+    color: #8993a5;
+
+    font-size: 11px;
+
+}
+
+
+.menu-arrow {
+
+    margin-left: auto;
+
+    color: #173f91;
+
+    font-size: 24px;
+
+    line-height: 1;
+
     transition:
-        transform 0.25s ease;
+        transform 0.2s ease;
+
 }
 
 
-.category-item:hover .category-icon {
-    background: #eef3ff;
+.account-menu-item:hover
+.menu-arrow {
 
-    transform: translateY(-2px);
+    transform:
+        translateX(4px);
+
 }
 
 
-.category-item:hover .category-icon svg {
-    transform: scale(1.08);
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+.logout-item {
+
+    border:
+        1px solid #f0dede;
+
+    background: #fffafa;
+
 }
 
 
-/* ================================
-   TÊN DANH MỤC
-================================ */
+.logout-item .menu-icon {
 
-.category-item span {
-    color: #4c5565;
+    background: #fff0f0;
 
-    font-size: 12px;
-
-    line-height: 1.35;
-
-    font-weight: 500;
 }
 
-@media (max-width: 768px) {
 
-    .popular-categories {
-        width: 92%;
+.logout-item .menu-icon svg {
 
-        padding: 30px 0 20px;
+    stroke: #c94a4a;
+
+}
+
+
+.logout-item .menu-text strong {
+
+    color: #b43d3d;
+
+}
+
+
+.logout-item:hover {
+
+    border-color:
+        #e7baba;
+
+}
+
+
+
+/* =========================================
+   KHI CHƯA ĐĂNG NHẬP
+========================================= */
+
+body.logged-out
+.account-menu-item:not(.logout-item) {
+
+    opacity: 0.75;
+
+}
+
+
+body.logged-out
+.logout-item {
+
+    display: none;
+
+}
+
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 600px) {
+
+    .account-header {
+
+        padding: 0 20px;
+
     }
 
 
-    .categories-header h2 {
-        font-size: 16px;
+    .account-page {
+
+        padding:
+            25px 15px 50px;
+
     }
 
 
-    .categories-list {
+    .account-profile {
 
-        display: flex;
+        padding: 20px;
 
-        overflow-x: auto;
+        gap: 15px;
 
-        gap: 12px;
-
-        padding: 5px 3px 15px;
-
-        scrollbar-width: none;
     }
 
 
-    .categories-list::-webkit-scrollbar {
-        display: none;
+    .profile-avatar {
+
+        width: 70px;
+
+        height: 70px;
+
     }
 
 
-    .category-item {
+    .profile-info h1 {
 
-        flex: 0 0 105px;
+        font-size: 19px;
 
-        min-height: 115px;
-
-        padding: 12px 6px;
     }
 
 
-    .category-icon {
-        width: 45px;
-        height: 45px;
+    .profile-info p {
 
-        font-size: 23px;
-
-        margin-bottom: 9px;
-    }
-
-
-    .category-item span {
         font-size: 11px;
+
+    }
+
+
+    .auth-section {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .account-menu-item {
+
+        min-height: 70px;
+
+        padding: 12px 14px;
+
+    }
+
+
+    .menu-text span {
+
+        display: none;
+
     }
 
 }
 
-
-/* =====================================================
-   TÀI KHOẢN HEADER - FIX
-===================================================== */
+/* =========================================
+   HEADER - TÀI KHOẢN ĐÃ ĐĂNG NHẬP
+========================================= */
 
 .user-account-wrapper {
     position: relative;
-    display: none;
 }
 
 
-/* Nút avatar + tên */
-
 .user-account {
-    display: flex !important;
-    align-items: center;
-
-    gap: 8px;
-
-    width: auto;
-
-    padding: 4px 0;
-
-    margin: 0;
-
-    border: none !important;
-    outline: none;
-
-    background: transparent !important;
-
-    color: #ffffff !important;
-
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 700;
+    border: none;
+    background: transparent;
+    padding: 0;
 
     cursor: pointer;
 
-    appearance: none;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: var(--white);
+
+    font-family: inherit;
 }
 
 
-/* Avatar */
-
-#headerAvatar {
-    width: 26px !important;
-    height: 26px !important;
-
-    min-width: 26px !important;
-    min-height: 26px !important;
-
-    max-width: 26px !important;
-    max-height: 26px !important;
-
-    display: block !important;
-    object-fit: cover !important;
-
-    border-radius: 50% !important;
-    border: 2px solid #ffffff !important;
-
-    flex-shrink: 0;
+.user-account:hover {
+    color: var(--iuh-yellow);
 }
 
-.user-account {
-    gap: 7px;
-}
 
-#adminLink {
-    color: #173f91 !important;
-    font-weight: 700 !important;
-}
+/* Avatar trên header */
 
-#adminLink:hover {
-    background: #eef3ff !important;
+.header-avatar {
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 2px solid #ffffff;
+
+    background: #ffffff;
 }
 
 
 /* Tên */
 
-#headerUserName {
-    color: #ffffff !important;
+.header-user-name {
+    max-width: 130px;
 
-    font-size: 15px;
-    font-weight: 700;
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 
     white-space: nowrap;
+
+    font-size: 14px;
+    font-weight: 600;
 }
 
 
-/* Mũi tên */
-
-.account-arrow {
-    color: #ffffff;
-
-    font-size: 18px;
-
-    line-height: 1;
-
-    margin-left: 2px;
-}
-
-
-/* =====================================================
+/* =========================================
    DROPDOWN
-===================================================== */
+========================================= */
 
 .account-dropdown {
+
     position: absolute;
 
-    top: calc(100% + 8px);
+    top: calc(100% + 10px);
+
     right: 0;
 
     width: 160px;
 
-    padding: 6px;
+    padding: 7px;
 
-    background: #ffffff !important;
+    background: #ffffff;
 
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e4e8ef;
 
-    border-radius: 10px;
+    border-radius: 9px;
 
     box-shadow:
-        0 8px 25px rgba(0, 0, 0, 0.18);
+        0 10px 30px
+        rgba(20, 48, 105, 0.15);
 
-    display: none !important;
+    z-index: 2000;
 
-    z-index: 99999;
 }
 
 
-/* Chỉ hiện khi JS thêm class show */
-
-.account-dropdown.show {
-    display: block !important;
-}
-
-
-/* Link + button bên trong */
+/* Các nút trong dropdown */
 
 .account-dropdown a,
 .account-dropdown button {
-    display: block;
 
     width: 100%;
 
-    box-sizing: border-box;
+    min-height: 38px;
 
-    padding: 10px 12px;
+    padding: 0 12px;
 
-    margin: 0;
+    display: flex;
 
-    border: none !important;
+    align-items: center;
 
-    border-radius: 7px;
+    border: none;
 
-    background: transparent !important;
+    border-radius: 6px;
 
-    color: #173f91 !important;
+    background: transparent;
+
+    color: #26344d;
+
+    text-decoration: none;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    text-align: left;
+
+}
+
+
+.account-dropdown a:hover,
+.account-dropdown button:hover {
+
+    background: #f1f5ff;
+
+    color: var(--iuh-blue);
+
+}
+
+
+/* Nút quản trị */
+
+#adminLink {
+
+    color: var(--iuh-blue);
+
+}
+
+
+/* Nút đăng xuất */
+
+#logoutButton {
+
+    color: #c94a4a;
+
+}
+
+
+#logoutButton:hover {
+
+    background: #fff1f1;
+
+    color: #b63838;
+
+}
+
+/* =========================================
+   FIX HEADER ACCOUNT
+========================================= */
+
+/*
+   TRẠNG THÁI MẶC ĐỊNH
+
+   Khi trang vừa mở:
+   - hiện Đăng nhập / Đăng ký
+   - ẩn tài khoản
+
+   Không dùng body:not(.logged-out)
+   vì lúc đầu body chưa có class nào.
+*/
+
+#guestAccount {
+    display: flex;
+}
+
+#userAccount {
+    display: none;
+}
+
+
+/* =========================================
+   CHƯA ĐĂNG NHẬP
+========================================= */
+
+body.logged-out #guestAccount {
+    display: flex !important;
+}
+
+body.logged-out #userAccount {
+    display: none !important;
+}
+
+
+/* =========================================
+   KHU VỰC TÀI KHOẢN
+========================================= */
+
+.user-account-wrapper {
+    position: relative;
+
+    align-items: center;
+}
+
+
+/* =========================================
+   NÚT TÀI KHOẢN
+========================================= */
+
+.user-account {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #ffffff;
 
     font-family: inherit;
 
@@ -1927,21 +1571,200 @@ body {
 
     font-weight: 600;
 
-    text-align: left;
-
     text-decoration: none;
 
     cursor: pointer;
-
-    appearance: none;
 }
 
 
-/* Hover */
+.user-account:hover {
+    color: var(--iuh-yellow);
+}
+
+
+/* =========================================
+   AVATAR TRÊN HEADER
+========================================= */
+
+.header-avatar {
+
+    width: 30px;
+
+    height: 30px;
+
+    min-width: 30px;
+
+    min-height: 30px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 2px solid #ffffff;
+
+    background: #ffffff;
+
+    display: block;
+}
+
+
+/* =========================================
+   TÊN NGƯỜI DÙNG
+========================================= */
+
+.header-user-name {
+
+    max-width: 130px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.user-account:hover
+.header-user-name {
+
+    color: var(--iuh-yellow);
+}
+
+
+
+/* =========================================
+   DROPDOWN
+========================================= */
+
+.account-dropdown {
+
+    position: absolute;
+
+    top: calc(100% + 10px);
+
+    right: 0;
+
+    width: 170px;
+
+    padding: 7px;
+
+    background: #ffffff;
+
+    border:
+        1px solid #e4e8ef;
+
+    border-radius: 9px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(20, 48, 105, 0.15);
+
+    z-index: 2000;
+
+}
+
+
+/* =========================================
+   DROPDOWN ITEM
+========================================= */
+
+.account-dropdown a,
+.account-dropdown button {
+
+    width: 100%;
+
+    min-height: 38px;
+
+    padding:
+        0 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: transparent;
+
+    color: #26344d;
+
+    text-decoration: none;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    text-align: left;
+}
+
 
 .account-dropdown a:hover,
 .account-dropdown button:hover {
-    background: #f1f4fa !important;
+
+    background: #f1f5ff;
+
+    color: var(--iuh-blue);
+}
+
+
+
+/* =========================================
+   QUẢN TRỊ
+========================================= */
+
+#adminLink {
+
+    color: var(--iuh-blue);
+}
+
+
+
+/* =========================================
+   ĐĂNG XUẤT TRONG DROPDOWN
+========================================= */
+
+#logoutButton {
+
+    color: #c94a4a;
+}
+
+
+#logoutButton:hover {
+
+    background: #fff1f1;
+
+    color: #b63838;
+}
+
+
+
+/* =========================================
+   MENU TRANG TÀI KHOẢN
+========================================= */
+
+body.logged-out
+.account-menu-item:not(.logout-item) {
+
+    opacity: 0.75;
+}
+
+
+body.logged-out
+.logout-item {
+
+    display: none;
 }
 
 /* =========================================
@@ -2121,13 +1944,137 @@ body {
     font-size: 15px;
 }
 
+/* =========================================
+   AVATAR TRANG TÀI KHOẢN
+========================================= */
+
+.profile-avatar-wrapper {
+    flex-shrink: 0;
+
+    width: 150px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/* Khung chứa avatar + nút chỉnh ảnh */
+
+.avatar-image-wrapper {
+    position: relative;
+
+    width: 120px;
+    height: 120px;
+}
+
+
+/* Avatar */
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 4px solid #ffffff;
+
+    box-shadow:
+        0 4px 14px rgba(20, 48, 105, 0.15);
+}
+
+
+/* =========================================
+   NÚT ĐỔI ẢNH
+========================================= */
+
+.change-avatar-button {
+    position: absolute;
+
+    right: -2px;
+    bottom: 0;
+
+    width: 36px;
+    height: 36px;
+
+    padding: 0;
+
+    border: 3px solid #ffffff;
+
+    border-radius: 50%;
+
+    background: #24449d;
+
+    color: #ffffff;
+
+    font-size: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* Hover nút đổi ảnh */
+
+.change-avatar-button:hover {
+    background: #f5c842;
+
+    color: #173f91;
+
+    transform: scale(1.08);
+}
+
+
+/* =========================================
+   VỀ ẢNH MẶC ĐỊNH
+========================================= */
+
+.reset-avatar-button {
+    margin-top: 10px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #667085;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease;
+}
+
+
+/* Hover */
+
+.reset-avatar-button:hover {
+    color: #f5c842;
+
+    text-decoration: underline;
+}
 
 
 
-
-/* =====================================================
-   FOOTER
-===================================================== */
 
 .site-footer {
     width: 100%;

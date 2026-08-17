@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Quản trị - IUH SHOP</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../CSS/admin.css"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- =========================================
+         HEADER ADMIN
+    ========================================== -->
+
+    <header class="admin-header">
+
+        <div class="admin-header-left">
+
+            <a
+                href="trangchu.html"
+                class="admin-brand"
+            >
+
+                <img
+                    src="../Images/logo-trang.png"
+                    alt="IUH SHOP"
+                >
+
+                <div>
+
+                    <strong>IUH SHOP</strong>
+
+                    <span>
+                        Trang quản trị
+                    </span>
+
+                </div>
+
+            </a>
+
+        </div>
+
+
+        <div class="admin-header-right">
+
+            <span
+                id="adminName"
+                class="admin-name"
+            >
+                Admin
+            </span>
+
+            <button
+                id="adminLogout"
+                class="logout-btn"
+                type="button"
+            >
+                Đăng xuất
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================================
+         NỘI DUNG
+    ========================================== -->
+
+    <main class="admin-container">
+
+        <!-- Tiêu đề -->
+
+        <section class="admin-welcome">
+
+            <div>
+
+                <span class="admin-label">
+                    ADMINISTRATOR
+                </span>
+
+                <h1>
+                    Bảng điều khiển
+                </h1>
+
+                <p>
+                    Quản lý và theo dõi hoạt động
+                    của IUH SHOP.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             THỐNG KÊ
+        ====================================== -->
+
+        <section class="admin-stats">
+
+            <div class="admin-stat-card">
+
+                <div class="admin-stat-icon">
+                    👥
+                </div>
+
+                <div>
+
+                    <span>
+                        Người dùng
+                    </span>
+
+                    <strong id="totalUsers">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="admin-stat-card">
+
+                <div class="admin-stat-icon">
+                    📦
+                </div>
+
+                <div>
+
+                    <span>
+                        Sản phẩm
+                    </span>
+
+                    <strong id="totalProducts">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="admin-stat-card">
+
+                <div class="admin-stat-icon">
+                    🛒
+                </div>
+
+                <div>
+
+                    <span>
+                        Đơn hàng
+                    </span>
+
+                    <strong id="totalOrders">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="admin-stat-card">
+
+                <div class="admin-stat-icon">
+                    ⚠
+                </div>
+
+                <div>
+
+                    <span>
+                        Chờ xử lý
+                    </span>
+
+                    <strong id="pendingItems">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             CHỨC NĂNG QUẢN TRỊ
+        ====================================== -->
+
+        <section class="admin-section">
+
+            <div class="section-heading">
+
+                <h2>
+                    Quản lý hệ thống
+                </h2>
+
+                <p>
+                    Các chức năng quản trị IUH SHOP
+                </p>
+
+            </div>
+
+
+            <div class="admin-menu-grid">
+
+
+                <!-- Người dùng -->
+
+                <button
+                    type="button"
+                    class="admin-menu-card"
+                    id="manageUsers"
+                >
+
+                    <div class="menu-icon">
+                        👥
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Quản lý người dùng
+                        </h3>
+
+                        <p>
+                            Xem và quản lý tài khoản
+                            sinh viên.
+                        </p>
+
+                    </div>
+
+                    <span class="menu-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+
+                <!-- Sản phẩm -->
+
+                <button
+                    type="button"
+                    class="admin-menu-card"
+                    id="manageProducts"
+                >
+
+                    <div class="menu-icon">
+                        📦
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Quản lý sản phẩm
+                        </h3>
+
+                        <p>
+                            Kiểm tra và quản lý
+                            sản phẩm được đăng bán.
+                        </p>
+
+                    </div>
+
+                    <span class="menu-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+
+                <!-- Danh mục -->
+
+                <button
+                    type="button"
+                    class="admin-menu-card"
+                    id="manageCategories"
+                >
+
+                    <div class="menu-icon">
+                        🏷
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Quản lý danh mục
+                        </h3>
+
+                        <p>
+                            Quản lý các danh mục
+                            sản phẩm.
+                        </p>
+
+                    </div>
+
+                    <span class="menu-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+
+                <!-- Đơn hàng -->
+
+                <button
+                    type="button"
+                    class="admin-menu-card"
+                    id="manageOrders"
+                >
+
+                    <div class="menu-icon">
+                        🛒
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Quản lý đơn hàng
+                        </h3>
+
+                        <p>
+                            Theo dõi và xử lý
+                            các đơn hàng.
+                        </p>
+
+                    </div>
+
+                    <span class="menu-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =========================================
+         SUPABASE
+    ========================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+    <script
+        src="../JS/admin.js"
+    ></script>
+
+</body>
+
+</html>

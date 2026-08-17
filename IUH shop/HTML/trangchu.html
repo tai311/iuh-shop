@@ -43,23 +43,104 @@
                         </button>
                     </form>
 
-                    <!-- Đăng nhập -->
-                    <a href="#" class="top-link login-link">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
-                            <path d="M11 8l4 4-4 4"></path>
-                            <path d="M15 12H4"></path>
-                        </svg>
-                        <span>Đăng nhập</span>
-                    </a>
+                    <!-- KHU VỰC TÀI KHOẢN -->
 
-                    <!-- Đường ngăn cách -->
-                    <span class="top-divider"></span>
+<div class="account-area">
 
-                    <!-- Đăng ký -->
-                    <a href="#" class="top-link register-link">
-                        Đăng ký
-                    </a>
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
 
                 </div>
             </div>
@@ -95,7 +176,7 @@
                 <!-- Menu -->
                 <nav class="navigation">
 
-                    <a href="trangchu.html" class="nav-item active">
+                    <a href="trangchu.html" class="nav-item">
                         TRANG CHỦ
                     </a>
 
@@ -107,24 +188,61 @@
                         SẢN PHẨM
                     </a>
 
-                    <a href="#" class="nav-item">
+                    <a href="chinhsach.html" class="nav-item">
                         CHÍNH SÁCH
                     </a>
 
-                    <a href="#" class="nav-item">
+                    <a href="lienhe.html" class="nav-item">
                         LIÊN HỆ
                     </a>
 
-                    <a href="#" class="nav-item account-nav">
-                       TÀI KHOẢN
+                    <div class="account-nav-wrapper">
 
-                       <span class="nav-arrow">
-                          <svg viewBox="0 0 24 24" aria-hidden="true">
-                             <path d="M6 9L12 15L18 9"></path>
-                          </svg>
-                      </span>
-                    </a>
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
 
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+    </div>
+
+</div>
                 </nav>
 
             </div>
@@ -151,7 +269,7 @@
         <!-- Banner 2 -->
         <div class="slide">
             <img
-                src="../Images/thu2.png"
+                src="../Images/banner2.jpg"
                 alt="Banner IUH Shop 2"
             >
         </div>
@@ -159,7 +277,7 @@
         <!-- Banner 3 -->
         <div class="slide">
             <img
-                src="../Images/banner-3.jpg"
+                src="../Images/banner3.png"
                 alt="Banner IUH Shop 3"
             >
         </div>
@@ -250,6 +368,235 @@
             </div>
 
         </div>
+
+    </div>
+
+</section>
+
+<section class="stats-section">
+
+    <div class="stats-container">
+
+        <!-- Sản phẩm -->
+        <div class="stat-item">
+
+            <div class="stat-icon">
+                ♧
+            </div>
+
+            <div class="stat-content">
+                <div class="stat-number">
+                    <span class="counter" data-target="1250">0</span>+
+                </div>
+
+                <div class="stat-label">
+                    Sản phẩm đang bán
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Sinh viên -->
+        <div class="stat-item">
+
+            <div class="stat-icon">
+                ♙
+            </div>
+
+            <div class="stat-content">
+                <div class="stat-number">
+                    <span class="counter" data-target="980">0</span>+
+                </div>
+
+                <div class="stat-label">
+                    Sinh viên tham gia
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Giao dịch -->
+        <div class="stat-item">
+
+            <div class="stat-icon">
+                ✓
+            </div>
+
+            <div class="stat-content">
+                <div class="stat-number">
+                    <span class="counter" data-target="680">0</span>+
+                </div>
+
+                <div class="stat-label">
+                    Giao dịch thành công
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Cộng đồng -->
+        <div class="stat-item">
+
+            <div class="stat-icon">
+                ♧
+            </div>
+
+            <div class="stat-content">
+                <div class="stat-number">
+                    <span class="counter" data-target="50">0</span>+
+                </div>
+
+                <div class="stat-label">
+                    Nhóm & cộng đồng
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================================
+     DANH MỤC PHỔ BIẾN
+================================ -->
+
+<section class="popular-categories">
+
+    <div class="categories-header">
+        <h2>DANH MỤC PHỔ BIẾN</h2>
+
+        <a href="../HTML/sanpham.html">
+            Xem tất cả <span>›</span>
+        </a>
+    </div>
+
+
+    <div class="categories-list">
+
+        <!-- Sách giáo trình -->
+        <a href="../HTML/sanpham.html?category=sach-giao-trinh"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <path d="M8 8h13c5 0 9 3 9 8v25c-2-2-5-3-9-3H8V8z"/>
+                    <path d="M40 8H27c-5 0-9 3-9 8v25c2-2 5-3 9-3h13V8z"/>
+                    <path d="M24 16v25"/>
+                </svg>
+            </div>
+
+            <span>Sách giáo trình</span>
+        </a>
+
+
+        <!-- Tài liệu môn học -->
+        <a href="../HTML/sanpham.html?category=tai-lieu"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <rect x="11" y="6" width="26" height="36" rx="3"/>
+                    <path d="M17 14h14"/>
+                    <path d="M17 21h14"/>
+                    <path d="M17 28h9"/>
+                    <path d="M17 35h6"/>
+                    <path d="M29 28l2 2 4-5"/>
+                </svg>
+            </div>
+
+            <span>Tài liệu môn học</span>
+        </a>
+
+
+        <!-- Đề thi - Đáp án -->
+        <a href="../HTML/sanpham.html?category=de-thi"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <rect x="9" y="6" width="30" height="36" rx="3"/>
+                    <path d="M17 14h14"/>
+                    <path d="M17 21h8"/>
+                    <path d="M17 29l3 3 6-7"/>
+                    <path d="M17 37h14"/>
+                </svg>
+            </div>
+
+            <span>Đề thi - Đáp án</span>
+        </a>
+
+
+        <!-- Đồng phục -->
+        <a href="../HTML/sanpham.html?category=dong-phuc"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <path d="M18 8l6 5 6-5 10 7-5 9-5-3v19H18V21l-5 3-5-9 10-7z"/>
+                    <path d="M24 13v22"/>
+                    <path d="M21 18h6"/>
+                </svg>
+            </div>
+
+            <span>Đồng phục</span>
+        </a>
+
+
+        <!-- Dụng cụ thực hành -->
+        <a href="../HTML/sanpham.html?category=dung-cu-thuc-hanh"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <rect x="7" y="17" width="34" height="25" rx="3"/>
+                    <path d="M16 17v-4h16v4"/>
+                    <path d="M7 25h34"/>
+                    <path d="M20 25v5h8v-5"/>
+                    <path d="M15 34h5"/>
+                    <path d="M28 34h5"/>
+                </svg>
+            </div>
+
+            <span>Dụng cụ thực hành</span>
+        </a>
+
+
+        <!-- Đồ dùng học tập -->
+        <a href="../HTML/sanpham.html?category=do-dung-hoc-tap"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <path d="M10 38l3-10L31 10l7 7-18 18-10 3z"/>
+                    <path d="M27 14l7 7"/>
+                    <path d="M13 28l7 7"/>
+                    <path d="M36 8l4 4"/>
+                </svg>
+            </div>
+
+            <span>Đồ dùng học tập</span>
+        </a>
+
+
+        <!-- Khác -->
+        <a href="../HTML/sanpham.html?category=khac"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <circle cx="24" cy="24" r="16"/>
+                    <circle cx="16" cy="24" r="2"/>
+                    <circle cx="24" cy="24" r="2"/>
+                    <circle cx="32" cy="24" r="2"/>
+                </svg>
+            </div>
+
+            <span>Khác</span>
+        </a>
 
     </div>
 
@@ -382,6 +729,7 @@
     </div>
 
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../JS/ok.js"></script>
 </body>
 </html>

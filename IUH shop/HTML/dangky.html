@@ -1,0 +1,397 @@
+<html>
+
+<head>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Đăng ký - IUH Shop</title>
+
+    <link
+        rel="stylesheet"
+        href="../CSS/dangky.css"
+    >
+</head>
+
+
+<body>
+
+
+    <main class="auth-page">
+
+
+        <div class="auth-container">
+
+
+            <!-- =====================================
+                 BÊN TRÁI
+            ====================================== -->
+
+            <section class="auth-intro">
+
+
+                <a
+                    href="../HTML/trangchu.html"
+                    class="auth-logo"
+                >
+
+                    <img
+                        src="../Images/logo-trang.png"
+                        alt="IUH Shop"
+                    >
+
+                </a>
+
+
+                <div class="intro-content">
+
+                    <h1>
+                        Tham gia IUH SHOP
+                    </h1>
+
+                    <p>
+                        Tạo tài khoản để mua bán,
+                        trao đổi sản phẩm và kết nối
+                        với cộng đồng sinh viên IUH.
+                    </p>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =====================================
+                 FORM ĐĂNG KÝ
+            ====================================== -->
+
+            <section class="auth-form">
+
+
+                <div class="form-heading">
+
+                    <h2>
+                        Tạo tài khoản
+                    </h2>
+
+                    <p>
+                        Điền thông tin để bắt đầu
+                        sử dụng IUH Shop
+                    </p>
+
+                </div>
+
+
+
+                <form
+                    id="registerForm"
+                    class="register-form"
+                >
+
+
+                    <!-- HỌ VÀ TÊN -->
+
+                    <div class="form-group">
+
+                        <label for="fullName">
+                            Họ và tên
+                        </label>
+
+                        <input
+                            type="text"
+                            id="fullName"
+                            name="fullName"
+                            placeholder="Nhập họ và tên"
+                            autocomplete="name"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- MSSV -->
+
+                    <div class="form-group">
+
+                        <label for="studentId">
+                            Mã số sinh viên
+                        </label>
+
+                        <input
+                            type="text"
+                            id="studentId"
+                            name="studentId"
+                            placeholder="Nhập mã số sinh viên"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- KHOA -->
+
+                    <div class="form-group">
+
+                        <label for="faculty">
+                            Khoa
+                        </label>
+
+                        <select
+                            id="faculty"
+                            name="faculty"
+                            required
+                        >
+
+                            <option
+                                value=""
+                                disabled
+                                selected
+                            >
+                                Chọn khoa của bạn
+                            </option>
+
+                            <option value="thuong-mai-du-lich">
+                                Khoa Thương mại và Du lịch
+                            </option>
+
+                            <option value="quan-tri-kinh-doanh">
+                                Khoa Quản trị Kinh doanh
+                            </option>
+
+                            <option value="ke-toan-kiem-toan">
+                                Khoa Kế toán - Kiểm toán
+                            </option>
+
+                            <option value="tai-chinh-ngan-hang">
+                                Khoa Tài chính - Ngân hàng
+                            </option>
+
+                            <option value="cong-nghe-thong-tin">
+                                Khoa Công nghệ Thông tin
+                            </option>
+
+                            <option value="ky-thuat">
+                                Khoa Công nghệ Kỹ thuật
+                            </option>
+
+                            <option value="ngoai-ngu">
+                                Khoa Ngoại ngữ
+                            </option>
+
+                            <option value="luat">
+                                Khoa Luật
+                            </option>
+
+                            <option value="khac">
+                                Khác
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- EMAIL -->
+
+                    <div class="form-group">
+
+                        <label for="email">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Nhập email"
+                            autocomplete="email"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- SỐ ĐIỆN THOẠI -->
+
+                    <div class="form-group">
+
+                        <label for="phone">
+                            Số điện thoại
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="Nhập số điện thoại"
+                            autocomplete="tel"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- MẬT KHẨU -->
+
+                    <div class="form-group">
+
+                        <label for="password">
+                            Mật khẩu
+                        </label>
+
+
+                        <div class="password-wrapper">
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Nhập mật khẩu"
+                                autocomplete="new-password"
+                                required
+                            >
+
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                onclick="togglePassword(
+                                    'password',
+                                    this
+                                )"
+                            >
+                                Hiện
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- XÁC NHẬN MẬT KHẨU -->
+
+                    <div class="form-group">
+
+                        <label for="confirmPassword">
+                            Xác nhận mật khẩu
+                        </label>
+
+
+                        <div class="password-wrapper">
+
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                placeholder="Nhập lại mật khẩu"
+                                autocomplete="new-password"
+                                required
+                            >
+
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                onclick="togglePassword(
+                                    'confirmPassword',
+                                    this
+                                )"
+                            >
+                                Hiện
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ĐIỀU KHOẢN -->
+
+                    <div class="terms">
+
+                        <label>
+
+                            <input
+                                type="checkbox"
+                                id="agreeTerms"
+                                required
+                            >
+
+                            <span>
+                                Tôi đồng ý với
+                                <a href="#">
+                                    Điều khoản sử dụng
+                                </a>
+                                của IUH Shop.
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+
+                    <!-- THÔNG BÁO -->
+
+                    <div
+                        id="formMessage"
+                        class="form-message"
+                    ></div>
+
+
+
+                    <!-- BUTTON -->
+
+                    <button
+                        type="submit"
+                        class="auth-button"
+                    >
+                        ĐĂNG KÝ
+                    </button>
+
+
+                </form>
+
+
+
+                <!-- ĐĂNG NHẬP -->
+
+                <p class="switch-auth">
+
+                    Đã có tài khoản?
+
+                    <a href="../HTML/dangnhap.html">
+                        Đăng nhập
+                    </a>
+
+                </p>
+
+
+            </section>
+
+
+        </div>
+
+
+    </main>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../JS/dangky.js"></script>
+
+</body>
+
+</html>
