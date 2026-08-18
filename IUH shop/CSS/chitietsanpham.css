@@ -1541,6 +1541,10 @@ body {
    MAIN
 ===================================================== */
 
+[hidden] {
+    display: none !important;
+}
+
 .detail-page {
 
     max-width: 1180px;
