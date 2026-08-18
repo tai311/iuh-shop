@@ -3,24 +3,29 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Chi tiết sản phẩm - IUH SHOP</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Quản lý tin - IUH SHOP</title>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="../CSS/chitietsanpham.css">
+    <link
+        rel="stylesheet"
+        href="../CSS/quanlytin.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
- <header class="site-header">
+<header class="site-header">
 
         <!-- ===== TẦNG 1 ===== -->
         <div class="top-bar">
@@ -35,13 +40,12 @@
                 <div class="top-actions">
 
                     <!-- Tìm kiếm -->
-                    <form class="search-box" id="searchForm">
-    <input
-        type="search"
-        id="searchInput"
-        placeholder="Tìm kiếm sản phẩm, danh mục..."
-        aria-label="Tìm kiếm"
-    >
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
 
                         <button type="submit" class="search-button">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -263,306 +267,137 @@
 
     </header>
 
+
 <!-- =====================================================
-     NỘI DUNG CHI TIẾT
+     MAIN
 ===================================================== -->
 
-<main class="detail-page">
+<main class="management-page">
 
-    <!-- BREADCRUMB -->
-
-    <div class="breadcrumb">
-
-        <a href="sanpham.html">
-            Sản phẩm
-        </a>
-
-        <span>›</span>
-
-        <span>
-            Chi tiết sản phẩm
-        </span>
-
-    </div>
+    <section class="management-container">
 
 
-    <!-- ĐANG TẢI -->
+        <div class="page-heading">
 
-    <div
-        id="loadingState"
-        class="state-card"
-    >
+            <div>
 
-        <div class="spinner"></div>
+                <span class="eyebrow">
+                    SELLER CENTER
+                </span>
 
-        <p>
-            Đang tải thông tin sản phẩm...
-        </p>
+                <h1>
+                    Quản lý tin
+                </h1>
 
-    </div>
-
-
-    <!-- LỖI -->
-
-    <div
-        id="errorState"
-        class="state-card error-state"
-        hidden
-    >
-
-        <div class="state-icon">
-            !
-        </div>
-
-        <h2>
-            Không thể tải sản phẩm
-        </h2>
-
-        <p id="errorMessage">
-            Sản phẩm không tồn tại hoặc đã bị xóa.
-        </p>
-
-        <a
-            href="sanpham.html"
-            class="primary-button"
-        >
-            Quay lại sản phẩm
-        </a>
-
-    </div>
-
-
-    <!-- =================================================
-         PRODUCT DETAIL
-    ================================================= -->
-
-    <section
-        id="productDetail"
-        class="product-detail"
-        hidden
-    >
-
-        <!-- =============================================
-             HÌNH ẢNH
-        ============================================== -->
-
-        <div class="product-gallery">
-
-            <div class="main-image-box">
-
-                <img
-                    id="mainProductImage"
-                    src=""
-                    alt="Sản phẩm"
-                >
-
-                <span
-                    id="imageCount"
-                    class="image-count"
-                ></span>
+                <p>
+                    Quản lý các sản phẩm bạn đang đăng bán trên IUH SHOP.
+                </p>
 
             </div>
 
 
-            <!-- ẢNH NHỎ -->
-
-            <div
-                id="thumbnailList"
-                class="thumbnail-list"
-            ></div>
-
-        </div>
-
-
-        <!-- =============================================
-             THÔNG TIN CHÍNH
-        ============================================== -->
-
-        <div class="product-info">
-
-            <!-- DANH MỤC -->
-
-            <span
-                id="productCategory"
-                class="category-badge"
-            ></span>
-
-
-            <!-- TÊN -->
-
-            <h1 id="productName">
-                Tên sản phẩm
-            </h1>
-
-
-            <!-- GIÁ -->
-
-            <div
-                id="productPrice"
-                class="product-price"
+            <a
+                href="dangtin.html"
+                class="create-button"
             >
-                0 ₫
-            </div>
-
-
-            <!-- THÔNG TIN NHANH -->
-
-            <div class="quick-info">
-
-                <div>
-
-                    <span class="info-label">
-                        Tình trạng
-                    </span>
-
-                    <strong id="productStatus">
-                        Đang bán
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <span class="info-label">
-                        Số lượng
-                    </span>
-
-                    <strong id="productQuantity">
-                        0
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div class="divider"></div>
-
-
-            <!-- NGƯỜI BÁN -->
-
-            <div class="seller-card">
-
-                <div class="seller-avatar-wrap">
-
-                    <img
-                        id="sellerAvatar"
-                        src="../Images/default-avatar.svg"
-                        alt="Người bán"
-                    >
-
-                </div>
-
-
-                <div class="seller-info">
-
-                    <span>
-                        Người bán
-                    </span>
-
-                    <strong id="sellerName">
-                        Đang tải...
-                    </strong>
-
-                </div>
-
-
-                <a
-                    id="sellerProfileLink"
-                    href="taikhoan.html"
-                    class="seller-link"
-                >
-                    Xem tài khoản
-                </a>
-
-            </div>
-
-
-            <!-- NÚT -->
-
-            <div class="action-row">
-
-                <button
-                    id="contactSellerBtn"
-                    class="primary-button"
-                    type="button"
-                >
-                    Liên hệ người bán
-                </button>
-
-
-                <button
-                    id="backButton"
-                    class="secondary-button"
-                    type="button"
-                >
-                    ← Quay lại
-                </button>
-
-            </div>
+                ＋ Đăng tin
+            </a>
 
         </div>
 
 
-        <!-- =============================================
-             MÔ TẢ
-        ============================================== -->
+        <!-- =================================================
+             TABS
+        ================================================= -->
 
-        <div class="description-card">
+        <div class="status-tabs">
 
-            <h2>
-                Thông tin sản phẩm
+            <button
+                type="button"
+                class="status-tab active"
+                data-status="active"
+            >
+                Đang bán
+                <span id="countActive">0</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="status-tab"
+                data-status="hidden"
+            >
+                Đã ẩn
+                <span id="countHidden">0</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="status-tab"
+                data-status="deleted"
+            >
+                Đã xóa
+                <span id="countDeleted">0</span>
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             LOADING
+        ================================================= -->
+
+        <div
+            id="loading"
+            class="loading-box"
+        >
+
+            <div class="spinner"></div>
+
+            <p>
+                Đang tải tin của bạn...
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             DANH SÁCH
+        ================================================= -->
+
+        <div
+            id="productList"
+            class="product-list"
+        ></div>
+
+
+        <!-- EMPTY -->
+
+        <div
+            id="emptyState"
+            class="empty-state"
+            style="display:none;"
+        >
+
+            <div class="empty-icon">
+                📋
+            </div>
+
+            <h2 id="emptyTitle">
+                Chưa có tin
             </h2>
 
-            <div class="description-line"></div>
+            <p id="emptyDescription">
+                Bạn chưa có sản phẩm nào trong mục này.
+            </p>
 
-
-            <div class="description-grid">
-
-                <div>
-
-                    <span>
-                        Danh mục
-                    </span>
-
-                    <strong id="detailCategory"></strong>
-
-                </div>
-
-
-                <div>
-
-                    <span>
-                        Số lượng còn lại
-                    </span>
-
-                    <strong id="detailQuantity"></strong>
-
-                </div>
-
-
-                <div>
-
-                    <span>
-                        Trạng thái
-                    </span>
-
-                    <strong id="detailStatus"></strong>
-
-                </div>
-
-            </div>
-
-
-            <h3>
-                Mô tả
-            </h3>
-
-            <p
-                id="productDescription"
-                class="product-description"
-            ></p>
+            <a
+                href="dangtin.html"
+                class="empty-button"
+            >
+                ＋ Đăng tin mới
+            </a>
 
         </div>
 
@@ -571,13 +406,14 @@
 </main>
 
 
-<!-- TOAST -->
+<!-- =====================================================
+     TOAST
+===================================================== -->
 
 <div
     id="toast"
     class="toast"
 ></div>
-
 
 <!-- =========================
      FOOTER
@@ -707,13 +543,8 @@
 
 </footer>
 
-<!-- SUPABASE -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- JS -->
-
-<script src="../JS/chitietsanpham.js"></script>
+<script src="../JS/quanlytin.js"></script>
 
 </body>
+
 </html>
