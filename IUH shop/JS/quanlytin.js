@@ -1366,6 +1366,128 @@ document
 /* =====================================================
    INIT
 ===================================================== */
+async function loadHeaderUser() {
+
+    const {
+        data: {
+            user
+        }
+    } = await supabaseClient.auth.getUser();
+
+    const guestAccount =
+        document.getElementById("guestAccount");
+
+    const userAccount =
+        document.getElementById("userAccount");
+
+
+    // CHƯA ĐĂNG NHẬP
+    if (!user) {
+
+        if (guestAccount) {
+            guestAccount.style.display = "flex";
+        }
+
+        if (userAccount) {
+            userAccount.style.display = "none";
+        }
+
+        currentUser = null;
+
+        return;
+
+    }
+
+
+    // ĐÃ ĐĂNG NHẬP
+    currentUser = user;
+
+
+    if (guestAccount) {
+        guestAccount.style.display = "none";
+    }
+
+    if (userAccount) {
+        userAccount.style.display = "block";
+    }
+
+
+    // Lấy thông tin user
+    const {
+        data: profile,
+        error
+    } = await supabaseClient
+        .from("users")
+        .select(`
+            fullname,
+            avatar_url,
+            role
+        `)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi lấy thông tin người dùng:",
+            error
+        );
+
+    }
+
+
+    const nameElement =
+        document.getElementById(
+            "headerUserName"
+        );
+
+    const avatarElement =
+        document.getElementById(
+            "headerAvatar"
+        );
+
+
+    if (nameElement) {
+
+        nameElement.textContent =
+            profile?.fullname ||
+            user.email ||
+            "Tài khoản";
+
+    }
+
+
+    if (avatarElement) {
+
+        avatarElement.src =
+            profile?.avatar_url ||
+            "../Images/default-avatar.svg";
+
+    }
+
+
+    // Hiện menu quản trị nếu là admin
+    const adminLink =
+        document.getElementById(
+            "adminLink"
+        );
+
+
+    if (
+        adminLink &&
+        (
+            profile?.role === "admin" ||
+            profile?.role === "moderator"
+        )
+    ) {
+
+        adminLink.style.display =
+            "flex";
+
+    }
+
+}
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -1375,7 +1497,7 @@ document.addEventListener(
 
             await loadHeaderUser();
 
-            setupDropdown();
+            setupAccountDropdown();
 
             await loadProducts();
 
