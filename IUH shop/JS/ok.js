@@ -814,3 +814,50 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+/* =====================================================
+   MENU ACTIVE
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const currentPage =
+            window.location.pathname
+                .split("/")
+                .pop()
+                .toLowerCase();
+
+
+        document
+            .querySelectorAll(
+                ".navigation a.nav-item"
+            )
+            .forEach(link => {
+
+                const linkPage =
+                    link
+                        .getAttribute("href")
+                        ?.split("/")
+                        .pop()
+                        .toLowerCase();
+
+
+                if (!linkPage) {
+                    return;
+                }
+
+
+                if (linkPage === currentPage) {
+
+                    link.classList.add(
+                        "active"
+                    );
+
+                }
+
+            });
+
+    }
+);

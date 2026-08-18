@@ -1,4 +1,51 @@
 /* =====================================================
+   MENU ACTIVE
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const currentPage =
+            window.location.pathname
+                .split("/")
+                .pop()
+                .toLowerCase();
+
+
+        document
+            .querySelectorAll(
+                ".navigation a.nav-item"
+            )
+            .forEach(link => {
+
+                const linkPage =
+                    link
+                        .getAttribute("href")
+                        ?.split("/")
+                        .pop()
+                        .toLowerCase();
+
+
+                if (!linkPage) {
+                    return;
+                }
+
+
+                if (linkPage === currentPage) {
+
+                    link.classList.add(
+                        "active"
+                    );
+
+                }
+
+            });
+
+    }
+);
+
+/* =====================================================
    IUH SHOP - TRANG SẢN PHẨM
    DỮ LIỆU LẤY TRỰC TIẾP TỪ SUPABASE
 ===================================================== */
@@ -33,16 +80,20 @@ function esc(value) {
 
 
 /* =====================================================
-   LẤY SẢN PHẨM TỪ SUPABASE
+   LẤY SẢN PHẨM + THÔNG TIN NGƯỜI BÁN
 ===================================================== */
 
 async function loadProducts() {
 
     try {
 
+        /* =========================================
+           1. LẤY DANH SÁCH SẢN PHẨM
+        ========================================= */
+
         const {
-            data,
-            error
+            data: productData,
+            error: productError
         } = await supabaseClient
 
             .from("products")
@@ -53,19 +104,17 @@ async function loadProducts() {
                 name,
                 category,
                 quantity,
+                price,
                 description,
                 image_urls,
                 status,
-                created_at,
-                users (
-                    fullname,
-                    avatar_url,
-                    student_verified,
-                    role
-                )
+                created_at
             `)
 
-            .eq("status", "active")
+            .eq(
+                "status",
+                "active"
+            )
 
             .order(
                 "created_at",
@@ -75,34 +124,153 @@ async function loadProducts() {
             );
 
 
-        if (error) {
+        if (productError) {
 
             console.error(
-                "Lỗi lấy sản phẩm:",
-                error
+                "Lỗi lấy products:",
+                productError
             );
 
-            alert(
-                "Không thể tải danh sách sản phẩm."
-            );
-
-            return;
-
+            throw productError;
         }
 
 
-        products = data || [];
+        /* =========================================
+           Không có sản phẩm
+        ========================================= */
+
+        if (
+            !productData ||
+            productData.length === 0
+        ) {
+
+            products = [];
+
+            renderProducts();
+
+            return;
+        }
+
+
+        /* =========================================
+           2. LẤY ID NGƯỜI BÁN
+        ========================================= */
+
+        const sellerIds = [
+            ...new Set(
+                productData
+                    .map(
+                        product =>
+                            product.seller_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+        /* =========================================
+           3. LẤY THÔNG TIN TỪ BẢNG users
+        ========================================= */
+
+        let users = [];
+
+
+        if (sellerIds.length > 0) {
+
+            const {
+                data: userData,
+                error: userError
+            } = await supabaseClient
+
+                .from("users")
+
+                .select(`
+                    user_id,
+                    fullname,
+                    avatar_url,
+                    student_verified,
+                    role
+                `)
+
+                .in(
+                    "user_id",
+                    sellerIds
+                );
+
+
+            if (userError) {
+
+                console.error(
+                    "Lỗi lấy users:",
+                    userError
+                );
+
+                throw userError;
+            }
+
+
+            users =
+                userData || [];
+        }
+
+
+        /* =========================================
+           4. GHÉP users VÀO products
+        ========================================= */
+
+        products =
+            productData.map(
+                product => {
+
+                    const seller =
+                        users.find(
+                            user =>
+                                String(
+                                    user.user_id
+                                ) ===
+                                String(
+                                    product.seller_id
+                                )
+                        );
+
+
+                    return {
+
+                        ...product,
+
+                        users:
+                            seller || null
+
+                    };
+
+                }
+            );
+
+
+        /* =========================================
+           5. HIỂN THỊ
+        ========================================= */
+
+        console.log(
+            "Danh sách sản phẩm:",
+            products
+        );
 
 
         renderProducts();
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
         console.error(
-            "Lỗi hệ thống:",
+            "Lỗi tải danh sách sản phẩm:",
             error
         );
+
+        products = [];
+
+        renderProducts();
 
     }
 
