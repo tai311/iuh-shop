@@ -558,3 +558,517 @@ body {
     }
 
 }
+
+/* =========================================
+   QUẢN LÝ XÁC THỰC SINH VIÊN
+========================================= */
+
+.verification-section {
+    display: none;
+    margin-top: 48px;
+    padding-top: 42px;
+    border-top: 1px solid #e5eaf2;
+}
+
+.verification-section.show {
+    display: block;
+    animation: verificationFade .22s ease;
+}
+
+@keyframes verificationFade {
+
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+.verification-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+
+.verification-close {
+    flex-shrink: 0;
+
+    padding: 9px 15px;
+
+    border: 1px solid #dbe2ee;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #59667d;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+
+.verification-close:hover {
+
+    border-color: #d4a900;
+
+    color: #173f91;
+
+    background: #fffaf0;
+
+}
+
+
+/* SEARCH */
+
+.verification-toolbar {
+
+    margin-top: 22px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 16px;
+
+    flex-wrap: wrap;
+}
+
+
+.verification-search {
+
+    flex: 1;
+
+    min-width: 260px;
+
+    height: 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 0 13px;
+
+    background: #ffffff;
+
+    border: 1px solid #e1e6ef;
+
+    border-radius: 8px;
+}
+
+
+.verification-search svg {
+
+    width: 18px;
+
+    height: 18px;
+
+    fill: none;
+
+    stroke: #8993a5;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+}
+
+
+.verification-search input {
+
+    width: 100%;
+
+    border: 0;
+
+    outline: 0;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    color: #26344d;
+
+    background: transparent;
+}
+
+
+/* FILTER */
+
+.verification-filter {
+
+    display: flex;
+
+    gap: 6px;
+
+    flex-wrap: wrap;
+}
+
+
+.filter-button {
+
+    padding: 8px 12px;
+
+    border: 1px solid #e0e6ef;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #6f7b8f;
+
+    font-family: inherit;
+
+    font-size: 11px;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+
+.filter-button:hover,
+.filter-button.active {
+
+    border-color: #d4a900;
+
+    background: #fff8df;
+
+    color: #173f91;
+
+}
+
+
+/* SUMMARY */
+
+.verification-summary {
+
+    margin: 16px 0 10px;
+
+    color: #7c879a;
+
+    font-size: 12px;
+}
+
+
+/* LIST */
+
+.verification-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.verification-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    min-height: 82px;
+
+    padding: 13px 15px;
+
+    background: #ffffff;
+
+    border: 1px solid #e7ebf2;
+
+    border-radius: 10px;
+
+    transition: .2s ease;
+}
+
+
+.verification-card:hover {
+
+    border-color: #cfd9ee;
+
+    box-shadow:
+        0 7px 20px
+        rgba(20,48,105,.06);
+}
+
+
+/* AVATAR */
+
+.verification-avatar {
+
+    width: 52px;
+
+    height: 52px;
+
+    flex: 0 0 52px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 2px solid #eef3ff;
+}
+
+
+/* USER */
+
+.verification-user {
+
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.verification-name {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+}
+
+
+.verification-name strong {
+
+    color: #26344d;
+
+    font-size: 13px;
+}
+
+
+.verification-email {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: #8a94a6;
+
+    font-size: 11px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+.verification-role {
+
+    display: inline-block;
+
+    margin-top: 5px;
+
+    color: #24449d;
+
+    font-size: 10px;
+
+    font-weight: 600;
+}
+
+
+/* TÍCH XANH */
+
+.student-verified-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 17px;
+
+    height: 17px;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-size: 10px;
+
+    font-weight: 800;
+}
+
+
+.verification-state {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: #9aa5b7;
+
+    font-size: 10px;
+}
+
+
+.verification-state.is-verified {
+
+    color: #21864a;
+
+    font-weight: 600;
+}
+
+
+/* BUTTON */
+
+.verification-action {
+
+    min-width: 105px;
+
+    padding: 9px 11px;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+
+.verification-action.grant {
+
+    border: 1px solid #24449d;
+
+    background: #24449d;
+
+    color: #ffffff;
+}
+
+
+.verification-action.grant:hover {
+
+    border-color: #d4a900;
+
+    background: #f5c842;
+
+    color: #173f91;
+}
+
+
+.verification-action.revoke {
+
+    border: 1px solid #e2baba;
+
+    background: #fffafa;
+
+    color: #b43d3d;
+}
+
+
+.verification-action.revoke:hover {
+
+    border-color: #cf8e8e;
+
+    background: #fff0f0;
+}
+
+
+/* EMPTY / ERROR */
+
+.verification-loading,
+.verification-empty,
+.verification-error {
+
+    padding: 30px 20px;
+
+    text-align: center;
+
+    border: 1px solid #e7ebf2;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #8993a5;
+
+    font-size: 12px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .verification-heading {
+
+        align-items: flex-start;
+
+    }
+
+
+    .verification-card {
+
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .verification-action {
+
+        width: 100%;
+
+        margin-left: 66px;
+
+    }
+
+
+    .verification-search {
+
+        min-width: 100%;
+
+    }
+
+}
+/* =========================================
+   FIX: PANEL XÁC THỰC
+========================================= */
+
+.verification-section {
+    display: none;
+    width: 100%;
+}
+
+.verification-section.show {
+    display: block !important;
+}
+
+.verification-section[aria-hidden="true"] {
+    display: none;
+}
+
+.verification-section.show[aria-hidden="false"] {
+    display: block !important;
+}

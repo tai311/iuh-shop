@@ -1,0 +1,704 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Đăng tin - IUH SHOP</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="../CSS/dangtin.css">
+</head>
+
+<body>
+
+ <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="lienhe.html" class="nav-item">
+                        LIÊN HỆ
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+
+<main class="post-page">
+
+    <section class="post-heading">
+
+        <span>IUH MARKETPLACE</span>
+
+        <h1>Đăng sản phẩm</h1>
+
+        <p>
+            Chia sẻ sản phẩm của bạn với cộng đồng sinh viên IUH.
+            Sau khi đăng, sản phẩm sẽ được hiển thị tại trang Sản phẩm.
+        </p>
+
+    </section>
+
+
+    <form
+        id="productForm"
+        class="post-form"
+    >
+
+        <!-- THÔNG TIN SẢN PHẨM -->
+
+        <section class="form-card">
+
+            <div class="card-title">
+
+                <div class="title-number">
+                    01
+                </div>
+
+                <div>
+                    <h2>
+                        Thông tin sản phẩm
+                    </h2>
+
+                    <p>
+                        Nhập thông tin cơ bản về sản phẩm.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-group full">
+
+                    <label for="productName">
+                        Tên sản phẩm
+                        <span>*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="productName"
+                        maxlength="120"
+                        placeholder="Ví dụ: Giáo trình Marketing căn bản"
+                        required
+                    >
+
+                    <small class="field-note">
+                        Tên sản phẩm nên ngắn gọn và dễ hiểu.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="productCategory">
+                        Danh mục
+                        <span>*</span>
+                    </label>
+
+                    <select
+                        id="productCategory"
+                        required
+                    >
+
+                        <option value="">
+                            -- Chọn danh mục --
+                        </option>
+
+                        <option value="Sách">
+                            Sách giáo trình 
+                        </option>
+
+                        <option value="Tài liệu">
+                            Tài liệu môn học
+                        </option>
+
+                        <option value="Đồ dùng học tập">
+                            Đồ dùng học tập
+                        </option>
+
+                        <option value="Điện tử">
+                            Đề thi đáp án
+                        </option>
+
+                        <option value="Quần áo">
+                            Đồng phục
+                        </option>
+
+                        <option value="Dụng cụ thực hành">
+                            Dụng cụ thực hành
+                        </option>
+
+                        <option value="Khác">
+                            Khác
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="productQuantity">
+                        Số lượng
+                        <span>*</span>
+                    </label>
+
+                    <input
+                        type="number"
+                        id="productQuantity"
+                        min="1"
+                        value="1"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+    <label for="productPrice">
+        Giá bán
+        <span>*</span>
+    </label>
+
+    <div class="price-input">
+        <input
+            type="number"
+            id="productPrice"
+            min="0"
+            step="1000"
+            placeholder="Ví dụ: 50000"
+            required
+        >
+
+        <span>VNĐ</span>
+    </div>
+
+    <small class="field-note">
+        Nhập giá bán cho 1 sản phẩm.
+    </small>
+
+</div>
+
+
+                <div class="form-group full">
+
+                    <label for="productDescription">
+                        Mô tả sản phẩm
+                        <span>*</span>
+                    </label>
+
+                    <textarea
+                        id="productDescription"
+                        rows="6"
+                        maxlength="2000"
+                        placeholder="Mô tả tình trạng, đặc điểm và các thông tin người mua cần biết..."
+                        required
+                    ></textarea>
+
+                    <div class="character-row">
+
+                        <small>
+                            Mô tả rõ ràng giúp người mua dễ quyết định.
+                        </small>
+
+                        <small>
+                            <b id="descriptionCount">0</b>/2000
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- HÌNH ẢNH -->
+
+        <section class="form-card">
+
+            <div class="card-title">
+
+                <div class="title-number">
+                    02
+                </div>
+
+                <div>
+
+                    <h2>
+                        Hình ảnh sản phẩm
+                    </h2>
+
+                    <p>
+                        Có thể tải tối đa 5 ảnh.
+                        Ảnh đầu tiên sẽ là ảnh đại diện.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="image-dropzone"
+                id="imageDropzone"
+            >
+
+                <input
+                    type="file"
+                    id="productImages"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    hidden
+                >
+
+                <div class="upload-icon">
+                    ＋
+                </div>
+
+                <h3>
+                    Thêm ảnh sản phẩm
+                </h3>
+
+                <p>
+                    Kéo thả ảnh vào đây hoặc
+
+                    <button
+                        type="button"
+                        id="chooseImages"
+                    >
+                        chọn từ thiết bị
+                    </button>
+                </p>
+
+                <small>
+                    JPG, PNG hoặc WEBP ·
+                    Tối đa 5 ảnh ·
+                    Mỗi ảnh tối đa 5MB
+                </small>
+
+            </div>
+
+
+            <div
+                class="image-preview-grid"
+                id="imagePreviewGrid"
+            ></div>
+
+        </section>
+
+
+        <!-- BUTTON -->
+
+        <div class="form-bottom">
+
+            <a
+                href="sanpham.html"
+                class="cancel-button"
+            >
+                Hủy
+            </a>
+
+            <button
+                type="submit"
+                class="submit-button"
+                id="submitProduct"
+            >
+                <span id="submitText">
+                    Đăng sản phẩm
+                </span>
+
+                <span
+                    id="submitLoading"
+                    hidden
+                >
+                    Đang đăng...
+                </span>
+
+            </button>
+
+        </div>
+
+    </form>
+
+</main>
+
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+<!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="#">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="#">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="../HTML/lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../JS/dangtin.js"></script>
+
+</body>
+</html>

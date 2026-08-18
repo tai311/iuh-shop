@@ -206,7 +206,9 @@ function renderGuestPage() {
 function renderUserPage(
     fullname,
     email,
-    avatar
+    avatar,
+    hasVerifiedBadge,
+    role
 ) {
 
     const accountName =
@@ -228,6 +230,40 @@ function renderUserPage(
         document.getElementById(
             "accountStatus"
         );
+    const studentVerifiedBadge =
+    document.getElementById(
+        "studentVerifiedBadge"
+    );
+
+    /* =====================================
+   HIỂN THỊ TÍCH XANH
+===================================== */
+
+if (studentVerifiedBadge) {
+
+    if (hasVerifiedBadge) {
+
+    studentVerifiedBadge.hidden = false;
+
+    if (role === "admin") {
+        studentVerifiedBadge.title =
+            "Tài khoản Admin";
+    }
+    else if (role === "moderator") {
+        studentVerifiedBadge.title =
+            "Tài khoản Quản trị viên";
+    }
+    else {
+        studentVerifiedBadge.title =
+            "Tài khoản đã xác thực sinh viên";
+    }
+
+}
+else {
+
+    studentVerifiedBadge.hidden = true;
+}
+}
 
     const authSection =
         document.getElementById(
@@ -251,9 +287,34 @@ function renderUserPage(
 
     if (accountStatus) {
 
+    if (role === "admin") {
+
         accountStatus.textContent =
-            "Đã đăng nhập";
+            "Admin";
+
     }
+
+    else if (role === "moderator") {
+
+        accountStatus.textContent =
+            "Quản trị viên";
+
+    }
+
+    else if (hasVerifiedBadge) {
+
+        accountStatus.textContent =
+            "Đã xác thực sinh viên";
+
+    }
+
+    else {
+
+        accountStatus.textContent =
+            "Chưa xác thực";
+
+    }
+}
 
 
     if (accountAvatar) {
@@ -386,7 +447,7 @@ async function loadAccount() {
             await supabaseClient
                 .from("users")
                 .select(
-                    "fullname, email, avatar_url"
+                 "fullname, email, avatar_url, student_verified, role"
                 )
                 .eq(
                     "user_id",
@@ -427,7 +488,40 @@ async function loadAccount() {
             user.user_metadata?.avatar_url ||
             DEFAULT_AVATAR;
 
+        /* =====================================
+   TRẠNG THÁI TÍCH XANH
+===================================== */
 
+const studentVerified =
+    profile?.student_verified === true;
+
+const role =
+    profile?.role || "user";
+
+
+/*
+   Xác định loại tài khoản
+*/
+
+const isAdmin =
+    role === "admin";
+
+const isModerator =
+    role === "moderator";
+
+
+/*
+   Tích xanh:
+   - Admin: có
+   - Quản trị viên: có
+   - Sinh viên đã xác thực: có
+   - Sinh viên chưa xác thực: không
+*/
+
+const hasVerifiedBadge =
+    isAdmin ||
+    isModerator ||
+    studentVerified;
 
         /* =====================================
            CẬP NHẬT HEADER
@@ -445,10 +539,12 @@ async function loadAccount() {
         ===================================== */
 
         renderUserPage(
-            fullname,
-            email,
-            avatar
-        );
+    fullname,
+    email,
+    avatar,
+    hasVerifiedBadge,
+    role
+);
 
     }
 
@@ -1818,3 +1914,512 @@ if (resetAvatarButton) {
     );
 
 }
+
+/* =========================================
+   XÁC THỰC SINH VIÊN - MỞ / ĐÓNG
+========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const toggle =
+            document.getElementById(
+                "verificationToggle"
+            );
+
+        const panel =
+            document.getElementById(
+                "verificationPanel"
+            );
+
+        const arrow =
+            document.getElementById(
+                "verificationArrow"
+            );
+
+
+        if (!toggle || !panel) {
+            return;
+        }
+
+
+        toggle.addEventListener(
+            "click",
+            function () {
+
+                panel.classList.toggle(
+                    "open"
+                );
+
+
+                if (arrow) {
+
+                    arrow.style.transform =
+                        panel.classList.contains("open")
+                            ? "rotate(90deg)"
+                            : "";
+
+                }
+
+            }
+        );
+
+    }
+);
+
+/* =========================================
+   CHỌN ẢNH THẺ SINH VIÊN
+========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const fileInput =
+            document.getElementById(
+                "studentCardFile"
+            );
+
+        const uploadButton =
+            document.getElementById(
+                "uploadStudentCard"
+            );
+
+        const preview =
+            document.getElementById(
+                "studentCardPreview"
+            );
+
+        const submitButton =
+            document.getElementById(
+                "submitVerification"
+            );
+
+
+        if (
+            !fileInput ||
+            !uploadButton ||
+            !preview
+        ) {
+            return;
+        }
+
+
+        /* Bấm Tải ảnh lên */
+
+        uploadButton.addEventListener(
+            "click",
+            function () {
+
+                fileInput.click();
+
+            }
+        );
+
+
+        /* Chọn ảnh */
+
+        fileInput.addEventListener(
+            "change",
+            function () {
+
+                const file =
+                    fileInput.files[0];
+
+
+                if (!file) {
+                    return;
+                }
+
+
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp"
+                ];
+
+
+                if (
+                    !allowedTypes.includes(
+                        file.type
+                    )
+                ) {
+
+                    alert(
+                        "Vui lòng chọn ảnh JPG, PNG hoặc WEBP."
+                    );
+
+                    fileInput.value = "";
+
+                    return;
+                }
+
+
+                if (
+                    file.size >
+                    5 * 1024 * 1024
+                ) {
+
+                    alert(
+                        "Ảnh không được lớn hơn 5MB."
+                    );
+
+                    fileInput.value = "";
+
+                    return;
+                }
+
+
+                const imageUrl =
+                    URL.createObjectURL(
+                        file
+                    );
+
+
+                preview.innerHTML = `
+                    <img
+                        src="${imageUrl}"
+                        alt="Ảnh thẻ sinh viên"
+                    >
+                `;
+
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        false;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+/* =========================================
+   CAMERA XÁC THỰC SINH VIÊN
+========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const openCamera =
+            document.getElementById(
+                "openStudentCamera"
+            );
+
+        const closeCamera =
+            document.getElementById(
+                "closeCamera"
+            );
+
+        const cameraContainer =
+            document.getElementById(
+                "cameraContainer"
+            );
+
+        const video =
+            document.getElementById(
+                "studentCamera"
+            );
+
+        const captureButton =
+            document.getElementById(
+                "captureStudentCard"
+            );
+
+        const preview =
+            document.getElementById(
+                "studentCardPreview"
+            );
+
+        const submitButton =
+            document.getElementById(
+                "submitVerification"
+            );
+
+
+        let cameraStream = null;
+
+
+        if (
+            !openCamera ||
+            !cameraContainer ||
+            !video
+        ) {
+            return;
+        }
+
+
+        /* MỞ CAMERA */
+
+        openCamera.addEventListener(
+            "click",
+            async function () {
+
+                try {
+
+                    cameraStream =
+                        await navigator.mediaDevices
+                            .getUserMedia({
+                                video: {
+                                    facingMode:
+                                        "environment"
+                                },
+                                audio: false
+                            });
+
+
+                    video.srcObject =
+                        cameraStream;
+
+
+                    cameraContainer.classList.add(
+                        "open"
+                    );
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "Không mở được camera:",
+                        error
+                    );
+
+                    alert(
+                        "Không thể mở camera. Hãy cấp quyền sử dụng camera cho trình duyệt."
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* CHỤP ẢNH */
+
+        captureButton.addEventListener(
+            "click",
+            function () {
+
+                if (!cameraStream) {
+                    return;
+                }
+
+
+                const canvas =
+                    document.createElement(
+                        "canvas"
+                    );
+
+
+                canvas.width =
+                    video.videoWidth;
+
+                canvas.height =
+                    video.videoHeight;
+
+
+                const context =
+                    canvas.getContext(
+                        "2d"
+                    );
+
+
+                context.drawImage(
+                    video,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+
+                const imageUrl =
+                    canvas.toDataURL(
+                        "image/jpeg",
+                        0.9
+                    );
+
+
+                preview.innerHTML = `
+                    <img
+                        src="${imageUrl}"
+                        alt="Ảnh thẻ sinh viên"
+                    >
+                `;
+
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        false;
+
+                }
+
+
+                stopCamera();
+
+            }
+        );
+
+
+        /* ĐÓNG CAMERA */
+
+        closeCamera.addEventListener(
+            "click",
+            function () {
+
+                stopCamera();
+
+            }
+        );
+
+
+        function stopCamera() {
+
+            if (cameraStream) {
+
+                cameraStream
+                    .getTracks()
+                    .forEach(
+                        track => track.stop()
+                    );
+
+                cameraStream = null;
+            }
+
+
+            video.srcObject = null;
+
+
+            cameraContainer.classList.remove(
+                "open"
+            );
+
+        }
+
+    }
+);
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const paymentButton =
+        document.getElementById("confirmVerificationPayment");
+
+    const uploadButton =
+        document.getElementById("uploadStudentCard");
+
+    const cameraButton =
+        document.getElementById("openStudentCamera");
+
+    const fileInput =
+        document.getElementById("studentCardFile");
+
+    const submitButton =
+        document.getElementById("submitVerification");
+
+    const paymentStatus =
+        document.getElementById("verificationPaymentStatus");
+
+
+    // BAN ĐẦU: KHÓA
+    function lockVerification() {
+
+        if (uploadButton) {
+            uploadButton.disabled = true;
+            uploadButton.classList.add("payment-locked");
+        }
+
+        if (cameraButton) {
+            cameraButton.disabled = true;
+            cameraButton.classList.add("payment-locked");
+        }
+
+        if (fileInput) {
+            fileInput.disabled = true;
+        }
+
+        if (submitButton) {
+            submitButton.disabled = true;
+        }
+    }
+
+
+    // SAU KHI THANH TOÁN: MỞ
+    function unlockVerification() {
+
+        if (uploadButton) {
+            uploadButton.disabled = false;
+            uploadButton.classList.remove("payment-locked");
+        }
+
+        if (cameraButton) {
+            cameraButton.disabled = false;
+            cameraButton.classList.remove("payment-locked");
+        }
+
+        if (fileInput) {
+            fileInput.disabled = false;
+        }
+
+        // Chưa có ảnh thì vẫn chưa cho gửi
+        if (submitButton) {
+            submitButton.disabled = true;
+        }
+    }
+
+
+    // Khóa lúc mới vào
+    lockVerification();
+
+
+    // BẤM "TÔI ĐÃ THANH TOÁN"
+    if (paymentButton) {
+
+        paymentButton.addEventListener("click", function () {
+
+            unlockVerification();
+
+            paymentButton.disabled = true;
+
+            paymentButton.textContent =
+                "✓ Đã xác nhận thanh toán";
+
+            if (paymentStatus) {
+                paymentStatus.textContent =
+                    "Đã xác nhận thanh toán. Bạn có thể tải ảnh thẻ sinh viên hoặc mở camera.";
+
+                paymentStatus.classList.add("show");
+            }
+
+        });
+
+    }
+
+
+    // Khi chọn ảnh → mới mở nút gửi
+    if (fileInput) {
+
+        fileInput.addEventListener("change", function () {
+
+            if (
+                fileInput.files &&
+                fileInput.files.length > 0
+            ) {
+
+                if (submitButton) {
+                    submitButton.disabled = false;
+                }
+
+            }
+
+        });
+
+    }
+
+});

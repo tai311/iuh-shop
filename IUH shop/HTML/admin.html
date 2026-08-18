@@ -30,7 +30,7 @@
 
     <link
         rel="stylesheet"
-        href="../CSS/admin.css"
+        href="../CSS/admin.css?v=20260818"
     >
 
 </head>
@@ -272,6 +272,7 @@
                 </button>
 
 
+            
 
                 <!-- Sản phẩm -->
 
@@ -371,6 +372,82 @@
                 </button>
 
 
+            </div>
+
+        </section>
+
+        <!-- =====================================
+             QUẢN LÝ XÁC THỰC SINH VIÊN
+        ====================================== -->
+
+        <section
+            class="verification-section"
+            id="verificationSection"
+            aria-hidden="true"
+        >
+
+            <div class="verification-heading">
+
+                <div>
+                    <span class="admin-label">XÁC THỰC</span>
+
+                    <h2>
+                        Quản lý tích xác thực sinh viên
+                    </h2>
+
+                    <p>
+                        Admin có thể cấp hoặc thu hồi tích xác thực
+                        cho tài khoản sinh viên.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="verification-close"
+                    id="closeVerification"
+                >
+                    Đóng
+                </button>
+
+            </div>
+
+            <div class="verification-toolbar">
+
+                <div class="verification-search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="M16 16l5 5"></path>
+                    </svg>
+
+                    <input
+                        type="search"
+                        id="verificationSearch"
+                        placeholder="Tìm tên hoặc email sinh viên..."
+                    >
+                </div>
+
+                <div class="verification-filter">
+                    <button type="button" class="filter-button active" data-filter="all">
+                        Tất cả
+                    </button>
+                    <button type="button" class="filter-button" data-filter="unverified">
+                        Chưa có tích
+                    </button>
+                    <button type="button" class="filter-button" data-filter="verified">
+                        Đã có tích
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="verification-summary" id="verificationSummary">
+                Chưa tải danh sách.
+            </div>
+
+            <div class="verification-list" id="verificationList">
+                <div class="verification-loading">
+                    Bấm “Quản lý người dùng” để tải danh sách tài khoản.
+                </div>
             </div>
 
         </section>

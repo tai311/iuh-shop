@@ -2073,6 +2073,515 @@ body.logged-out
     text-decoration: underline;
 }
 
+/* =========================================
+   XÁC THỰC SINH VIÊN
+========================================= */
+
+.student-verification-section {
+    margin-top: 18px;
+}
+
+
+/* MỤC XÁC THỰC */
+
+.verification-menu-item {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 76px;
+
+    padding: 14px 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e7ebf2;
+
+    border-radius: 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    color: #26344d;
+
+    font-family: inherit;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.verification-menu-item:hover {
+
+    transform: translateX(3px);
+
+    border-color: #ccd8f1;
+
+    box-shadow:
+        0 6px 18px
+        rgba(20, 48, 105, 0.07);
+}
+
+
+/* ICON */
+
+.verification-icon {
+
+    width: 43px;
+    height: 43px;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+
+    background: #eef3ff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.verification-icon svg {
+
+    width: 21px;
+    height: 21px;
+
+    fill: none;
+
+    stroke: #173f91;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+
+/* TEXT */
+
+.verification-text {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.verification-text strong {
+
+    color: #26344d;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+.verification-text span {
+
+    color: #8993a5;
+
+    font-size: 11px;
+}
+
+
+/* MŨI TÊN */
+
+.verification-arrow {
+
+    margin-left: auto;
+
+    color: #173f91;
+
+    font-size: 24px;
+
+    line-height: 1;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.verification-menu-item:hover
+.verification-arrow {
+
+    transform: translateX(4px);
+}
+
+
+/* =========================================
+   PANEL XÁC THỰC
+========================================= */
+
+.verification-panel {
+
+    display: none;
+
+    margin-top: 10px;
+
+    padding: 24px;
+
+    background: #ffffff;
+
+    border: 1px solid #e7ebf2;
+
+    border-radius: 11px;
+}
+
+
+.verification-panel.open {
+
+    display: block;
+}
+
+
+/* =========================================
+   TIÊU ĐỀ
+========================================= */
+
+.verification-heading h3 {
+
+    margin: 0 0 6px;
+
+    color: #26344d;
+
+    font-size: 17px;
+
+    font-weight: 700;
+}
+
+
+.verification-heading p {
+
+    margin: 0 0 18px;
+
+    color: #8993a5;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   PREVIEW
+========================================= */
+
+.student-card-preview {
+
+    width: 100%;
+
+    min-height: 180px;
+
+    border: 2px dashed #d9e0ec;
+
+    border-radius: 10px;
+
+    background: #f8faff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+
+.student-card-preview img {
+
+    width: 100%;
+
+    max-height: 300px;
+
+    object-fit: contain;
+
+    display: block;
+}
+
+
+.preview-placeholder {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #9aa5b7;
+
+    font-size: 13px;
+}
+
+
+.preview-placeholder svg {
+
+    width: 42px;
+    height: 42px;
+
+    fill: none;
+
+    stroke: #aab5c6;
+
+    stroke-width: 1.5;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+
+/* =========================================
+   CAMERA
+========================================= */
+
+.camera-container {
+
+    display: none;
+
+    position: relative;
+
+    margin-top: 16px;
+
+    background: #101828;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+
+.camera-container.open {
+
+    display: block;
+}
+
+
+.camera-container video {
+
+    width: 100%;
+
+    max-height: 400px;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* =========================================
+   CÁC NÚT
+========================================= */
+
+.verification-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 16px;
+}
+
+
+.verification-action-button {
+
+    flex: 1;
+
+    min-height: 44px;
+
+    border: 1px solid #dce3ef;
+
+    border-radius: 8px;
+
+    background: #f8faff;
+
+    color: #173f91;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.verification-action-button:hover {
+
+    background: #eef3ff;
+
+    border-color: #b9c9e8;
+}
+
+
+.verification-action-button svg {
+
+    width: 18px;
+    height: 18px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+
+/* GỬI */
+
+.submit-verification-button {
+
+    width: 100%;
+
+    margin-top: 12px;
+
+    min-height: 45px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #24449d;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.submit-verification-button:hover:not(:disabled) {
+
+    background: #1b3785;
+
+    transform: translateY(-1px);
+}
+
+
+.submit-verification-button:disabled {
+
+    opacity: 0.45;
+
+    cursor: not-allowed;
+}
+
+
+/* CAMERA BUTTON */
+
+.capture-button,
+.close-camera-button {
+
+    position: absolute;
+
+    bottom: 12px;
+
+    padding: 9px 15px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.capture-button {
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    background: #f5c842;
+
+    color: #173f91;
+}
+
+
+.close-camera-button {
+
+    right: 12px;
+
+    background: rgba(255,255,255,0.92);
+
+    color: #26344d;
+}
+
+
+/* THÔNG BÁO */
+
+.verification-message {
+
+    margin: 10px 0 0;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* =========================================
+   CHƯA ĐĂNG NHẬP
+========================================= */
+
+body.logged-out
+.student-verification-section {
+
+    display: none;
+}
+
+
+
 
 
 
@@ -2397,4 +2906,381 @@ body.logged-out
     .footer-links {
         align-items: center;
     }
+}
+
+/* =========================================
+   THANH TOÁN XÁC THỰC 5.000Đ
+========================================= */
+
+.verification-payment-box {
+    margin: 0 0 20px;
+    padding: 20px;
+    border: 1px solid #f0d56a;
+    border-radius: 10px;
+    background: #fffaf0;
+    text-align: center;
+}
+
+.verification-payment-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 6px;
+}
+
+.verification-payment-title span {
+    color: #59667d;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.verification-payment-title strong {
+    color: #d4a900;
+    font-size: 20px;
+}
+
+.verification-payment-description {
+    margin: 0 0 16px;
+    color: #7c8798;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.verification-qr-box {
+    width: 210px;
+    height: 210px;
+    margin: 0 auto 12px;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #e4e8ef;
+    border-radius: 8px;
+}
+
+.verification-qr-box img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+.verification-transfer-note {
+    margin: 0 0 14px;
+    color: #7c8798;
+    font-size: 11px;
+}
+
+.verification-transfer-note strong {
+    color: #173f91;
+}
+
+.verification-payment-button {
+    width: 100%;
+    min-height: 44px;
+    border: 0;
+    border-radius: 8px;
+    background: #173f91;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.verification-payment-button:hover {
+    background: #f5c842;
+    color: #173f91;
+}
+
+.verification-payment-button:disabled {
+    opacity: .7;
+    cursor: default;
+}
+
+.verification-payment-status {
+    display: none;
+    margin: 10px 0 0;
+    color: #21864a;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.verification-payment-status.show {
+    display: block;
+}
+
+.payment-locked {
+    opacity: .45;
+    cursor: not-allowed !important;
+}
+
+.payment-unlocked {
+    opacity: 1;
+    cursor: pointer !important;
+}
+
+/* =========================================
+   THANH TOÁN XÁC THỰC SINH VIÊN
+========================================= */
+
+.verification-payment {
+    margin-bottom: 24px;
+    padding: 22px;
+    background: #fffaf0;
+    border: 1px solid #f0d56a;
+    border-radius: 11px;
+    text-align: center;
+}
+
+.verification-payment-title {
+    margin-bottom: 6px;
+    color: #26344d;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.verification-payment-fee {
+    margin-bottom: 8px;
+    color: #d4a900;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.verification-payment p {
+    margin: 0 0 18px;
+    color: #8993a5;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* QR */
+
+.verification-payment-qr {
+    width: 230px;
+    height: 230px;
+    margin: 0 auto 18px;
+    padding: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+    border: 1px solid #e1e6ef;
+    border-radius: 9px;
+    overflow: hidden;
+}
+
+.verification-payment-qr img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* Khi chưa có ảnh QR */
+
+.verification-payment-qr.qr-missing::before {
+    content: "QR THANH TOÁN";
+    color: #a3adbd;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* Nội dung chuyển khoản */
+
+.verification-transfer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+
+.verification-transfer-content span {
+    color: #8993a5;
+    font-size: 11px;
+}
+
+.verification-transfer-content strong {
+    padding: 9px 15px;
+    background: #f3f5f9;
+    border-radius: 6px;
+    color: #173f91;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* Nút xác nhận thanh toán */
+
+.confirm-verification-payment {
+    width: 100%;
+    min-height: 44px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #173f91;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        transform .2s ease;
+}
+
+.confirm-verification-payment:hover {
+    background: #f5c842;
+    color: #173f91;
+    transform: translateY(-1px);
+}
+
+.confirm-verification-payment:disabled {
+    background: #edf1f6;
+    color: #2c9656;
+    cursor: default;
+    transform: none;
+}
+
+
+/* Thông báo sau thanh toán */
+
+.verification-payment-message {
+    display: none;
+
+    margin-top: 12px;
+    padding: 10px 12px;
+
+    border-radius: 7px;
+
+    background: #edf9f1;
+    color: #24864b;
+
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.verification-payment-message.show {
+    display: block;
+}
+
+
+/* =========================================
+   KHÓA UPLOAD / CAMERA
+========================================= */
+
+.verification-action-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.verification-action-button:disabled:hover {
+    background: #f8faff;
+    border-color: #dce3ef;
+}
+
+.payment-locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.payment-locked:not(:disabled) {
+    opacity: 1;
+    cursor: pointer;
+}
+
+/* =========================================
+   TÍCH XANH TÀI KHOẢN
+========================================= */
+
+.account-name-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+}
+
+
+.account-name-row h1 {
+
+    margin: 0;
+
+}
+
+
+.student-verified-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 20px;
+
+    height: 20px;
+
+    border-radius: 50%;
+
+    background: #1877f2;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    box-shadow:
+        0 2px 6px
+        rgba(24, 119, 242, 0.25);
+
+    cursor: help;
+
+    animation:
+        verifiedBadgeIn
+        .25s ease;
+
+}
+
+
+.student-verified-badge[hidden] {
+
+    display: none;
+
+}
+
+
+@keyframes verifiedBadgeIn {
+
+    from {
+
+        opacity: 0;
+
+        transform: scale(.7);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: scale(1);
+
+    }
+
 }

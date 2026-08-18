@@ -343,9 +343,23 @@
                         Chưa đăng nhập
                     </span>
 
-                    <h1 id="accountName">
-                        Khách
-                    </h1>
+                    <div class="account-name-row">
+
+    <h1 id="accountName">
+        Khách
+    </h1>
+
+    <span
+        id="studentVerifiedBadge"
+        class="student-verified-badge"
+        title="Tài khoản chưa xác thực"
+        aria-label="Trạng thái xác thực"
+        hidden
+    >
+        ✓
+    </span>
+
+</div>
 
                     <p id="accountEmail">
                         Đăng nhập để sử dụng đầy đủ
@@ -478,6 +492,298 @@
                         </span>
 
                     </a>
+
+                    <!-- =================================
+     XÁC THỰC SINH VIÊN
+================================= -->
+
+<section
+    id="studentVerificationSection"
+    class="student-verification-section"
+>
+
+    <button
+        type="button"
+        id="verificationToggle"
+        class="verification-menu-item"
+    >
+
+        <div class="verification-icon">
+
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path
+                    d="M4 5h16v14H4z"
+                />
+
+                <path
+                    d="M8 9h8"
+                />
+
+                <path
+                    d="M8 13h5"
+                />
+
+                <path
+                    d="M8 17h3"
+                />
+            </svg>
+
+        </div>
+
+
+        <div class="verification-text">
+
+            <strong>
+                Xác thực sinh viên
+            </strong>
+
+            <span id="verificationDescription">
+                Xác minh bạn là sinh viên IUH
+            </span>
+
+        </div>
+
+
+        <span
+            id="verificationArrow"
+            class="verification-arrow"
+        >
+            ›
+        </span>
+
+    </button>
+
+
+    <!-- KHU VỰC XÁC THỰC -->
+
+    <div
+        id="verificationPanel"
+        class="verification-panel"
+    >
+
+        <div class="verification-heading">
+
+            <h3>
+                Xác thực sinh viên IUH
+            </h3>
+
+            <p>
+                Tải ảnh thẻ sinh viên hoặc sử dụng camera
+                để gửi yêu cầu xác thực.
+            </p>
+
+        </div>
+
+
+        <!-- THANH TOÁN 5.000Đ -->
+
+        <div class="verification-payment-box" id="verificationPaymentBox">
+
+            <div class="verification-payment-title">
+                <span>Phí xác thực</span>
+                <strong>5.000đ</strong>
+            </div>
+
+            <p class="verification-payment-description">
+                Vui lòng chuyển khoản 5.000đ theo mã QR bên dưới.
+                Sau khi thanh toán, bấm “Tôi đã thanh toán” để mở phần tải thẻ sinh viên.
+            </p>
+
+            <div class="verification-qr-box">
+                <img
+                    src="../Images/qr.jpg"
+                    alt="QR thanh toán xác thực sinh viên"
+                >
+            </div>
+
+            <p class="verification-transfer-note">
+                Nội dung chuyển khoản: <strong>XACMINH</strong>
+            </p>
+
+            <button
+                type="button"
+                id="confirmVerificationPayment"
+                class="verification-payment-button"
+            >
+                Tôi đã thanh toán 5.000đ
+            </button>
+
+            <p
+                id="verificationPaymentStatus"
+                class="verification-payment-status"
+            >
+            </p>
+
+        </div>
+        
+
+
+        <!-- KHU VỰC PREVIEW -->
+
+        <div
+            id="studentCardPreview"
+            class="student-card-preview"
+        >
+
+            <div class="preview-placeholder">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M4 5h16v14H4z"
+                    />
+
+                    <circle
+                        cx="9"
+                        cy="10"
+                        r="2"
+                    />
+
+                    <path
+                        d="M7 16c.8-2 2-3 4-3s3.2 1 4 3"
+                    />
+                </svg>
+
+                <span>
+                    Chưa chọn ảnh thẻ
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- INPUT FILE -->
+
+        <input
+            type="file"
+            id="studentCardFile"
+            accept="image/jpeg,image/png,image/webp"
+            hidden
+        >
+
+
+        <!-- CAMERA -->
+
+        <div
+            id="cameraContainer"
+            class="camera-container"
+        >
+
+            <video
+                id="studentCamera"
+                autoplay
+                playsinline
+            ></video>
+
+            <button
+                type="button"
+                id="captureStudentCard"
+                class="capture-button"
+            >
+                Chụp ảnh
+            </button>
+
+            <button
+                type="button"
+                id="closeCamera"
+                class="close-camera-button"
+            >
+                Đóng camera
+            </button>
+
+        </div>
+
+
+        <!-- NÚT CHỌN ẢNH -->
+
+        <div class="verification-actions">
+
+            <button
+                type="button"
+                id="uploadStudentCard"
+                class="verification-action-button payment-locked"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M12 16V4"
+                    />
+
+                    <path
+                        d="M7 9l5-5 5 5"
+                    />
+
+                    <path
+                        d="M5 20h14"
+                    />
+                </svg>
+
+                Tải ảnh lên
+
+            </button>
+
+
+            <button
+                type="button"
+                id="openStudentCamera"
+                class="verification-action-button payment-locked"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <rect
+                        x="3"
+                        y="6"
+                        width="18"
+                        height="14"
+                        rx="2"
+                    />
+
+                    <circle
+                        cx="12"
+                        cy="13"
+                        r="3"
+                    />
+                </svg>
+
+                Dùng camera
+
+            </button>
+
+        </div>
+
+
+        <!-- GỬI YÊU CẦU -->
+
+        <button
+            type="button"
+            id="submitVerification"
+            class="submit-verification-button payment-locked"
+            disabled
+        >
+            Gửi yêu cầu xác thực
+        </button>
+
+
+        <p
+            id="verificationMessage"
+            class="verification-message"
+        ></p>
+
+    </div>
+
+</section>
 
 
 
