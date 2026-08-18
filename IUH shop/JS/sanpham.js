@@ -1,4 +1,20 @@
 /* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+    "https://xecxofmogvqysejjpxvl.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+
+/* =====================================================
    MENU ACTIVE
 ===================================================== */
 
