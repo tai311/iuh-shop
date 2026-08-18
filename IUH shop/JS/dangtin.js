@@ -1344,14 +1344,38 @@ productForm.addEventListener(
 
 
 /* =========================================================
-   INIT
+   INIT - KHỞI TẠO TRANG ĐĂNG TIN
    ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     async () => {
 
-        await loadSellerProfile();
+        try {
+
+            // Lấy tài khoản Supabase đang đăng nhập
+            currentUser = await loadCurrentUser();
+
+            if (currentUser) {
+                console.log(
+                    "Đã đăng nhập:",
+                    currentUser.email
+                );
+            } else {
+                console.log(
+                    "Chưa có tài khoản đăng nhập."
+                );
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Lỗi kiểm tra đăng nhập:",
+                error
+            );
+
+            currentUser = null;
+        }
 
     }
 );
