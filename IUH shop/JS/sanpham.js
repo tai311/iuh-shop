@@ -292,6 +292,170 @@ async function loadProducts() {
 
 }
 
+/* =====================================================
+   HEADER - KIỂM TRA TÀI KHOẢN
+===================================================== */
+
+async function updateHeaderAccount() {
+
+    const guestAccount =
+        document.getElementById("guestAccount");
+
+    const userAccount =
+        document.getElementById("userAccount");
+
+    const headerAvatar =
+        document.getElementById("headerAvatar");
+
+    const headerUserName =
+        document.getElementById("headerUserName");
+
+    try {
+
+        /* Lấy tài khoản đang đăng nhập */
+        const {
+            data: {
+                user
+            }
+        } = await supabaseClient.auth.getUser();
+
+
+        /* =========================================
+           CHƯA ĐĂNG NHẬP
+        ========================================= */
+
+        if (!user) {
+
+            if (guestAccount) {
+                guestAccount.style.display = "flex";
+            }
+
+            if (userAccount) {
+                userAccount.style.display = "none";
+            }
+
+            return;
+        }
+
+
+        /* =========================================
+           ĐÃ ĐĂNG NHẬP
+        ========================================= */
+
+        const {
+            data: profile,
+            error
+        } = await supabaseClient
+            .from("users")
+            .select("fullname, avatar_url, role")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+
+        if (error) {
+            console.error(
+                "Lỗi lấy thông tin users:",
+                error
+            );
+        }
+
+
+        /* =========================================
+           TÊN HIỂN THỊ
+        ========================================= */
+
+        const fullname =
+            profile?.fullname ||
+            user.email?.split("@")[0] ||
+            "Tài khoản";
+
+
+        if (headerUserName) {
+
+            headerUserName.textContent =
+                fullname;
+
+        }
+
+
+        /* =========================================
+           ẢNH ĐẠI DIỆN
+        ========================================= */
+
+        if (headerAvatar) {
+
+            headerAvatar.src =
+                profile?.avatar_url ||
+                "../Images/default-avatar.svg";
+
+            headerAvatar.onerror =
+                function () {
+
+                    this.src =
+                        "../Images/default-avatar.svg";
+
+                };
+
+        }
+
+
+        /* =========================================
+           ẨN ĐĂNG NHẬP / ĐĂNG KÝ
+        ========================================= */
+
+        if (guestAccount) {
+            guestAccount.style.display = "none";
+        }
+
+
+        /* =========================================
+           HIỆN TÀI KHOẢN
+        ========================================= */
+
+        if (userAccount) {
+            userAccount.style.display = "flex";
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi cập nhật header:",
+            error
+        );
+
+        /* Nếu có lỗi thì giữ trạng thái khách */
+
+        if (guestAccount) {
+            guestAccount.style.display = "flex";
+        }
+
+        if (userAccount) {
+            userAccount.style.display = "none";
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   THEO DÕI ĐĂNG NHẬP / ĐĂNG XUẤT
+===================================================== */
+
+supabaseClient.auth.onAuthStateChange(
+    function (event, session) {
+
+        console.log(
+            "Auth event:",
+            event
+        );
+
+        updateHeaderAccount();
+
+    }
+);
+
 
 /* =====================================================
    FILTER
@@ -924,7 +1088,9 @@ $("emptyClearButton")?.addEventListener(
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    async () => {
+
+        await updateHeaderAccount();
 
         loadProducts();
 
