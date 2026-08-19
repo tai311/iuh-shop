@@ -2037,40 +2037,37 @@ body {
 }
 
 .seller-verified-badge {
-    display: inline-flex !important;
+     display: inline-flex;
+
     align-items: center;
+
     justify-content: center;
 
-    width: 20px !important;
-    height: 20px !important;
+    width: 20px;
 
-    min-width: 20px !important;
-    min-height: 20px !important;
-
-    max-width: 20px !important;
-    max-height: 20px !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
+    height: 20px;
 
     border-radius: 50%;
 
-    background: #3975EA;
+    background: #1877f2;
+
     color: #ffffff;
 
+    font-size: 13px;
 
-    font-size: 13px !important;
     font-weight: 800;
 
     line-height: 1;
 
     box-shadow:
-    0 2px 6px
-    rgba(57, 117, 234, 0.25);
+        0 2px 6px
+        rgba(24, 119, 242, 0.25);
 
     cursor: help;
 
-    flex-shrink: 0;
+    animation:
+        verifiedBadgeIn
+        .25s ease;
 }
 
 .seller-verified-badge[hidden] {

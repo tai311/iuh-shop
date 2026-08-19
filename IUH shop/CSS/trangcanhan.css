@@ -1642,23 +1642,37 @@ body {
 ===================================================== */
 
 .verified-badge {
-    width: 23px;
-    height: 23px;
-
-    display: inline-flex;
+     display: inline-flex;
 
     align-items: center;
+
     justify-content: center;
+
+    width: 20px;
+
+    height: 20px;
 
     border-radius: 50%;
 
-    background: var(--iuh-blue);
+    background: #1877f2;
 
     color: #ffffff;
 
-    font-size: 14px;
+    font-size: 13px;
 
     font-weight: 800;
+
+    line-height: 1;
+
+    box-shadow:
+        0 2px 6px
+        rgba(24, 119, 242, 0.25);
+
+    cursor: help;
+
+    animation:
+        verifiedBadgeIn
+        .25s ease;
 }
 
 
