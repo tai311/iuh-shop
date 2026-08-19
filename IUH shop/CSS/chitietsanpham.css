@@ -2019,29 +2019,53 @@ body {
     margin-bottom: 3px;
 }
 
+/* =========================================
+   TÊN NGƯỜI ĐĂNG + TÍCH XANH
+========================================= */
+
 .seller-name-row {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
 }
+
+.seller-name-row strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+
+/* TÍCH XANH */
 
 .seller-verified-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    width: 19px;
-    height: 19px;
+    width: 18px;
+    height: 18px;
+
+    margin-left: 2px;
 
     border-radius: 50%;
 
     background: #2f80ed;
     color: #ffffff;
 
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 800;
+
+    line-height: 1;
 
     flex-shrink: 0;
+}
+
+
+/* Không hiện khi hidden */
+
+.seller-verified-badge[hidden] {
+    display: none !important;
 }
 
 /* =====================================================
