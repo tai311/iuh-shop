@@ -896,7 +896,7 @@ function setupProfileOwnerUI() {
 
     // Chỉ khởi tạo chức năng chỉnh sửa
     // khi đúng chủ tài khoản
-    setupIntroductionEditor();
+    setupIntroductionEditor(profile);
     setupAvatarEditor();
 }
 
