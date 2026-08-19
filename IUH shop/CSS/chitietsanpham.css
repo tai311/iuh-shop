@@ -1837,6 +1837,117 @@ body {
 }
 
 
+/* =========================================================
+   CÁC NÚT THAO TÁC SẢN PHẨM
+========================================================= */
+
+.action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+
+/* MUA NGAY */
+
+.primary-button,
+#buyNowBtn {
+    border: none;
+    background: #29449c;
+    color: #ffffff;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.primary-button:hover,
+#buyNowBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(41, 68, 156, 0.2);
+}
+
+
+/* THÊM GIỎ HÀNG */
+
+.cart-button {
+    border: 1px solid #29449c;
+    background: #ffffff;
+    color: #29449c;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.cart-button:hover {
+    background: #f0f3ff;
+    transform: translateY(-2px);
+}
+
+
+/* CHAT */
+
+.chat-button {
+    border: 1px solid #29449c;
+    background: #ffffff;
+    color: #29449c;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.chat-button:hover {
+    background: #f0f3ff;
+    transform: translateY(-2px);
+}
+
+
+/* QUAY LẠI */
+
+.secondary-button {
+    border: 1px solid #dfe4ef;
+    background: #ffffff;
+    color: #1d2945;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.secondary-button:hover {
+    background: #f5f7fb;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+
+    .action-row {
+        flex-direction: column;
+    }
+
+    .action-row button {
+        width: 100%;
+    }
+
+}
+
 /* =====================================================
    SELLER
 ===================================================== */

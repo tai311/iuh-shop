@@ -1619,3 +1619,278 @@ document.addEventListener(
 
     }
 );
+
+/* =========================================================
+   THÊM SẢN PHẨM VÀO GIỎ HÀNG
+========================================================= */
+
+const addToCartBtn =
+    document.getElementById("addToCartBtn");
+
+
+if (addToCartBtn) {
+
+    addToCartBtn.addEventListener(
+        "click",
+        async function () {
+
+            /* -----------------------------------------
+               KIỂM TRA SẢN PHẨM
+            ----------------------------------------- */
+
+            if (!currentProduct) {
+
+                showToast(
+                    "Chưa tải được thông tin sản phẩm."
+                );
+
+                return;
+            }
+
+
+            /* -----------------------------------------
+               KIỂM TRA SỐ LƯỢNG
+            ----------------------------------------- */
+
+            const productQuantity =
+                Number(
+                    currentProduct.quantity
+                ) || 0;
+
+
+            if (productQuantity <= 0) {
+
+                showToast(
+                    "Sản phẩm đã hết hàng."
+                );
+
+                return;
+            }
+
+
+            /* -----------------------------------------
+               LẤY USER ĐANG ĐĂNG NHẬP
+            ----------------------------------------- */
+
+            const {
+                data: {
+                    user
+                }
+            } =
+                await supabaseClient
+                    .auth
+                    .getUser();
+
+
+            if (!user) {
+
+                showToast(
+                    "Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng."
+                );
+
+                setTimeout(
+                    function () {
+
+                        window.location.href =
+                            "dangnhap.html";
+
+                    },
+                    1200
+                );
+
+                return;
+            }
+
+
+            /* -----------------------------------------
+               LẤY GIỎ HÀNG HIỆN TẠI
+            ----------------------------------------- */
+
+            const cartKey =
+                "iuhShopCart_" + user.id;
+
+
+            let cart = [];
+
+
+            try {
+
+                const savedCart =
+                    localStorage.getItem(
+                        cartKey
+                    );
+
+
+                if (savedCart) {
+
+                    cart =
+                        JSON.parse(
+                            savedCart
+                        );
+
+                }
+
+
+                if (!Array.isArray(cart)) {
+
+                    cart = [];
+
+                }
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Lỗi đọc giỏ hàng:",
+                    error
+                );
+
+                cart = [];
+
+            }
+
+
+            /* -----------------------------------------
+               KIỂM TRA SẢN PHẨM ĐÃ CÓ TRONG GIỎ CHƯA
+            ----------------------------------------- */
+
+            const existingProduct =
+                cart.find(
+                    item =>
+                        String(item.id) ===
+                        String(currentProduct.id)
+                );
+
+
+            if (existingProduct) {
+
+                /* Không cho vượt quá số lượng người bán */
+
+                if (
+                    existingProduct.quantityInCart
+                    >=
+                    productQuantity
+                ) {
+
+                    showToast(
+                        "Bạn đã thêm tối đa số lượng sản phẩm hiện có."
+                    );
+
+                    return;
+
+                }
+
+
+                existingProduct.quantityInCart += 1;
+
+            }
+            else {
+
+                /* -----------------------------------------
+                   THÊM SẢN PHẨM MỚI
+                ----------------------------------------- */
+
+                cart.push({
+
+                    id:
+                        currentProduct.id,
+
+                    seller_id:
+                        currentProduct.seller_id,
+
+                    name:
+                        currentProduct.name,
+
+                    category:
+                        currentProduct.category,
+
+                    price:
+                        Number(
+                            currentProduct.price
+                        ) || 0,
+
+                    quantity:
+                        productQuantity,
+
+                    quantityInCart:
+                        1,
+
+                    description:
+                        currentProduct.description || "",
+
+                    image_urls:
+                        currentProduct.image_urls || []
+
+                });
+
+            }
+
+
+            /* -----------------------------------------
+               LƯU GIỎ HÀNG
+            ----------------------------------------- */
+
+            try {
+
+                localStorage.setItem(
+                    cartKey,
+                    JSON.stringify(cart)
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Lỗi lưu giỏ hàng:",
+                    error
+                );
+
+                showToast(
+                    "Không thể lưu sản phẩm vào giỏ hàng."
+                );
+
+                return;
+
+            }
+
+
+            /* -----------------------------------------
+               THÔNG BÁO
+            ----------------------------------------- */
+
+            showToast(
+                "🛒 Đã thêm sản phẩm vào giỏ hàng."
+            );
+
+
+            /* Đổi trạng thái nút trong 1.5 giây */
+
+            const oldText =
+                addToCartBtn.innerHTML;
+
+
+            addToCartBtn.innerHTML =
+                "✓ Đã thêm vào giỏ hàng";
+
+
+            addToCartBtn.disabled =
+                true;
+
+
+            setTimeout(
+                function () {
+
+                    addToCartBtn.innerHTML =
+                        oldText;
+
+                    addToCartBtn.disabled =
+                        false;
+
+                },
+                1500
+            );
+
+        }
+    );
+
+}
