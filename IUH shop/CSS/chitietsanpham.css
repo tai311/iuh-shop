@@ -2042,11 +2042,11 @@ body {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
 
-    width: 20px !important;
-    height: 20px !important;
+    width: 18px !important;
+    height: 18px !important;
 
-    min-width: 20px !important;
-    min-height: 20px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
 
     border-radius: 50% !important;
 
