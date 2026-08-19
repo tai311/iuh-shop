@@ -770,11 +770,6 @@ profileRole.textContent = roleText;
             "verifiedBadge"
         );
 
-    const studentVerifiedText =
-        document.getElementById(
-            "studentVerifiedText"
-        );
-
 
     const role =
     profile.role || "user";
@@ -805,16 +800,12 @@ const verified =
         verifiedBadge.style.display =
             "inline-flex";
 
-        studentVerifiedText.style.display =
-            "inline-flex";
 
     } else {
 
         verifiedBadge.style.display =
             "none";
 
-        studentVerifiedText.style.display =
-            "none";
     }
 
 
