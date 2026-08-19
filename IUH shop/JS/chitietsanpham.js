@@ -36,6 +36,16 @@ function $(id) {
     return document.getElementById(id);
 }
 
+function getProductId() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    return params.get("id");
+}
+
 
 /* =========================================================
    4. DOM
@@ -61,29 +71,47 @@ const detailQuantity = $("detailQuantity");
 const detailStatus = $("detailStatus");
 const productDescription = $("productDescription");
 
-const sellerName =
-    $("sellerName");
-
-const sellerAvatar =
-    $("sellerAvatar");
-
-const sellerVerifiedBadge =
-    $("sellerVerifiedBadge");
-
-const sellerProfileLink =
-    $("sellerProfileLink");
+const sellerName = $("sellerName");
+const sellerAvatar = $("sellerAvatar");
+const sellerVerifiedBadge = $("sellerVerifiedBadge");
+const sellerProfileLink = $("sellerProfileLink");
 
 const backButton = $("backButton");
 
 const buyNowBtn = $("buyNowBtn");
-const contactSellerBtn = $("contactSellerBtn");
 const addToCartBtn = $("addToCartBtn");
+const contactSellerBtn = $("contactSellerBtn");
 
 const toast = $("toast");
 
 
 /* =========================================================
-   5. HIỂN THỊ LỖI
+   5. TOAST
+   ========================================================= */
+
+function showToast(message) {
+
+    if (!toast) {
+        return;
+    }
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    clearTimeout(showToast.timer);
+
+    showToast.timer = setTimeout(
+        function () {
+            toast.classList.remove("show");
+        },
+        2500
+    );
+}
+
+
+/* =========================================================
+   6. HIỂN THỊ LỖI
    ========================================================= */
 
 function showError(message) {
@@ -103,30 +131,6 @@ function showError(message) {
     if (errorState) {
         errorState.hidden = false;
     }
-}
-
-
-/* =========================================================
-   6. TOAST
-   ========================================================= */
-
-function showToast(message) {
-
-    if (!toast) {
-        return;
-    }
-
-    toast.textContent = message;
-
-    toast.classList.add("show");
-
-    clearTimeout(showToast.timer);
-
-    showToast.timer = setTimeout(() => {
-
-        toast.classList.remove("show");
-
-    }, 2500);
 }
 
 
@@ -154,24 +158,7 @@ function formatPrice(value) {
 
 
 /* =========================================================
-   8. LẤY ID SẢN PHẨM
-   URL:
-   chitietsanpham.html?id=2
-   ========================================================= */
-
-function getProductId() {
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    return params.get("id");
-}
-
-
-/* =========================================================
-   9. CHUYỂN IMAGE_URLS THÀNH ARRAY
+   8. CHUYỂN IMAGE_URLS THÀNH ARRAY
    ========================================================= */
 
 function normalizeImages(value) {
@@ -180,16 +167,9 @@ function normalizeImages(value) {
         return [];
     }
 
-    /* Supabase trả về Array */
-
     if (Array.isArray(value)) {
-
         return value.filter(Boolean);
-
     }
-
-
-    /* Supabase trả về JSON string */
 
     if (typeof value === "string") {
 
@@ -205,23 +185,161 @@ function normalizeImages(value) {
                 JSON.parse(trimmed);
 
             if (Array.isArray(parsed)) {
-
                 return parsed.filter(Boolean);
-
             }
 
         }
         catch (error) {
 
-            /* Nếu chỉ là một URL */
-
             return [trimmed];
 
         }
-
     }
 
     return [];
+}
+
+
+/* =========================================================
+   9. HIỂN THỊ HÌNH ẢNH SẢN PHẨM
+   ========================================================= */
+
+function renderProductImages(product) {
+
+    const images =
+        normalizeImages(
+            product.image_urls
+        );
+
+
+    /* Không có ảnh */
+
+    if (images.length === 0) {
+
+        if (mainProductImage) {
+
+            mainProductImage.src =
+                "../Images/default-product.png";
+
+            mainProductImage.alt =
+                product.name ||
+                "Sản phẩm";
+        }
+
+        if (imageCount) {
+            imageCount.textContent = "";
+        }
+
+        if (thumbnailList) {
+            thumbnailList.innerHTML = "";
+        }
+
+        return;
+    }
+
+
+    /* Ảnh chính */
+
+    if (mainProductImage) {
+
+        mainProductImage.src =
+            images[0];
+
+        mainProductImage.alt =
+            product.name ||
+            "Sản phẩm";
+    }
+
+
+    /* Số ảnh */
+
+    if (imageCount) {
+
+        imageCount.textContent =
+            `${images.length} ảnh`;
+    }
+
+
+    /* Thumbnail */
+
+    if (!thumbnailList) {
+        return;
+    }
+
+    thumbnailList.innerHTML = "";
+
+
+    images.forEach(
+        function (url, index) {
+
+            const button =
+                document.createElement("button");
+
+            button.type = "button";
+
+            button.className =
+                index === 0
+                    ? "thumbnail active"
+                    : "thumbnail";
+
+
+            const img =
+                document.createElement("img");
+
+            img.src = url;
+
+            img.alt =
+                `${product.name || "Sản phẩm"} - ảnh ${index + 1}`;
+
+
+            img.onerror =
+                function () {
+
+                    button.style.display =
+                        "none";
+                };
+
+
+            button.appendChild(img);
+
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    if (mainProductImage) {
+
+                        mainProductImage.src =
+                            url;
+                    }
+
+
+                    document
+                        .querySelectorAll(
+                            ".thumbnail"
+                        )
+                        .forEach(
+                            function (item) {
+
+                                item.classList.remove(
+                                    "active"
+                                );
+                            }
+                        );
+
+
+                    button.classList.add(
+                        "active"
+                    );
+                }
+            );
+
+
+            thumbnailList.appendChild(
+                button
+            );
+        }
+    );
 }
 
 
@@ -231,60 +349,49 @@ function normalizeImages(value) {
 
 function renderProduct(product) {
 
-    /* -----------------------------------------------------
-       TITLE
-       ----------------------------------------------------- */
-
     document.title =
         `${product.name || "Sản phẩm"} - IUH SHOP`;
 
 
-    /* -----------------------------------------------------
-       DANH MỤC
-       ----------------------------------------------------- */
+    /* Danh mục */
 
     if (productCategory) {
 
         productCategory.textContent =
-            product.category || "Khác";
-
+            product.category ||
+            "Khác";
     }
 
     if (detailCategory) {
 
         detailCategory.textContent =
-            product.category || "Khác";
-
+            product.category ||
+            "Khác";
     }
 
 
-    /* -----------------------------------------------------
-       TÊN
-       ----------------------------------------------------- */
+    /* Tên */
 
     if (productName) {
 
         productName.textContent =
-            product.name || "Sản phẩm";
-
+            product.name ||
+            "Sản phẩm";
     }
 
 
-    /* -----------------------------------------------------
-       GIÁ
-       ----------------------------------------------------- */
+    /* Giá */
 
     if (productPrice) {
 
         productPrice.textContent =
-            formatPrice(product.price);
-
+            formatPrice(
+                product.price
+            );
     }
 
 
-    /* -----------------------------------------------------
-       SỐ LƯỢNG
-       ----------------------------------------------------- */
+    /* Số lượng */
 
     const quantity =
         Number(product.quantity) || 0;
@@ -293,20 +400,16 @@ function renderProduct(product) {
 
         productQuantity.textContent =
             quantity;
-
     }
 
     if (detailQuantity) {
 
         detailQuantity.textContent =
             quantity;
-
     }
 
 
-    /* -----------------------------------------------------
-       TRẠNG THÁI
-       ----------------------------------------------------- */
+    /* Trạng thái */
 
     const statusText =
         product.status === "active" &&
@@ -319,226 +422,85 @@ function renderProduct(product) {
 
         productStatus.textContent =
             statusText;
-
     }
 
     if (detailStatus) {
 
         detailStatus.textContent =
             statusText;
-
     }
 
 
-    /* -----------------------------------------------------
-       MÔ TẢ
-       ----------------------------------------------------- */
+    /* Mô tả */
 
     if (productDescription) {
 
         productDescription.textContent =
             product.description ||
-            "Người bán chưa thêm mô tả.";
-
+            "Người đăng chưa thêm mô tả.";
     }
 
 
-    /* -----------------------------------------------------
-       HÌNH ẢNH
-       ----------------------------------------------------- */
+    /* Hình ảnh */
 
     renderProductImages(product);
-
 }
 
 
 /* =========================================================
-   11. HIỂN THỊ HÌNH ẢNH
-   ========================================================= */
-
-function renderProductImages(product) {
-
-    const images =
-        normalizeImages(product.image_urls);
-
-
-    /* -----------------------------------------------------
-       KHÔNG CÓ ẢNH
-       ----------------------------------------------------- */
-
-    if (images.length === 0) {
-
-        if (mainProductImage) {
-
-            mainProductImage.src =
-                "../Images/default-product.png";
-
-            mainProductImage.alt =
-                product.name || "Sản phẩm";
-
-        }
-
-        if (imageCount) {
-
-            imageCount.textContent = "";
-
-        }
-
-        if (thumbnailList) {
-
-            thumbnailList.innerHTML = "";
-
-        }
-
-        return;
-    }
-
-
-    /* -----------------------------------------------------
-       ẢNH CHÍNH
-       ----------------------------------------------------- */
-
-    if (mainProductImage) {
-
-        mainProductImage.src =
-            images[0];
-
-        mainProductImage.alt =
-            product.name || "Sản phẩm";
-
-    }
-
-
-    /* -----------------------------------------------------
-       SỐ LƯỢNG ẢNH
-
-       Hiển thị:
-       1 ảnh
-       2 ảnh
-       3 ảnh
-
-       KHÔNG hiển thị:
-       (2)
-       (3)
-       ----------------------------------------------------- */
-
-    if (imageCount) {
-
-        imageCount.textContent =
-            `${images.length} ảnh`;
-
-    }
-
-
-    /* -----------------------------------------------------
-       XÓA THUMBNAIL CŨ
-       ----------------------------------------------------- */
-
-    if (!thumbnailList) {
-        return;
-    }
-
-    thumbnailList.innerHTML = "";
-
-
-    /* -----------------------------------------------------
-       TẠO THUMBNAIL
-       ----------------------------------------------------- */
-
-    images.forEach((url, index) => {
-
-        const button =
-            document.createElement("button");
-
-        button.type = "button";
-
-        button.className =
-            `thumbnail ${
-                index === 0
-                    ? "active"
-                    : ""
-            }`;
-
-
-        const img =
-            document.createElement("img");
-
-        img.src = url;
-
-        img.alt =
-            `${product.name || "Sản phẩm"} - ảnh ${index + 1}`;
-
-
-        /* Ảnh lỗi */
-
-        img.onerror = function () {
-
-            button.style.display = "none";
-
-        };
-
-
-        button.appendChild(img);
-
-
-        /* -------------------------------------------------
-           CLICK THUMBNAIL
-           ------------------------------------------------- */
-
-        button.addEventListener(
-            "click",
-            function () {
-
-                if (mainProductImage) {
-
-                    mainProductImage.src =
-                        url;
-
-                }
-
-
-                document
-                    .querySelectorAll(".thumbnail")
-                    .forEach(item => {
-
-                        item.classList.remove(
-                            "active"
-                        );
-
-                    });
-
-
-                button.classList.add(
-                    "active"
-                );
-
-            }
-        );
-
-
-        thumbnailList.appendChild(button);
-
-    });
-
-}
-
-
-/* =========================================================
-   12. LẤY THÔNG TIN NGƯỜI BÁN
+   11. LẤY ĐÚNG NGƯỜI ĐĂNG BÀI
+   =========================================================
+
+   QUAN TRỌNG:
+
+   products.seller_id
+          ↓
+   users.user_id
+          ↓
+   fullname
+   avatar_url
+   student_verified
+
+   KHÔNG lấy user đang đăng nhập.
    ========================================================= */
 
 async function loadSeller(sellerId) {
 
     if (!sellerId) {
 
+        currentSeller = null;
+
         if (sellerName) {
-            sellerName.textContent = "Không xác định";
+            sellerName.textContent =
+                "Không xác định";
+        }
+
+        if (sellerAvatar) {
+            sellerAvatar.src =
+                "../Images/default-avatar.svg";
+        }
+
+        if (sellerVerifiedBadge) {
+            sellerVerifiedBadge.hidden = true;
+        }
+
+        if (sellerProfileLink) {
+            sellerProfileLink.removeAttribute(
+                "href"
+            );
         }
 
         return;
     }
 
+
     try {
+
+        console.log(
+            "IUH SHOP - Seller ID:",
+            sellerId
+        );
+
 
         const {
             data: seller,
@@ -563,13 +525,20 @@ async function loadSeller(sellerId) {
         if (error) {
 
             console.error(
-                "Lỗi lấy thông tin người đăng:",
+                "Lỗi lấy người đăng:",
                 error
             );
+
+            currentSeller = null;
 
             if (sellerName) {
                 sellerName.textContent =
                     "Không xác định";
+            }
+
+            if (sellerVerifiedBadge) {
+                sellerVerifiedBadge.hidden =
+                    true;
             }
 
             return;
@@ -578,29 +547,41 @@ async function loadSeller(sellerId) {
 
         if (!seller) {
 
+            console.warn(
+                "Không tìm thấy users với user_id:",
+                sellerId
+            );
+
+            currentSeller = null;
+
             if (sellerName) {
                 sellerName.textContent =
                     "Không xác định";
+            }
+
+            if (sellerVerifiedBadge) {
+                sellerVerifiedBadge.hidden =
+                    true;
             }
 
             return;
         }
 
 
-        /* =========================================
-           LƯU NGƯỜI ĐĂNG
-        ========================================= */
+        /* =============================================
+           LƯU ĐÚNG NGƯỜI ĐĂNG
+           ============================================= */
 
         currentSeller =
             seller;
 
 
-        /* =========================================
-           TÊN NGƯỜI ĐĂNG
-        ========================================= */
+        /* =============================================
+           TÊN
+           ============================================= */
 
         const fullname =
-            seller.fullname ||
+            seller.fullname?.trim() ||
             seller.email?.split("@")[0] ||
             "Không xác định";
 
@@ -609,51 +590,56 @@ async function loadSeller(sellerId) {
 
             sellerName.textContent =
                 fullname;
-
         }
 
 
-        /* =========================================
+        /* =============================================
            AVATAR
-        ========================================= */
+           ============================================= */
 
         if (sellerAvatar) {
 
             sellerAvatar.src =
                 seller.avatar_url ||
                 "../Images/default-avatar.svg";
-
         }
 
 
-        /* =========================================
+        /* =============================================
            TÍCH XÁC THỰC
-        ========================================= */
+           ============================================= */
 
         const verified =
-            seller.student_verified === true;
+            seller.student_verified === true ||
+            seller.student_verified === "true" ||
+            seller.student_verified === 1 ||
+            seller.student_verified === "1";
 
 
         if (sellerVerifiedBadge) {
 
             sellerVerifiedBadge.hidden =
                 !verified;
-
         }
 
 
-        /* =========================================
-           TRANG CÁ NHÂN
-        ========================================= */
+        /* =============================================
+           TRANG CÁ NHÂN ĐÚNG NGƯỜI ĐĂNG
+           ============================================= */
 
         if (sellerProfileLink) {
 
             sellerProfileLink.href =
                 `taikhoan.html?id=${encodeURIComponent(
-                    sellerId
+                    seller.user_id
                 )}`;
-
         }
+
+
+        console.log(
+            "IUH SHOP - Người đăng:",
+            seller.fullname
+        );
 
     }
     catch (error) {
@@ -663,20 +649,28 @@ async function loadSeller(sellerId) {
             error
         );
 
-        if (sellerName) {
+        currentSeller = null;
 
+        if (sellerName) {
             sellerName.textContent =
                 "Không xác định";
-
         }
 
-    }
+        if (sellerAvatar) {
+            sellerAvatar.src =
+                "../Images/default-avatar.svg";
+        }
 
+        if (sellerVerifiedBadge) {
+            sellerVerifiedBadge.hidden =
+                true;
+        }
+    }
 }
 
 
 /* =========================================================
-   13. TẢI SẢN PHẨM
+   12. TẢI SẢN PHẨM
    ========================================================= */
 
 async function loadProduct() {
@@ -691,10 +685,6 @@ async function loadProduct() {
     );
 
 
-    /* -----------------------------------------------------
-       KHÔNG CÓ ID
-       ----------------------------------------------------- */
-
     if (!productId) {
 
         showError(
@@ -702,15 +692,10 @@ async function loadProduct() {
         );
 
         return;
-
     }
 
 
     try {
-
-        /* -------------------------------------------------
-           LẤY SẢN PHẨM
-           ------------------------------------------------- */
 
         const {
             data: product,
@@ -728,7 +713,10 @@ async function loadProduct() {
                 image_urls,
                 status
             `)
-            .eq("id", productId)
+            .eq(
+                "id",
+                productId
+            )
             .maybeSingle();
 
 
@@ -750,13 +738,8 @@ async function loadProduct() {
             );
 
             return;
-
         }
 
-
-        /* -------------------------------------------------
-           KHÔNG TÌM THẤY
-           ------------------------------------------------- */
 
         if (!product) {
 
@@ -765,63 +748,52 @@ async function loadProduct() {
             );
 
             return;
-
         }
 
 
-        /* -------------------------------------------------
+        /* =============================================
            LƯU SẢN PHẨM
-           ------------------------------------------------- */
+           ============================================= */
 
         currentProduct =
             product;
 
 
-        /* -------------------------------------------------
+        /* =============================================
            RENDER SẢN PHẨM NGAY
-           Không chờ users
-           ------------------------------------------------- */
+           Không phụ thuộc users
+           ============================================= */
 
-        renderProduct(product);
+        renderProduct(
+            product
+        );
 
 
-        /* -------------------------------------------------
-           HIỆN SẢN PHẨM NGAY
-           ------------------------------------------------- */
+        /* =============================================
+           ẨN LOADING NGAY
+           ============================================= */
 
         if (loadingState) {
-
             loadingState.hidden = true;
-
         }
 
         if (errorState) {
-
             errorState.hidden = true;
-
         }
 
         if (productDetail) {
-
             productDetail.hidden = false;
-
         }
 
 
-        /* -------------------------------------------------
-           TẢI NGƯỜI BÁN SAU
-           ------------------------------------------------- */
+        /* =============================================
+           SAU ĐÓ MỚI TẢI NGƯỜI ĐĂNG
+           ============================================= */
 
-        loadSeller(
+        await loadSeller(
             product.seller_id
-        ).catch(error => {
+        );
 
-            console.error(
-                "Lỗi tải seller:",
-                error
-            );
-
-        });
 
     }
     catch (error) {
@@ -834,14 +806,12 @@ async function loadProduct() {
         showError(
             "Có lỗi xảy ra khi tải sản phẩm."
         );
-
     }
-
 }
 
 
 /* =========================================================
-   14. CHAT NGƯỜI BÁN
+   13. CHAT NGƯỜI ĐĂNG
    ========================================================= */
 
 function setupContactSeller() {
@@ -857,15 +827,14 @@ function setupContactSeller() {
 
             if (
                 !currentProduct ||
-                !currentSeller
+                !currentProduct.seller_id
             ) {
 
                 showToast(
-                    "Chưa tải được thông tin người bán."
+                    "Không xác định được người đăng."
                 );
 
                 return;
-
             }
 
 
@@ -880,21 +849,18 @@ function setupContactSeller() {
 
                     productName:
                         currentProduct.name
-
                 });
 
 
             window.location.href =
                 `tinnhan.html?${params.toString()}`;
-
         }
     );
-
 }
 
 
 /* =========================================================
-   15. MUA NGAY
+   14. MUA NGAY
    ========================================================= */
 
 function setupBuyNow() {
@@ -915,7 +881,6 @@ function setupBuyNow() {
                 );
 
                 return;
-
             }
 
 
@@ -932,14 +897,8 @@ function setupBuyNow() {
                 );
 
                 return;
-
             }
 
-
-            /*
-             * Chuyển sang giỏ hàng
-             * với sản phẩm cần mua ngay.
-             */
 
             const params =
                 new URLSearchParams({
@@ -949,21 +908,18 @@ function setupBuyNow() {
 
                     quantity:
                         "1"
-
                 });
 
 
             window.location.href =
                 `giohang.html?buyNow=true&${params.toString()}`;
-
         }
     );
-
 }
 
 
 /* =========================================================
-   16. THÊM VÀO GIỎ HÀNG
+   15. THÊM VÀO GIỎ HÀNG
    ========================================================= */
 
 function setupAddToCart() {
@@ -977,10 +933,6 @@ function setupAddToCart() {
         "click",
         async function () {
 
-            /* -------------------------------------------------
-               KIỂM TRA SẢN PHẨM
-               ------------------------------------------------- */
-
             if (!currentProduct) {
 
                 showToast(
@@ -988,13 +940,8 @@ function setupAddToCart() {
                 );
 
                 return;
-
             }
 
-
-            /* -------------------------------------------------
-               KIỂM TRA SỐ LƯỢNG
-               ------------------------------------------------- */
 
             const productQuantity =
                 Number(
@@ -1009,22 +956,33 @@ function setupAddToCart() {
                 );
 
                 return;
-
             }
 
 
-            /* -------------------------------------------------
-               LẤY USER
-               ------------------------------------------------- */
+            /* =========================================
+               LẤY USER ĐANG ĐĂNG NHẬP
+               Chỉ dùng cho GIỎ HÀNG.
+               Không dùng để xác định người đăng.
+               ========================================= */
 
             const {
                 data: {
                     user
-                }
+                },
+                error
             } =
                 await supabaseClient
                     .auth
                     .getUser();
+
+
+            if (error) {
+
+                console.error(
+                    "Lỗi lấy tài khoản:",
+                    error
+                );
+            }
 
 
             if (!user) {
@@ -1032,7 +990,6 @@ function setupAddToCart() {
                 showToast(
                     "Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng."
                 );
-
 
                 setTimeout(
                     function () {
@@ -1045,13 +1002,12 @@ function setupAddToCart() {
                 );
 
                 return;
-
             }
 
 
-            /* -------------------------------------------------
-               KEY GIỎ HÀNG THEO USER
-               ------------------------------------------------- */
+            /* =========================================
+               GIỎ HÀNG RIÊNG THEO USER
+               ========================================= */
 
             const cartKey =
                 "iuhShopCart_" +
@@ -1060,10 +1016,6 @@ function setupAddToCart() {
 
             let cart = [];
 
-
-            /* -------------------------------------------------
-               ĐỌC GIỎ HÀNG
-               ------------------------------------------------- */
 
             try {
 
@@ -1079,14 +1031,11 @@ function setupAddToCart() {
                         JSON.parse(
                             savedCart
                         );
-
                 }
 
 
                 if (!Array.isArray(cart)) {
-
                     cart = [];
-
                 }
 
             }
@@ -1098,13 +1047,12 @@ function setupAddToCart() {
                 );
 
                 cart = [];
-
             }
 
 
-            /* -------------------------------------------------
+            /* =========================================
                KIỂM TRA SẢN PHẨM ĐÃ CÓ
-               ------------------------------------------------- */
+               ========================================= */
 
             const existingProduct =
                 cart.find(
@@ -1113,10 +1061,6 @@ function setupAddToCart() {
                         String(currentProduct.id)
                 );
 
-
-            /* -------------------------------------------------
-               ĐÃ CÓ TRONG GIỎ
-               ------------------------------------------------- */
 
             if (existingProduct) {
 
@@ -1136,7 +1080,6 @@ function setupAddToCart() {
                     );
 
                     return;
-
                 }
 
 
@@ -1144,12 +1087,6 @@ function setupAddToCart() {
                     currentCartQuantity + 1;
 
             }
-
-
-            /* -------------------------------------------------
-               CHƯA CÓ TRONG GIỎ
-               ------------------------------------------------- */
-
             else {
 
                 cart.push({
@@ -1178,19 +1115,19 @@ function setupAddToCart() {
                         1,
 
                     description:
-                        currentProduct.description || "",
+                        currentProduct.description ||
+                        "",
 
                     image_urls:
-                        currentProduct.image_urls || []
-
+                        currentProduct.image_urls ||
+                        []
                 });
-
             }
 
 
-            /* -------------------------------------------------
-               LƯU GIỎ HÀNG
-               ------------------------------------------------- */
+            /* =========================================
+               LƯU
+               ========================================= */
 
             try {
 
@@ -1212,22 +1149,17 @@ function setupAddToCart() {
                 );
 
                 return;
-
             }
 
-
-            /* -------------------------------------------------
-               THÔNG BÁO
-               ------------------------------------------------- */
 
             showToast(
                 "🛒 Đã thêm sản phẩm vào giỏ hàng."
             );
 
 
-            /* -------------------------------------------------
-               ĐỔI TRẠNG THÁI NÚT
-               ------------------------------------------------- */
+            /* =========================================
+               HIỆU ỨNG NÚT
+               ========================================= */
 
             const oldText =
                 addToCartBtn.innerHTML;
@@ -1253,15 +1185,13 @@ function setupAddToCart() {
                 },
                 1500
             );
-
         }
     );
-
 }
 
 
 /* =========================================================
-   17. QUAY LẠI
+   16. QUAY LẠI
    ========================================================= */
 
 function setupBackButton() {
@@ -1289,17 +1219,14 @@ function setupBackButton() {
 
                 window.location.href =
                     "sanpham.html";
-
             }
-
         }
     );
-
 }
 
 
 /* =========================================================
-   18. TÌM KIẾM
+   17. TÌM KIẾM
    ========================================================= */
 
 function setupSearch() {
@@ -1336,16 +1263,16 @@ function setupSearch() {
 
 
             window.location.href =
-                `sanpham.html?search=${encodeURIComponent(keyword)}`;
-
+                `sanpham.html?search=${encodeURIComponent(
+                    keyword
+                )}`;
         }
     );
-
 }
 
 
 /* =========================================================
-   19. CẬP NHẬT HEADER THEO USER
+   18. HEADER - TÀI KHOẢN
    ========================================================= */
 
 async function updateUserMenu() {
@@ -1371,7 +1298,6 @@ async function updateUserMenu() {
             );
 
             return;
-
         }
 
 
@@ -1400,9 +1326,7 @@ async function updateUserMenu() {
             $("headerUserName");
 
 
-        /* -------------------------------------------------
-           CHƯA ĐĂNG NHẬP
-           ------------------------------------------------- */
+        /* Chưa đăng nhập */
 
         if (!user) {
 
@@ -1419,17 +1343,19 @@ async function updateUserMenu() {
             }
 
             if (userAccount) {
-                userAccount.style.display = "none";
+                userAccount.style.display =
+                    "none";
             }
 
             return;
-
         }
 
 
-        /* -------------------------------------------------
-           LẤY PROFILE
-           ------------------------------------------------- */
+        /* =========================================
+           LẤY PROFILE CỦA USER ĐANG ĐĂNG NHẬP
+           Chỗ này chỉ phục vụ HEADER.
+           Không liên quan seller của sản phẩm.
+           ========================================= */
 
         const {
             data: profile,
@@ -1453,13 +1379,10 @@ async function updateUserMenu() {
                 "Lỗi lấy profile:",
                 error
             );
-
         }
 
 
-        /* -------------------------------------------------
-           ADMIN
-           ------------------------------------------------- */
+        /* Admin */
 
         const adminLink =
             $("adminLink");
@@ -1467,27 +1390,14 @@ async function updateUserMenu() {
 
         if (adminLink) {
 
-            if (
+            adminLink.style.display =
                 profile?.role === "admin"
-            ) {
-
-                adminLink.style.display =
-                    "block";
-
-            }
-            else {
-
-                adminLink.style.display =
-                    "none";
-
-            }
-
+                    ? "block"
+                    : "none";
         }
 
 
-        /* -------------------------------------------------
-           TÊN
-           ------------------------------------------------- */
+        /* Tên */
 
         const fullname =
             profile?.fullname ||
@@ -1499,58 +1409,43 @@ async function updateUserMenu() {
 
             headerUserName.textContent =
                 fullname;
-
         }
 
 
-        /* -------------------------------------------------
-           AVATAR
-           ------------------------------------------------- */
+        /* Avatar */
 
         if (headerAvatar) {
 
             headerAvatar.src =
                 profile?.avatar_url ||
                 "../Images/default-avatar.svg";
-
         }
 
 
-        /* -------------------------------------------------
-           ẨN LOGIN / REGISTER
-           ------------------------------------------------- */
+        /* Ẩn đăng nhập */
 
         if (loginLink) {
-
             loginLink.style.display =
                 "none";
-
         }
 
         if (registerLink) {
-
             registerLink.style.display =
                 "none";
-
         }
 
         if (divider) {
-
             divider.style.display =
                 "none";
-
         }
 
 
-        /* -------------------------------------------------
-           HIỆN ACCOUNT
-           ------------------------------------------------- */
+        /* Hiện tài khoản */
 
         if (userAccount) {
 
             userAccount.style.display =
                 "flex";
-
         }
 
     }
@@ -1560,14 +1455,12 @@ async function updateUserMenu() {
             "Lỗi cập nhật tài khoản:",
             error
         );
-
     }
-
 }
 
 
 /* =========================================================
-   20. DROPDOWN TÀI KHOẢN
+   19. DROPDOWN TÀI KHOẢN
    ========================================================= */
 
 function setupAccountDropdown() {
@@ -1583,9 +1476,7 @@ function setupAccountDropdown() {
         !userAccountButton ||
         !accountDropdown
     ) {
-
         return;
-
     }
 
 
@@ -1598,7 +1489,6 @@ function setupAccountDropdown() {
             accountDropdown.classList.toggle(
                 "show"
             );
-
         }
     );
 
@@ -1608,7 +1498,6 @@ function setupAccountDropdown() {
         function (event) {
 
             event.stopPropagation();
-
         }
     );
 
@@ -1620,15 +1509,13 @@ function setupAccountDropdown() {
             accountDropdown.classList.remove(
                 "show"
             );
-
         }
     );
-
 }
 
 
 /* =========================================================
-   21. DROPDOWN - CÁC LỐI TẮT
+   20. ACCOUNT SHORTCUTS
    ========================================================= */
 
 function setupAccountShortcuts() {
@@ -1650,15 +1537,9 @@ function setupAccountShortcuts() {
         !accountArrow ||
         !accountShortcuts
     ) {
-
         return;
-
     }
 
-
-    /* -----------------------------------------------------
-       BẤM MŨI TÊN
-       ----------------------------------------------------- */
 
     accountArrow.addEventListener(
         "click",
@@ -1671,28 +1552,18 @@ function setupAccountShortcuts() {
             accountWrapper.classList.toggle(
                 "open"
             );
-
         }
     );
 
-
-    /* -----------------------------------------------------
-       BẤM MENU
-       ----------------------------------------------------- */
 
     accountShortcuts.addEventListener(
         "click",
         function (event) {
 
             event.stopPropagation();
-
         }
     );
 
-
-    /* -----------------------------------------------------
-       BẤM RA NGOÀI
-       ----------------------------------------------------- */
 
     document.addEventListener(
         "click",
@@ -1701,15 +1572,13 @@ function setupAccountShortcuts() {
             accountWrapper.classList.remove(
                 "open"
             );
-
         }
     );
-
 }
 
 
 /* =========================================================
-   22. ĐĂNG XUẤT
+   21. ĐĂNG XUẤT
    ========================================================= */
 
 function setupLogout() {
@@ -1749,7 +1618,6 @@ function setupLogout() {
                     );
 
                     return;
-
                 }
 
 
@@ -1766,17 +1634,14 @@ function setupLogout() {
                 alert(
                     "Có lỗi xảy ra khi đăng xuất."
                 );
-
             }
-
         }
     );
-
 }
 
 
 /* =========================================================
-   23. MENU ACTIVE
+   22. MENU ACTIVE
    ========================================================= */
 
 function setupActiveMenu() {
@@ -1792,42 +1657,43 @@ function setupActiveMenu() {
         .querySelectorAll(
             ".navigation a.nav-item"
         )
-        .forEach(link => {
+        .forEach(
+            function (link) {
 
-            const href =
-                link.getAttribute("href");
+                const href =
+                    link.getAttribute(
+                        "href"
+                    );
 
 
-            if (!href) {
-                return;
+                if (!href) {
+                    return;
+                }
+
+
+                const linkPage =
+                    href
+                        .split("/")
+                        .pop()
+                        .toLowerCase();
+
+
+                if (
+                    linkPage ===
+                    currentPage
+                ) {
+
+                    link.classList.add(
+                        "active"
+                    );
+                }
             }
-
-
-            const linkPage =
-                href
-                    .split("/")
-                    .pop()
-                    .toLowerCase();
-
-
-            if (
-                linkPage ===
-                currentPage
-            ) {
-
-                link.classList.add(
-                    "active"
-                );
-
-            }
-
-        });
-
+        );
 }
 
 
 /* =========================================================
-   24. THEO DÕI AUTH
+   23. THEO DÕI AUTH
    ========================================================= */
 
 supabaseClient.auth.onAuthStateChange(
@@ -1838,44 +1704,34 @@ supabaseClient.auth.onAuthStateChange(
             event
         );
 
-
-        /*
-         * Không await ở đây.
-         * Auth không được phép chặn
-         * việc tải sản phẩm.
-         */
-
         updateUserMenu();
-
     }
 );
 
 
 /* =========================================================
-   25. KHỞI ĐỘNG TRANG
+   24. KHỞI ĐỘNG
    ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     function () {
 
-        /* -------------------------------------------------
-           HEADER
-           ------------------------------------------------- */
+        /* Header */
 
-        updateUserMenu().catch(error => {
+        updateUserMenu()
+            .catch(
+                function (error) {
 
-            console.error(
-                "Lỗi cập nhật tài khoản:",
-                error
+                    console.error(
+                        "Lỗi cập nhật tài khoản:",
+                        error
+                    );
+                }
             );
 
-        });
 
-
-        /* -------------------------------------------------
-           ACCOUNT
-           ------------------------------------------------- */
+        /* Account */
 
         setupAccountDropdown();
 
@@ -1884,16 +1740,12 @@ document.addEventListener(
         setupLogout();
 
 
-        /* -------------------------------------------------
-           MENU
-           ------------------------------------------------- */
+        /* Menu */
 
         setupActiveMenu();
 
 
-        /* -------------------------------------------------
-           CÁC NÚT SẢN PHẨM
-           ------------------------------------------------- */
+        /* Sản phẩm */
 
         setupContactSeller();
 
@@ -1904,19 +1756,16 @@ document.addEventListener(
         setupBackButton();
 
 
-        /* -------------------------------------------------
-           TÌM KIẾM
-           ------------------------------------------------- */
+        /* Search */
 
         setupSearch();
 
 
-        /* -------------------------------------------------
+        /* =========================================
            QUAN TRỌNG:
            TẢI SẢN PHẨM ĐỘC LẬP VỚI HEADER
-           ------------------------------------------------- */
+           ========================================= */
 
         loadProduct();
-
     }
 );
