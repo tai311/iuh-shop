@@ -832,69 +832,71 @@ const verified =
    KIỂM TRA CHỦ TÀI KHOẢN
 ===================================================== */
 
-function setupProfileOwnerUI(profile) {
+function setupProfileOwnerUI() {
 
     const editIntroductionButton =
-        document.getElementById(
-            "editIntroductionButton"
-        );
+        document.getElementById("editIntroductionButton");
 
     const changeAvatarButton =
-        document.getElementById(
-            "changeAvatarButton"
-        );
+        document.getElementById("changeAvatarButton");
 
 
-    /*
-       KHÔNG PHẢI CHỦ
-
-       => ẨN toàn bộ nút chỉnh sửa
-    */
+    // ==========================================
+    // KHÔNG PHẢI CHỦ TÀI KHOẢN
+    // → ẨN NÚT CHỈNH SỬA
+    // ==========================================
 
     if (!isProfileOwner) {
 
         if (editIntroductionButton) {
+            editIntroductionButton.style.setProperty(
+                "display",
+                "none",
+                "important"
+            );
 
-            editIntroductionButton.hidden =
-                true;
+            editIntroductionButton.disabled = true;
         }
-
 
         if (changeAvatarButton) {
+            changeAvatarButton.style.setProperty(
+                "display",
+                "none",
+                "important"
+            );
 
-            changeAvatarButton.hidden =
-                true;
+            changeAvatarButton.disabled = true;
         }
-
 
         return;
     }
 
 
-    /*
-       LÀ CHỦ
-
-       => cho phép chỉnh sửa
-    */
+    // ==========================================
+    // ĐÚNG CHỦ TÀI KHOẢN
+    // → HIỆN NÚT CHỈNH SỬA
+    // ==========================================
 
     if (editIntroductionButton) {
+        editIntroductionButton.style.removeProperty(
+            "display"
+        );
 
-        editIntroductionButton.hidden =
-            false;
+        editIntroductionButton.disabled = false;
     }
-
 
     if (changeAvatarButton) {
+        changeAvatarButton.style.removeProperty(
+            "display"
+        );
 
-        changeAvatarButton.hidden =
-            false;
+        changeAvatarButton.disabled = false;
     }
 
 
-    setupIntroductionEditor(
-        profile
-    );
-
+    // Chỉ khởi tạo chức năng chỉnh sửa
+    // khi đúng chủ tài khoản
+    setupIntroductionEditor();
     setupAvatarEditor();
 }
 
