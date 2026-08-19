@@ -2272,3 +2272,191 @@ body {
 .profile-edit-button:active {
     transform: translateY(0);
 }
+
+/* =====================================================
+   KHU VỰC CHỈNH SỬA GIỚI THIỆU
+===================================================== */
+
+.introduction-editor {
+    width: 100%;
+    margin-top: 24px;
+}
+
+/* Ô nhập giới thiệu */
+#introductionInput {
+    display: block;
+
+    width: 100%;
+    min-height: 150px;
+
+    padding: 16px 18px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d8e1f0;
+    border-radius: 10px;
+
+    background: #ffffff;
+    color: #18243f;
+
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.6;
+
+    resize: vertical;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#introductionInput::placeholder {
+    color: #9aa6ba;
+    opacity: 1;
+}
+
+#introductionInput:focus {
+    border-color: #3975EA;
+
+    box-shadow:
+        0 0 0 3px rgba(57, 117, 234, 0.12);
+}
+
+
+/* Dòng dưới ô nhập */
+.introduction-editor-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 12px;
+}
+
+
+/* Bộ đếm ký tự */
+#introductionCounter {
+    color: #7b879c;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* Nhóm nút */
+.introduction-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-top: 14px;
+}
+
+
+/* =====================================================
+   NÚT HỦY
+===================================================== */
+
+.profile-cancel-button {
+    height: 40px;
+
+    padding: 0 18px;
+
+    border: 1px solid #d5ddeb;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #52617a;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.profile-cancel-button:hover {
+    background: #f5f7fa;
+    border-color: #c5cfdf;
+    color: #26344f;
+}
+
+
+/* =====================================================
+   NÚT LƯU
+===================================================== */
+
+.profile-save-button {
+    height: 40px;
+
+    padding: 0 20px;
+
+    border: 1px solid #173f91;
+    border-radius: 8px;
+
+    background: #173f91;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.profile-save-button:hover {
+    background: #123477;
+    border-color: #123477;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 4px 10px rgba(23, 63, 145, 0.18);
+}
+
+.profile-save-button:active {
+    transform: translateY(0);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    #introductionInput {
+        min-height: 130px;
+
+        padding: 14px;
+
+        font-size: 15px;
+    }
+
+    .introduction-actions {
+        flex-wrap: wrap;
+    }
+
+    .profile-cancel-button,
+    .profile-save-button {
+        height: 38px;
+
+        padding: 0 15px;
+
+        font-size: 13px;
+    }
+}
