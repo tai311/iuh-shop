@@ -653,9 +653,19 @@ const sellerProfileLink =
    BUTTON
 ========================================================= */
 
+/* =========================================================
+   BUTTON
+========================================================= */
+
 const backButton =
     document.getElementById(
         "backButton"
+    );
+
+
+const buyNowBtn =
+    document.getElementById(
+        "buyNowBtn"
     );
 
 
@@ -665,12 +675,16 @@ const contactSellerBtn =
     );
 
 
+const addToCartBtn =
+    document.getElementById(
+        "addToCartBtn"
+    );
+
+
 const toast =
     document.getElementById(
         "toast"
     );
-
-
 /* =========================================================
    BIẾN TOÀN CỤC
 ========================================================= */
@@ -1427,18 +1441,21 @@ async function loadSeller(
    CHAT NGƯỜI BÁN
 ========================================================= */
 
-chatSellerBtn.addEventListener(
+contactSellerBtn.addEventListener(
     "click",
     () => {
 
-        if (!currentProduct || !currentSeller) {
-
+        if (
+            !currentProduct ||
+            !currentSeller
+        ) {
             showToast(
                 "Chưa tải được thông tin sản phẩm."
             );
 
             return;
         }
+
 
         const params =
             new URLSearchParams({
@@ -1453,6 +1470,7 @@ chatSellerBtn.addEventListener(
                     currentProduct.name
 
             });
+
 
         window.location.href =
             `tinnhan.html?${params.toString()}`;
