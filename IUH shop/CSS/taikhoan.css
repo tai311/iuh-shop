@@ -3284,3 +3284,18 @@ body.logged-out
     }
 
 }
+
+
+/* =========================================
+   GIỚI HẠN CHIỀU RỘNG TRANG TÀI KHOẢN
+========================================= */
+
+.account-page {
+    padding: 35px 0 60px;
+}
+
+.account-container {
+    width: 92%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
