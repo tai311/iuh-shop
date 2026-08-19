@@ -588,60 +588,52 @@ async function loadSeller(sellerId) {
 
 
         /* =================================================
-           TÊN
-           ================================================= */
+   TÊN + TÍCH XANH
+   Tích xanh là một phần của tên
+   ================================================= */
 
-        const fullname =
-            seller.fullname?.trim() ||
-            seller.email?.split("@")[0] ||
-            "Không xác định";
-
-
-        if (sellerName) {
-
-            sellerName.textContent =
-                fullname;
-        }
+const fullname =
+    seller.fullname?.trim() ||
+    seller.email?.split("@")[0] ||
+    "Không xác định";
 
 
-        /* =================================================
-           AVATAR
-           ================================================= */
-
-        if (sellerAvatar) {
-
-            sellerAvatar.src =
-                seller.avatar_url ||
-                "../Images/default-avatar.svg";
-
-            sellerAvatar.alt =
-                `Ảnh đại diện của ${fullname}`;
-        }
+const verified =
+    seller.role === "admin" ||
+    seller.role === "moderator" ||
+    seller.student_verified === true ||
+    seller.student_verified === "true" ||
+    seller.student_verified === 1 ||
+    seller.student_verified === "1";
 
 
-        /* =================================================
-           TÍCH XÁC THỰC
-           ================================================= */
+if (sellerName) {
 
-        const verified =
-            seller.student_verified === true ||
-            seller.student_verified === "true" ||
-            seller.student_verified === 1 ||
-            seller.student_verified === "1";
+    sellerName.textContent =
+        fullname;
 
-
-        if (sellerVerifiedBadge) {
-
-            sellerVerifiedBadge.hidden =
-                !verified;
+    sellerName.classList.toggle(
+        "has-verified-badge",
+        verified
+    );
+}
 
 
-            if (verified) {
+/* Tạo tích xanh nằm ngay sau tên */
 
-                sellerVerifiedBadge.textContent =
-                    "✓ Đã xác thực sinh viên";
-            }
-        }
+if (sellerVerifiedBadge) {
+
+    sellerVerifiedBadge.textContent =
+        "✓";
+
+    sellerVerifiedBadge.hidden =
+        !verified;
+
+    sellerVerifiedBadge.setAttribute(
+        "aria-label",
+        "Đã xác thực"
+    );
+}
 
 
         /* =================================================
