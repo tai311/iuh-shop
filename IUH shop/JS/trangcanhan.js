@@ -1463,28 +1463,24 @@ function setupAvatarEditor() {
 
 
 /* =====================================================
-   LOAD TIN ĐĂNG CỦA ĐÚNG NGƯỜI
+   LOAD TIN ĐĂNG BÁN CỦA NGƯỜI DÙNG
 ===================================================== */
 
-async function loadProfileProducts(
-    userId
-) {
+async function loadProfileProducts(userId) {
 
     const productsGrid =
-        document.getElementById(
-            "productsGrid"
-        );
+        document.getElementById("productsGrid");
 
     const productsCount =
-        document.getElementById(
-            "productsCount"
-        );
+        document.getElementById("productsCount");
 
 
     if (!productsGrid) {
         return;
     }
 
+
+    /* Hiển thị loading */
 
     productsGrid.innerHTML = `
         <div class="profile-loading">
@@ -1493,28 +1489,40 @@ async function loadProfileProducts(
     `;
 
 
-    /*
-       seller_id = người đăng tin
+    try {
 
-       => chỉ lấy sản phẩm
-       của đúng user đang xem.
-    */
+        console.log(
+            "IUH SHOP - Đang tải tin của user:",
+            userId
+        );
 
-    const {
-        data: products,
-        error
-    } =
-        await supabaseClient
+
+        /* =================================================
+           LẤY CÁC TIN ĐĂNG CỦA ĐÚNG NGƯỜI DÙNG
+
+           products.seller_id
+                    ↓
+           userId của trang cá nhân
+           ================================================= */
+
+        const {
+            data: products,
+            error
+        } = await supabaseClient
 
             .from("products")
 
             .select(`
                 id,
-                title,
-                price,
-                image_url,
+                seller_id,
+                name,
                 category,
-                quantity
+                quantity,
+                price,
+                description,
+                image_urls,
+                status,
+                created_at
             `)
 
             .eq(
@@ -1523,22 +1531,343 @@ async function loadProfileProducts(
             )
 
             .order(
-                "id",
+                "created_at",
                 {
                     ascending: false
                 }
             );
 
 
-    if (error) {
+        /* =================================================
+           KIỂM TRA LỖI
+           ================================================= */
+
+        if (error) {
+
+            console.error(
+                "IUH SHOP - Lỗi lấy tin đăng:",
+                error
+            );
+
+
+            if (productsCount) {
+
+                productsCount.textContent =
+                    "Không thể tải dữ liệu";
+
+            }
+
+
+            productsGrid.innerHTML = `
+
+                <div class="empty-content">
+
+                    <div class="empty-icon">
+                        !
+                    </div>
+
+                    <h3>
+                        Không thể tải tin đăng
+                    </h3>
+
+                    <p>
+                        Vui lòng thử lại sau.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        /* =================================================
+           KHÔNG CÓ TIN ĐĂNG
+           ================================================= */
+
+        if (
+            !products ||
+            products.length === 0
+        ) {
+
+            if (productsCount) {
+
+                productsCount.textContent =
+                    "Chưa có tin đăng nào";
+
+            }
+
+
+            productsGrid.innerHTML = `
+
+                <div class="empty-content">
+
+                    <div class="empty-icon">
+                        🛍
+                    </div>
+
+                    <h3>
+                        Chưa có tin đăng bán
+                    </h3>
+
+                    <p>
+                        Người dùng chưa đăng sản phẩm nào.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        /* =================================================
+           CÓ TIN ĐĂNG
+           ================================================= */
+
+        if (productsCount) {
+
+            productsCount.textContent =
+                `Đang hiển thị ${products.length} tin đăng`;
+
+        }
+
+
+        productsGrid.innerHTML = "";
+
+
+        /* =================================================
+           HIỂN THỊ TỪNG TIN
+           ================================================= */
+
+        products.forEach(
+            function (product) {
+
+                const card =
+                    document.createElement("a");
+
+
+                card.className =
+                    "profile-product-card";
+
+
+                /* -----------------------------------------
+                   BẤM VÀO TIN → CHI TIẾT SẢN PHẨM
+                   ----------------------------------------- */
+
+                card.href =
+                    `chitietsanpham.html?id=${encodeURIComponent(
+                        product.id
+                    )}`;
+
+
+                /* -----------------------------------------
+                   HÌNH ẢNH
+
+                   image_urls có thể là:
+                   - array
+                   - JSON string
+                   - null
+                   ----------------------------------------- */
+
+                let images = [];
+
+
+                if (
+                    Array.isArray(
+                        product.image_urls
+                    )
+                ) {
+
+                    images =
+                        product.image_urls;
+
+                }
+
+                else if (
+                    typeof product.image_urls ===
+                    "string"
+                ) {
+
+                    try {
+
+                        const parsed =
+                            JSON.parse(
+                                product.image_urls
+                            );
+
+
+                        if (
+                            Array.isArray(parsed)
+                        ) {
+
+                            images = parsed;
+
+                        }
+
+                        else {
+
+                            images = [
+                                product.image_urls
+                            ];
+
+                        }
+
+                    }
+
+                    catch (error) {
+
+                        images = [
+                            product.image_urls
+                        ];
+
+                    }
+
+                }
+
+
+                const image =
+                    images[0] ||
+                    "../Images/default-product.png";
+
+
+                /* -----------------------------------------
+                   THÔNG TIN
+                   ----------------------------------------- */
+
+                const title =
+                    product.name ||
+                    "Sản phẩm";
+
+
+                const category =
+                    product.category ||
+                    "Khác";
+
+
+                const price =
+                    formatProfilePrice(
+                        product.price
+                    );
+
+
+                const quantity =
+                    Number(
+                        product.quantity
+                    ) || 0;
+
+
+                /* -----------------------------------------
+                   TRẠNG THÁI
+                   ----------------------------------------- */
+
+                const status =
+                    product.status === "active" &&
+                    quantity > 0
+                        ? "Đang bán"
+                        : "Tạm hết hàng";
+
+
+                /* -----------------------------------------
+                   HTML CARD
+                   ----------------------------------------- */
+
+                card.innerHTML = `
+
+                    <div class="profile-product-image-wrap">
+
+                        <img
+                            src="${escapeProfileHTML(image)}"
+                            alt="${escapeProfileHTML(title)}"
+                            class="profile-product-image"
+                            onerror="
+                                this.src='../Images/default-product.png';
+                            "
+                        >
+
+                    </div>
+
+
+                    <div class="profile-product-info">
+
+                        <span class="profile-product-category">
+
+                            ${escapeProfileHTML(
+                                category
+                            )}
+
+                        </span>
+
+
+                        <h3 class="profile-product-title">
+
+                            ${escapeProfileHTML(
+                                title
+                            )}
+
+                        </h3>
+
+
+                        <div class="profile-product-price">
+
+                            ${price}
+
+                        </div>
+
+
+                        <div class="profile-product-meta">
+
+                            <span>
+                                ${status}
+                            </span>
+
+                            <span>
+                                Còn ${quantity}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                productsGrid.appendChild(
+                    card
+                );
+
+            }
+        );
+
+
+        console.log(
+            "IUH SHOP - Đã tải",
+            products.length,
+            "tin đăng"
+        );
+
+    }
+
+    catch (error) {
 
         console.error(
-            "Lỗi lấy tin đăng:",
+            "IUH SHOP - Lỗi tải tin đăng:",
             error
         );
 
 
+        if (productsCount) {
+
+            productsCount.textContent =
+                "Không thể tải dữ liệu";
+
+        }
+
+
         productsGrid.innerHTML = `
+
             <div class="empty-content">
 
                 <div class="empty-icon">
@@ -1554,195 +1883,11 @@ async function loadProfileProducts(
                 </p>
 
             </div>
+
         `;
 
-
-        if (productsCount) {
-
-            productsCount.textContent =
-                "Không thể tải dữ liệu";
-        }
-
-
-        return;
     }
 
-
-    /*
-       Không có tin
-    */
-
-    if (
-        !products ||
-        products.length === 0
-    ) {
-
-        if (productsCount) {
-
-            productsCount.textContent =
-                "Chưa có tin đăng nào";
-        }
-
-
-        productsGrid.innerHTML = `
-            <div class="empty-content">
-
-                <div class="empty-icon">
-                    🛍
-                </div>
-
-                <h3>
-                    Chưa có tin đăng bán
-                </h3>
-
-                <p>
-                    Người dùng chưa đăng sản phẩm nào.
-                </p>
-
-            </div>
-        `;
-
-
-        return;
-    }
-
-
-    /*
-       Có tin
-    */
-
-    if (productsCount) {
-
-        productsCount.textContent =
-            `Đang hiển thị ${products.length} tin đăng`;
-    }
-
-
-    productsGrid.innerHTML = "";
-
-
-    products.forEach(
-        function (product) {
-
-            /*
-               Dùng thẻ A để toàn bộ card
-               có thể click được.
-            */
-
-            const card =
-                document.createElement(
-                    "a"
-                );
-
-
-            card.className =
-                "profile-product-card";
-
-
-            /*
-               Sang chi tiết sản phẩm
-            */
-
-            card.href =
-                `chitietsanpham.html?id=${encodeURIComponent(product.id)}`;
-
-
-            /*
-               Ảnh
-            */
-
-            const image =
-                product.image_url ||
-                "../Images/default-product.jpg";
-
-
-            /*
-               Tên
-            */
-
-            const title =
-                product.title ||
-                "Sản phẩm";
-
-
-            /*
-               Danh mục
-            */
-
-            const category =
-                product.category ||
-                "Sản phẩm";
-
-
-            /*
-               Giá
-            */
-
-            const price =
-                formatProfilePrice(
-                    product.price
-                );
-
-
-            /*
-               Số lượng
-            */
-
-            const quantity =
-                product.quantity ??
-                0;
-
-
-            card.innerHTML = `
-
-                <img
-                    src="${escapeProfileHTML(image)}"
-                    alt="${escapeProfileHTML(title)}"
-                    class="profile-product-image"
-                >
-
-                <div class="profile-product-info">
-
-                    <span
-                        class="profile-product-category"
-                    >
-                        ${escapeProfileHTML(category)}
-                    </span>
-
-                    <h3
-                        class="profile-product-title"
-                    >
-                        ${escapeProfileHTML(title)}
-                    </h3>
-
-                    <div
-                        class="profile-product-bottom"
-                    >
-
-                        <span
-                            class="profile-product-price"
-                        >
-                            ${price}
-                        </span>
-
-                        <span
-                            class="profile-product-quantity"
-                        >
-                            SL: ${quantity}
-                        </span>
-
-                    </div>
-
-                </div>
-
-            `;
-
-
-            productsGrid.appendChild(
-                card
-            );
-        }
-    );
 }
 
 
