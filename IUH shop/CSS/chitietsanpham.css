@@ -2020,49 +2020,57 @@ body {
 }
 
 /* =========================================
-   TÊN NGƯỜI ĐĂNG + TÍCH XANH
+   TÍCH XANH NGƯỜI ĐĂNG
+   Đồng bộ với trang Tài khoản
 ========================================= */
 
 .seller-name-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .seller-name-row strong {
+    margin: 0;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
 }
 
-
-/* TÍCH XANH */
-
 .seller-verified-badge {
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
 
-    width: 18px;
-    height: 18px;
+    width: 20px !important;
+    height: 20px !important;
 
-    margin-left: 2px;
+    min-width: 20px !important;
+    min-height: 20px !important;
+
+    max-width: 20px !important;
+    max-height: 20px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
 
     border-radius: 50%;
 
-    background: #2f80ed;
+    background: #1877f2;
     color: #ffffff;
 
-    font-size: 11px;
+    font-size: 13px !important;
     font-weight: 800;
 
     line-height: 1;
 
+    box-shadow:
+        0 2px 6px
+        rgba(24, 119, 242, 0.25);
+
+    cursor: help;
+
     flex-shrink: 0;
 }
-
-
-/* Không hiện khi hidden */
 
 .seller-verified-badge[hidden] {
     display: none !important;
