@@ -581,15 +581,15 @@ async function loadSeller(sellerId) {
         }
 
 
-        /* LƯU ĐÚNG NGƯỜI ĐĂNG */
-
-        currentSeller =
-            seller;
-
-
         /* =================================================
-   TÊN + TÍCH XANH
-   Tích xanh là một phần của tên
+   LƯU ĐÚNG NGƯỜI ĐĂNG
+   ================================================= */
+
+currentSeller = seller;
+
+
+/* =================================================
+   TÊN NGƯỜI ĐĂNG
    ================================================= */
 
 const fullname =
@@ -597,6 +597,37 @@ const fullname =
     seller.email?.split("@")[0] ||
     "Không xác định";
 
+if (sellerName) {
+    sellerName.textContent = fullname;
+}
+
+
+/* =================================================
+   ẢNH ĐẠI DIỆN NGƯỜI ĐĂNG
+   ================================================= */
+
+if (sellerAvatar) {
+
+    sellerAvatar.src =
+        seller.avatar_url ||
+        "../Images/default-avatar.svg";
+
+    sellerAvatar.alt =
+        `Ảnh đại diện của ${fullname}`;
+
+    sellerAvatar.onerror =
+        function () {
+            this.onerror = null;
+            this.src = "../Images/default-avatar.svg";
+        };
+}
+
+
+/* =================================================
+   TÍCH XANH
+   Admin + Quản trị viên mặc định có tích
+   User đã xác thực cũng có tích
+   ================================================= */
 
 const verified =
     seller.role === "admin" ||
@@ -607,27 +638,11 @@ const verified =
     seller.student_verified === "1";
 
 
-if (sellerName) {
-
-    sellerName.textContent =
-        fullname;
-
-    sellerName.classList.toggle(
-        "has-verified-badge",
-        verified
-    );
-}
-
-
-/* Tạo tích xanh nằm ngay sau tên */
-
 if (sellerVerifiedBadge) {
 
-    sellerVerifiedBadge.textContent =
-        "✓";
+    sellerVerifiedBadge.textContent = "✓";
 
-    sellerVerifiedBadge.hidden =
-        !verified;
+    sellerVerifiedBadge.hidden = !verified;
 
     sellerVerifiedBadge.setAttribute(
         "aria-label",
