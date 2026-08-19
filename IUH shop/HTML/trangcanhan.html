@@ -1,14 +1,14 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IUH Market</title>
+    <title>Trang cá nhân</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
-    <link rel="stylesheet" href="../CSS/trangchu.css">
+    <link rel="stylesheet" href="../CSS/trangcanhan.css">
 </head>
 
 <body>
@@ -256,358 +256,206 @@
     </header>
 
 
+    <!-- =====================================================
+     NỘI DUNG TRANG CÁ NHÂN
+===================================================== -->
+
+<main class="profile-page">
+
     <!-- =========================
-     SLIDER BANNER
-========================= -->
-<section class="hero-slider">
+         THÔNG TIN CÁ NHÂN
+    ========================== -->
+    <section class="profile-card">
 
-    <div class="slider-container">
+        <!-- ẢNH ĐẠI DIỆN -->
+        <div class="profile-avatar-wrapper">
 
-        <!-- Banner 1 -->
-        <div class="slide active">
             <img
-                src="../Images/banner1.png"
-                alt="Banner IUH Shop 1"
+                id="profileAvatar"
+                src="../Images/default-avatar.svg"
+                alt="Ảnh đại diện"
+                class="profile-avatar"
             >
-        </div>
-
-        <!-- Banner 2 -->
-        <div class="slide">
-            <img
-                src="../Images/banner2.jpg"
-                alt="Banner IUH Shop 2"
-            >
-        </div>
-
-        <!-- Banner 3 -->
-        <div class="slide">
-            <img
-                src="../Images/banner3.png"
-                alt="Banner IUH Shop 3"
-            >
-        </div>
-
-
-        <!-- Nút chuyển trái -->
-         <button class="slider-button slider-prev" type="button" aria-label="Banner trước">
-              <svg viewBox="0 0 24 24">
-                 <path d="M15 4 L7 12 L15 20"></path>
-              </svg>
-         </button>
-
-         <button class="slider-button slider-next" type="button" aria-label="Banner tiếp theo">
-              <svg viewBox="0 0 24 24">
-                 <path d="M9 4 L17 12 L9 20"></path>
-              </svg>
-         </button>
-
-
-        <!-- Dấu chấm -->
-        <div class="slider-dots">
-
-            <button class="slider-dot active" type="button"></button>
-
-            <button class="slider-dot" type="button"></button>
-
-            <button class="slider-dot" type="button"></button>
-
-        </div>
-
-     </div>
-
-</section>
-
-<!-- =========================
-     PHẦN CHÀO MỪNG
-========================= -->
-<section class="welcome-section">
-
-    <div class="welcome-container">
-
-        <!-- Nội dung -->
-        <div class="welcome-content">
-
-            <span class="welcome-label">
-                CHÀO MỪNG BẠN ĐẾN VỚI
-            </span>
-
-            <h2>
-                IUH <span>SHOP</span>
-            </h2>
-
-            <div class="welcome-line"></div>
-
-            <p class="welcome-text">
-                IUH SHOP là không gian mua bán và trao đổi dành riêng cho
-                sinh viên, nơi mọi người có thể dễ dàng tìm kiếm sản phẩm,
-                đăng bán những món đồ mình không còn sử dụng và kết nối
-                trực tiếp với nhau.
-            </p>
-
-            <p class="welcome-text">
-                Chúng tôi hướng đến một cộng đồng mua bán
-                <strong>tiện lợi – minh bạch – thân thiện</strong>,
-                giúp mỗi món đồ tìm được người cần và mỗi sinh viên
-                có thêm một nơi để kết nối, chia sẻ và trao đổi.
-            </p>
-
-            <a href="sanpham.html" class="welcome-button">
-                KHÁM PHÁ NGAY
-                <span>→</span>
-            </a>
 
         </div>
 
 
-        <!-- Ảnh trang trí -->
-        <div class="welcome-image-wrapper">
+        <!-- THÔNG TIN -->
+        <div class="profile-info">
 
-            <div class="welcome-image-frame">
+            <div class="profile-name-row">
 
-                <img
-                    src="../Images/a.jpg"
-                    alt="Sinh viên IUH"
-                    class="welcome-image"
+                <h1 id="profileName">
+                    Đang tải...
+                </h1>
+
+                <!-- TÍCH XÁC THỰC -->
+                <span
+                    id="verifiedBadge"
+                    class="verified-badge"
+                    style="display: none;"
+                    title="Đã xác thực sinh viên"
                 >
+                    ✓
+                </span>
 
+            </div>
+
+
+            <!-- CHỨC DANH -->
+            <p
+                id="profileRole"
+                class="profile-role"
+            >
+                Sinh viên / Người bán
+            </p>
+
+
+            <!-- THÔNG TIN SINH VIÊN -->
+            <div
+                id="studentVerifiedText"
+                class="student-verified"
+                style="display: none;"
+            >
+                ✓ Đã xác thực sinh viên
             </div>
 
         </div>
 
-    </div>
+    </section>
 
-</section>
-
-<section class="stats-section">
-
-    <div class="stats-container">
-
-        <!-- Sản phẩm -->
-        <div class="stat-item">
-
-            <div class="stat-icon">
-                ♧
-            </div>
-
-            <div class="stat-content">
-                <div class="stat-number">
-                    <span class="counter" data-target="1250">0</span>+
-                </div>
-
-                <div class="stat-label">
-                    Sản phẩm đang bán
-                </div>
-            </div>
-
-        </div>
-
-
-        <!-- Sinh viên -->
-        <div class="stat-item">
-
-            <div class="stat-icon">
-                ♙
-            </div>
-
-            <div class="stat-content">
-                <div class="stat-number">
-                    <span class="counter" data-target="980">0</span>+
-                </div>
-
-                <div class="stat-label">
-                    Sinh viên tham gia
-                </div>
-            </div>
-
-        </div>
-
-
-        <!-- Giao dịch -->
-        <div class="stat-item">
-
-            <div class="stat-icon">
-                ✓
-            </div>
-
-            <div class="stat-content">
-                <div class="stat-number">
-                    <span class="counter" data-target="680">0</span>+
-                </div>
-
-                <div class="stat-label">
-                    Giao dịch thành công
-                </div>
-            </div>
-
-        </div>
-
-
-        <!-- Cộng đồng -->
-        <div class="stat-item">
-
-            <div class="stat-icon">
-                ♧
-            </div>
-
-            <div class="stat-content">
-                <div class="stat-number">
-                    <span class="counter" data-target="50">0</span>+
-                </div>
-
-                <div class="stat-label">
-                    Nhóm & cộng đồng
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ================================
-     DANH MỤC PHỔ BIẾN
-================================ -->
-
-<section class="popular-categories">
-
-    <div class="categories-header">
-        <h2>DANH MỤC PHỔ BIẾN</h2>
-
-        <a href="../HTML/sanpham.html">
-            Xem tất cả <span>›</span>
-        </a>
-    </div>
-
-
-    <div class="categories-list">
-
-        <!-- Sách giáo trình -->
-        <a href="../HTML/sanpham.html?category=sach-giao-trinh"
-           class="category-item">
-
-            <div class="category-icon">
-                <svg viewBox="0 0 48 48">
-                    <path d="M8 8h13c5 0 9 3 9 8v25c-2-2-5-3-9-3H8V8z"/>
-                    <path d="M40 8H27c-5 0-9 3-9 8v25c2-2 5-3 9-3h13V8z"/>
-                    <path d="M24 16v25"/>
-                </svg>
-            </div>
-
-            <span>Sách giáo trình</span>
-        </a>
-
-
-        <!-- Tài liệu môn học -->
-        <a href="../HTML/sanpham.html?category=tai-lieu"
-           class="category-item">
-
-            <div class="category-icon">
-                <svg viewBox="0 0 48 48">
-                    <rect x="11" y="6" width="26" height="36" rx="3"/>
-                    <path d="M17 14h14"/>
-                    <path d="M17 21h14"/>
-                    <path d="M17 28h9"/>
-                    <path d="M17 35h6"/>
-                    <path d="M29 28l2 2 4-5"/>
-                </svg>
-            </div>
-
-            <span>Tài liệu môn học</span>
-        </a>
-
-
-        <!-- Tìm đồ thất lạc -->
-        <a href="../HTML/sanpham.html?category=de-thi"
-           class="category-item">
-
-            <div class="category-icon">
-                <svg viewBox="0 0 48 48">
-                    <rect x="9" y="6" width="30" height="36" rx="3"/>
-                    <path d="M17 14h14"/>
-                    <path d="M17 21h8"/>
-                    <path d="M17 29l3 3 6-7"/>
-                    <path d="M17 37h14"/>
-                </svg>
-            </div>
-
-            <span>Tìm đồ thất lạc</span>
-        </a>
-
-
-        <!-- Đồng phục -->
-        <a href="../HTML/sanpham.html?category=dong-phuc"
-           class="category-item">
-
-            <div class="category-icon">
-                <svg viewBox="0 0 48 48">
-                    <path d="M18 8l6 5 6-5 10 7-5 9-5-3v19H18V21l-5 3-5-9 10-7z"/>
-                    <path d="M24 13v22"/>
-                    <path d="M21 18h6"/>
-                </svg>
-            </div>
-
-            <span>Đồng phục</span>
-        </a>
-
-
-        <!-- Dụng cụ thực hành -->
-        <a href="../HTML/sanpham.html?category=dung-cu-thuc-hanh"
-           class="category-item">
-
-            <div class="category-icon">
-                <svg viewBox="0 0 48 48">
-                    <rect x="7" y="17" width="34" height="25" rx="3"/>
-                    <path d="M16 17v-4h16v4"/>
-                    <path d="M7 25h34"/>
-                    <path d="M20 25v5h8v-5"/>
-                    <path d="M15 34h5"/>
-                    <path d="M28 34h5"/>
-                </svg>
-            </div>
-
-            <span>Dụng cụ thực hành</span>
-        </a>
-
-
-        <!-- Đồ dùng học tập -->
-        <a href="../HTML/sanpham.html?category=do-dung-hoc-tap"
-           class="category-item">
-
-            <div class="category-icon">
-                <svg viewBox="0 0 48 48">
-                    <path d="M10 38l3-10L31 10l7 7-18 18-10 3z"/>
-                    <path d="M27 14l7 7"/>
-                    <path d="M13 28l7 7"/>
-                    <path d="M36 8l4 4"/>
-                </svg>
-            </div>
-
-            <span>Đồ dùng học tập</span>
-        </a>
-
-
-        <!-- Khác -->
-        <a href="../HTML/sanpham.html?category=khac"
-           class="category-item">
-
-            <div class="category-icon">
-                <svg viewBox="0 0 48 48">
-                    <circle cx="24" cy="24" r="16"/>
-                    <circle cx="16" cy="24" r="2"/>
-                    <circle cx="24" cy="24" r="2"/>
-                    <circle cx="32" cy="24" r="2"/>
-                </svg>
-            </div>
-
-            <span>Khác</span>
-        </a>
-
-    </div>
-
-</section>
 
     <!-- =========================
+         GIỚI THIỆU
+    ========================== -->
+    <section class="profile-introduction">
+
+        <h2>Giới thiệu</h2>
+
+        <div class="section-line"></div>
+
+        <p id="profileDescription">
+            Chưa có thông tin giới thiệu.
+        </p>
+
+    </section>
+
+
+    <!-- =========================
+         NỘI DUNG CỦA NGƯỜI DÙNG
+    ========================== -->
+    <section class="profile-content">
+
+        <!-- TAB -->
+        <div class="profile-tabs">
+
+            <button
+                type="button"
+                class="profile-tab active"
+                id="productsTab"
+            >
+                Tin đăng bán
+            </button>
+
+            <button
+                type="button"
+                class="profile-tab"
+                id="postsTab"
+            >
+                Bài viết
+            </button>
+
+        </div>
+
+
+        <!-- =========================
+             TIN ĐĂNG BÁN
+        ========================== -->
+        <div
+            id="productsContent"
+            class="tab-content active"
+        >
+
+            <div class="content-header">
+
+                <div>
+                    <h2>Tin đăng bán</h2>
+
+                    <p id="productsCount">
+                        Đang tải tin đăng...
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- DANH SÁCH SẢN PHẨM -->
+            <div
+                id="productsGrid"
+                class="profile-products-grid"
+            >
+
+                <div class="profile-loading">
+                    Đang tải tin đăng...
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             BÀI VIẾT
+        ========================== -->
+        <div
+            id="postsContent"
+            class="tab-content"
+        >
+
+            <div class="content-header">
+
+                <div>
+                    <h2>Bài viết</h2>
+
+                    <p>
+                        Các bài viết được đăng bởi người dùng
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div
+                id="postsGrid"
+                class="profile-posts-grid"
+            >
+
+                <div class="empty-content">
+
+                    <div class="empty-icon">
+                        ✍
+                    </div>
+
+                    <h3>
+                        Chưa có bài viết
+                    </h3>
+
+                    <p>
+                        Người dùng chưa đăng bài viết nào.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+     <!-- =========================
      FOOTER
 ========================= -->
 <footer class="site-footer">
@@ -735,6 +583,6 @@
 
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../JS/ok.js"></script>
+<script src="../JS/trangcanhan.js"></script>
 </body>
 </html>
