@@ -2171,49 +2171,59 @@ body {
 
 }
 
-/* =========================================
+/* =====================================================
    NÚT ĐỔI ẢNH ĐẠI DIỆN
-========================================= */
+===================================================== */
+
+.profile-avatar-wrapper {
+    position: relative !important;
+    width: 125px;
+    height: 125px;
+    flex-shrink: 0;
+}
 
 .profile-edit-avatar {
-    position: absolute;
-    right: 8px;
-    bottom: 8px;
+    position: absolute !important;
 
-    width: 38px;
-    height: 38px;
+    /* nằm ở góc dưới bên phải avatar */
+    right: 2px !important;
+    bottom: 2px !important;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 34px !important;
+    height: 34px !important;
 
-    border: 3px solid #ffffff;
-    border-radius: 50%;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
-    background: #173f91;
-    color: #ffffff;
+    padding: 0 !important;
+    margin: 0 !important;
 
-    font-family: inherit;
-    font-size: 17px;
-    font-weight: 600;
+    border: 3px solid #ffffff !important;
+    border-radius: 50% !important;
 
-    cursor: pointer;
+    background: #3975EA !important;
+    color: #ffffff !important;
 
-    box-shadow: 0 3px 10px rgba(23, 63, 145, 0.25);
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
 
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+    cursor: pointer !important;
+
+    box-shadow:
+        0 3px 8px rgba(57, 117, 234, 0.28) !important;
+
+    z-index: 10 !important;
 }
 
 .profile-edit-avatar:hover {
-    background: #f5c842;
-    color: #173f91;
+    background: #2f68d6 !important;
+    transform: scale(1.05);
+}
 
-    transform: scale(1.06);
-
-    box-shadow: 0 4px 12px rgba(23, 63, 145, 0.3);
+.profile-edit-avatar:active {
+    transform: scale(0.97);
 }
 
 
