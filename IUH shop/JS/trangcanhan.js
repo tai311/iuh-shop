@@ -747,20 +747,15 @@ async function loadProfileUser(userId) {
             "profileRole"
         );
 
-    let roleText = "Người dùng";
+    let roleText = "Sinh viên / Người bán";
 
-if (
-    profile.role === "admin" ||
-    profile.role === "moderator"
-) {
+if (profile.role === "admin") {
+
+    roleText = "Admin";
+
+} else if (profile.role === "moderator") {
 
     roleText = "Quản trị viên";
-
-} else if (
-    profile.student_verified
-) {
-
-    roleText = "Sinh viên / Người bán";
 }
 
 profileRole.textContent = roleText;
@@ -781,15 +776,28 @@ profileRole.textContent = roleText;
         );
 
 
-    const isAdmin =
-    profile.role === "admin" ||
-    profile.role === "moderator";
+    const role =
+    profile.role || "user";
 
-    const verified =
-    profile.student_verified === true ||
-    profile.student_verified === "true" ||
-    profile.student_verified === 1 ||
-    profile.student_verified === "1";
+const isAdmin =
+    role === "admin";
+
+const isModerator =
+    role === "moderator";
+
+const isVerifiedUser =
+    role === "user" &&
+    (
+        profile.student_verified === true ||
+        profile.student_verified === "true" ||
+        profile.student_verified === 1 ||
+        profile.student_verified === "1"
+    );
+
+const verified =
+    isAdmin ||
+    isModerator ||
+    isVerifiedUser;
 
 
     if (verified) {
