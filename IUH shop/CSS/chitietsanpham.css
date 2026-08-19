@@ -2021,7 +2021,7 @@ body {
 
 /* =========================================
    TÍCH XANH NGƯỜI ĐĂNG
-   Đồng bộ 100% với tích xanh trang Tài khoản
+   Đồng bộ với trang Tài khoản
 ========================================= */
 
 .seller-name-row {
@@ -2034,57 +2034,46 @@ body {
     margin: 0;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text-dark);
 }
 
 .seller-verified-badge {
     display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    align-items: center;
+    justify-content: center;
 
     width: 20px !important;
     height: 20px !important;
+
     min-width: 20px !important;
     min-height: 20px !important;
+
     max-width: 20px !important;
     max-height: 20px !important;
-
-    flex: 0 0 20px !important;
 
     padding: 0 !important;
     margin: 0 !important;
 
-    border-radius: 50% !important;
+    border-radius: 50%;
 
-    background: #1877f2 !important;
-    color: #ffffff !important;
+    background: #1877f2;
+    color: #ffffff;
 
-    font-family: Arial, sans-serif !important;
     font-size: 13px !important;
-    font-weight: 800 !important;
-    line-height: 20px !important;
-    text-align: center !important;
+    font-weight: 800;
+
+    line-height: 1;
 
     box-shadow:
         0 2px 6px
         rgba(24, 119, 242, 0.25);
 
     cursor: help;
-    vertical-align: middle;
-    box-sizing: border-box;
+
+    flex-shrink: 0;
 }
 
 .seller-verified-badge[hidden] {
     display: none !important;
-}
-
-/* Không cho rule ".seller-info span" làm ảnh hưởng tích xanh */
-.seller-info .seller-verified-badge {
-    display: inline-flex !important;
-    color: #ffffff !important;
 }
 
 /* =====================================================
