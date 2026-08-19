@@ -747,33 +747,23 @@ async function loadProfileUser(userId) {
             "profileRole"
         );
 
-    let roleText =
-        "Người dùng";
+    let roleText = "Người dùng";
 
+if (
+    profile.role === "admin" ||
+    profile.role === "moderator"
+) {
 
-    if (profile.student_verified) {
+    roleText = "Quản trị viên";
 
-        roleText =
-            "Sinh viên / Người bán";
+} else if (
+    profile.student_verified
+) {
 
-    } else if (
-        profile.role === "admin"
-    ) {
+    roleText = "Sinh viên / Người bán";
+}
 
-        roleText =
-            "Quản trị viên";
-
-    } else if (
-        profile.role === "moderator"
-    ) {
-
-        roleText =
-            "Kiểm duyệt viên";
-    }
-
-
-    profileRole.textContent =
-        roleText;
+profileRole.textContent = roleText;
 
 
     /* =================================================
@@ -791,11 +781,18 @@ async function loadProfileUser(userId) {
         );
 
 
-    const verified =
+    const isAdmin =
+    profile.role === "admin" ||
+    profile.role === "moderator";
+
+const verified =
+    !isAdmin &&
+    (
         profile.student_verified === true ||
         profile.student_verified === "true" ||
         profile.student_verified === 1 ||
-        profile.student_verified === "1";
+        profile.student_verified === "1"
+    );
 
 
     if (verified) {
@@ -1526,16 +1523,21 @@ async function loadProfileProducts(userId) {
             `)
 
             .eq(
-                "seller_id",
-                userId
-            )
+    "seller_id",
+    userId
+)
 
-            .order(
-                "created_at",
-                {
-                    ascending: false
-                }
-            );
+.eq(
+    "status",
+    "active"
+)
+
+.order(
+    "created_at",
+    {
+        ascending: false
+    }
+);
 
 
         /* =================================================
