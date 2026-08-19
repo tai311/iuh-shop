@@ -832,7 +832,7 @@ const verified =
    KIỂM TRA CHỦ TÀI KHOẢN
 ===================================================== */
 
-function setupProfileOwnerUI() {
+function setupProfileOwnerUI(profile) {
 
     const editIntroductionButton =
         document.getElementById("editIntroductionButton");
