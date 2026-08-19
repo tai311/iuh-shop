@@ -583,9 +583,7 @@ function renderProductCard(product) {
 
 
     const verified =
-        seller.student_verified === true ||
-        seller.role === "admin" ||
-        seller.role === "moderator";
+    seller.student_verified === true;
 
 
     return `
@@ -686,29 +684,25 @@ function renderProductCard(product) {
 
                         <span class="seller-name">
 
-                            ${esc(
-                                seller.fullname ||
-                                "Sinh viên IUH"
-                            )}
+    ${esc(
+        seller.fullname ||
+        "Không xác định"
+    )}
 
-                            ${
-                                verified
-                                    ? " ✓"
-                                    : ""
-                            }
+    ${
+        verified
+            ? " ✓"
+            : ""
+    }
 
-                        </span>
+</span>
 
 
-                        <span class="seller-status">
+<span class="seller-status">
 
-                            ${
-                                verified
-                                    ? "Tài khoản đã xác thực"
-                                    : "Sinh viên IUH"
-                            }
+    Người đăng
 
-                        </span>
+</span>
 
                     </div>
 

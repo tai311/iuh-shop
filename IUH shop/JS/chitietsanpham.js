@@ -61,9 +61,17 @@ const detailQuantity = $("detailQuantity");
 const detailStatus = $("detailStatus");
 const productDescription = $("productDescription");
 
-const sellerName = $("sellerName");
-const sellerAvatar = $("sellerAvatar");
-const sellerProfileLink = $("sellerProfileLink");
+const sellerName =
+    $("sellerName");
+
+const sellerAvatar =
+    $("sellerAvatar");
+
+const sellerVerifiedBadge =
+    $("sellerVerifiedBadge");
+
+const sellerProfileLink =
+    $("sellerProfileLink");
 
 const backButton = $("backButton");
 
@@ -524,16 +532,11 @@ async function loadSeller(sellerId) {
     if (!sellerId) {
 
         if (sellerName) {
-
-            sellerName.textContent =
-                "Không xác định";
-
+            sellerName.textContent = "Không xác định";
         }
 
         return;
-
     }
-
 
     try {
 
@@ -546,69 +549,109 @@ async function loadSeller(sellerId) {
                 user_id,
                 fullname,
                 avatar_url,
-                email
+                email,
+                role,
+                student_verified
             `)
-            .eq("user_id", sellerId)
+            .eq(
+                "user_id",
+                sellerId
+            )
             .maybeSingle();
 
 
         if (error) {
 
             console.error(
-                "Lỗi lấy người bán:",
+                "Lỗi lấy thông tin người đăng:",
                 error
             );
 
             if (sellerName) {
-
                 sellerName.textContent =
-                    "Người bán";
-
+                    "Không xác định";
             }
 
             return;
-
         }
 
 
-        currentSeller = seller;
+        if (!seller) {
+
+            if (sellerName) {
+                sellerName.textContent =
+                    "Không xác định";
+            }
+
+            return;
+        }
 
 
-        /* -------------------------------------------------
-           TÊN
-           ------------------------------------------------- */
+        /* =========================================
+           LƯU NGƯỜI ĐĂNG
+        ========================================= */
+
+        currentSeller =
+            seller;
+
+
+        /* =========================================
+           TÊN NGƯỜI ĐĂNG
+        ========================================= */
+
+        const fullname =
+            seller.fullname ||
+            seller.email?.split("@")[0] ||
+            "Không xác định";
+
 
         if (sellerName) {
 
             sellerName.textContent =
-                seller?.fullname ||
-                seller?.email?.split("@")[0] ||
-                "Người bán";
+                fullname;
 
         }
 
 
-        /* -------------------------------------------------
+        /* =========================================
            AVATAR
-           ------------------------------------------------- */
+        ========================================= */
 
         if (sellerAvatar) {
 
             sellerAvatar.src =
-                seller?.avatar_url ||
+                seller.avatar_url ||
                 "../Images/default-avatar.svg";
 
         }
 
 
-        /* -------------------------------------------------
-           LINK TRANG CÁ NHÂN
-           ------------------------------------------------- */
+        /* =========================================
+           TÍCH XÁC THỰC
+        ========================================= */
+
+        const verified =
+            seller.student_verified === true;
+
+
+        if (sellerVerifiedBadge) {
+
+            sellerVerifiedBadge.hidden =
+                !verified;
+
+        }
+
+
+        /* =========================================
+           TRANG CÁ NHÂN
+        ========================================= */
 
         if (sellerProfileLink) {
 
             sellerProfileLink.href =
-                `taikhoan.html?id=${encodeURIComponent(sellerId)}`;
+                `taikhoan.html?id=${encodeURIComponent(
+                    sellerId
+                )}`;
 
         }
 
@@ -616,14 +659,14 @@ async function loadSeller(sellerId) {
     catch (error) {
 
         console.error(
-            "Lỗi seller:",
+            "Lỗi tải người đăng:",
             error
         );
 
         if (sellerName) {
 
             sellerName.textContent =
-                "Người bán";
+                "Không xác định";
 
         }
 

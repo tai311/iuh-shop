@@ -2012,6 +2012,37 @@ body {
     font-weight: 700;
 }
 
+.seller-label {
+    display: block;
+    font-size: 14px;
+    color: #6f7b91;
+    margin-bottom: 3px;
+}
+
+.seller-name-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.seller-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 19px;
+    height: 19px;
+
+    border-radius: 50%;
+
+    background: #2f80ed;
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    flex-shrink: 0;
+}
 
 /* =====================================================
    BUTTON

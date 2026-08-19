@@ -442,41 +442,50 @@
 
             <!-- NGƯỜI BÁN -->
 
-            <div class="seller-card">
+           <div class="seller-card">
 
-                <div class="seller-avatar-wrap">
+    <div class="seller-avatar-wrap">
+        <img
+            id="sellerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh người đăng"
+        >
+    </div>
 
-                    <img
-                        id="sellerAvatar"
-                        src="../Images/default-avatar.svg"
-                        alt="Người bán"
-                    >
+    <div class="seller-info">
 
-                </div>
+        <span class="seller-label">
+            Người đăng
+        </span>
 
+        <div class="seller-name-row">
 
-                <div class="seller-info">
+            <strong id="sellerName">
+                Đang tải...
+            </strong>
 
-                    <span>
-                        Người bán
-                    </span>
+            <span
+                id="sellerVerifiedBadge"
+                class="seller-verified-badge"
+                title="Tài khoản đã xác thực"
+                hidden
+            >
+                ✓
+            </span>
 
-                    <strong id="sellerName">
-                        Đang tải...
-                    </strong>
+        </div>
 
-                </div>
+    </div>
 
+    <a
+        id="sellerProfileLink"
+        href="taikhoan.html"
+        class="seller-link"
+    >
+        Xem tài khoản
+    </a>
 
-                <a
-                    id="sellerProfileLink"
-                    href="taikhoan.html"
-                    class="seller-link"
-                >
-                    Xem tài khoản
-                </a>
-
-            </div>
+</div>
 
 
             <!-- NÚT -->
