@@ -651,7 +651,7 @@ async function loadSeller(sellerId) {
         if (sellerProfileLink) {
 
             sellerProfileLink.href =
-                `taikhoan.html?id=${encodeURIComponent(
+                `trangcanhan.html?id=${encodeURIComponent(
                     seller.user_id
                 )}`;
 

@@ -565,30 +565,47 @@ document.addEventListener(
 );
 
 
+
+
+
 /* =====================================================
    TRANG CÁ NHÂN
 ===================================================== */
 
 
 /* =====================================================
-   LẤY USER ID CẦN HIỂN THỊ
+   BIẾN TRẠNG THÁI
+===================================================== */
+
+let currentProfileUserId = null;
+let currentAuthUserId = null;
+let isProfileOwner = false;
+
+const DEFAULT_PROFILE_AVATAR =
+    "../Images/default-avatar.svg";
+
+
+/* =====================================================
+   LẤY ID NGƯỜI CẦN XEM
 ===================================================== */
 
 async function getProfileUserId() {
 
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
     /*
-       Nếu URL có:
+       Nếu URL là:
 
-       trangcanhan.html?id=xxxxx
+       trangcanhan.html?id=xxxxxxxx
 
-       thì xem trang cá nhân của người đó.
+       => xem tài khoản của người đó
     */
 
-    const params = new URLSearchParams(
-        window.location.search
-    );
-
-    const userIdFromUrl = params.get("id");
+    const userIdFromUrl =
+        params.get("id");
 
     if (userIdFromUrl) {
         return userIdFromUrl;
@@ -596,8 +613,8 @@ async function getProfileUserId() {
 
 
     /*
-       Nếu không có id trên URL
-       thì lấy tài khoản đang đăng nhập.
+       Nếu không có id
+       => xem chính tài khoản đang đăng nhập
     */
 
     const {
@@ -633,7 +650,8 @@ async function loadProfileUser(userId) {
 
         document.getElementById(
             "profileName"
-        ).textContent = "Không xác định";
+        ).textContent =
+            "Không xác định";
 
         return null;
     }
@@ -643,7 +661,9 @@ async function loadProfileUser(userId) {
         data: profile,
         error
     } = await supabaseClient
+
         .from("users")
+
         .select(`
             user_id,
             fullname,
@@ -651,9 +671,15 @@ async function loadProfileUser(userId) {
             role,
             student_verified,
             faculty,
-            student_id
+            student_id,
+            bio
         `)
-        .eq("user_id", userId)
+
+        .eq(
+            "user_id",
+            userId
+        )
+
         .maybeSingle();
 
 
@@ -666,7 +692,8 @@ async function loadProfileUser(userId) {
 
         document.getElementById(
             "profileName"
-        ).textContent = "Không thể tải thông tin";
+        ).textContent =
+            "Không thể tải thông tin";
 
         return null;
     }
@@ -676,51 +703,49 @@ async function loadProfileUser(userId) {
 
         document.getElementById(
             "profileName"
-        ).textContent = "Không tìm thấy người dùng";
+        ).textContent =
+            "Không tìm thấy người dùng";
 
         return null;
     }
 
 
-    /* =========================
+    /* =================================================
        TÊN
-    ========================= */
+    ================================================= */
 
     const profileName =
         document.getElementById(
             "profileName"
         );
 
-
     profileName.textContent =
         profile.fullname ||
         "Người dùng";
 
 
-    /* =========================
+    /* =================================================
        AVATAR
-    ========================= */
+    ================================================= */
 
     const profileAvatar =
         document.getElementById(
             "profileAvatar"
         );
 
-
     profileAvatar.src =
         profile.avatar_url ||
-        "../Images/default-avatar.svg";
+        DEFAULT_PROFILE_AVATAR;
 
 
-    /* =========================
+    /* =================================================
        CHỨC DANH
-    ========================= */
+    ================================================= */
 
     const profileRole =
         document.getElementById(
             "profileRole"
         );
-
 
     let roleText =
         "Người dùng";
@@ -731,16 +756,19 @@ async function loadProfileUser(userId) {
         roleText =
             "Sinh viên / Người bán";
 
-    } else if (profile.role === "admin") {
+    } else if (
+        profile.role === "admin"
+    ) {
 
         roleText =
             "Quản trị viên";
 
-    } else if (profile.role === "moderator") {
+    } else if (
+        profile.role === "moderator"
+    ) {
 
         roleText =
             "Kiểm duyệt viên";
-
     }
 
 
@@ -748,15 +776,14 @@ async function loadProfileUser(userId) {
         roleText;
 
 
-    /* =========================
+    /* =================================================
        XÁC THỰC SINH VIÊN
-    ========================= */
+    ================================================= */
 
     const verifiedBadge =
         document.getElementById(
             "verifiedBadge"
         );
-
 
     const studentVerifiedText =
         document.getElementById(
@@ -764,7 +791,14 @@ async function loadProfileUser(userId) {
         );
 
 
-    if (profile.student_verified === true) {
+    const verified =
+        profile.student_verified === true ||
+        profile.student_verified === "true" ||
+        profile.student_verified === 1 ||
+        profile.student_verified === "1";
+
+
+    if (verified) {
 
         verifiedBadge.style.display =
             "inline-flex";
@@ -782,21 +816,664 @@ async function loadProfileUser(userId) {
     }
 
 
+    /* =================================================
+       GIỚI THIỆU
+    ================================================= */
+
+    const profileDescription =
+        document.getElementById(
+            "profileDescription"
+        );
+
+
+    profileDescription.textContent =
+        profile.bio?.trim() ||
+        "Chưa có thông tin giới thiệu.";
+
+
     return profile;
 }
 
 
 /* =====================================================
-   LOAD TIN ĐĂNG BÁN
+   KIỂM TRA CHỦ TÀI KHOẢN
 ===================================================== */
 
-async function loadProfileProducts(userId) {
+function setupProfileOwnerUI(profile) {
+
+    const editIntroductionButton =
+        document.getElementById(
+            "editIntroductionButton"
+        );
+
+    const changeAvatarButton =
+        document.getElementById(
+            "changeAvatarButton"
+        );
+
+
+    /*
+       KHÔNG PHẢI CHỦ
+
+       => ẨN toàn bộ nút chỉnh sửa
+    */
+
+    if (!isProfileOwner) {
+
+        if (editIntroductionButton) {
+
+            editIntroductionButton.hidden =
+                true;
+        }
+
+
+        if (changeAvatarButton) {
+
+            changeAvatarButton.hidden =
+                true;
+        }
+
+
+        return;
+    }
+
+
+    /*
+       LÀ CHỦ
+
+       => cho phép chỉnh sửa
+    */
+
+    if (editIntroductionButton) {
+
+        editIntroductionButton.hidden =
+            false;
+    }
+
+
+    if (changeAvatarButton) {
+
+        changeAvatarButton.hidden =
+            false;
+    }
+
+
+    setupIntroductionEditor(
+        profile
+    );
+
+    setupAvatarEditor();
+}
+
+
+/* =====================================================
+   CHỈNH SỬA GIỚI THIỆU
+===================================================== */
+
+function setupIntroductionEditor(
+    profile
+) {
+
+    const editButton =
+        document.getElementById(
+            "editIntroductionButton"
+        );
+
+    const editor =
+        document.getElementById(
+            "introductionEditor"
+        );
+
+    const description =
+        document.getElementById(
+            "profileDescription"
+        );
+
+    const input =
+        document.getElementById(
+            "introductionInput"
+        );
+
+    const counter =
+        document.getElementById(
+            "introductionCounter"
+        );
+
+    const cancelButton =
+        document.getElementById(
+            "cancelIntroductionButton"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "saveIntroductionButton"
+        );
+
+
+    if (
+        !editButton ||
+        !editor ||
+        !description ||
+        !input ||
+        !counter ||
+        !cancelButton ||
+        !saveButton
+    ) {
+
+        return;
+    }
+
+
+    /* =================================================
+       ĐẾM KÝ TỰ
+    ================================================= */
+
+    function updateCounter() {
+
+        counter.textContent =
+            `${input.value.length}/1000`;
+    }
+
+
+    /* =================================================
+       BẤM CHỈNH SỬA
+    ================================================= */
+
+    editButton.onclick =
+        function () {
+
+            input.value =
+                profile.bio || "";
+
+            updateCounter();
+
+
+            description.hidden =
+                true;
+
+            editor.hidden =
+                false;
+
+            editButton.hidden =
+                true;
+
+            input.focus();
+        };
+
+
+    /* =================================================
+       NHẬP NỘI DUNG
+    ================================================= */
+
+    input.oninput =
+        updateCounter;
+
+
+    /* =================================================
+       HỦY
+    ================================================= */
+
+    cancelButton.onclick =
+        function () {
+
+            input.value =
+                profile.bio || "";
+
+            description.hidden =
+                false;
+
+            editor.hidden =
+                true;
+
+            editButton.hidden =
+                false;
+
+            updateCounter();
+        };
+
+
+    /* =================================================
+       LƯU
+    ================================================= */
+
+    saveButton.onclick =
+        async function () {
+
+            const bio =
+                input.value.trim();
+
+
+            saveButton.disabled =
+                true;
+
+            saveButton.textContent =
+                "Đang lưu...";
+
+
+            try {
+
+                /*
+                   Kiểm tra lại người đăng nhập
+                   trước khi cập nhật database.
+                */
+
+                const {
+                    data: {
+                        user
+                    },
+                    error: userError
+                } =
+                    await supabaseClient
+                        .auth
+                        .getUser();
+
+
+                if (
+                    userError ||
+                    !user ||
+                    user.id !== currentProfileUserId
+                ) {
+
+                    alert(
+                        "Bạn không có quyền chỉnh sửa trang cá nhân này."
+                    );
+
+                    return;
+                }
+
+
+                /*
+                   Cập nhật bio
+                */
+
+                const {
+                    error
+                } =
+                    await supabaseClient
+
+                        .from("users")
+
+                        .update({
+                            bio:
+                                bio || null
+                        })
+
+                        .eq(
+                            "user_id",
+                            user.id
+                        );
+
+
+                if (error) {
+
+                    console.error(
+                        "Lỗi lưu giới thiệu:",
+                        error
+                    );
+
+                    alert(
+                        "Không thể lưu phần giới thiệu."
+                    );
+
+                    return;
+                }
+
+
+                /*
+                   Cập nhật giao diện
+                */
+
+                profile.bio =
+                    bio;
+
+
+                description.textContent =
+                    bio ||
+                    "Chưa có thông tin giới thiệu.";
+
+
+                description.hidden =
+                    false;
+
+                editor.hidden =
+                    true;
+
+                editButton.hidden =
+                    false;
+
+
+                alert(
+                    "Đã cập nhật giới thiệu."
+                );
+
+            } finally {
+
+                saveButton.disabled =
+                    false;
+
+                saveButton.textContent =
+                    "Lưu thay đổi";
+            }
+        };
+}
+
+
+/* =====================================================
+   ĐỔI ẢNH ĐẠI DIỆN
+===================================================== */
+
+function setupAvatarEditor() {
+
+    const changeButton =
+        document.getElementById(
+            "changeAvatarButton"
+        );
+
+    const input =
+        document.getElementById(
+            "avatarInput"
+        );
+
+    const avatar =
+        document.getElementById(
+            "profileAvatar"
+        );
+
+
+    if (
+        !changeButton ||
+        !input ||
+        !avatar
+    ) {
+
+        return;
+    }
+
+
+    /* =================================================
+       MỞ FILE
+    ================================================= */
+
+    changeButton.onclick =
+        function () {
+
+            input.click();
+        };
+
+
+    /* =================================================
+       CHỌN FILE
+    ================================================= */
+
+    input.onchange =
+        async function () {
+
+            const file =
+                input.files?.[0];
+
+
+            input.value = "";
+
+
+            if (!file) {
+                return;
+            }
+
+
+            /* Kiểm tra ảnh */
+
+            if (
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
+
+                alert(
+                    "Vui lòng chọn một file ảnh."
+                );
+
+                return;
+            }
+
+
+            /* Tối đa 5MB */
+
+            if (
+                file.size >
+                5 * 1024 * 1024
+            ) {
+
+                alert(
+                    "Ảnh không được lớn hơn 5MB."
+                );
+
+                return;
+            }
+
+
+            /*
+               Kiểm tra quyền
+            */
+
+            const {
+                data: {
+                    user
+                },
+                error: userError
+            } =
+                await supabaseClient
+                    .auth
+                    .getUser();
+
+
+            if (
+                userError ||
+                !user ||
+                user.id !== currentProfileUserId
+            ) {
+
+                alert(
+                    "Bạn không có quyền đổi ảnh đại diện."
+                );
+
+                return;
+            }
+
+
+            changeButton.disabled =
+                true;
+
+            changeButton.textContent =
+                "...";
+
+
+            try {
+
+                /*
+                   Lấy đuôi file
+                */
+
+                const extension =
+                    file.name
+                        .split(".")
+                        .pop()
+                        ?.toLowerCase() ||
+                    "jpg";
+
+
+                /*
+                   Mỗi user có 1 avatar riêng
+                */
+
+                const filePath =
+                    `${user.id}/avatar.${extension}`;
+
+
+                /*
+                   Upload Storage
+                */
+
+                const {
+                    error:
+                        uploadError
+                } =
+                    await supabaseClient
+
+                        .storage
+
+                        .from("avatars")
+
+                        .upload(
+                            filePath,
+                            file,
+                            {
+                                upsert: true,
+                                contentType:
+                                    file.type
+                            }
+                        );
+
+
+                if (uploadError) {
+
+                    console.error(
+                        "Lỗi upload avatar:",
+                        uploadError
+                    );
+
+                    alert(
+                        "Không thể tải ảnh lên. Hãy kiểm tra bucket avatars."
+                    );
+
+                    return;
+                }
+
+
+                /*
+                   Lấy URL
+                */
+
+                const {
+                    data:
+                        publicUrlData
+                } =
+                    supabaseClient
+
+                        .storage
+
+                        .from("avatars")
+
+                        .getPublicUrl(
+                            filePath
+                        );
+
+
+                const avatarUrl =
+                    `${publicUrlData.publicUrl}?t=${Date.now()}`;
+
+
+                /*
+                   Lưu URL vào users
+                */
+
+                const {
+                    error:
+                        updateError
+                } =
+                    await supabaseClient
+
+                        .from("users")
+
+                        .update({
+                            avatar_url:
+                                publicUrlData.publicUrl
+                        })
+
+                        .eq(
+                            "user_id",
+                            user.id
+                        );
+
+
+                if (updateError) {
+
+                    console.error(
+                        "Lỗi lưu avatar:",
+                        updateError
+                    );
+
+                    alert(
+                        "Ảnh đã tải lên nhưng chưa thể lưu vào tài khoản."
+                    );
+
+                    return;
+                }
+
+
+                /*
+                   Cập nhật ảnh trên trang
+                */
+
+                avatar.src =
+                    avatarUrl;
+
+
+                /*
+                   Cập nhật avatar trên header
+                */
+
+                const headerAvatar =
+                    document.getElementById(
+                        "headerAvatar"
+                    );
+
+
+                if (headerAvatar) {
+
+                    headerAvatar.src =
+                        avatarUrl;
+                }
+
+
+                alert(
+                    "Đã cập nhật ảnh đại diện."
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Lỗi đổi ảnh đại diện:",
+                    error
+                );
+
+                alert(
+                    "Có lỗi xảy ra khi đổi ảnh đại diện."
+                );
+
+            } finally {
+
+                changeButton.disabled =
+                    false;
+
+                changeButton.textContent =
+                    "✎";
+            }
+        };
+}
+
+
+/* =====================================================
+   LOAD TIN ĐĂNG CỦA ĐÚNG NGƯỜI
+===================================================== */
+
+async function loadProfileProducts(
+    userId
+) {
 
     const productsGrid =
         document.getElementById(
             "productsGrid"
         );
-
 
     const productsCount =
         document.getElementById(
@@ -817,29 +1494,40 @@ async function loadProfileProducts(userId) {
 
 
     /*
-       seller_id chính là người đăng sản phẩm.
+       seller_id = người đăng tin
 
-       Vì vậy chỉ lấy những sản phẩm
-       có seller_id = userId đang xem.
+       => chỉ lấy sản phẩm
+       của đúng user đang xem.
     */
 
     const {
         data: products,
         error
-    } = await supabaseClient
-        .from("products")
-        .select(`
-            id,
-            title,
-            price,
-            image_url,
-            category,
-            quantity
-        `)
-        .eq("seller_id", userId)
-        .order("id", {
-            ascending: false
-        });
+    } =
+        await supabaseClient
+
+            .from("products")
+
+            .select(`
+                id,
+                title,
+                price,
+                image_url,
+                category,
+                quantity
+            `)
+
+            .eq(
+                "seller_id",
+                userId
+            )
+
+            .order(
+                "id",
+                {
+                    ascending: false
+                }
+            );
 
 
     if (error) {
@@ -868,19 +1556,32 @@ async function loadProfileProducts(userId) {
             </div>
         `;
 
-        productsCount.textContent =
-            "Không thể tải dữ liệu";
+
+        if (productsCount) {
+
+            productsCount.textContent =
+                "Không thể tải dữ liệu";
+        }
+
 
         return;
     }
 
 
-    /* Không có tin */
+    /*
+       Không có tin
+    */
 
-    if (!products || products.length === 0) {
+    if (
+        !products ||
+        products.length === 0
+    ) {
 
-        productsCount.textContent =
-            "Chưa có tin đăng nào";
+        if (productsCount) {
+
+            productsCount.textContent =
+                "Chưa có tin đăng nào";
+        }
 
 
         productsGrid.innerHTML = `
@@ -901,103 +1602,147 @@ async function loadProfileProducts(userId) {
             </div>
         `;
 
+
         return;
     }
 
 
-    /* Có tin */
+    /*
+       Có tin
+    */
 
-    productsCount.textContent =
-        `Đang hiển thị ${products.length} tin đăng`;
+    if (productsCount) {
+
+        productsCount.textContent =
+            `Đang hiển thị ${products.length} tin đăng`;
+    }
 
 
     productsGrid.innerHTML = "";
 
 
-    products.forEach(product => {
+    products.forEach(
+        function (product) {
 
-        const card =
-            document.createElement("a");
+            /*
+               Dùng thẻ A để toàn bộ card
+               có thể click được.
+            */
 
-
-        card.className =
-            "profile-product-card";
-
-
-        /*
-           Khi bấm sản phẩm
-           chuyển sang trang chi tiết.
-        */
-
-        card.href =
-            `chitietsanpham.html?id=${encodeURIComponent(product.id)}`;
+            const card =
+                document.createElement(
+                    "a"
+                );
 
 
-        const image =
-            product.image_url ||
-            "../Images/default-product.jpg";
+            card.className =
+                "profile-product-card";
 
 
-        const title =
-            product.title ||
-            "Sản phẩm";
+            /*
+               Sang chi tiết sản phẩm
+            */
+
+            card.href =
+                `chitietsanpham.html?id=${encodeURIComponent(product.id)}`;
 
 
-        const category =
-            product.category ||
-            "Sản phẩm";
+            /*
+               Ảnh
+            */
+
+            const image =
+                product.image_url ||
+                "../Images/default-product.jpg";
 
 
-        const price =
-            formatProfilePrice(
-                product.price
-            );
+            /*
+               Tên
+            */
+
+            const title =
+                product.title ||
+                "Sản phẩm";
 
 
-        const quantity =
-            product.quantity ??
-            0;
+            /*
+               Danh mục
+            */
+
+            const category =
+                product.category ||
+                "Sản phẩm";
 
 
-        card.innerHTML = `
+            /*
+               Giá
+            */
 
-            <img
-                src="${escapeProfileHTML(image)}"
-                alt="${escapeProfileHTML(title)}"
-                class="profile-product-image"
-            >
+            const price =
+                formatProfilePrice(
+                    product.price
+                );
 
-            <div class="profile-product-info">
 
-                <span class="profile-product-category">
-                    ${escapeProfileHTML(category)}
-                </span>
+            /*
+               Số lượng
+            */
 
-                <h3 class="profile-product-title">
-                    ${escapeProfileHTML(title)}
-                </h3>
+            const quantity =
+                product.quantity ??
+                0;
 
-                <div class="profile-product-bottom">
 
-                    <span class="profile-product-price">
-                        ${price}
+            card.innerHTML = `
+
+                <img
+                    src="${escapeProfileHTML(image)}"
+                    alt="${escapeProfileHTML(title)}"
+                    class="profile-product-image"
+                >
+
+                <div class="profile-product-info">
+
+                    <span
+                        class="profile-product-category"
+                    >
+                        ${escapeProfileHTML(category)}
                     </span>
 
-                    <span class="profile-product-quantity">
-                        SL: ${quantity}
-                    </span>
+                    <h3
+                        class="profile-product-title"
+                    >
+                        ${escapeProfileHTML(title)}
+                    </h3>
+
+                    <div
+                        class="profile-product-bottom"
+                    >
+
+                        <span
+                            class="profile-product-price"
+                        >
+                            ${price}
+                        </span>
+
+                        <span
+                            class="profile-product-quantity"
+                        >
+                            SL: ${quantity}
+                        </span>
+
+                    </div>
 
                 </div>
 
-            </div>
-
-        `;
+            `;
 
 
-        productsGrid.appendChild(card);
-
-    });
-
+            productsGrid.appendChild(
+                card
+            );
+        }
+    );
 }
 
 
@@ -1005,41 +1750,72 @@ async function loadProfileProducts(userId) {
    FORMAT GIÁ
 ===================================================== */
 
-function formatProfilePrice(price) {
+function formatProfilePrice(
+    price
+) {
 
     const number =
         Number(price);
 
 
-    if (!Number.isFinite(number)) {
+    if (
+        !Number.isFinite(number)
+    ) {
 
         return "Liên hệ";
     }
 
 
-    return number.toLocaleString(
-        "vi-VN"
-    ) + " đ";
+    return (
+        number.toLocaleString(
+            "vi-VN"
+        ) +
+        " đ"
+    );
 }
 
 
 /* =====================================================
-   ESCAPE HTML
+   CHỐNG HTML INJECTION
 ===================================================== */
 
-function escapeProfileHTML(value) {
+function escapeProfileHTML(
+    value
+) {
 
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return String(
+        value ?? ""
+    )
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
 
 /* =====================================================
-   TAB: TIN ĐĂNG / BÀI VIẾT
+   TAB TIN ĐĂNG / BÀI VIẾT
 ===================================================== */
 
 function setupProfileTabs() {
@@ -1049,18 +1825,15 @@ function setupProfileTabs() {
             "productsTab"
         );
 
-
     const postsTab =
         document.getElementById(
             "postsTab"
         );
 
-
     const productsContent =
         document.getElementById(
             "productsContent"
         );
-
 
     const postsContent =
         document.getElementById(
@@ -1074,14 +1847,16 @@ function setupProfileTabs() {
         !productsContent ||
         !postsContent
     ) {
+
         return;
     }
 
 
-    /* Tin đăng */
+    /* =================================================
+       TIN ĐĂNG
+    ================================================= */
 
-    productsTab.addEventListener(
-        "click",
+    productsTab.onclick =
         function () {
 
             productsTab.classList.add(
@@ -1100,15 +1875,14 @@ function setupProfileTabs() {
             postsContent.classList.remove(
                 "active"
             );
-
-        }
-    );
+        };
 
 
-    /* Bài viết */
+    /* =================================================
+       BÀI VIẾT
+    ================================================= */
 
-    postsTab.addEventListener(
-        "click",
+    postsTab.onclick =
         function () {
 
             postsTab.classList.add(
@@ -1127,15 +1901,12 @@ function setupProfileTabs() {
             productsContent.classList.remove(
                 "active"
             );
-
-        }
-    );
-
+        };
 }
 
 
 /* =====================================================
-   KHỞI TẠO TRANG CÁ NHÂN
+   KHỞI TẠO TRANG
 ===================================================== */
 
 document.addEventListener(
@@ -1145,12 +1916,55 @@ document.addEventListener(
         try {
 
             /*
-               Xác định người cần xem
+               ==========================================
+               1. LẤY NGƯỜI ĐANG ĐĂNG NHẬP
+               ==========================================
+            */
+
+            const {
+                data: {
+                    user: authUser
+                },
+                error: authError
+            } =
+                await supabaseClient
+                    .auth
+                    .getUser();
+
+
+            if (authError) {
+
+                console.error(
+                    "Lỗi lấy tài khoản đăng nhập:",
+                    authError
+                );
+            }
+
+
+            currentAuthUserId =
+                authUser?.id ||
+                null;
+
+
+            /*
+               ==========================================
+               2. LẤY NGƯỜI CẦN HIỂN THỊ
+               ==========================================
             */
 
             const userId =
                 await getProfileUserId();
 
+
+            currentProfileUserId =
+                userId;
+
+
+            /*
+               ==========================================
+               3. CHƯA CÓ USER
+               ==========================================
+            */
 
             if (!userId) {
 
@@ -1166,12 +1980,27 @@ document.addEventListener(
                     "Vui lòng đăng nhập để xem trang cá nhân.";
 
 
+                setupProfileTabs();
+
                 return;
             }
 
 
             /*
-               Tải thông tin người dùng
+               ==========================================
+               4. XÁC ĐỊNH CHỦ TÀI KHOẢN
+               ==========================================
+            */
+
+            isProfileOwner =
+                !!currentAuthUserId &&
+                currentAuthUserId === userId;
+
+
+            /*
+               ==========================================
+               5. LOAD PROFILE
+               ==========================================
             */
 
             const profile =
@@ -1186,8 +2015,20 @@ document.addEventListener(
 
 
             /*
-               Tải các tin đăng của
-               ĐÚNG người này
+               ==========================================
+               6. QUYỀN CHỈNH SỬA
+               ==========================================
+            */
+
+            setupProfileOwnerUI(
+                profile
+            );
+
+
+            /*
+               ==========================================
+               7. LOAD TIN ĐĂNG
+               ==========================================
             */
 
             await loadProfileProducts(
@@ -1196,19 +2037,20 @@ document.addEventListener(
 
 
             /*
-               Khởi tạo tab
+               ==========================================
+               8. TAB
+               ==========================================
             */
 
             setupProfileTabs();
 
-        }
-        catch (error) {
+
+        } catch (error) {
 
             console.error(
                 "Lỗi khởi tạo trang cá nhân:",
                 error
             );
-
         }
 
     }

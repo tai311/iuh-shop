@@ -256,18 +256,14 @@
     </header>
 
 
+    <main class="profile-page">
+
     <!-- =====================================================
-     NỘI DUNG TRANG CÁ NHÂN
-===================================================== -->
-
-<main class="profile-page">
-
-    <!-- =========================
          THÔNG TIN CÁ NHÂN
-    ========================== -->
+    ====================================================== -->
     <section class="profile-card">
 
-        <!-- ẢNH ĐẠI DIỆN -->
+        <!-- AVATAR -->
         <div class="profile-avatar-wrapper">
 
             <img
@@ -275,6 +271,24 @@
                 src="../Images/default-avatar.svg"
                 alt="Ảnh đại diện"
                 class="profile-avatar"
+            >
+
+            <!-- CHỈ CHỦ TÀI KHOẢN MỚI THẤY -->
+            <button
+                type="button"
+                id="changeAvatarButton"
+                class="profile-edit-avatar"
+                hidden
+                title="Đổi ảnh đại diện"
+            >
+                ✎
+            </button>
+
+            <input
+                type="file"
+                id="avatarInput"
+                accept="image/jpeg,image/png,image/webp"
+                hidden
             >
 
         </div>
@@ -302,16 +316,14 @@
             </div>
 
 
-            <!-- CHỨC DANH -->
             <p
                 id="profileRole"
                 class="profile-role"
             >
-                Sinh viên / Người bán
+                Người dùng
             </p>
 
 
-            <!-- THÔNG TIN SINH VIÊN -->
             <div
                 id="studentVerifiedText"
                 class="student-verified"
@@ -325,28 +337,99 @@
     </section>
 
 
-    <!-- =========================
+
+    <!-- =====================================================
          GIỚI THIỆU
-    ========================== -->
+    ====================================================== -->
     <section class="profile-introduction">
 
-        <h2>Giới thiệu</h2>
+        <div class="section-heading-row">
+
+            <h2>
+                Giới thiệu
+            </h2>
+
+            <!-- CHỈ CHỦ TÀI KHOẢN MỚI THẤY -->
+            <button
+                type="button"
+                id="editIntroductionButton"
+                class="profile-edit-button"
+                hidden
+            >
+                Chỉnh sửa
+            </button>
+
+        </div>
+
 
         <div class="section-line"></div>
 
+
+        <!-- Nội dung giới thiệu -->
         <p id="profileDescription">
             Chưa có thông tin giới thiệu.
         </p>
 
+
+        <!-- Khu vực chỉnh sửa -->
+        <div
+            id="introductionEditor"
+            class="introduction-editor"
+            hidden
+        >
+
+            <textarea
+                id="introductionInput"
+                maxlength="1000"
+                rows="6"
+                placeholder="Viết một chút về bạn..."
+            ></textarea>
+
+
+            <div class="introduction-editor-bottom">
+
+                <span id="introductionCounter">
+                    0/1000
+                </span>
+
+
+                <div class="introduction-actions">
+
+                    <button
+                        type="button"
+                        id="cancelIntroductionButton"
+                        class="profile-cancel-button"
+                    >
+                        Hủy
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="saveIntroductionButton"
+                        class="profile-save-button"
+                    >
+                        Lưu thay đổi
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </section>
 
 
-    <!-- =========================
-         NỘI DUNG CỦA NGƯỜI DÙNG
-    ========================== -->
+
+    <!-- =====================================================
+         NỘI DUNG NGƯỜI DÙNG
+    ====================================================== -->
     <section class="profile-content">
 
-        <!-- TAB -->
+        <!-- =========================
+             2 TAB
+        ========================== -->
         <div class="profile-tabs">
 
             <button
@@ -356,6 +439,7 @@
             >
                 Tin đăng bán
             </button>
+
 
             <button
                 type="button"
@@ -368,9 +452,10 @@
         </div>
 
 
-        <!-- =========================
-             TIN ĐĂNG BÁN
-        ========================== -->
+
+        <!-- =================================================
+             TAB TIN ĐĂNG BÁN
+        ================================================== -->
         <div
             id="productsContent"
             class="tab-content active"
@@ -379,17 +464,20 @@
             <div class="content-header">
 
                 <div>
-                    <h2>Tin đăng bán</h2>
+
+                    <h2>
+                        Tin đăng bán
+                    </h2>
 
                     <p id="productsCount">
                         Đang tải tin đăng...
                     </p>
+
                 </div>
 
             </div>
 
 
-            <!-- DANH SÁCH SẢN PHẨM -->
             <div
                 id="productsGrid"
                 class="profile-products-grid"
@@ -404,9 +492,10 @@
         </div>
 
 
-        <!-- =========================
-             BÀI VIẾT
-        ========================== -->
+
+        <!-- =================================================
+             TAB BÀI VIẾT
+        ================================================== -->
         <div
             id="postsContent"
             class="tab-content"
@@ -415,11 +504,15 @@
             <div class="content-header">
 
                 <div>
-                    <h2>Bài viết</h2>
+
+                    <h2>
+                        Bài viết
+                    </h2>
 
                     <p>
                         Các bài viết được đăng bởi người dùng
                     </p>
+
                 </div>
 
             </div>
