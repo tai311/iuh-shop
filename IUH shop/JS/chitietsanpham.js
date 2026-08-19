@@ -1422,63 +1422,93 @@ async function loadSeller(
 }
 
 
+
 /* =========================================================
-   LIÊN HỆ NGƯỜI BÁN
+   CHAT NGƯỜI BÁN
 ========================================================= */
 
-contactSellerBtn.addEventListener(
+chatSellerBtn.addEventListener(
     "click",
-    async () => {
+    () => {
 
-        /*
-            Chưa lấy được seller
-        */
-
-        if (!currentSeller) {
+        if (!currentProduct || !currentSeller) {
 
             showToast(
-                "Chưa lấy được thông tin người bán."
+                "Chưa tải được thông tin sản phẩm."
             );
 
             return;
-
         }
 
+        const params =
+            new URLSearchParams({
 
-        /*
-            Hiện tại chưa có
-            hệ thống chat.
+                product:
+                    currentProduct.id,
 
-            Nếu seller có email
-            thì mở email.
-        */
+                seller:
+                    currentProduct.seller_id,
 
-        if (
-            currentSeller.email
-        ) {
+                productName:
+                    currentProduct.name
 
-            window.location.href =
+            });
 
-                `mailto:${
-                    currentSeller.email
-                }?subject=${
-                    encodeURIComponent(
-                        "Quan tâm sản phẩm: " +
-                        (
-                            currentProduct?.name ||
-                            ""
-                        )
-                    )
-                }`;
+        window.location.href =
+            `tinnhan.html?${params.toString()}`;
 
-        }
-        else {
+    }
+);
+
+
+/* =========================================================
+   MUA NGAY
+========================================================= */
+
+buyNowBtn.addEventListener(
+    "click",
+    () => {
+
+        if (!currentProduct) {
 
             showToast(
-                "Người bán chưa cung cấp email."
+                "Chưa tải được thông tin sản phẩm."
             );
 
+            return;
         }
+
+
+        const quantity =
+            Number(
+                currentProduct.quantity
+            ) || 0;
+
+
+        if (quantity <= 0) {
+
+            showToast(
+                "Sản phẩm hiện đã hết hàng."
+            );
+
+            return;
+        }
+
+
+        const params =
+            new URLSearchParams({
+
+                id:
+                    currentProduct.id,
+
+                quantity:
+                    "1"
+
+            });
+
+
+        window.location.href =
+            `giohang.html?buyNow=${params.toString()}`;
 
     }
 );
