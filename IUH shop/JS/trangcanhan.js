@@ -785,14 +785,11 @@ profileRole.textContent = roleText;
     profile.role === "admin" ||
     profile.role === "moderator";
 
-const verified =
-    !isAdmin &&
-    (
-        profile.student_verified === true ||
-        profile.student_verified === "true" ||
-        profile.student_verified === 1 ||
-        profile.student_verified === "1"
-    );
+    const verified =
+    profile.student_verified === true ||
+    profile.student_verified === "true" ||
+    profile.student_verified === 1 ||
+    profile.student_verified === "1";
 
 
     if (verified) {
