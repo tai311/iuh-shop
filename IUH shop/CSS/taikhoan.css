@@ -3299,3 +3299,602 @@ body.logged-out
     max-width: 1400px;
     margin: 0 auto;
 }
+
+/* =====================================================
+   ĐÁNH GIÁ IUH SHOP
+===================================================== */
+
+.site-review-section {
+    margin-top: 45px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border);
+
+    border-radius: 16px;
+
+    padding: 32px 35px;
+
+    box-shadow:
+        0 8px 30px rgba(20, 48, 105, 0.05);
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.site-review-header {
+    margin-bottom: 28px;
+}
+
+
+.site-review-label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--iuh-yellow);
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.8px;
+}
+
+
+.site-review-header h2 {
+    margin: 0 0 8px;
+
+    color: var(--text-dark);
+
+    font-size: 23px;
+
+    font-weight: 800;
+}
+
+
+.site-review-header p {
+    margin: 0;
+
+    color: var(--text-gray);
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+.site-review-form {
+    padding: 24px;
+
+    background: #f8faff;
+
+    border: 1px solid #e4eaf5;
+
+    border-radius: 14px;
+
+    margin-bottom: 35px;
+}
+
+
+.site-review-form h3 {
+    margin: 0 0 5px;
+
+    color: var(--text-dark);
+
+    font-size: 17px;
+
+    font-weight: 800;
+}
+
+
+.site-review-form-note {
+    margin: 0 0 15px;
+
+    color: var(--text-gray);
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   SAO
+========================= */
+
+.review-stars-input {
+    display: flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    margin-bottom: 5px;
+}
+
+
+.review-star-button {
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #cbd2df;
+
+    font-size: 27px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+
+.review-star-button:hover {
+    color: #f2c94c;
+
+    transform: scale(1.08);
+}
+
+
+.review-star-button.active {
+    color: #f2c94c;
+}
+
+
+.review-rating-text {
+    display: block;
+
+    margin-bottom: 15px;
+
+    color: #7b879b;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   TEXTAREA
+========================= */
+
+.site-review-input {
+    width: 100%;
+
+    min-height: 105px;
+
+    box-sizing: border-box;
+
+    resize: vertical;
+
+    padding: 13px 15px;
+
+    border: 1px solid #d9e0ed;
+
+    border-radius: 10px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: var(--text-dark);
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.site-review-input:focus {
+    border-color: var(--iuh-blue);
+
+    box-shadow:
+        0 0 0 3px rgba(36, 68, 154, 0.08);
+}
+
+
+.site-review-form-bottom {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 12px;
+}
+
+
+#siteReviewCounter {
+    color: #8994a8;
+
+    font-size: 13px;
+}
+
+
+.site-review-submit {
+    padding: 10px 20px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: var(--iuh-blue);
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.site-review-submit:hover {
+    background: var(--iuh-blue-dark);
+
+    transform: translateY(-1px);
+}
+
+
+.site-review-submit:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =========================
+   CHƯA ĐĂNG NHẬP
+========================= */
+
+.site-review-login {
+    margin-bottom: 30px;
+
+    padding: 18px;
+
+    border-radius: 10px;
+
+    background: #f5f7fb;
+
+    color: var(--text-gray);
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   HEADER DANH SÁCH
+========================= */
+
+.site-review-list-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+
+.site-review-list-header h3 {
+    margin: 0 0 4px;
+
+    color: var(--text-dark);
+
+    font-size: 18px;
+
+    font-weight: 800;
+}
+
+
+.site-review-list-header p {
+    margin: 0;
+
+    color: var(--text-gray);
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   DANH SÁCH
+========================= */
+
+.site-reviews-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+
+.site-review-card {
+    padding: 20px;
+
+    border: 1px solid #e4e9f2;
+
+    border-radius: 13px;
+
+    background: #ffffff;
+
+    transition:
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.site-review-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 7px 20px rgba(20, 48, 105, 0.07);
+}
+
+
+/* =========================
+   SAO HIỂN THỊ
+========================= */
+
+.site-review-stars {
+    margin-bottom: 10px;
+
+    color: #f2c94c;
+
+    font-size: 16px;
+
+    letter-spacing: 1px;
+}
+
+
+.site-review-content {
+    margin: 0 0 18px;
+
+    color: #596a84;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+    white-space: pre-line;
+}
+
+
+/* =========================
+   USER
+========================= */
+
+.site-review-user {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding-top: 14px;
+
+    border-top: 1px solid #edf0f5;
+}
+
+
+.site-review-avatar {
+    width: 40px;
+    height: 40px;
+
+    min-width: 40px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 2px solid #eef3ff;
+
+    background: #f1f3f7;
+}
+
+
+.site-review-user-info {
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.site-review-name-row {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+.site-review-name {
+    color: var(--text-dark);
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+.site-review-role {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #8994a8;
+
+    font-size: 12px;
+}
+
+
+.site-review-date {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #a0a9b8;
+
+    font-size: 11px;
+}
+
+
+/* =========================
+   TÍCH XANH TRONG REVIEW
+========================= */
+
+.site-review-badge {
+    width: 17px;
+    height: 17px;
+
+    min-width: 17px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #3975ea;
+
+    color: #ffffff;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    box-shadow:
+        0 2px 5px rgba(57, 117, 234, 0.25);
+}
+
+
+/* =========================
+   SỬA / XÓA
+========================= */
+
+.site-review-actions {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 12px;
+}
+
+
+.site-review-action {
+    padding: 5px 10px;
+
+    border: 1px solid #d9e1ef;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #294b9b;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+
+.site-review-action:hover {
+    background: #f3f6fc;
+}
+
+
+.site-review-action.delete {
+    color: #d9534f;
+}
+
+
+/* =========================
+   EMPTY / LOADING
+========================= */
+
+.site-review-loading,
+.site-review-empty {
+    grid-column: 1 / -1;
+
+    padding: 30px;
+
+    color: var(--text-gray);
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 800px) {
+
+    .site-reviews-list {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .site-review-section {
+        padding: 24px 20px;
+    }
+
+    .site-review-form {
+        padding: 18px;
+    }
+
+    .site-review-form-bottom {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .site-review-submit {
+        width: 100%;
+    }
+
+}

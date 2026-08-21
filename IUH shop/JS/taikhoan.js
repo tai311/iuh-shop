@@ -770,6 +770,14 @@ document.addEventListener(
 
         await loadAccount();
 
+        /*
+            TẢI ĐÁNH GIÁ IUH SHOP
+        */
+
+        setupReviewStars();
+        setupSiteReviewForm();
+        await loadSiteReviews();
+
 
         /*
             Thiết lập dropdown
@@ -2423,3 +2431,1178 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
+
+
+/* =====================================================
+   ĐÁNH GIÁ IUH SHOP
+===================================================== */
+
+let selectedReviewRating = 0;
+let currentUserReview = null;
+
+
+/* =====================================================
+   XÁC ĐỊNH TÍCH XANH
+===================================================== */
+
+function hasSiteReviewBadge(user) {
+
+    if (!user) {
+        return false;
+    }
+
+    const role =
+        user.role || "user";
+
+    const studentVerified =
+        user.student_verified === true ||
+        user.student_verified === "true" ||
+        user.student_verified === 1 ||
+        user.student_verified === "1";
+
+    return (
+        role === "admin" ||
+        role === "moderator" ||
+        (
+            role === "user" &&
+            studentVerified
+        )
+    );
+}
+
+
+/* =====================================================
+   CHỌN SAO
+===================================================== */
+
+function setupReviewStars() {
+
+    const stars =
+        document.querySelectorAll(
+            ".review-star-button"
+        );
+
+    const ratingText =
+        document.getElementById(
+            "reviewRatingText"
+        );
+
+    if (!stars.length) {
+        return;
+    }
+
+
+    stars.forEach(
+        function (star) {
+
+            star.addEventListener(
+                "click",
+                function () {
+
+                    selectedReviewRating =
+                        Number(
+                            this.dataset.rating
+                        );
+
+
+                    stars.forEach(
+                        function (item) {
+
+                            const rating =
+                                Number(
+                                    item.dataset.rating
+                                );
+
+                            item.classList.toggle(
+                                "active",
+                                rating <=
+                                selectedReviewRating
+                            );
+
+                        }
+                    );
+
+
+                    const texts = {
+                        1: "Rất không hài lòng",
+                        2: "Không hài lòng",
+                        3: "Bình thường",
+                        4: "Hài lòng",
+                        5: "Rất hài lòng"
+                    };
+
+
+                    if (ratingText) {
+
+                        ratingText.textContent =
+                            texts[
+                                selectedReviewRating
+                            ];
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   HIỂN THỊ SAO
+===================================================== */
+
+function renderReviewStars(rating) {
+
+    let html = "";
+
+    for (
+        let i = 1;
+        i <= 5;
+        i++
+    ) {
+
+        html +=
+            i <= rating
+                ? "★"
+                : "☆";
+
+    }
+
+    return html;
+}
+
+
+/* =====================================================
+   LOAD REVIEW
+===================================================== */
+
+async function loadSiteReviews() {
+
+    const list =
+        document.getElementById(
+            "siteReviewsList"
+        );
+
+    const count =
+        document.getElementById(
+            "siteReviewCount"
+        );
+
+    const form =
+        document.getElementById(
+            "siteReviewForm"
+        );
+
+    const loginMessage =
+        document.getElementById(
+            "siteReviewLoginMessage"
+        );
+
+
+    if (!list) {
+        return;
+    }
+
+
+    try {
+
+        /* =========================================
+           KIỂM TRA ĐĂNG NHẬP
+        ========================================= */
+
+        if (!currentAuthUserId) {
+
+            if (form) {
+                form.hidden = true;
+            }
+
+            if (loginMessage) {
+                loginMessage.hidden = false;
+            }
+
+        } else {
+
+            if (form) {
+                form.hidden = false;
+            }
+
+            if (loginMessage) {
+                loginMessage.hidden = true;
+            }
+
+        }
+
+
+        /* =========================================
+           LẤY ĐÁNH GIÁ
+        ========================================= */
+
+        const {
+            data: reviews,
+            error
+        } =
+            await supabaseClient
+                .from("site_reviews")
+                .select(`
+                    review_id,
+                    user_id,
+                    rating,
+                    content,
+                    created_at,
+                    updated_at
+                `)
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi tải đánh giá:",
+                error
+            );
+
+            list.innerHTML =
+                `<div class="site-review-empty">
+                    Không thể tải đánh giá.
+                </div>`;
+
+            return;
+        }
+
+
+        /* =========================================
+           COUNT
+        ========================================= */
+
+        if (count) {
+
+            count.textContent =
+                `${reviews.length} đánh giá`;
+
+        }
+
+
+        /* =========================================
+           LẤY USER
+        ========================================= */
+
+        const userIds =
+            [
+                ...new Set(
+                    reviews.map(
+                        review =>
+                            review.user_id
+                    )
+                )
+            ];
+
+
+        let users = [];
+
+
+        if (userIds.length) {
+
+            const {
+                data,
+                error: usersError
+            } =
+                await supabaseClient
+                    .from("users")
+                    .select(`
+                        user_id,
+                        fullname,
+                        avatar_url,
+                        role,
+                        student_verified
+                    `)
+                    .in(
+                        "user_id",
+                        userIds
+                    );
+
+
+            if (usersError) {
+
+                console.error(
+                    "Lỗi lấy người đánh giá:",
+                    usersError
+                );
+
+            } else {
+
+                users =
+                    data || [];
+
+            }
+
+        }
+
+
+        const userMap =
+            new Map(
+                users.map(
+                    user => [
+                        user.user_id,
+                        user
+                    ]
+                )
+            );
+
+
+        /* =========================================
+           ĐÁNH GIÁ CỦA USER HIỆN TẠI
+        ========================================= */
+
+        currentUserReview = null;
+
+
+        if (currentAuthUserId) {
+
+            currentUserReview =
+                reviews.find(
+                    review =>
+                        review.user_id ===
+                        currentAuthUserId
+                ) || null;
+
+
+            if (currentUserReview) {
+
+                selectedReviewRating =
+                    currentUserReview.rating;
+
+
+                const input =
+                    document.getElementById(
+                        "siteReviewInput"
+                    );
+
+                if (input) {
+
+                    input.value =
+                        currentUserReview.content;
+
+                }
+
+
+                updateReviewForm();
+
+
+                const submitButton =
+                    document.getElementById(
+                        "submitSiteReview"
+                    );
+
+                if (submitButton) {
+
+                    submitButton.textContent =
+                        "Cập nhật đánh giá";
+
+                }
+
+            }
+
+        }
+
+
+        /* =========================================
+           KHÔNG CÓ REVIEW
+        ========================================= */
+
+        if (!reviews.length) {
+
+            list.innerHTML =
+                `<div class="site-review-empty">
+                    Chưa có đánh giá nào. Hãy là người đầu tiên chia sẻ trải nghiệm!
+                </div>`;
+
+            return;
+        }
+
+
+        /* =========================================
+           RENDER
+        ========================================= */
+
+        list.innerHTML = "";
+
+
+        reviews.forEach(
+            function (review) {
+
+                const user =
+                    userMap.get(
+                        review.user_id
+                    ) || {};
+
+
+                const card =
+                    document.createElement(
+                        "article"
+                    );
+
+                card.className =
+                    "site-review-card";
+
+
+                /* Sao */
+
+                const stars =
+                    document.createElement(
+                        "div"
+                    );
+
+                stars.className =
+                    "site-review-stars";
+
+                stars.textContent =
+                    renderReviewStars(
+                        review.rating
+                    );
+
+
+                /* Nội dung */
+
+                const content =
+                    document.createElement(
+                        "p"
+                    );
+
+                content.className =
+                    "site-review-content";
+
+                content.textContent =
+                    review.content;
+
+
+                /* User */
+
+                const userRow =
+                    document.createElement(
+                        "div"
+                    );
+
+                userRow.className =
+                    "site-review-user";
+
+
+                const avatar =
+                    document.createElement(
+                        "img"
+                    );
+
+                avatar.className =
+                    "site-review-avatar";
+
+                avatar.src =
+                    user.avatar_url ||
+                    "../Images/default-avatar.svg";
+
+
+                avatar.alt =
+                    user.fullname ||
+                    "Người dùng";
+
+
+                const userInfo =
+                    document.createElement(
+                        "div"
+                    );
+
+                userInfo.className =
+                    "site-review-user-info";
+
+
+                const nameRow =
+                    document.createElement(
+                        "div"
+                    );
+
+                nameRow.className =
+                    "site-review-name-row";
+
+
+                const name =
+                    document.createElement(
+                        "span"
+                    );
+
+                name.className =
+                    "site-review-name";
+
+                name.textContent =
+                    user.fullname ||
+                    "Người dùng";
+
+
+                nameRow.appendChild(
+                    name
+                );
+
+
+                /* =====================================
+                   TÍCH XANH
+                ===================================== */
+
+                if (
+                    hasSiteReviewBadge(
+                        user
+                    )
+                ) {
+
+                    const badge =
+                        document.createElement(
+                            "span"
+                        );
+
+                    badge.className =
+                        "site-review-badge";
+
+                    badge.textContent =
+                        "✓";
+
+                    badge.title =
+                        "Đã xác thực";
+
+                    nameRow.appendChild(
+                        badge
+                    );
+
+                }
+
+
+                /* Role */
+
+                const role =
+                    document.createElement(
+                        "span"
+                    );
+
+                role.className =
+                    "site-review-role";
+
+
+                if (
+                    user.role ===
+                    "admin"
+                ) {
+
+                    role.textContent =
+                        "Admin";
+
+                } else if (
+                    user.role ===
+                    "moderator"
+                ) {
+
+                    role.textContent =
+                        "Quản trị viên";
+
+                } else {
+
+                    role.textContent =
+                        "Người dùng IUH SHOP";
+
+                }
+
+
+                /* Date */
+
+                const date =
+                    document.createElement(
+                        "span"
+                    );
+
+                date.className =
+                    "site-review-date";
+
+                date.textContent =
+                    formatReviewDate(
+                        review.created_at
+                    );
+
+
+                userInfo.appendChild(
+                    nameRow
+                );
+
+                userInfo.appendChild(
+                    role
+                );
+
+                userInfo.appendChild(
+                    date
+                );
+
+
+                userRow.appendChild(
+                    avatar
+                );
+
+                userRow.appendChild(
+                    userInfo
+                );
+
+
+                card.appendChild(
+                    stars
+                );
+
+                card.appendChild(
+                    content
+                );
+
+                card.appendChild(
+                    userRow
+                );
+
+
+                /* =================================
+                   NÚT SỬA / XÓA
+                ================================= */
+
+                if (
+                    review.user_id ===
+                    currentAuthUserId
+                ) {
+
+                    const actions =
+                        document.createElement(
+                            "div"
+                        );
+
+                    actions.className =
+                        "site-review-actions";
+
+
+                    const edit =
+                        document.createElement(
+                            "button"
+                        );
+
+                    edit.type =
+                        "button";
+
+                    edit.className =
+                        "site-review-action";
+
+                    edit.textContent =
+                        "Sửa";
+
+
+                    edit.onclick =
+                        function () {
+
+                            selectedReviewRating =
+                                review.rating;
+
+                            const input =
+                                document.getElementById(
+                                    "siteReviewInput"
+                                );
+
+                            if (input) {
+
+                                input.value =
+                                    review.content;
+
+                            }
+
+                            currentUserReview =
+                                review;
+
+                            updateReviewForm();
+
+                            document
+                                .getElementById(
+                                    "siteReviewForm"
+                                )
+                                ?.scrollIntoView({
+                                    behavior:
+                                        "smooth",
+                                    block:
+                                        "center"
+                                });
+
+                        };
+
+
+                    const remove =
+                        document.createElement(
+                            "button"
+                        );
+
+                    remove.type =
+                        "button";
+
+                    remove.className =
+                        "site-review-action delete";
+
+                    remove.textContent =
+                        "Xóa";
+
+
+                    remove.onclick =
+                        async function () {
+
+                            const confirmed =
+                                window.confirm(
+                                    "Bạn có chắc muốn xóa đánh giá này?"
+                                );
+
+                            if (!confirmed) {
+                                return;
+                            }
+
+
+                            const {
+                                error:
+                                    deleteError
+                            } =
+                                await supabaseClient
+                                    .from(
+                                        "site_reviews"
+                                    )
+                                    .delete()
+                                    .eq(
+                                        "review_id",
+                                        review.review_id
+                                    )
+                                    .eq(
+                                        "user_id",
+                                        currentAuthUserId
+                                    );
+
+
+                            if (deleteError) {
+
+                                console.error(
+                                    deleteError
+                                );
+
+                                alert(
+                                    "Không thể xóa đánh giá."
+                                );
+
+                                return;
+
+                            }
+
+
+                            currentUserReview =
+                                null;
+
+                            selectedReviewRating =
+                                0;
+
+
+                            const input =
+                                document.getElementById(
+                                    "siteReviewInput"
+                                );
+
+                            if (input) {
+                                input.value = "";
+                            }
+
+
+                            updateReviewForm();
+
+                            const submitButton =
+                                document.getElementById(
+                                    "submitSiteReview"
+                                );
+
+                            if (submitButton) {
+
+                                submitButton.textContent =
+                                    "Gửi đánh giá";
+
+                            }
+
+
+                            await loadSiteReviews();
+
+                        };
+
+
+                    actions.appendChild(
+                        edit
+                    );
+
+                    actions.appendChild(
+                        remove
+                    );
+
+                    card.appendChild(
+                        actions
+                    );
+
+                }
+
+
+                list.appendChild(
+                    card
+                );
+
+            }
+        );
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi đánh giá:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   CẬP NHẬT FORM SAO
+===================================================== */
+
+function updateReviewForm() {
+
+    const stars =
+        document.querySelectorAll(
+            ".review-star-button"
+        );
+
+
+    stars.forEach(
+        function (star) {
+
+            const rating =
+                Number(
+                    star.dataset.rating
+                );
+
+            star.classList.toggle(
+                "active",
+                rating <=
+                selectedReviewRating
+            );
+
+        }
+    );
+
+
+    const ratingText =
+        document.getElementById(
+            "reviewRatingText"
+        );
+
+
+    const texts = {
+        0: "Chọn số sao",
+        1: "Rất không hài lòng",
+        2: "Không hài lòng",
+        3: "Bình thường",
+        4: "Hài lòng",
+        5: "Rất hài lòng"
+    };
+
+
+    if (ratingText) {
+
+        ratingText.textContent =
+            texts[
+                selectedReviewRating
+            ] || texts[0];
+
+    }
+
+}
+
+
+/* =====================================================
+   NGÀY
+===================================================== */
+
+function formatReviewDate(dateString) {
+
+    if (!dateString) {
+        return "";
+    }
+
+
+    const date =
+        new Date(dateString);
+
+
+    return date.toLocaleDateString(
+        "vi-VN",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }
+    );
+
+}
+
+
+/* =====================================================
+   GỬI / CẬP NHẬT REVIEW
+===================================================== */
+
+function setupSiteReviewForm() {
+
+    const submitButton =
+        document.getElementById(
+            "submitSiteReview"
+        );
+
+    const input =
+        document.getElementById(
+            "siteReviewInput"
+        );
+
+    const counter =
+        document.getElementById(
+            "siteReviewCounter"
+        );
+
+
+    if (
+        !submitButton ||
+        !input
+    ) {
+        return;
+    }
+
+
+    input.addEventListener(
+        "input",
+        function () {
+
+            if (counter) {
+
+                counter.textContent =
+                    `${input.value.length}/1000`;
+
+            }
+
+        }
+    );
+
+
+    submitButton.addEventListener(
+        "click",
+        async function () {
+
+            if (!currentAuthUserId) {
+
+                alert(
+                    "Vui lòng đăng nhập để đánh giá."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                selectedReviewRating < 1 ||
+                selectedReviewRating > 5
+            ) {
+
+                alert(
+                    "Vui lòng chọn số sao."
+                );
+
+                return;
+
+            }
+
+
+            const content =
+                input.value.trim();
+
+
+            if (!content) {
+
+                alert(
+                    "Vui lòng nhập nội dung đánh giá."
+                );
+
+                input.focus();
+
+                return;
+
+            }
+
+
+            submitButton.disabled =
+                true;
+
+            submitButton.textContent =
+                currentUserReview
+                    ? "Đang cập nhật..."
+                    : "Đang gửi...";
+
+
+            try {
+
+                let error = null;
+
+
+                /* =====================================
+                   CẬP NHẬT
+                ===================================== */
+
+                if (currentUserReview) {
+
+                    const result =
+                        await supabaseClient
+                            .from(
+                                "site_reviews"
+                            )
+                            .update({
+                                rating:
+                                    selectedReviewRating,
+
+                                content:
+                                    content,
+
+                                updated_at:
+                                    new Date()
+                                        .toISOString()
+                            })
+                            .eq(
+                                "review_id",
+                                currentUserReview.review_id
+                            )
+                            .eq(
+                                "user_id",
+                                currentAuthUserId
+                            );
+
+
+                    error =
+                        result.error;
+
+                }
+
+
+                /* =====================================
+                   TẠO MỚI
+                ===================================== */
+
+                else {
+
+                    const result =
+                        await supabaseClient
+                            .from(
+                                "site_reviews"
+                            )
+                            .insert({
+                                user_id:
+                                    currentAuthUserId,
+
+                                rating:
+                                    selectedReviewRating,
+
+                                content:
+                                    content
+                            });
+
+
+                    error =
+                        result.error;
+
+                }
+
+
+                if (error) {
+
+                    console.error(
+                        "Lỗi lưu đánh giá:",
+                        error
+                    );
+
+                    alert(
+                        "Không thể lưu đánh giá. Vui lòng thử lại."
+                    );
+
+                    return;
+
+                }
+
+
+                alert(
+                    currentUserReview
+                        ? "Đã cập nhật đánh giá."
+                        : "Đã gửi đánh giá."
+                );
+
+
+                input.value = "";
+
+                selectedReviewRating =
+                    0;
+
+                currentUserReview =
+                    null;
+
+
+                submitButton.textContent =
+                    "Gửi đánh giá";
+
+
+                if (counter) {
+
+                    counter.textContent =
+                        "0/1000";
+
+                }
+
+
+                updateReviewForm();
+
+                await loadSiteReviews();
+
+
+            }
+            finally {
+
+                submitButton.disabled =
+                    false;
+
+                if (
+                    !currentUserReview
+                ) {
+
+                    submitButton.textContent =
+                        "Gửi đánh giá";
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   KHỞI TẠO REVIEW
+===================================================== */
+
+setupReviewStars();
+setupSiteReviewForm();
+loadSiteReviews();
