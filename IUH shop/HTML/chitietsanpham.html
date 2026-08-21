@@ -382,10 +382,44 @@
 
             <!-- DANH MỤC -->
 
-            <span
-                id="productCategory"
-                class="category-badge"
-            ></span>
+            <div class="category-report-row">
+
+    <span
+        id="productCategory"
+        class="category-badge"
+    ></span>
+
+    <button
+        id="reportListingBtn"
+        class="report-listing-btn"
+        type="button"
+        aria-label="Báo cáo tin đăng"
+        title="Báo cáo tin đăng"
+    >
+        <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <path
+                d="M12 3L22 21H2L12 3Z"
+            ></path>
+
+            <line
+                x1="12"
+                y1="9"
+                x2="12"
+                y2="14"
+            ></line>
+
+            <circle
+                cx="12"
+                cy="17.5"
+                r="0.8"
+            ></circle>
+        </svg>
+    </button>
+
+</div>
 
 
             <!-- TÊN -->
@@ -590,6 +624,132 @@
         </div>
 
     </section>
+    <!-- POPUP BÁO CÁO TIN ĐĂNG -->
+<div id="reportModal" class="report-modal" hidden>
+
+    <div class="report-overlay"></div>
+
+    <div class="report-dialog">
+
+        <button
+            type="button"
+            id="closeReportModal"
+            class="report-close"
+            aria-label="Đóng"
+        >
+            ×
+        </button>
+
+        <div class="report-header">
+            <div class="report-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3L22 21H2L12 3Z"></path>
+                    <line x1="12" y1="9" x2="12" y2="14"></line>
+                    <circle cx="12" cy="17.5" r="0.8"></circle>
+                </svg>
+            </div>
+
+            <div>
+                <h2>Báo cáo tin đăng</h2>
+                <p>
+                    Hãy cho chúng tôi biết vấn đề với tin đăng này.
+                </p>
+            </div>
+        </div>
+
+        <div class="report-reasons">
+
+            <label class="report-option">
+                <input
+                    type="radio"
+                    name="reportReason"
+                    value="scam"
+                >
+                <span class="report-radio"></span>
+                <span>Tin đăng có dấu hiệu lừa đảo</span>
+            </label>
+
+            <label class="report-option">
+                <input
+                    type="radio"
+                    name="reportReason"
+                    value="incorrect_info"
+                >
+                <span class="report-radio"></span>
+                <span>Thông tin sản phẩm không chính xác</span>
+            </label>
+
+            <label class="report-option">
+                <input
+                    type="radio"
+                    name="reportReason"
+                    value="prohibited"
+                >
+                <span class="report-radio"></span>
+                <span>Sản phẩm bị cấm hoặc không phù hợp</span>
+            </label>
+
+            <label class="report-option">
+                <input
+                    type="radio"
+                    name="reportReason"
+                    value="inappropriate"
+                >
+                <span class="report-radio"></span>
+                <span>Nội dung hoặc hình ảnh không phù hợp</span>
+            </label>
+
+            <label class="report-option">
+                <input
+                    type="radio"
+                    name="reportReason"
+                    value="duplicate"
+                >
+                <span class="report-radio"></span>
+                <span>Tin đăng trùng lặp</span>
+            </label>
+
+            <label class="report-option">
+                <input
+                    type="radio"
+                    name="reportReason"
+                    value="other"
+                >
+                <span class="report-radio"></span>
+                <span>Lý do khác</span>
+            </label>
+
+        </div>
+
+        <textarea
+            id="reportDescription"
+            class="report-description"
+            placeholder="Mô tả thêm vấn đề (không bắt buộc)..."
+            rows="3"
+        ></textarea>
+
+        <div class="report-actions">
+
+            <button
+                type="button"
+                id="cancelReportBtn"
+                class="report-cancel-btn"
+            >
+                Hủy
+            </button>
+
+            <button
+                type="button"
+                id="submitReportBtn"
+                class="report-submit-btn"
+            >
+                Gửi báo cáo
+            </button>
+
+        </div>
+
+    </div>
+</div>
 
 </main>
 

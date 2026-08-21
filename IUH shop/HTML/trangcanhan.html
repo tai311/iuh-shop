@@ -323,6 +323,20 @@
                 Người dùng
             </p>
 
+            <div
+    id="profileReportArea"
+    class="profile-report-area"
+    hidden
+>
+    <button
+        type="button"
+        id="reportUserButton"
+        class="report-user-button"
+    >
+        ⚠ 
+    </button>
+</div>
+
         </div>
 
     </section>
@@ -538,6 +552,129 @@
 
 </main>
 
+<!-- =========================================
+     POPUP BÁO CÁO NGƯỜI DÙNG
+========================================= -->
+
+<div
+    class="profile-report-modal-backdrop"
+    id="profileReportModal"
+    hidden
+>
+    <div
+        class="profile-report-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="profileReportTitle"
+    >
+
+        <!-- Nút đóng -->
+        <button
+            type="button"
+            class="profile-report-close"
+            id="closeProfileReportModal"
+            aria-label="Đóng"
+        >
+            ×
+        </button>
+
+
+        <!-- Icon -->
+        <div class="profile-report-icon">
+            ⚑
+        </div>
+
+
+        <h2 id="profileReportTitle">
+            Báo cáo người dùng
+        </h2>
+
+
+        <p class="profile-report-user">
+            Bạn đang báo cáo:
+            <strong id="reportedUserName">
+                Người dùng
+            </strong>
+        </p>
+
+
+        <form id="profileReportForm">
+
+            <label for="profileReportReason">
+                Lý do báo cáo
+            </label>
+
+            <select
+                id="profileReportReason"
+                required
+            >
+                <option value="">
+                    -- Chọn lý do --
+                </option>
+
+                <option value="scam">
+                    Có dấu hiệu lừa đảo
+                </option>
+
+                <option value="fake">
+                    Giả mạo người khác
+                </option>
+
+                <option value="inappropriate">
+                    Nội dung hoặc hành vi không phù hợp
+                </option>
+
+                <option value="spam">
+                    Spam / quảng cáo
+                </option>
+
+                <option value="harassment">
+                    Quấy rối / làm phiền
+                </option>
+
+                <option value="other">
+                    Lý do khác
+                </option>
+            </select>
+
+
+            <label for="profileReportDescription">
+                Mô tả thêm
+                <span>(không bắt buộc)</span>
+            </label>
+
+            <textarea
+                id="profileReportDescription"
+                rows="4"
+                maxlength="1000"
+                placeholder="Mô tả vấn đề bạn gặp phải..."
+            ></textarea>
+
+
+            <div class="profile-report-actions">
+
+                <button
+                    type="button"
+                    class="profile-report-cancel"
+                    id="cancelProfileReport"
+                >
+                    Hủy
+                </button>
+
+                <button
+                    type="submit"
+                    class="profile-report-submit"
+                >
+                    Gửi báo cáo
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
 
      <!-- =========================
      FOOTER
@@ -629,7 +766,7 @@
 
                 <li>
                     <a href="diendan.html">
-                        Chính sách
+                        Diễn đàn
                     </a>
                 </li>
 

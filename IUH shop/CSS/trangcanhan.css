@@ -2609,3 +2609,396 @@ body {
     }
 
 }
+
+.profile-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    gap: 30px;
+
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 35px 40px;
+
+    box-shadow: 0 8px 30px rgba(20, 48, 105, 0.07);
+}
+
+
+/* =========================================
+   NÚT BÁO CÁO NGƯỜI DÙNG
+========================================= */
+
+.profile-report-area {
+    position: absolute;
+    top: 35px;
+    right: 40px;
+
+    margin: 0;
+}
+
+.report-user-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 38px;
+    padding: 0 16px;
+
+    border: 1px solid #e2b8b8;
+    border-radius: 8px;
+
+    background: #fff7f7;
+    color: #c0392b;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.report-user-button:hover {
+    background: #fff0f0;
+    border-color: #d99a9a;
+    color: #a93226;
+}
+
+/* =========================================
+   POPUP BÁO CÁO NGƯỜI DÙNG
+========================================= */
+
+.profile-report-modal-backdrop {
+    position: fixed;
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(15, 30, 60, 0.45);
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+
+/* Ẩn popup */
+.profile-report-modal-backdrop[hidden] {
+    display: none;
+}
+
+
+/* Hộp popup */
+
+.profile-report-modal {
+    position: relative;
+
+    width: 100%;
+    max-width: 520px;
+
+    padding: 32px;
+
+    background: #ffffff;
+
+    border: 1px solid #e3e8f2;
+    border-radius: 18px;
+
+    box-shadow:
+        0 20px 60px rgba(20, 48, 105, 0.18);
+
+    animation: profileReportPopupIn 0.22s ease;
+}
+
+
+@keyframes profileReportPopupIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+
+/* Nút X */
+
+.profile-report-close {
+    position: absolute;
+
+    top: 16px;
+    right: 16px;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f4f6fa;
+
+    color: #64748b;
+
+    font-size: 24px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+
+.profile-report-close:hover {
+    background: #e9edf5;
+    color: #1f3f91;
+
+    transform: rotate(90deg);
+}
+
+
+/* Icon báo cáo */
+
+.profile-report-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 16px;
+
+    border-radius: 12px;
+
+    background: #fff4f3;
+
+    color: #d64545;
+
+    font-size: 24px;
+}
+
+
+/* Tiêu đề */
+
+.profile-report-modal h2 {
+    margin: 0 0 8px;
+
+    color: #182746;
+
+    font-size: 24px;
+    font-weight: 700;
+}
+
+
+/* Người bị báo cáo */
+
+.profile-report-user {
+    margin: 0 0 24px;
+
+    color: #718096;
+
+    font-size: 14px;
+}
+
+
+.profile-report-user strong {
+    color: #243b78;
+}
+
+
+/* Label */
+
+.profile-report-modal label {
+    display: block;
+
+    margin: 0 0 8px;
+
+    color: #24324d;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+.profile-report-modal label span {
+    color: #94a3b8;
+
+    font-size: 12px;
+    font-weight: 400;
+}
+
+
+/* Select + textarea */
+
+.profile-report-modal select,
+.profile-report-modal textarea {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border: 1px solid #dce3ef;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #263653;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.profile-report-modal select {
+    height: 46px;
+
+    padding: 0 14px;
+
+    margin-bottom: 20px;
+
+    cursor: pointer;
+}
+
+
+.profile-report-modal textarea {
+    min-height: 110px;
+
+    padding: 12px 14px;
+
+    resize: vertical;
+
+    margin-bottom: 24px;
+}
+
+
+.profile-report-modal select:focus,
+.profile-report-modal textarea:focus {
+
+    border-color: #29479a;
+
+    box-shadow:
+        0 0 0 3px rgba(41, 71, 154, 0.10);
+}
+
+
+/* Nút */
+
+.profile-report-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+}
+
+
+.profile-report-cancel,
+.profile-report-submit {
+
+    height: 42px;
+
+    padding: 0 18px;
+
+    border-radius: 9px;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+
+/* Hủy */
+
+.profile-report-cancel {
+
+    border: 1px solid #dce3ef;
+
+    background: #ffffff;
+
+    color: #64748b;
+}
+
+
+.profile-report-cancel:hover {
+
+    background: #f5f7fa;
+
+    color: #263653;
+}
+
+
+/* Gửi */
+
+.profile-report-submit {
+
+    border: none;
+
+    background: #29479a;
+
+    color: #ffffff;
+}
+
+
+.profile-report-submit:hover {
+
+    background: #203b87;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(41, 71, 154, 0.20);
+}
+
+
+.profile-report-submit:active {
+    transform: translateY(0);
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .profile-report-modal {
+        padding: 24px 20px;
+
+        border-radius: 16px;
+    }
+
+    .profile-report-actions {
+        flex-direction: column-reverse;
+    }
+
+    .profile-report-cancel,
+    .profile-report-submit {
+        width: 100%;
+    }
+
+}
+
+body.modal-open {
+    overflow: hidden;
+}

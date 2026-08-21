@@ -83,7 +83,15 @@ const buyNowBtn = $("buyNowBtn");
 const addToCartBtn = $("addToCartBtn");
 const contactSellerBtn = $("contactSellerBtn");
 
+
 const toast = $("toast");
+
+const reportListingBtn = $("reportListingBtn");
+const reportModal = $("reportModal");
+const closeReportModal = $("closeReportModal");
+const cancelReportBtn = $("cancelReportBtn");
+const submitReportBtn = $("submitReportBtn");
+
 
 
 /* =========================================================
@@ -1798,6 +1806,7 @@ document.addEventListener(
         setupAddToCart();
 
         setupBackButton();
+        setupReportListing();
 
 
         /* Search */
@@ -1810,3 +1819,81 @@ document.addEventListener(
         loadProduct();
     }
 );
+
+function setupReportListing() {
+
+    if (!reportListingBtn || !reportModal) {
+        return;
+    }
+
+    function openReportModal() {
+        reportModal.hidden = false;
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeReportModalFunc() {
+        reportModal.hidden = true;
+        document.body.style.overflow = "";
+    }
+
+    reportListingBtn.addEventListener(
+        "click",
+        openReportModal
+    );
+
+    closeReportModal?.addEventListener(
+        "click",
+        closeReportModalFunc
+    );
+
+    cancelReportBtn?.addEventListener(
+        "click",
+        closeReportModalFunc
+    );
+
+    reportModal
+        .querySelector(".report-overlay")
+        ?.addEventListener(
+            "click",
+            closeReportModalFunc
+        );
+
+    submitReportBtn?.addEventListener(
+        "click",
+        function () {
+
+            const selectedReason =
+                document.querySelector(
+                    'input[name="reportReason"]:checked'
+                );
+
+            if (!selectedReason) {
+
+                showToast(
+                    "Vui lòng chọn lý do báo cáo."
+                );
+
+                return;
+            }
+
+            const description =
+                $("reportDescription")?.value.trim() || "";
+
+            console.log(
+                "Báo cáo tin đăng:",
+                {
+                    product_id: currentProduct?.id,
+                    seller_id: currentProduct?.seller_id,
+                    reason: selectedReason.value,
+                    description: description
+                }
+            );
+
+            closeReportModalFunc();
+
+            showToast(
+                "Báo cáo của bạn đã được ghi nhận."
+            );
+        }
+    );
+}

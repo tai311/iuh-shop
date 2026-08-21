@@ -402,6 +402,8 @@ document.addEventListener(
 
         setupLogout();
 
+        setupUserReportModal();
+
     }
 );
 
@@ -840,6 +842,56 @@ function setupProfileOwnerUI(profile) {
     const changeAvatarButton =
         document.getElementById("changeAvatarButton");
 
+
+        /* ==========================================
+       BÁO CÁO NGƯỜI DÙNG
+       ========================================== */
+
+    const profileReportArea =
+        document.getElementById(
+            "profileReportArea"
+        );
+
+    const reportUserButton =
+        document.getElementById(
+            "reportUserButton"
+        );
+
+
+    if (profileReportArea) {
+
+        if (
+            isProfileOwner ||
+            !currentProfileUserId
+        ) {
+
+            // Đang xem chính mình
+            profileReportArea.hidden = true;
+
+        } else {
+
+            // Đang xem người khác
+            profileReportArea.hidden = false;
+
+        }
+
+    }
+
+
+    if (reportUserButton) {
+
+        reportUserButton.onclick =
+            function () {
+
+                openUserReportModal(
+                    currentProfileUserId,
+                    profile?.fullname ||
+                    "Người dùng"
+                );
+
+            };
+
+    }
 
     // ==========================================
     // KHÔNG PHẢI CHỦ TÀI KHOẢN
@@ -2200,3 +2252,213 @@ document.addEventListener(
 
     }
 );
+
+function setupUserReportModal() {
+
+    const reportArea =
+        document.getElementById(
+            "profileReportArea"
+        );
+
+    const reportButton =
+        document.getElementById(
+            "reportUserButton"
+        );
+
+    const modal =
+        document.getElementById(
+            "profileReportModal"
+        );
+
+    const closeButton =
+        document.getElementById(
+            "closeProfileReportModal"
+        );
+
+    const cancelButton =
+        document.getElementById(
+            "cancelProfileReport"
+        );
+
+    const form =
+        document.getElementById(
+            "profileReportForm"
+        );
+
+    const reportedUserName =
+        document.getElementById(
+            "reportedUserName"
+        );
+
+
+    if (!reportButton || !modal) {
+        return;
+    }
+
+
+    /* ================================
+       MỞ POPUP
+    ================================= */
+
+    reportButton.addEventListener(
+        "click",
+        function () {
+
+            if (!currentProfileUserId) {
+                return;
+            }
+
+
+            /*
+             * Lấy tên đang hiển thị
+             * trên trang cá nhân
+             */
+
+            const nameElement =
+                document.getElementById(
+                    "profileName"
+                );
+
+            const name =
+                nameElement?.textContent
+                    ?.trim() ||
+                "Người dùng";
+
+
+            reportedUserName.textContent =
+                name;
+
+
+            modal.hidden = false;
+
+            document.body.classList.add(
+                "modal-open"
+            );
+
+        }
+    );
+
+
+    /* ================================
+       ĐÓNG POPUP
+    ================================= */
+
+    function closeModal() {
+
+        modal.hidden = true;
+
+        document.body.classList.remove(
+            "modal-open"
+        );
+
+        form?.reset();
+
+    }
+
+
+    closeButton?.addEventListener(
+        "click",
+        closeModal
+    );
+
+
+    cancelButton?.addEventListener(
+        "click",
+        closeModal
+    );
+
+
+    /* Click ra ngoài popup */
+
+    modal.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target === modal
+            ) {
+                closeModal();
+            }
+
+        }
+    );
+
+
+    /* ESC */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape" &&
+                !modal.hidden
+            ) {
+                closeModal();
+            }
+
+        }
+    );
+
+
+    /* ================================
+       GỬI BÁO CÁO
+    ================================= */
+
+    form?.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const reason =
+                document.getElementById(
+                    "profileReportReason"
+                )?.value;
+
+            const description =
+                document.getElementById(
+                    "profileReportDescription"
+                )?.value
+                    ?.trim();
+
+
+            if (!reason) {
+                return;
+            }
+
+
+            console.log(
+                "Báo cáo người dùng:",
+                {
+                    reported_user_id:
+                        currentProfileUserId,
+
+                    reason:
+                        reason,
+
+                    description:
+                        description
+                }
+            );
+
+
+            /*
+             * Tạm thời thông báo thành công.
+             *
+             * Khi bạn có bảng reports trong Supabase
+             * thì phần INSERT sẽ đặt ở đây.
+             */
+
+            alert(
+                "Đã gửi báo cáo. Cảm ơn bạn đã phản hồi."
+            );
+
+
+            closeModal();
+
+        }
+    );
+
+}
