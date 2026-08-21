@@ -861,3 +861,628 @@ document.addEventListener(
 
     }
 );
+
+
+/* =====================================================
+   IUH SHOP - SẢN PHẨM NỔI BẬT TRANG CHỦ
+===================================================== */
+
+let featuredProducts = [];
+
+let featuredSort = "newest";
+
+
+/* =====================================================
+   HELPER
+===================================================== */
+
+function formatFeaturedPrice(value) {
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return "Liên hệ";
+    }
+
+    return new Intl.NumberFormat(
+        "vi-VN"
+    ).format(number) + "đ";
+}
+
+
+function normalizeFeaturedImages(value) {
+
+    if (!value) {
+        return [];
+    }
+
+    // Supabase trả về array
+    if (Array.isArray(value)) {
+        return value.filter(Boolean);
+    }
+
+    // Nếu là JSON string
+    if (typeof value === "string") {
+
+        const trimmed = value.trim();
+
+        if (!trimmed) {
+            return [];
+        }
+
+        try {
+
+            const parsed =
+                JSON.parse(trimmed);
+
+            if (Array.isArray(parsed)) {
+                return parsed.filter(Boolean);
+            }
+
+        } catch (error) {
+
+            // Nếu chỉ là 1 URL
+            return [trimmed];
+        }
+    }
+
+    return [];
+}
+
+
+/* =====================================================
+   KIỂM TRA TÍCH XANH
+===================================================== */
+
+function isFeaturedSellerVerified(seller) {
+
+    if (!seller) {
+        return false;
+    }
+
+    /*
+       ADMIN → mặc định có tích
+       QUẢN TRỊ VIÊN → mặc định có tích
+       TÀI KHOẢN THƯỜNG → có tích nếu đã xác thực
+    */
+
+    return (
+        seller.role === "admin" ||
+        seller.role === "moderator" ||
+
+        seller.student_verified === true ||
+        seller.student_verified === "true" ||
+        seller.student_verified === 1 ||
+        seller.student_verified === "1"
+    );
+}
+
+
+/* =====================================================
+   TẢI SẢN PHẨM
+===================================================== */
+
+async function loadFeaturedProducts() {
+
+    const container =
+        document.getElementById(
+            "featuredProductList"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    try {
+
+        container.innerHTML = `
+            <div class="featured-loading">
+                Đang tải sản phẩm...
+            </div>
+        `;
+
+
+        /* -----------------------------------------
+           LẤY CÁC TIN ĐANG HOẠT ĐỘNG
+        ----------------------------------------- */
+
+        const {
+            data: productData,
+            error: productError
+        } = await supabaseClient
+
+            .from("products")
+
+            .select(`
+                id,
+                seller_id,
+                name,
+                category,
+                price,
+                image_urls,
+                status,
+                created_at
+            `)
+
+            .eq(
+                "status",
+                "active"
+            )
+
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+
+        if (productError) {
+
+            console.error(
+                "Lỗi tải sản phẩm nổi bật:",
+                productError
+            );
+
+            throw productError;
+        }
+
+
+        if (
+            !productData ||
+            productData.length === 0
+        ) {
+
+            featuredProducts = [];
+
+            renderFeaturedProducts();
+
+            return;
+        }
+
+
+        /* -----------------------------------------
+           LẤY ID NGƯỜI BÁN
+        ----------------------------------------- */
+
+        const sellerIds = [
+            ...new Set(
+                productData
+                    .map(
+                        product =>
+                            product.seller_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+        let users = [];
+
+
+        /* -----------------------------------------
+           LẤY USERS
+        ----------------------------------------- */
+
+        if (sellerIds.length > 0) {
+
+            const {
+                data: userData,
+                error: userError
+            } = await supabaseClient
+
+                .from("users")
+
+                .select(`
+                    user_id,
+                    fullname,
+                    avatar_url,
+                    student_verified,
+                    role
+                `)
+
+                .in(
+                    "user_id",
+                    sellerIds
+                );
+
+
+            if (userError) {
+
+                console.error(
+                    "Lỗi tải người bán:",
+                    userError
+                );
+
+                throw userError;
+            }
+
+
+            users =
+                userData || [];
+        }
+
+
+        /* -----------------------------------------
+           GHÉP SẢN PHẨM + NGƯỜI BÁN
+        ----------------------------------------- */
+
+        featuredProducts =
+            productData.map(
+                product => {
+
+                    const seller =
+                        users.find(
+                            user =>
+                                String(
+                                    user.user_id
+                                ) ===
+                                String(
+                                    product.seller_id
+                                )
+                        );
+
+
+                    return {
+
+                        ...product,
+
+                        seller:
+                            seller || null
+                    };
+                }
+            );
+
+
+        renderFeaturedProducts();
+
+
+    } catch (error) {
+
+        console.error(
+            "Không thể tải sản phẩm nổi bật:",
+            error
+        );
+
+
+        container.innerHTML = `
+            <div class="featured-empty">
+                Không thể tải sản phẩm.
+            </div>
+        `;
+    }
+}
+
+
+/* =====================================================
+   CARD SẢN PHẨM
+===================================================== */
+
+function renderFeaturedCard(product) {
+
+    const seller =
+        product.seller || {};
+
+
+    const images =
+        normalizeFeaturedImages(
+            product.image_urls
+        );
+
+
+    const image =
+        images[0] ||
+        "../Images/default-product.png";
+
+
+    const sellerName =
+        seller.fullname ||
+        "Người bán";
+
+
+    const avatar =
+        seller.avatar_url ||
+        "../Images/default-avatar.svg";
+
+
+    const verified =
+        isFeaturedSellerVerified(
+            seller
+        );
+
+
+    const category =
+        product.category ||
+        "Sản phẩm";
+
+
+    const badgeHTML =
+        verified
+            ? `
+                <span
+                    class="featured-seller-badge"
+                    title="Tài khoản đã xác thực">
+                    ✓
+                </span>
+            `
+            : "";
+
+
+    const roleText =
+        seller.role === "admin"
+            ? "Admin"
+            : seller.role === "moderator"
+                ? "Quản trị viên"
+                : "Sinh viên";
+
+
+    return `
+
+        <article
+            class="featured-product-card"
+            data-featured-product-id="${product.id}">
+
+            <!-- Ảnh -->
+            <div class="featured-product-image">
+
+                <img
+                    src="${image}"
+                    alt="${product.name || "Sản phẩm"}"
+                    loading="lazy"
+                    onerror="
+                        this.onerror=null;
+                        this.src='../Images/default-product.png';
+                    "
+                >
+
+                <span class="featured-heart">
+                    ♡
+                </span>
+
+            </div>
+
+
+            <!-- Nội dung -->
+            <div class="featured-product-content">
+
+                <span class="featured-product-category">
+                    ${category}
+                </span>
+
+
+                <h3 class="featured-product-name">
+                    ${product.name || "Sản phẩm"}
+                </h3>
+
+
+                <div class="featured-product-price">
+                    ${formatFeaturedPrice(product.price)}
+                </div>
+
+
+                <!-- Người bán -->
+                <div class="featured-seller">
+
+                    <img
+                        class="featured-seller-avatar"
+                        src="${avatar}"
+                        alt="${sellerName}"
+                        onerror="
+                            this.onerror=null;
+                            this.src='../Images/default-avatar.svg';
+                        "
+                    >
+
+
+                    <div class="featured-seller-info">
+
+                        <div class="featured-seller-name">
+
+                            <span
+                                class="featured-seller-name-text">
+                                ${sellerName}
+                            </span>
+
+                            ${badgeHTML}
+
+                        </div>
+
+
+                        <div class="featured-seller-role">
+                            ${roleText}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+/* =====================================================
+   HIỂN THỊ
+===================================================== */
+
+function renderFeaturedProducts() {
+
+    const container =
+        document.getElementById(
+            "featuredProductList"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    let result =
+        [...featuredProducts];
+
+
+    /* -----------------------------------------
+       SẮP XẾP
+    ----------------------------------------- */
+
+    if (featuredSort === "newest") {
+
+        result.sort(
+            (a, b) =>
+                new Date(b.created_at) -
+                new Date(a.created_at)
+        );
+
+    }
+
+
+    if (featuredSort === "price-low") {
+
+        result.sort(
+            (a, b) =>
+                Number(a.price || 0) -
+                Number(b.price || 0)
+        );
+
+    }
+
+
+    if (featuredSort === "price-high") {
+
+        result.sort(
+            (a, b) =>
+                Number(b.price || 0) -
+                Number(a.price || 0)
+        );
+
+    }
+
+
+    // Chỉ lấy 5 sản phẩm trên trang chủ
+    result =
+        result.slice(0, 5);
+
+
+    if (result.length === 0) {
+
+        container.innerHTML = `
+            <div class="featured-empty">
+                Chưa có sản phẩm đang bán.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        result
+            .map(
+                renderFeaturedCard
+            )
+            .join("");
+
+
+    bindFeaturedProductEvents();
+}
+
+
+/* =====================================================
+   BẤM CARD → CHI TIẾT SẢN PHẨM
+===================================================== */
+
+function bindFeaturedProductEvents() {
+
+    document
+        .querySelectorAll(
+            "[data-featured-product-id]"
+        )
+        .forEach(card => {
+
+            card.addEventListener(
+                "click",
+                function () {
+
+                    const productId =
+                        this.dataset
+                            .featuredProductId;
+
+
+                    if (!productId) {
+                        return;
+                    }
+
+
+                    window.location.href =
+                        `chitietsanpham.html?id=${encodeURIComponent(productId)}`;
+                }
+            );
+
+        });
+}
+
+
+/* =====================================================
+   TAB SẢN PHẨM NỔI BẬT
+===================================================== */
+
+function setupFeaturedTabs() {
+
+    document
+        .querySelectorAll(
+            ".featured-tab"
+        )
+        .forEach(tab => {
+
+            tab.addEventListener(
+                "click",
+                function () {
+
+                    document
+                        .querySelectorAll(
+                            ".featured-tab"
+                        )
+                        .forEach(
+                            item =>
+                                item.classList.remove(
+                                    "active"
+                                )
+                        );
+
+
+                    this.classList.add(
+                        "active"
+                    );
+
+
+                    featuredSort =
+                        this.dataset
+                            .featuredSort ||
+                        "newest";
+
+
+                    renderFeaturedProducts();
+                }
+            );
+
+        });
+}
+
+
+/* =====================================================
+   KHỞI ĐỘNG
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        loadFeaturedProducts();
+
+        setupFeaturedTabs();
+
+    }
+);
