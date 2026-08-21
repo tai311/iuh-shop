@@ -690,10 +690,15 @@ function renderProductCard(product) {
     )}
 
     ${
-        verified
-            ? " ✓"
-            : ""
-    }
+    verified
+        ? `
+            <span
+                class="seller-verified-badge"
+                title="Đã xác minh sinh viên IUH"
+            >✓</span>
+          `
+        : ""
+}
 
 </span>
 
