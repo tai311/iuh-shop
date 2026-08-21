@@ -402,6 +402,8 @@ async function loadAccount() {
 
         if (!user) {
 
+            currentAuthUserId = null;
+
             console.log(
                 "Người dùng chưa đăng nhập"
             );
@@ -423,6 +425,8 @@ async function loadAccount() {
         /* =====================================
            ĐÃ ĐĂNG NHẬP
         ===================================== */
+
+        currentAuthUserId = user.id;
 
         console.log(
             "Đã đăng nhập:",
@@ -2437,6 +2441,7 @@ document.addEventListener("DOMContentLoaded", function () {
    ĐÁNH GIÁ IUH SHOP
 ===================================================== */
 
+let currentAuthUserId = null;
 let selectedReviewRating = 0;
 let currentUserReview = null;
 
@@ -3606,3 +3611,122 @@ function setupSiteReviewForm() {
 setupReviewStars();
 setupSiteReviewForm();
 loadSiteReviews();
+
+
+/* =========================================
+   POPUP ĐÁNH GIÁ IUH SHOP
+========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const openButton =
+            document.getElementById(
+                "openSiteReviewButton"
+            );
+
+        const modal =
+            document.getElementById(
+                "siteReviewModal"
+            );
+
+        const overlay =
+            document.getElementById(
+                "siteReviewOverlay"
+            );
+
+        const closeButton =
+            document.getElementById(
+                "closeSiteReviewButton"
+            );
+
+
+        if (
+            !openButton ||
+            !modal
+        ) {
+            return;
+        }
+
+
+        function openReviewModal() {
+
+            modal.classList.add("open");
+
+            modal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            document.body.style.overflow =
+                "hidden";
+
+            /*
+                Tải lại đánh giá khi mở popup
+            */
+
+            loadSiteReviews();
+
+        }
+
+
+        function closeReviewModal() {
+
+            modal.classList.remove("open");
+
+            modal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            document.body.style.overflow =
+                "";
+
+        }
+
+
+        openButton.addEventListener(
+            "click",
+            openReviewModal
+        );
+
+
+        if (closeButton) {
+
+            closeButton.addEventListener(
+                "click",
+                closeReviewModal
+            );
+
+        }
+
+
+        if (overlay) {
+
+            overlay.addEventListener(
+                "click",
+                closeReviewModal
+            );
+
+        }
+
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape" &&
+                    modal.classList.contains("open")
+                ) {
+
+                    closeReviewModal();
+
+                }
+
+            }
+        );
+
+    }
+);

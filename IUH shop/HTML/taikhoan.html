@@ -978,174 +978,42 @@
 
                     </a>
 
-                    <!-- =====================================================
+                    <!-- =================================
      ĐÁNH GIÁ IUH SHOP
-====================================================== -->
-<section class="site-review-section">
+================================= -->
 
-    <div class="site-review-header">
+<button
+    type="button"
+    id="openSiteReviewButton"
+    class="account-menu-item site-review-menu-button"
+>
 
-        <div>
-            <span class="site-review-label">
-                TRẢI NGHIỆM CỦA BẠN
-            </span>
-
-            <h2>
-                Đánh giá IUH SHOP
-            </h2>
-
-            <p>
-                Chia sẻ trải nghiệm của bạn để IUH SHOP
-                ngày càng tốt hơn.
-            </p>
-        </div>
-
+    <div class="menu-icon">
+        <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <path
+                d="M12 3.5l2.65 5.37 5.93.86-4.29 4.18 1.01 5.91L12 17.03l-5.3 2.79 1.01-5.91-4.29-4.18 5.93-.86L12 3.5z"
+            />
+        </svg>
     </div>
 
+    <div class="menu-text">
+        <strong>
+            Đánh giá IUH SHOP
+        </strong>
 
-    <!-- FORM ĐÁNH GIÁ -->
-    <div
-        id="siteReviewForm"
-        class="site-review-form"
-    >
-
-        <h3>
-            Đánh giá của bạn
-        </h3>
-
-        <p class="site-review-form-note">
-            Bạn cảm thấy thế nào về IUH SHOP?
-        </p>
-
-
-        <!-- CHỌN SAO -->
-        <div
-            id="reviewStarsInput"
-            class="review-stars-input"
-        >
-
-            <button
-                type="button"
-                class="review-star-button"
-                data-rating="1"
-                aria-label="1 sao"
-            >
-                ★
-            </button>
-
-            <button
-                type="button"
-                class="review-star-button"
-                data-rating="2"
-                aria-label="2 sao"
-            >
-                ★
-            </button>
-
-            <button
-                type="button"
-                class="review-star-button"
-                data-rating="3"
-                aria-label="3 sao"
-            >
-                ★
-            </button>
-
-            <button
-                type="button"
-                class="review-star-button"
-                data-rating="4"
-                aria-label="4 sao"
-            >
-                ★
-            </button>
-
-            <button
-                type="button"
-                class="review-star-button"
-                data-rating="5"
-                aria-label="5 sao"
-            >
-                ★
-            </button>
-
-        </div>
-
-
-        <span
-            id="reviewRatingText"
-            class="review-rating-text"
-        >
-            Chọn số sao
+        <span>
+            Chia sẻ trải nghiệm và góp ý của bạn
         </span>
-
-
-        <!-- NỘI DUNG -->
-        <textarea
-            id="siteReviewInput"
-            class="site-review-input"
-            maxlength="1000"
-            placeholder="Chia sẻ trải nghiệm của bạn..."
-        ></textarea>
-
-
-        <div class="site-review-form-bottom">
-
-            <span id="siteReviewCounter">
-                0/1000
-            </span>
-
-            <button
-                type="button"
-                id="submitSiteReview"
-                class="site-review-submit"
-            >
-                Gửi đánh giá
-            </button>
-
-        </div>
-
     </div>
 
+    <span class="menu-arrow">
+        ›
+    </span>
 
-    <!-- CHƯA ĐĂNG NHẬP -->
-    <div
-        id="siteReviewLoginMessage"
-        class="site-review-login"
-        hidden
-    >
-        Vui lòng đăng nhập để đánh giá IUH SHOP.
-    </div>
-
-
-    <!-- DANH SÁCH ĐÁNH GIÁ -->
-    <div class="site-review-list-header">
-
-        <div>
-            <h3>
-                Đánh giá gần đây
-            </h3>
-
-            <p id="siteReviewCount">
-                Đang tải đánh giá...
-            </p>
-        </div>
-
-    </div>
-
-
-    <div
-        id="siteReviewsList"
-        class="site-reviews-list"
-    >
-
-        <div class="site-review-loading">
-            Đang tải đánh giá...
-        </div>
-
-    </div>
-
-</section>
+</button>
 
 
 
@@ -1205,6 +1073,212 @@
 
 
         </section>
+
+        <!-- =================================
+     POPUP ĐÁNH GIÁ IUH SHOP
+================================= -->
+
+<div
+    id="siteReviewModal"
+    class="site-review-modal"
+    aria-hidden="true"
+>
+
+    <div
+        class="site-review-overlay"
+        id="siteReviewOverlay"
+    ></div>
+
+    <div
+        class="site-review-modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="siteReviewModalTitle"
+    >
+
+        <!-- HEADER POPUP -->
+
+        <div class="site-review-modal-header">
+
+            <div>
+                <span class="site-review-label">
+                    TRẢI NGHIỆM CỦA BẠN
+                </span>
+
+                <h2 id="siteReviewModalTitle">
+                    Đánh giá IUH SHOP
+                </h2>
+
+                <p>
+                    Chia sẻ trải nghiệm để IUH SHOP
+                    ngày càng tốt hơn.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                id="closeSiteReviewButton"
+                class="site-review-close"
+                aria-label="Đóng"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <div
+            id="siteReviewForm"
+            class="site-review-form"
+        >
+
+            <h3>
+                Đánh giá của bạn
+            </h3>
+
+            <p class="site-review-form-note">
+                Bạn cảm thấy thế nào về IUH SHOP?
+            </p>
+
+
+            <!-- SAO -->
+
+            <div
+                id="reviewStarsInput"
+                class="review-stars-input"
+            >
+
+                <button
+                    type="button"
+                    class="review-star-button"
+                    data-rating="1"
+                    aria-label="1 sao"
+                >
+                    ★
+                </button>
+
+                <button
+                    type="button"
+                    class="review-star-button"
+                    data-rating="2"
+                    aria-label="2 sao"
+                >
+                    ★
+                </button>
+
+                <button
+                    type="button"
+                    class="review-star-button"
+                    data-rating="3"
+                    aria-label="3 sao"
+                >
+                    ★
+                </button>
+
+                <button
+                    type="button"
+                    class="review-star-button"
+                    data-rating="4"
+                    aria-label="4 sao"
+                >
+                    ★
+                </button>
+
+                <button
+                    type="button"
+                    class="review-star-button"
+                    data-rating="5"
+                    aria-label="5 sao"
+                >
+                    ★
+                </button>
+
+            </div>
+
+
+            <span
+                id="reviewRatingText"
+                class="review-rating-text"
+            >
+                Chọn số sao
+            </span>
+
+
+            <!-- NỘI DUNG -->
+
+            <textarea
+                id="siteReviewInput"
+                class="site-review-input"
+                maxlength="1000"
+                placeholder="Chia sẻ trải nghiệm của bạn..."
+            ></textarea>
+
+
+            <div class="site-review-form-bottom">
+
+                <span id="siteReviewCounter">
+                    0/1000
+                </span>
+
+                <button
+                    type="button"
+                    id="submitSiteReview"
+                    class="site-review-submit"
+                >
+                    Gửi đánh giá
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- CHƯA ĐĂNG NHẬP -->
+
+        <div
+            id="siteReviewLoginMessage"
+            class="site-review-login"
+            hidden
+        >
+            Vui lòng đăng nhập để đánh giá IUH SHOP.
+        </div>
+
+
+        <!-- DANH SÁCH -->
+
+        <div class="site-review-list-header">
+
+            <div>
+
+                <h3>
+                    Đánh giá gần đây
+                </h3>
+
+                <p id="siteReviewCount">
+                    Đang tải đánh giá...
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="siteReviewsList"
+            class="site-reviews-list"
+        >
+
+            <div class="site-review-loading">
+                Đang tải đánh giá...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
     </main>
 
