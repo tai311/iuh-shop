@@ -2881,9 +2881,9 @@ body {
     align-items: center;
     justify-content: center;
 
-    width: 17px;
-    height: 17px;
-    min-width: 17px;
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
 
     margin-left: 5px;
 
@@ -2892,7 +2892,7 @@ body {
     background: #2f6edb;
     color: #ffffff;
 
-    font-size: 11px;
+    font-size: 8px;
     font-weight: 800;
     line-height: 1;
 
