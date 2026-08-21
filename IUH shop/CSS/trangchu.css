@@ -2255,6 +2255,826 @@ body {
     }
 }
 
+/* =========================================
+   VÌ SAO CHỌN IUH SHOP
+========================================= */
+
+.why-iuh-section {
+    width: 90%;
+    max-width: 1450px;
+
+    margin: 0 auto;
+
+    padding: 20px 0 55px;
+}
+
+
+.why-iuh-container {
+    display: grid;
+
+    grid-template-columns:
+        1.1fr 1fr;
+
+    min-height: 330px;
+
+    border: 1px solid #e7ebf2;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 5px 20px rgba(20, 48, 105, 0.04);
+}
+
+
+/* =========================================
+   BÊN TRÁI
+========================================= */
+
+.why-iuh-banner {
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+
+    padding: 45px 55px;
+
+    background-image: url("../Images/bn1.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    color: #ffffff;
+}
+
+.why-iuh-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: rgba(20, 55, 130, 0.28);
+
+    z-index: 1;
+}
+
+.why-iuh-banner-content {
+    position: relative;
+    z-index: 3;
+}
+
+
+.why-iuh-banner::before {
+    content: "";
+
+    position: absolute;
+
+    width: 280px;
+    height: 280px;
+
+    right: -100px;
+    bottom: -140px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.06);
+}
+
+
+.why-iuh-banner-content {
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 550px;
+}
+
+
+.why-iuh-label {
+    display: block;
+
+    margin-bottom: 18px;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+}
+
+
+.why-iuh-banner h2 {
+    margin: 0 0 30px;
+
+    font-size: 34px;
+
+    line-height: 1.35;
+
+    font-weight: 700;
+}
+
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.why-iuh-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 14px;
+
+    min-width: 190px;
+
+    padding: 14px 24px;
+
+    background: #f4c33d;
+
+    color: #182b52;
+
+    border-radius: 9px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.why-iuh-button span {
+    font-size: 24px;
+
+    line-height: 15px;
+}
+
+
+.why-iuh-button:hover {
+    transform: translateY(-2px);
+
+    background: #ffd45c;
+
+    box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================
+   BÊN PHẢI
+========================================= */
+
+.why-iuh-reasons {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 0;
+
+    padding: 35px 38px;
+
+    background: #ffffff;
+}
+
+
+.why-iuh-reason {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 17px;
+
+    padding: 18px 15px;
+
+    transition:
+        background 0.2s ease;
+}
+
+
+.why-iuh-reason:hover {
+    background: #fafcff;
+
+    border-radius: 12px;
+}
+
+
+/* =========================================
+   ICON
+========================================= */
+
+.why-iuh-icon {
+    width: 46px;
+    height: 46px;
+
+    min-width: 46px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid #f0c64a;
+
+    border-radius: 11px;
+
+    color: #e2ad25;
+
+    font-size: 22px;
+
+    font-weight: 700;
+}
+
+
+.why-iuh-reason-content h3 {
+    margin: 1px 0 7px;
+
+    color: #183c87;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+.why-iuh-reason-content p {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 12px;
+
+    line-height: 1.65;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1050px) {
+
+    .why-iuh-container {
+        grid-template-columns: 1fr;
+    }
+
+    .why-iuh-banner {
+        min-height: 300px;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .why-iuh-section {
+        width: 92%;
+
+        padding:
+            15px 0 40px;
+    }
+
+
+    .why-iuh-banner {
+        padding: 35px 30px;
+    }
+
+
+    .why-iuh-banner h2 {
+        font-size: 27px;
+    }
+
+
+    .why-iuh-decoration {
+        opacity: 0.5;
+    }
+
+
+    .why-iuh-reasons {
+        grid-template-columns: 1fr;
+
+        padding: 20px;
+    }
+
+
+    .why-iuh-reason {
+        padding: 15px 5px;
+    }
+
+}
+
+.why-iuh-icon svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: #e2ad25;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/* =========================================
+   ĐÁNH GIÁ TỪ SINH VIÊN
+========================================= */
+
+.reviews-section {
+    width: 90%;
+    max-width: 1450px;
+
+    margin: 0 auto;
+
+    padding: 25px 0 70px;
+}
+
+
+.reviews-container {
+    width: 100%;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.reviews-header {
+    text-align: center;
+
+    max-width: 700px;
+
+    margin: 0 auto 35px;
+}
+
+
+.reviews-label {
+    display: block;
+
+    margin-bottom: 10px;
+
+    color: #e2ad2f;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+
+.reviews-header h2 {
+    margin: 0 0 12px;
+
+    color: #18294b;
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+
+.reviews-header p {
+    margin: 0;
+
+    color: #71809a;
+
+    font-size: 16px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================
+   DANH SÁCH REVIEW
+========================= */
+
+.reviews-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 22px;
+}
+
+
+/* =========================
+   REVIEW CARD
+========================= */
+
+.review-card {
+    background: #ffffff;
+
+    border: 1px solid #e3e8f1;
+
+    border-radius: 16px;
+
+    padding: 26px 25px;
+
+    box-shadow:
+        0 5px 20px rgba(20, 48, 105, 0.04);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.review-card:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 10px 28px rgba(20, 48, 105, 0.09);
+}
+
+
+/* =========================
+   SAO
+========================= */
+
+.review-stars {
+    margin-bottom: 15px;
+
+    color: #f0c64f;
+
+    font-size: 18px;
+
+    letter-spacing: 2px;
+}
+
+
+/* =========================
+   NỘI DUNG
+========================= */
+
+.review-content {
+    margin: 0 0 24px;
+
+    min-height: 78px;
+
+    color: #536783;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   NGƯỜI DÙNG
+========================= */
+
+.review-user {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #edf0f5;
+}
+
+
+.review-avatar {
+    width: 42px;
+    height: 42px;
+
+    min-width: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #edf2ff;
+
+    color: #294b9b;
+
+    font-size: 16px;
+
+    font-weight: 700;
+}
+
+
+.review-user-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.review-user-info strong {
+    color: #18294b;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+.review-user-info span {
+    color: #8491a7;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .reviews-list {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .reviews-section {
+        width: 92%;
+
+        padding-bottom: 45px;
+    }
+
+
+    .reviews-header h2 {
+        font-size: 24px;
+    }
+
+
+    .reviews-header p {
+        font-size: 14px;
+    }
+
+
+    .reviews-list {
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+    }
+
+
+    .review-card {
+        padding: 22px;
+    }
+
+}
+
+/* =========================================
+   CTA ĐĂNG TIN CUỐI TRANG
+========================================= */
+
+.post-cta-section {
+    width: 90%;
+    max-width: 1450px;
+
+    margin: 0 auto;
+
+    padding: 10px 0 65px;
+}
+
+
+.post-cta {
+    position: relative;
+    min-height: 300px;
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+    border-radius: 20px;
+
+    background-image: url("../Images/bn2.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    color: #ffffff;
+}
+
+
+/* =========================================
+   NỘI DUNG
+========================================= */
+
+.post-cta-content {
+    position: relative;
+
+    z-index: 3;
+
+    width: 58%;
+
+    padding: 45px 55px;
+}
+
+
+.post-cta-label {
+    display: block;
+
+    margin-bottom: 12px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
+
+    color: #ffffff;
+}
+
+
+.post-cta h2 {
+    margin: 0 0 14px;
+
+    font-size: 32px;
+
+    line-height: 1.25;
+
+    font-weight: 700;
+
+    color: #ffffff;
+}
+
+
+.post-cta p {
+    max-width: 570px;
+
+    margin: 0 0 25px;
+
+    font-size: 16px;
+
+    line-height: 1.6;
+
+    color: rgba(255,255,255,0.88);
+}
+
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.post-cta-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 14px;
+
+    min-width: 175px;
+
+    padding: 13px 24px;
+
+    border-radius: 10px;
+
+    background: #f2c94c;
+
+    color: #173a86;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    transition: all 0.25s ease;
+}
+
+
+.post-cta-button span {
+    font-size: 25px;
+
+    line-height: 15px;
+}
+
+
+.post-cta-button:hover {
+    transform: translateY(-2px);
+
+    background: #ffd965;
+
+    box-shadow:
+        0 7px 18px rgba(0,0,0,0.16);
+}
+
+
+/* =========================================
+   PHẦN HÌNH ẢNH
+========================================= */
+
+.post-cta-visual {
+    position: absolute;
+
+    right: 0;
+    top: 0;
+
+    width: 42%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+
+/* =========================================
+   HÌNH TRANG TRÍ
+========================================= */
+
+.post-cta-circle {
+    position: absolute;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.07);
+}
+
+
+.circle-1 {
+    width: 260px;
+    height: 260px;
+
+    right: 5%;
+    bottom: -150px;
+}
+
+
+.circle-2 {
+    width: 180px;
+    height: 180px;
+
+    right: 30%;
+    top: -90px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 800px) {
+
+    .post-cta-content {
+        width: 100%;
+
+        padding: 40px;
+    }
+
+    .post-cta h2 {
+        font-size: 27px;
+    }
+
+    .post-cta-visual {
+        opacity: 0.35;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .post-cta-section {
+        width: 92%;
+    }
+
+    .post-cta-content {
+        padding: 32px 25px;
+    }
+
+    .post-cta h2 {
+        font-size: 24px;
+    }
+
+    .post-cta p {
+        font-size: 14px;
+    }
+
+    .post-cta-button {
+        width: 100%;
+    }
+
+}
+
+
+
 /* =====================================================
    TÀI KHOẢN HEADER - FIX
 ===================================================== */
