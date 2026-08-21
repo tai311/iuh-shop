@@ -2723,6 +2723,155 @@ body {
 
 }
 
+/* =========================================
+   NÚT VỀ ĐẦU TRANG - LIQUID GLASS
+========================================= */
+
+.back-to-top {
+    position: fixed;
+
+    right: 28px;
+    bottom: 28px;
+
+    width: 54px;
+    height: 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    border-radius: 50%;
+
+    /* Kính trong hơn */
+    background: rgba(255, 255, 255, 0.12);
+
+     backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+
+    /* Tạo viền kính rõ */
+   box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.45),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.08),
+        0 8px 24px rgba(20, 40, 80, 0.14);
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transform:
+        translateY(15px)
+        scale(0.88);
+
+    transition:
+        opacity 0.28s ease,
+        visibility 0.28s ease,
+        transform 0.28s cubic-bezier(.22, 1, .36, 1),
+        background 0.25s ease,
+        box-shadow 0.25s ease;
+    
+    z-index: 9998;
+}
+
+
+/* Hiện nút */
+
+.back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+
+/* Mũi tên */
+
+.back-to-top svg {
+    width: 25px;
+    height: 25px;
+
+    fill: none;
+
+    stroke: #29489A;
+    stroke-width: 2.8;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    filter:
+        drop-shadow(
+            0 1px 2px
+            rgba(255, 255, 255, 0.6)
+        );
+
+    transition: transform 0.25s ease;
+}
+
+
+/* =========================================
+   HOVER
+========================================= */
+
+.back-to-top:hover {
+    background: rgba(255, 255, 255, 0.20);
+
+    border-color:
+        rgba(255, 255, 255, 0.55);
+
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.6),
+        0 10px 28px rgba(20, 40, 80, 0.18);
+
+    transform:
+        translateY(-4px)
+        scale(1.06);
+}
+
+
+/* Mũi tên bay nhẹ */
+
+.back-to-top:hover svg {
+    transform: translateY(-2px);
+}
+
+
+/* Khi click */
+
+.back-to-top:active {
+    transform:
+        translateY(-1px)
+        scale(0.94);
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+    .back-to-top {
+        right: 18px;
+        bottom: 18px;
+
+        width: 48px;
+        height: 48px;
+    }
+
+    .back-to-top svg {
+        width: 22px;
+        height: 22px;
+    }
+
+}
+
 
 
 
