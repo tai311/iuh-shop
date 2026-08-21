@@ -1486,3 +1486,108 @@ document.addEventListener(
 
     }
 );
+
+/* =====================================================
+   SCROLL REVEAL ANIMATION
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const revealElements = [
+
+            ".welcome-section",
+            ".stats-section",
+            ".popular-categories",
+            ".featured-products",
+            ".why-iuh-section",
+            ".reviews-section",
+            ".post-cta-section",
+            ".site-footer"
+
+        ];
+
+
+        /* -----------------------------------------
+           Lấy tất cả section cần animation
+        ----------------------------------------- */
+
+        const elements = [];
+
+        revealElements.forEach(function (selector) {
+
+            document
+                .querySelectorAll(selector)
+                .forEach(function (element) {
+
+                    element.classList.add(
+                        "scroll-reveal"
+                    );
+
+                    elements.push(element);
+
+                });
+
+        });
+
+
+        if (elements.length === 0) {
+            return;
+        }
+
+
+        /* -----------------------------------------
+           Intersection Observer
+        ----------------------------------------- */
+
+        const revealObserver =
+            new IntersectionObserver(
+                function (entries, observer) {
+
+                    entries.forEach(function (entry) {
+
+                        if (
+                            !entry.isIntersecting
+                        ) {
+                            return;
+                        }
+
+
+                        entry.target.classList.add(
+                            "is-visible"
+                        );
+
+
+                        /*
+                         * Chỉ chạy một lần.
+                         * Khi đã xuất hiện thì không
+                         * theo dõi nữa.
+                         */
+
+                        observer.unobserve(
+                            entry.target
+                        );
+
+                    });
+
+                },
+                {
+                    threshold: 0.15,
+
+                    rootMargin:
+                        "0px 0px -60px 0px"
+                }
+            );
+
+
+        elements.forEach(function (element) {
+
+            revealObserver.observe(
+                element
+            );
+
+        });
+
+    }
+);

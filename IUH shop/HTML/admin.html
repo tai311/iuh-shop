@@ -377,6 +377,141 @@
         </section>
 
         <!-- =====================================
+     QUẢN LÝ TIN ĐĂNG
+====================================== -->
+
+<section
+    class="products-section"
+    id="productsSection"
+    aria-hidden="true"
+>
+
+    <div class="products-heading">
+
+        <div>
+
+            <span class="admin-label">
+                TIN ĐĂNG
+            </span>
+
+            <h2>
+                Quản lý tin đăng
+            </h2>
+
+            <p>
+                Admin có thể ẩn, hiện hoặc xóa
+                tin đăng của sinh viên.
+            </p>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="products-close"
+            id="closeProducts"
+        >
+            Đóng
+        </button>
+
+    </div>
+
+
+    <!-- THANH TÌM KIẾM + LỌC -->
+
+    <div class="products-toolbar">
+
+        <div class="products-search">
+
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+
+                <circle
+                    cx="11"
+                    cy="11"
+                    r="7"
+                ></circle>
+
+                <path
+                    d="M16 16l5 5"
+                ></path>
+
+            </svg>
+
+
+            <input
+                type="search"
+                id="productsSearch"
+                placeholder="Tìm tên sản phẩm hoặc người bán..."
+            >
+
+        </div>
+
+
+        <div class="products-filter">
+
+            <button
+                type="button"
+                class="product-filter-button active"
+                data-product-filter="all"
+            >
+                Tất cả
+            </button>
+
+
+            <button
+                type="button"
+                class="product-filter-button"
+                data-product-filter="active"
+            >
+                Đang hiển thị
+            </button>
+
+
+            <button
+                type="button"
+                class="product-filter-button"
+                data-product-filter="hidden"
+            >
+                Đang ẩn
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- THỐNG KÊ -->
+
+    <div
+        class="products-summary"
+        id="productsSummary"
+    >
+        Chưa tải danh sách tin đăng.
+    </div>
+
+
+    <!-- DANH SÁCH -->
+
+    <div
+        class="products-list"
+        id="productsList"
+    >
+
+        <div class="products-loading">
+
+            Bấm “Quản lý sản phẩm”
+            để tải danh sách tin đăng.
+
+        </div>
+
+    </div>
+
+</section>
+
+        <!-- =====================================
              QUẢN LÝ XÁC THỰC SINH VIÊN
         ====================================== -->
 
