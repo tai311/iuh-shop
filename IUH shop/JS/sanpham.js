@@ -583,7 +583,9 @@ function renderProductCard(product) {
 
 
     const verified =
-    seller.student_verified === true;
+    seller.student_verified === true ||
+    seller.role === "admin" ||
+    seller.role === "moderator";
 
 
     return `
