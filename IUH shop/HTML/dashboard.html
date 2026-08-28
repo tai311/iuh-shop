@@ -1,0 +1,922 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IUH Market</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/dashboard.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+    <main class="dashboard-page">
+
+        <!-- =================================================
+             HEADER DASHBOARD
+        ================================================== -->
+
+        <section class="dashboard-heading">
+
+            <div>
+
+                <span class="dashboard-label">
+                    IUH SHOP ANALYTICS
+                </span>
+
+                <h1>
+                    Tổng quan hoạt động
+                </h1>
+
+                <p>
+                    Theo dõi doanh thu, đơn hàng và các khoản
+                    phí sàn của bạn tại IUH SHOP.
+                </p>
+
+            </div>
+
+
+            <div class="dashboard-date">
+
+                <span>
+                    Cập nhật
+                </span>
+
+                <strong id="dashboardDate">
+                    —
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             STAT CARDS
+        ================================================== -->
+
+        <section class="dashboard-stats">
+
+
+            <!-- DOANH THU -->
+
+            <div class="dashboard-card revenue-card">
+
+                <div class="stat-icon">
+                    ₫
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Doanh thu
+                    </span>
+
+                    <strong
+                        id="totalRevenue"
+                        data-value="0"
+                    >
+                        0đ
+                    </strong>
+
+                    <small>
+                        Từ các đơn hàng đã hoàn thành
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- CHI PHÍ -->
+
+            <div class="dashboard-card expense-card">
+
+                <div class="stat-icon">
+                    %
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Chi phí
+                    </span>
+
+                    <strong
+                        id="totalFee"
+                        data-value="0"
+                    >
+                        0đ
+                    </strong>
+
+                    <small id="feeDescription">
+                        Phí sàn IUH SHOP · 5%
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- ĐƠN HÀNG -->
+
+            <div class="dashboard-card order-card">
+
+                <div class="stat-icon">
+                    #
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Số đơn hàng
+                    </span>
+
+                    <strong
+                        id="totalOrders"
+                        data-value="0"
+                    >
+                        0
+                    </strong>
+
+                    <small>
+                        Tổng số đơn hàng
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- ĐƠN HOÀN THÀNH -->
+
+            <div class="dashboard-card completed-card">
+
+                <div class="stat-icon">
+                    ✓
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Đã hoàn thành
+                    </span>
+
+                    <strong
+                        id="completedOrders"
+                        data-value="0"
+                    >
+                        0
+                    </strong>
+
+                    <small>
+                        Đơn đã hoàn tất
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SECONDARY STATS
+        ================================================== -->
+
+        <section class="mini-stats">
+
+
+            <div class="mini-card">
+
+                <span>
+                    Ví IUH SHOP
+                </span>
+
+                <strong id="walletBalance">
+                    0đ
+                </strong>
+
+                <small>
+                    Số dư có thể rút
+                </small>
+
+            </div>
+
+
+            <div class="mini-card">
+
+                <span>
+                    Đang xử lý
+                </span>
+
+                <strong id="processingOrders">
+                    0
+                </strong>
+
+                <small>
+                    Đơn chưa hoàn thành
+                </small>
+
+            </div>
+
+
+            <div class="mini-card">
+
+                <span>
+                    Công nợ phí
+                </span>
+
+                <strong
+                    id="outstandingFee"
+                    class="debt-value"
+                >
+                    0đ
+                </strong>
+
+                <small id="debtStatus">
+                    Không có khoản phí quá hạn
+                </small>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHART
+        ================================================== -->
+
+        <section class="chart-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span>
+                        PHÂN TÍCH
+                    </span>
+
+                    <h2>
+                        Doanh thu theo tháng
+                    </h2>
+
+                </div>
+
+                <select id="chartYear">
+
+                    <option value="2026">
+                        2026
+                    </option>
+
+                    <option value="2025">
+                        2025
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="chart-wrapper">
+
+                <canvas id="revenueChart"></canvas>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ORDER + FEE
+        ================================================== -->
+
+        <section class="dashboard-grid">
+
+
+            <!-- ĐƠN HÀNG -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <span>
+                            ĐƠN HÀNG
+                        </span>
+
+                        <h2>
+                            Hoạt động gần đây
+                        </h2>
+
+                    </div>
+
+                    <a href="donhang.html">
+                        Xem tất cả →
+                    </a>
+
+                </div>
+
+
+                <div
+                    class="order-list"
+                    id="recentOrders"
+                >
+
+                    <!-- JS render -->
+
+                </div>
+
+            </div>
+
+
+            <!-- PHÍ -->
+
+            <div class="panel fee-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <span>
+                            PHÍ SÀN
+                        </span>
+
+                        <h2>
+                            Khoản cần thanh toán
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div id="feeList">
+
+                    <!-- JS render -->
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             NOTE
+        ================================================== -->
+
+        <div class="dashboard-note">
+
+            <span>
+                ⓘ
+            </span>
+
+            <p>
+                Phí sàn được tính theo quy chế giao dịch của
+                IUH SHOP. Đối với đơn COD, phí được ghi nhận
+                sau khi đơn hoàn thành. Người bán có thời hạn
+                07 ngày để thanh toán. Khoản phí quá hạn sẽ
+                được tính phí chậm thanh toán theo cơ chế lãi kép.
+            </p>
+
+        </div>
+
+    </main>
+
+
+     <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/dashboard.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+<!-- =====================================================
+     POPUP THANH TOÁN PHÍ
+===================================================== -->
+
+<div
+    class="payment-modal"
+    id="paymentModal"
+>
+
+    <div class="payment-modal-overlay"
+         onclick="closePaymentModal()">
+    </div>
+
+
+    <div class="payment-modal-box">
+
+        <button
+            class="payment-close"
+            onclick="closePaymentModal()"
+        >
+            ×
+        </button>
+
+
+        <span class="payment-modal-label">
+            IUH SHOP WALLET
+        </span>
+
+        <h2>
+            Thanh toán phí sàn
+        </h2>
+
+        <p class="payment-modal-description">
+            Kiểm tra thông tin bên dưới trước khi xác nhận
+            thanh toán khoản phí.
+        </p>
+
+
+        <!-- SỐ TIỀN -->
+
+        <div class="payment-total">
+
+            <span>
+                Số tiền cần thanh toán
+            </span>
+
+            <strong id="paymentAmount">
+                0đ
+            </strong>
+
+        </div>
+
+
+        <!-- THÔNG TIN -->
+
+        <div class="payment-info">
+
+            <div>
+
+                <span>
+                    Mã giao dịch
+                </span>
+
+                <strong id="paymentTransaction">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Phương thức
+                </span>
+
+                <strong>
+                    Ví IUH SHOP
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Trạng thái
+                </span>
+
+                <strong class="payment-demo-status">
+                    Mô phỏng
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- THÔNG BÁO -->
+
+        <div class="payment-demo-note">
+
+            <span>
+                ⓘ
+            </span>
+
+            <p>
+                Đây là giao dịch mô phỏng phục vụ mục đích
+                trình diễn hệ thống. Không phát sinh giao dịch
+                tài chính thực tế.
+            </p>
+
+        </div>
+
+
+        <!-- BUTTON -->
+
+        <button
+            class="confirm-payment-button"
+            id="confirmPaymentButton"
+            onclick="confirmPayment()"
+        >
+
+            Xác nhận đã thanh toán
+
+        </button>
+
+
+        <button
+            class="cancel-payment-button"
+            onclick="closePaymentModal()"
+        >
+
+            Hủy
+
+        </button>
+
+    </div>
+
+</div>
+</body>
+</html>

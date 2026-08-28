@@ -397,23 +397,88 @@
                 </div>
 
                 <div class="form-group">
-
-    <label for="productPrice">
-        Giá bán
+                   
+                    <label for="productPrice">
+        Giá người bán đặt
         <span>*</span>
     </label>
 
     <div class="price-input">
+
         <input
             type="number"
             id="productPrice"
-            min="0"
+            min="1000"
             step="1000"
             placeholder="Ví dụ: 50000"
             required
         >
 
         <span>VNĐ</span>
+
+    </div>
+
+    <small class="field-note">
+        Đây là số tiền bạn muốn nhận cho mỗi sản phẩm.
+    </small>
+
+
+    <!-- KHU VỰC TÍNH PHÍ -->
+
+    <div class="seller-price-summary">
+
+        <div class="price-row">
+
+            <span>Giá người bán đặt</span>
+
+            <strong id="sellerPricePreview">
+                0đ
+            </strong>
+
+        </div>
+
+
+        <div class="price-row fee">
+
+            <span>
+                Phí sàn IUH SHOP
+                <b>(5%)</b>
+            </span>
+
+            <strong id="platformFeePreview">
+                0đ
+            </strong>
+
+        </div>
+
+
+        <div class="price-divider"></div>
+
+
+        <div class="price-row total">
+
+            <span>Giá người mua thanh toán</span>
+
+            <strong id="buyerPricePreview">
+                0đ
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="price-notice">
+
+        <span class="price-notice-icon">ⓘ</span>
+
+        <span>
+            IUH SHOP thu phí dịch vụ 5% trên giá người bán đặt.
+            Phí sàn được xử lý theo phương thức thanh toán của đơn hàng.
+        </span>
+
+    </div>
+
     </div>
 
     <small class="field-note">
@@ -572,6 +637,288 @@
     class="toast"
     id="toast"
 ></div>
+
+<!-- =====================================================
+     POPUP 1 - ĐIỀU KHOẢN
+===================================================== -->
+
+<div
+    class="terms-modal"
+    id="termsModal"
+    aria-hidden="true"
+>
+
+    <div
+        class="terms-backdrop"
+        data-close-terms
+    ></div>
+
+
+    <div
+        class="terms-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="termsTitle"
+    >
+
+        <button
+            type="button"
+            class="terms-close"
+            id="closeTermsModal"
+            aria-label="Đóng"
+        >
+            ×
+        </button>
+
+
+        <div class="terms-icon">
+            !
+        </div>
+
+
+        <div class="terms-header">
+
+            <span class="modal-label">
+                LƯU Ý TRƯỚC KHI ĐĂNG TIN
+            </span>
+
+            <h2 id="termsTitle">
+                Điều khoản & Quy chế giao dịch
+            </h2>
+
+            <p>
+                Vui lòng đọc kỹ các quy định trước khi
+                đăng sản phẩm trên IUH SHOP.
+            </p>
+
+        </div>
+
+
+        <div class="terms-highlight">
+
+            <strong>
+                Phí dịch vụ IUH SHOP: 5%
+            </strong>
+
+            <span>
+                Phí được tính trên giá người bán thiết lập
+                và được xử lý theo phương thức thanh toán.
+            </span>
+
+        </div>
+
+
+        <div class="terms-list">
+
+            <div>
+                <b>01</b>
+                <span>
+                    Đơn hàng thanh toán trực tuyến:
+                    phí sàn được xử lý tự động theo hệ thống.
+                </span>
+            </div>
+
+            <div>
+                <b>02</b>
+                <span>
+                    Đơn hàng COD: phí sàn được ghi nhận
+                    vào khoản phí cần thanh toán của người bán
+                    sau khi đơn hoàn thành.
+                </span>
+            </div>
+
+            <div>
+                <b>03</b>
+                <span>
+                    Phí COD phải được thanh toán trong
+                    thời hạn 07 ngày kể từ khi đơn hoàn thành.
+                </span>
+            </div>
+
+            <div>
+                <b>04</b>
+                <span>
+                    Khoản phí quá hạn có thể phát sinh
+                    phí chậm thanh toán theo quy chế.
+                </span>
+            </div>
+
+            <div>
+                <b>05</b>
+                <span>
+                    Người bán không được cố tình chuyển
+                    giao dịch ra ngoài IUH SHOP nhằm né phí.
+                </span>
+            </div>
+
+        </div>
+
+
+        <a
+            href="dieukhoandang.html"
+            class="read-terms-link"
+        >
+            Đọc đầy đủ Điều khoản & Quy chế
+            <span>→</span>
+        </a>
+
+
+        <label class="terms-check">
+
+            <input
+                type="checkbox"
+                id="termsAgreement"
+            >
+
+            <span class="custom-checkbox"></span>
+
+            <span>
+                Tôi đã đọc, hiểu và đồng ý với
+                Điều khoản & Quy chế giao dịch của IUH SHOP.
+            </span>
+
+        </label>
+
+
+        <div class="terms-footer">
+
+            <button
+                type="button"
+                class="modal-btn secondary"
+                id="cancelTerms"
+            >
+                Hủy
+            </button>
+
+            <button
+                type="button"
+                class="modal-btn primary"
+                id="continueTerms"
+                disabled
+            >
+                Đồng ý & tiếp tục
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     POPUP 2 - XÁC NHẬN CUỐI
+===================================================== -->
+
+<div
+    class="confirm-modal"
+    id="confirmModal"
+    aria-hidden="true"
+>
+
+    <div
+        class="confirm-backdrop"
+        data-close-confirm
+    ></div>
+
+
+    <div
+        class="confirm-dialog"
+        role="dialog"
+        aria-modal="true"
+    >
+
+        <div class="confirm-icon">
+            ✓
+        </div>
+
+
+        <span class="modal-label">
+            XÁC NHẬN LẦN CUỐI
+        </span>
+
+
+        <h2>
+            Bạn chắc chắn muốn đăng sản phẩm?
+        </h2>
+
+
+        <p>
+            Sau khi xác nhận, sản phẩm sẽ được đăng
+            lên IUH SHOP và các giao dịch phát sinh
+            sẽ tuân theo Điều khoản & Quy chế mà bạn
+            đã đồng ý.
+        </p>
+
+
+        <div class="confirm-product-info">
+
+            <div>
+                <span>Sản phẩm</span>
+                <strong id="confirmProductName">
+                    —
+                </strong>
+            </div>
+
+            <div>
+                <span>Giá người bán</span>
+                <strong id="confirmSellerPrice">
+                    0đ
+                </strong>
+            </div>
+
+            <div>
+                <span>Phí sàn 5%</span>
+                <strong id="confirmPlatformFee">
+                    0đ
+                </strong>
+            </div>
+
+            <div>
+                <span>Giá người mua</span>
+                <strong id="confirmBuyerPrice">
+                    0đ
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="confirm-warning">
+
+            <span>!</span>
+
+            <p>
+                Hãy kiểm tra lại thông tin sản phẩm,
+                giá bán và số lượng trước khi xác nhận.
+            </p>
+
+        </div>
+
+
+        <div class="confirm-actions">
+
+            <button
+                type="button"
+                class="modal-btn secondary"
+                id="backToTerms"
+            >
+                Quay lại
+            </button>
+
+            <button
+                type="button"
+                class="modal-btn primary"
+                id="finalConfirmPost"
+            >
+                Xác nhận đăng
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 <!-- =========================
      FOOTER

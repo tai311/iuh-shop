@@ -1,0 +1,1794 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ĐIỀU KHOẢN ĐĂNG TIN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/dieukhoandang.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+     <!-- =====================================================
+     NỘI DUNG ĐIỀU KHOẢN & QUY CHẾ IUH SHOP
+     Header + Footer sử dụng code hiện có
+===================================================== -->
+
+<main class="terms-page">
+
+    <!-- HERO -->
+    <section class="terms-hero">
+
+        <div class="terms-hero-content">
+
+            <span class="terms-eyebrow">
+                IUH SHOP • QUY ĐỊNH NỀN TẢNG
+            </span>
+
+            <h1>
+                Điều khoản &amp;<br>
+                Quy chế giao dịch
+            </h1>
+
+            <p>
+                Vui lòng đọc kỹ các điều khoản dưới đây trước
+                khi sử dụng chức năng đăng bán và thực hiện
+                giao dịch trên IUH SHOP.
+            </p>
+
+            <div class="terms-version">
+                Phiên bản 1.0
+                <span>•</span>
+                Cập nhật lần đầu
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- NỘI DUNG -->
+    <section class="terms-content">
+
+        <div class="terms-layout">
+
+            <!-- SIDEBAR -->
+            <aside class="terms-sidebar">
+
+                <div class="terms-sidebar-inner">
+
+                    <span>
+                        NỘI DUNG
+                    </span>
+
+                    <a href="#general">
+                        01. Quy định chung
+                    </a>
+
+                    <a href="#account">
+                        02. Tài khoản người dùng
+                    </a>
+
+                    <a href="#listing">
+                        03. Quy định đăng tin
+                    </a>
+
+                    <a href="#pricing">
+                        04. Giá bán &amp; phí sàn
+                    </a>
+
+                    <a href="#payment">
+                        05. Phương thức thanh toán
+                    </a>
+
+                    <a href="#wallet">
+                        06. Ví IUH SHOP
+                    </a>
+
+                    <a href="#cod">
+                        07. Quy định đối với COD
+                    </a>
+
+                    <a href="#late-fee">
+                        08. Phí chậm thanh toán
+                    </a>
+
+                    <a href="#outside">
+                        09. Giao dịch ngoài hệ thống
+                    </a>
+
+                    <a href="#violation">
+                        10. Vi phạm &amp; xử lý
+                    </a>
+
+                    <a href="#agreement">
+                        11. Xác nhận điều khoản
+                    </a>
+
+                </div>
+
+            </aside>
+
+
+            <!-- ARTICLE -->
+            <article class="terms-article">
+
+
+                <!-- 01 -->
+                <section
+                    class="terms-section"
+                    id="general"
+                >
+
+                    <div class="section-number">
+                        01
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            QUY ĐỊNH CHUNG
+                        </span>
+
+                        <h2>
+                            Phạm vi áp dụng
+                        </h2>
+
+                        <p>
+                            Điều khoản &amp; Quy chế giao dịch
+                            IUH SHOP quy định các nguyên tắc
+                            áp dụng đối với hoạt động đăng tin,
+                            mua bán, thanh toán, quản lý đơn hàng
+                            và các giao dịch được thực hiện trên
+                            nền tảng IUH SHOP.
+                        </p>
+
+                        <p>
+                            Khi sử dụng chức năng đăng bán sản phẩm,
+                            người dùng xác nhận rằng mình đã đọc,
+                            hiểu và đồng ý tuân thủ các quy định
+                            được công bố trên trang này.
+                        </p>
+
+                        <p>
+                            Các quy định này được xây dựng nhằm
+                            duy trì môi trường mua bán minh bạch,
+                            an toàn và hạn chế các hành vi lợi dụng
+                            nền tảng để thực hiện giao dịch ngoài
+                            hệ thống.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 02 -->
+                <section
+                    class="terms-section"
+                    id="account"
+                >
+
+                    <div class="section-number">
+                        02
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            TÀI KHOẢN
+                        </span>
+
+                        <h2>
+                            Quy định đối với tài khoản
+                        </h2>
+
+                        <p>
+                            Người dùng chịu trách nhiệm đối với
+                            thông tin tài khoản và các hoạt động
+                            được thực hiện thông qua tài khoản
+                            của mình trên IUH SHOP.
+                        </p>
+
+                        <p>
+                            Người bán phải cung cấp thông tin
+                            sản phẩm trung thực, chính xác và
+                            không sử dụng nền tảng cho các mục
+                            đích trái với quy định của IUH SHOP.
+                        </p>
+
+                        <p>
+                            Việc cố tình sử dụng nhiều tài khoản,
+                            cung cấp thông tin sai lệch hoặc sử
+                            dụng tài khoản nhằm né tránh nghĩa vụ
+                            phí có thể bị xem xét xử lý.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 03 -->
+                <section
+                    class="terms-section"
+                    id="listing"
+                >
+
+                    <div class="section-number">
+                        03
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            ĐĂNG TIN
+                        </span>
+
+                        <h2>
+                            Quy định khi đăng sản phẩm
+                        </h2>
+
+                        <p>
+                            Người bán phải kiểm tra đầy đủ tên,
+                            hình ảnh, mô tả, số lượng và giá bán
+                            trước khi xác nhận đăng sản phẩm.
+                        </p>
+
+                        <p>
+                            Thông tin đăng bán phải phản ánh đúng
+                            sản phẩm thực tế. Người bán không được
+                            cố tình sử dụng thông tin gây hiểu nhầm
+                            cho người mua.
+                        </p>
+
+                        <div class="terms-note warning">
+
+                            <strong>
+                                Lưu ý
+                            </strong>
+
+                            <span>
+                                Sau khi người dùng xác nhận đăng,
+                                sản phẩm có thể được hiển thị trên
+                                nền tảng và tham gia vào quá trình
+                                giao dịch theo các quy định của
+                                IUH SHOP.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 04 -->
+                <section
+                    class="terms-section"
+                    id="pricing"
+                >
+
+                    <div class="section-number">
+                        04
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            PHÍ DỊCH VỤ
+                        </span>
+
+                        <h2>
+                            Giá bán &amp; phí sàn 5%
+                        </h2>
+
+                        <p>
+                            IUH SHOP áp dụng phí dịch vụ nền tảng
+                            ở mức <strong>5%</strong> trên giá do
+                            người bán thiết lập.
+                        </p>
+
+                        <p>
+                            Giá người bán thiết lập là số tiền
+                            người bán mong muốn nhận được từ sản
+                            phẩm. Phí sàn được tính riêng và được
+                            cộng vào số tiền người mua thanh toán.
+                        </p>
+
+
+                        <div class="fee-example">
+
+                            <div class="fee-example-title">
+                                VÍ DỤ TÍNH PHÍ
+                            </div>
+
+
+                            <div class="fee-row">
+
+                                <span>
+                                    Giá người bán đặt
+                                </span>
+
+                                <strong>
+                                    100.000đ
+                                </strong>
+
+                            </div>
+
+
+                            <div class="fee-row">
+
+                                <span>
+                                    Phí sàn IUH SHOP (5%)
+                                </span>
+
+                                <strong class="fee">
+                                    5.000đ
+                                </strong>
+
+                            </div>
+
+
+                            <div class="fee-line"></div>
+
+
+                            <div class="fee-row total">
+
+                                <span>
+                                    Giá người mua thanh toán
+                                </span>
+
+                                <strong>
+                                    105.000đ
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <p>
+                            Công thức:
+                        </p>
+
+                        <div class="formula">
+                            Phí sàn = Giá người bán đặt × 5%
+                        </div>
+
+                        <div class="formula">
+                            Giá người mua thanh toán =
+                            Giá người bán đặt + Phí sàn
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 05 -->
+                <section
+                    class="terms-section"
+                    id="payment"
+                >
+
+                    <div class="section-number">
+                        05
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            THANH TOÁN
+                        </span>
+
+                        <h2>
+                            Phương thức thanh toán
+                        </h2>
+
+                        <p>
+                            IUH SHOP hỗ trợ các phương thức thanh
+                            toán được hệ thống cung cấp. Tùy theo
+                            phương thức được lựa chọn, việc xử lý
+                            phí sàn và số tiền người bán nhận được
+                            sẽ được thực hiện theo cơ chế tương ứng.
+                        </p>
+
+
+                        <div class="payment-card">
+
+                            <div class="payment-icon">
+                                01
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Thanh toán trực tuyến
+                                </h3>
+
+                                <p>
+                                    Khi người mua thanh toán trực
+                                    tuyến, hệ thống ghi nhận toàn
+                                    bộ số tiền giao dịch và phân
+                                    bổ theo cơ chế của IUH SHOP.
+                                </p>
+
+                                <div class="flow">
+                                    Người mua thanh toán
+                                    <span>→</span>
+                                    Hệ thống xử lý
+                                    <span>→</span>
+                                    Phân bổ vào Ví IUH SHOP
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="payment-card">
+
+                            <div class="payment-icon yellow">
+                                02
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Thanh toán khi nhận hàng
+                                    (COD)
+                                </h3>
+
+                                <p>
+                                    Đối với COD, phí sàn được ghi
+                                    nhận vào khoản phí người bán
+                                    cần thanh toán sau khi đơn hàng
+                                    hoàn thành.
+                                </p>
+
+                                <div class="flow">
+                                    Đơn hoàn thành
+                                    <span>→</span>
+                                    Ghi nhận phí
+                                    <span>→</span>
+                                    Người bán thanh toán phí
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 06 -->
+                <section
+                    class="terms-section"
+                    id="wallet"
+                >
+
+                    <div class="section-number">
+                        06
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            VÍ IUH SHOP
+                        </span>
+
+                        <h2>
+                            Cơ chế quản lý số dư
+                        </h2>
+
+                        <p>
+                            Ví IUH SHOP là khu vực dùng để ghi nhận
+                            và quản lý các khoản tiền liên quan đến
+                            hoạt động bán hàng của người dùng trên
+                            nền tảng.
+                        </p>
+
+
+                        <div class="wallet-grid">
+
+                            <div class="wallet-card">
+
+                                <span>
+                                    SỐ DƯ KHẢ DỤNG
+                                </span>
+
+                                <strong>
+                                    Tiền người bán
+                                </strong>
+
+                                <p>
+                                    Khoản tiền đủ điều kiện
+                                    để người bán thực hiện
+                                    yêu cầu rút tiền.
+                                </p>
+
+                            </div>
+
+
+                            <div class="wallet-card">
+
+                                <span>
+                                    ĐANG XỬ LÝ
+                                </span>
+
+                                <strong>
+                                    Tiền chờ hoàn thành
+                                </strong>
+
+                                <p>
+                                    Khoản tiền chưa đủ điều
+                                    kiện để chuyển sang số
+                                    dư khả dụng.
+                                </p>
+
+                            </div>
+
+
+                            <div class="wallet-card">
+
+                                <span>
+                                    PHÍ CẦN THANH TOÁN
+                                </span>
+
+                                <strong>
+                                    Phí sàn COD
+                                </strong>
+
+                                <p>
+                                    Khoản phí phát sinh từ
+                                    các đơn hàng COD đã hoàn
+                                    thành.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <p>
+                            Người bán có trách nhiệm theo dõi
+                            số dư và các khoản phí được ghi nhận
+                            trong Ví IUH SHOP.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 07 -->
+                <section
+                    class="terms-section"
+                    id="cod"
+                >
+
+                    <div class="section-number">
+                        07
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            COD
+                        </span>
+
+                        <h2>
+                            Quy định đối với phí COD
+                        </h2>
+
+                        <p>
+                            Sau khi đơn hàng COD được xác nhận
+                            hoàn thành, hệ thống ghi nhận phí sàn
+                            5% tương ứng với đơn hàng vào khoản phí
+                            cần thanh toán của người bán.
+                        </p>
+
+                        <p>
+                            Người bán có thời hạn
+                            <strong>07 ngày</strong> kể từ ngày
+                            đơn hàng được xác nhận hoàn thành để
+                            thanh toán khoản phí này.
+                        </p>
+
+
+                        <div class="deadline-card">
+
+                            <div class="deadline-number">
+                                07
+                                <small>NGÀY</small>
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Thời hạn thanh toán
+                                </strong>
+
+                                <p>
+                                    Khoản phí COD cần được thanh
+                                    toán trong vòng 07 ngày.
+                                    Hệ thống sẽ hiển thị cảnh báo
+                                    khi thời hạn sắp kết thúc.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- =====================================================
+     08 - PHÍ CHẬM THANH TOÁN
+===================================================== -->
+
+<section
+    class="terms-section"
+    id="late-fee"
+>
+
+    <div class="section-number">
+        08
+    </div>
+
+    <div>
+
+        <span class="section-label">
+            QUÁ HẠN
+        </span>
+
+        <h2>
+            Phí chậm thanh toán
+        </h2>
+
+        <p>
+            Đối với các khoản phí sàn phát sinh từ đơn hàng
+            thanh toán khi nhận hàng (COD), người bán có thời
+            hạn <strong>07 ngày</strong> kể từ ngày đơn hàng
+            được xác nhận hoàn thành để thực hiện nghĩa vụ
+            thanh toán.
+        </p>
+
+        <p>
+            Trong thời hạn 07 ngày, người bán có thể hoàn thành
+            nghĩa vụ thanh toán mà <strong>không phát sinh phí
+            chậm thanh toán</strong>.
+        </p>
+
+
+        <!-- MỨC PHÍ -->
+
+        <div class="late-rate-card">
+
+            <div class="late-rate-main">
+
+                <span>
+                    PHÍ CHẬM THANH TOÁN
+                </span>
+
+                <strong>
+                    0,1%
+                    <small>/ ngày</small>
+                </strong>
+
+            </div>
+
+
+            <div class="late-rate-info">
+
+                <div>
+
+                    <b>
+                        07 ngày
+                    </b>
+
+                    <span>
+                        Thời hạn thanh toán không
+                        phát sinh phí chậm
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <b>
+                        Từ ngày 08
+                    </b>
+
+                    <span>
+                        Bắt đầu tính phí nếu khoản phí
+                        vẫn chưa được thanh toán
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CƠ CHẾ TÍNH -->
+
+        <h3>
+            Cơ chế tính phí
+        </h3>
+
+        <p>
+            Kể từ ngày thứ 08, nếu người bán chưa hoàn thành
+            nghĩa vụ thanh toán, hệ thống sẽ áp dụng mức phí
+            chậm thanh toán <strong>0,1%/ngày</strong> trên
+            khoản phí chưa thanh toán.
+        </p>
+
+        <p>
+            Phí chậm thanh toán được tính theo
+            <strong>cơ chế lãi kép hằng ngày</strong>. Số tiền
+            sau mỗi ngày quá hạn sẽ trở thành cơ sở để tính
+            cho ngày tiếp theo.
+        </p>
+
+
+        <!-- Ô CÔNG THỨC -->
+
+        <div class="late-fee-box">
+
+            <div class="late-fee-title">
+                CÔNG THỨC TÍNH PHÍ CHẬM THANH TOÁN
+            </div>
+
+
+            <div class="late-formula">
+
+                Khoản phải trả sau n ngày
+                =
+                Khoản phí ban đầu
+                ×
+                (1 + 0,001)<sup>n</sup>
+
+            </div>
+
+
+            <div class="late-variables">
+
+                <div>
+
+                    <strong>
+                        0,001
+                    </strong>
+
+                    <span>
+                        Tương đương mức phí chậm
+                        thanh toán 0,1% mỗi ngày.
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        n
+                    </strong>
+
+                    <span>
+                        Là số ngày quá hạn được tính
+                        kể từ ngày thứ 08.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- VÍ DỤ -->
+
+        <h3>
+            Ví dụ minh họa
+        </h3>
+
+        <p>
+            Giả sử người bán phát sinh khoản phí sàn
+            <strong>5.000đ</strong> từ một đơn hàng COD
+            đã hoàn thành.
+        </p>
+
+
+        <div class="late-example">
+
+            <div class="late-example-row">
+
+                <span>
+                    Phí sàn ban đầu
+                </span>
+
+                <strong>
+                    5.000đ
+                </strong>
+
+            </div>
+
+
+            <div class="late-example-row">
+
+                <span>
+                    07 ngày đầu
+                </span>
+
+                <strong class="normal">
+                    Không phát sinh phí chậm
+                </strong>
+
+            </div>
+
+
+            <div class="late-example-row">
+
+                <span>
+                    Quá hạn 10 ngày
+                </span>
+
+                <strong>
+                    ≈ 5.050đ
+                </strong>
+
+            </div>
+
+
+            <div class="late-example-note">
+
+                Khoản phải trả được tính theo:
+
+                <br>
+
+                <strong>
+                    5.000 × (1 + 0,001)<sup>10</sup>
+                    ≈ 5.050đ
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- THEO DÕI -->
+
+        <h3>
+            Theo dõi và cảnh báo
+        </h3>
+
+        <p>
+            Hệ thống sẽ tự động theo dõi thời hạn thanh toán
+            của từng khoản phí. Người bán có thể xem trực tiếp
+            các thông tin:
+        </p>
+
+
+        <ul class="terms-bullets">
+
+            <li>
+                Khoản phí sàn ban đầu.
+            </li>
+
+            <li>
+                Ngày đơn hàng hoàn thành.
+            </li>
+
+            <li>
+                Thời hạn thanh toán còn lại.
+            </li>
+
+            <li>
+                Số ngày đã quá hạn.
+            </li>
+
+            <li>
+                Phí chậm thanh toán phát sinh.
+            </li>
+
+            <li>
+                Tổng số tiền cần thanh toán.
+            </li>
+
+        </ul>
+
+
+        <div class="terms-note warning">
+
+            <strong>
+                Minh bạch phí
+            </strong>
+
+            <span>
+                IUH SHOP sẽ hiển thị riêng phí sàn ban đầu,
+                số ngày quá hạn, phí chậm thanh toán phát sinh
+                và tổng số tiền cần thanh toán để người bán
+                chủ động theo dõi nghĩa vụ của mình.
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="payment-warning">
+
+    <strong>
+        Cảnh báo
+    </strong>
+
+    <span>
+        Người bán cần chủ động theo dõi các khoản phí và
+        thời hạn thanh toán được hiển thị để đảm bảo hoàn thành nghĩa vụ đúng hạn.
+    </span>
+
+</div>
+
+
+</section>
+
+
+                <!-- 09 -->
+                <section
+                    class="terms-section"
+                    id="outside"
+                >
+
+                    <div class="section-number">
+                        09
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            GIAO DỊCH
+                        </span>
+
+                        <h2>
+                            Không né tránh giao dịch trên nền tảng
+                        </h2>
+
+                        <p>
+                            IUH SHOP được xây dựng để hỗ trợ người
+                            mua và người bán thực hiện giao dịch
+                            trong cùng một hệ thống. Người dùng
+                            không được cố tình chuyển giao dịch
+                            ra ngoài nền tảng nhằm né tránh phí
+                            dịch vụ hoặc các cơ chế bảo vệ giao dịch.
+                        </p>
+
+
+                        <h3>
+                            Các hành vi có thể bị xem xét xử lý
+                        </h3>
+
+                        <ul class="terms-bullets">
+
+                            <li>
+                                Cố tình cung cấp thông tin liên hệ
+                                nhằm yêu cầu người mua thực hiện
+                                giao dịch bên ngoài IUH SHOP.
+                            </li>
+
+                            <li>
+                                Thỏa thuận thanh toán trực tiếp
+                                bên ngoài hệ thống nhằm né tránh
+                                phí sàn.
+                            </li>
+
+                            <li>
+                                Cố tình khai báo sai giá trị giao
+                                dịch để giảm nghĩa vụ phí.
+                            </li>
+
+                            <li>
+                                Sử dụng nhiều tài khoản hoặc các
+                                phương thức khác để né tránh
+                                nghĩa vụ phát sinh trên nền tảng.
+                            </li>
+
+                        </ul>
+
+
+                        <div class="terms-note warning">
+
+                            <strong>
+                                Mục đích của quy định
+                            </strong>
+
+                            <span>
+                                Quy định này nhằm duy trì tính minh
+                                bạch của hệ thống và đảm bảo các
+                                chức năng hỗ trợ giao dịch của
+                                IUH SHOP có thể được vận hành
+                                thống nhất.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+               <!-- =====================================================
+     10 - VI PHẠM & XỬ LÝ
+===================================================== -->
+
+<section
+    class="terms-section"
+    id="violation"
+>
+
+    <div class="section-number">
+        10
+    </div>
+
+
+    <div>
+
+        <span class="section-label">
+            XỬ LÝ VI PHẠM
+        </span>
+
+        <h2>
+            Vi phạm &amp; cơ chế xử lý
+        </h2>
+
+        <p>
+            IUH SHOP hướng đến việc xây dựng môi trường mua bán
+            minh bạch và an toàn cho cộng đồng sinh viên. Khi
+            phát hiện người dùng vi phạm điều khoản, hệ thống
+            sẽ căn cứ vào tính chất, mức độ và tình trạng vi
+            phạm để áp dụng biện pháp xử lý phù hợp.
+        </p>
+
+
+        <!-- CẤP ĐỘ XỬ LÝ -->
+
+        <div class="late-levels">
+
+
+            <!-- 01 -->
+
+            <div class="late-level">
+
+                <span>
+                    01
+                </span>
+
+                <div>
+
+                    <strong>
+                        Nhắc nhở
+                    </strong>
+
+                    <p>
+                        Áp dụng đối với các trường hợp vi phạm
+                        ở mức độ nhẹ hoặc khoản phí mới bắt đầu
+                        quá hạn. Người dùng được thông báo để
+                        chủ động khắc phục.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- 02 -->
+
+            <div class="late-level">
+
+                <span>
+                    02
+                </span>
+
+                <div>
+
+                    <strong>
+                        Cảnh báo nghiêm trọng
+                    </strong>
+
+                    <p>
+                        Nếu người dùng tiếp tục không khắc phục,
+                        hệ thống có thể gửi cảnh báo và thông báo
+                        rõ nguy cơ bị hạn chế các chức năng
+                        của tài khoản.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- 03 -->
+
+            <div class="late-level">
+
+                <span>
+                    03
+                </span>
+
+                <div>
+
+                    <strong>
+                        Hạn chế chức năng
+                    </strong>
+
+                    <p>
+                        IUH SHOP có thể hạn chế một số chức năng
+                        như đăng tin mới, bán hàng hoặc thực hiện
+                        một số giao dịch cho đến khi người dùng
+                        hoàn thành nghĩa vụ liên quan.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- 04 -->
+
+            <div class="late-level">
+
+                <span>
+                    04
+                </span>
+
+                <div>
+
+                    <strong>
+                        Tạm khóa tài khoản
+                    </strong>
+
+                    <p>
+                        Đối với trường hợp quá hạn kéo dài,
+                        tái phạm hoặc vi phạm nghiêm trọng,
+                        tài khoản có thể bị tạm khóa để
+                        xác minh và xử lý.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PHỐI HỢP VỚI KHOA -->
+
+        <div class="faculty-cooperation">
+
+            <div class="faculty-icon">
+                IUH
+            </div>
+
+
+            <div>
+
+                <span>
+                    XỬ LÝ Ở CẤP ĐỘ CAO HƠN
+                </span>
+
+                <h3>
+                    Phối hợp với Khoa
+                </h3>
+
+                <p>
+                    Đối với người dùng là sinh viên IUH, trong
+                    trường hợp phát sinh khoản công nợ quá hạn
+                    kéo dài, giá trị lớn hoặc có hành vi vi phạm
+                    nghiêm trọng quy chế của IUH SHOP, vụ việc
+                    có thể được chuyển đến bộ phận quản trị
+                    để xác minh.
+                </p>
+
+                <p>
+                    Khi cần thiết, IUH SHOP có thể
+                    <strong>phối hợp với Khoa hoặc đơn vị quản
+                    lý sinh viên có liên quan</strong> để xác
+                    minh thông tin, tình trạng vụ việc và thực
+                    hiện biện pháp xử lý phù hợp.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- NGƯỠNG XỬ LÝ NGHIÊM TRỌNG -->
+
+        <div class="legal-threshold">
+
+            <div class="legal-threshold-header">
+
+                <span>
+                    NGƯỠNG XỬ LÝ NGHIÊM TRỌNG
+                </span>
+
+                <strong>
+                    ≥ 45 ngày
+                </strong>
+
+            </div>
+
+
+            <p>
+                Khi tổng nghĩa vụ chưa thanh toán của người dùng
+                kéo dài từ <strong>45 ngày</strong>, hoặc người
+                dùng có hành vi vi phạm nghiêm trọng, hệ thống
+                có thể chuyển vụ việc sang cấp quản trị để
+                xác minh và áp dụng biện pháp xử lý phù hợp.
+            </p>
+
+            <p>
+                Ngưỡng này được sử dụng như
+                <strong>một tiêu chí xử lý nội bộ của IUH SHOP</strong>,
+                không được hiểu là mức tiền mà tại đó người dùng
+                đương nhiên vi phạm pháp luật.
+            </p>
+
+        </div>
+
+
+        <!-- CƠ QUAN CÓ THẨM QUYỀN -->
+
+        <div class="legal-warning">
+
+            <div class="legal-warning-icon">
+                !
+            </div>
+
+
+            <div>
+
+                <span>
+                    TRƯỜNG HỢP CÓ DẤU HIỆU VI PHẠM PHÁP LUẬT
+                </span>
+
+                <h3>
+                    Phối hợp với cơ quan có thẩm quyền
+                </h3>
+
+                <p>
+                    Trong trường hợp vụ việc có dấu hiệu gian
+                    dối, chiếm đoạt tài sản hoặc hành vi có dấu
+                    hiệu vi phạm pháp luật, IUH SHOP có quyền
+                    thực hiện các biện pháp cần thiết để bảo
+                    toàn dữ liệu, thông tin và chứng cứ liên
+                    quan đến giao dịch.
+                </p>
+
+                <p>
+                    Tùy theo tính chất và căn cứ của vụ việc,
+                    IUH SHOP có thể
+                    <strong>phối hợp với Khoa, đơn vị có liên
+                    quan và/hoặc cơ quan nhà nước có thẩm quyền</strong>
+                    để xác minh và xử lý theo quy định.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- KHÔNG TỰ ĐỘNG KẾT LUẬN -->
+
+        <div class="terms-note warning">
+
+            <strong>
+                Lưu ý
+            </strong>
+
+            <span>
+                Việc chuyển vụ việc đến cơ quan có thẩm quyền
+                không chỉ dựa trên giá trị khoản tiền. IUH SHOP
+                sẽ xem xét tính chất hành vi, mức độ vi phạm,
+                thông tin và chứng cứ liên quan trước khi thực
+                hiện bước xử lý phù hợp.
+            </span>
+
+        </div>
+
+
+        <!-- KẾT -->
+
+        <p>
+            Người dùng có trách nhiệm hợp tác trong quá trình
+            xác minh và cung cấp thông tin cần thiết khi được
+            yêu cầu. Việc khắc phục vi phạm hoặc hoàn thành
+            nghĩa vụ tài chính có thể được xem xét trong quá
+            trình xử lý tùy thuộc vào từng trường hợp.
+        </p>
+
+    </div>
+
+</section>
+
+
+                <!-- 11 -->
+                <section
+                    class="terms-section final-section"
+                    id="agreement"
+                >
+
+                    <div class="section-number">
+                        11
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            XÁC NHẬN
+                        </span>
+
+                        <h2>
+                            Xác nhận và hiệu lực
+                        </h2>
+
+                        <p>
+                            Khi người dùng lần đầu sử dụng chức năng
+                            đăng tin và chọn <strong>“Tôi đã đọc,
+                            hiểu và đồng ý”</strong>, việc xác nhận
+                            được hệ thống ghi nhận cùng với tài khoản,
+                            thời điểm xác nhận và phiên bản điều khoản
+                            được áp dụng.
+                        </p>
+
+                        <p>
+                            Việc xác nhận này được xem là sự chấp
+                            thuận của người dùng đối với các quy
+                            định của IUH SHOP liên quan đến hoạt động
+                            đăng bán và giao dịch trên nền tảng.
+                        </p>
+
+                        <p>
+                            Người dùng không phải xác nhận lại
+                            điều khoản ở mỗi lần đăng tin trong
+                            cùng một phiên bản điều khoản.
+                        </p>
+
+
+                        <div class="agreement-box">
+
+                            <div class="agreement-check">
+                                ✓
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Tôi xác nhận đã đọc và hiểu
+                                    Điều khoản &amp; Quy chế giao dịch
+                                    IUH SHOP.
+                                </strong>
+
+                                <span>
+                                    Việc tiếp tục sử dụng chức năng
+                                    đăng tin đồng nghĩa với việc
+                                    chấp thuận các quy định được
+                                    nêu trên.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+     <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/dieukhoandang.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+</body>
+</html>
