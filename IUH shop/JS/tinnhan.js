@@ -1052,54 +1052,7 @@ async function ensureAdminChat() {
            Tạo tin nhắn chào mặc định.
         */
 
-        const welcomeMessage =
-            "Xin chào! IUH SHOP có thể hỗ trợ bạn về tài khoản, sản phẩm, đơn hàng, thanh toán, Ví IUH SHOP hoặc các vấn đề khác. Bạn cần hỗ trợ gì?";
-
-
-        const {
-            error: messageError
-        } =
-            await supabaseClient
-
-                .from("messages")
-
-                .insert({
-
-                    conversation_id:
-                        conversationId,
-
-                    sender_id:
-                        admin.id,
-
-                    content:
-                        welcomeMessage,
-
-                    message_type:
-                        "text",
-
-                    is_read:
-                        false
-
-                });
-
-
-        if (messageError) {
-
-            console.error(
-                "Lỗi tạo tin nhắn Admin:",
-                messageError
-            );
-
-        }
-
-
-        await updateConversationLastMessage(
-
-            conversationId,
-
-            welcomeMessage
-
-        );
+        
 
     }
 
@@ -1625,16 +1578,8 @@ function renderConversationList(
                             );
 
 
-                    const initial =
-                        isAdmin
-
-                            ? "A"
-
-                            :
-
-                            fullname
-                                .charAt(0)
-                                .toUpperCase();
+                    const avatarUrl =
+    user?.avatar_url || "";
 
 
                     const active =
@@ -1662,18 +1607,33 @@ function renderConversationList(
                         >
 
                             <div
-                                class="
-                                    conversation-avatar
-                                "
-                            >
+    class="conversation-avatar"
+>
 
-                                ${initial}
+    ${
+        avatarUrl
+            ? `
+                <img
+                    src="${escapeHTML(avatarUrl)}"
+                    alt="${escapeHTML(fullname)}"
+                >
+            `
+            : `
+                <span class="avatar-letter">
+                    ${escapeHTML(
+                        fullname
+                            .charAt(0)
+                            .toUpperCase()
+                    )}
+                </span>
+            `
+    }
 
-                                <span
-                                    class="online-dot"
-                                ></span>
+    <span
+        class="online-dot"
+    ></span>
 
-                            </div>
+</div>
 
 
                             <div
@@ -2068,51 +2028,32 @@ async function loadMessages(
    RENDER MESSAGES
    ========================================================= */
 
-function renderMessages(
-    messages
-) {
+async function renderMessages(messages) {
 
     if (!messagesArea) {
-
         return;
-
     }
 
+    messagesArea.innerHTML = "";
 
-    messagesArea.innerHTML =
-        "";
-
-
-    if (!messages.length) {
+    if (!messages || !messages.length) {
 
         messagesArea.innerHTML = `
-
             <div class="chat-loading">
-
                 Bắt đầu cuộc trò chuyện.
-
             </div>
-
         `;
 
         return;
+    }
+
+    for (const message of messages) {
+
+        await renderSingleMessage(message);
 
     }
 
-
-    messages.forEach(
-        message => {
-
-            renderSingleMessage(
-                message
-            );
-
-        }
-    );
-
-
     scrollToBottom();
-
 }
 
 
@@ -2120,44 +2061,55 @@ function renderMessages(
    RENDER SINGLE MESSAGE
    ========================================================= */
 
-function renderSingleMessage(
-    message
-) {
+async function renderSingleMessage(message) {
 
     if (!messagesArea) {
-
         return;
-
     }
-
 
     const existing =
         document.querySelector(
             `[data-message-id="${message.id}"]`
         );
 
-
     if (existing) {
-
         return;
+    }
+
+    const mine =
+        message.sender_id === currentUser.id;
+
+
+    /* =========================================
+       LẤY THÔNG TIN NGƯỜI GỬI
+       ========================================= */
+
+    let senderProfile = null;
+
+    if (mine) {
+
+        senderProfile =
+            currentUserProfile;
+
+    } else {
+
+        senderProfile =
+            await getUserProfile(
+                message.sender_id
+            );
 
     }
 
 
-    const mine =
-        message.sender_id ===
-        currentUser.id;
-
+    /* =========================================
+       TẠO DÒNG MESSAGE
+       ========================================= */
 
     const row =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     row.dataset.messageId =
         message.id;
-
 
     row.className =
         "message-row " +
@@ -2168,45 +2120,68 @@ function renderSingleMessage(
         );
 
 
-    const bubble =
-        document.createElement(
-            "div"
-        );
+    /* =========================================
+       AVATAR
+       ========================================= */
 
+    const avatar =
+        document.createElement("img");
+
+    avatar.className =
+        "message-avatar";
+
+    avatar.src =
+        senderProfile?.avatar_url ||
+        "";
+
+    avatar.alt =
+        senderProfile?.fullname ||
+        "Người dùng";
+
+
+    /* =========================================
+       NẾU KHÔNG CÓ AVATAR
+       ========================================= */
+
+    if (!senderProfile?.avatar_url) {
+
+        avatar.style.display =
+            "none";
+
+    }
+
+
+    /* =========================================
+       BUBBLE
+       ========================================= */
+
+    const bubble =
+        document.createElement("div");
 
     bubble.className =
         "message-bubble";
 
 
-    /* -----------------------------------------
+    /* =========================================
        ẢNH
-       ----------------------------------------- */
+       ========================================= */
 
-    if (
-        message.image_url
-    ) {
+    if (message.image_url) {
 
         const image =
-            document.createElement(
-                "img"
-            );
-
+            document.createElement("img");
 
         image.className =
             "message-image";
 
-
         image.src =
             message.image_url;
-
 
         image.alt =
             "Hình ảnh";
 
-
         image.loading =
             "lazy";
-
 
         image.addEventListener(
             "click",
@@ -2220,7 +2195,6 @@ function renderSingleMessage(
             }
         );
 
-
         bubble.appendChild(
             image
         );
@@ -2228,27 +2202,20 @@ function renderSingleMessage(
     }
 
 
-    /* -----------------------------------------
+    /* =========================================
        TEXT
-       ----------------------------------------- */
+       ========================================= */
 
-    if (
-        message.content
-    ) {
+    if (message.content) {
 
         const text =
-            document.createElement(
-                "div"
-            );
-
+            document.createElement("div");
 
         text.className =
             "message-text";
 
-
         text.textContent =
             message.content;
-
 
         bubble.appendChild(
             text
@@ -2257,40 +2224,56 @@ function renderSingleMessage(
     }
 
 
-    /* -----------------------------------------
+    /* =========================================
        TIME
-       ----------------------------------------- */
+       ========================================= */
 
     const time =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     time.className =
         "message-time";
-
 
     time.textContent =
         formatMessageTime(
             message.created_at
         );
 
-
     bubble.appendChild(
         time
     );
 
 
-    row.appendChild(
-        bubble
-    );
+    /* =========================================
+       SẮP XẾP AVATAR + BUBBLE
+       ========================================= */
+
+    if (mine) {
+
+        row.appendChild(
+            bubble
+        );
+
+        row.appendChild(
+            avatar
+        );
+
+    } else {
+
+        row.appendChild(
+            avatar
+        );
+
+        row.appendChild(
+            bubble
+        );
+
+    }
 
 
     messagesArea.appendChild(
         row
     );
-
 }
 
 
@@ -2443,15 +2426,14 @@ async function sendMessage() {
            HIỂN THỊ NGAY
            ----------------------------------------- */
 
-        if (data) {
+         if (data) {
 
-            renderSingleMessage(
-                data
-            );
+    await renderSingleMessage(
+        data
+    );
 
-            scrollToBottom();
-
-        }
+    scrollToBottom();
+}
 
 
         /* -----------------------------------------
@@ -2859,7 +2841,7 @@ function subscribeToMessages(
                     }
 
 
-                    renderSingleMessage(
+                    await renderSingleMessage(
                         message
                     );
 
