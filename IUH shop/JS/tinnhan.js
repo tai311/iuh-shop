@@ -949,32 +949,40 @@ async function createConversation(
             throw conversationError;
         }
 
-        // 2. Thêm 2 thành viên
-        const members = [
-            {
-                conversation_id: conversationId,
-                user_id: currentUser.id
-            },
-            {
-                conversation_id: conversationId,
-                user_id: otherUserId
-            }
-        ];
+       // 2. Thêm người đang đăng nhập trước
+const { error: selfMemberError } = await supabaseClient
+    .from("conversation_members")
+    .insert({
+        conversation_id: conversationId,
+        user_id: currentUser.id
+    });
 
-        const {
-            error: memberError
-        } = await supabaseClient
-            .from("conversation_members")
-            .insert(members);
+if (selfMemberError) {
+    console.error(
+        "Lỗi thêm thành viên hiện tại:",
+        selfMemberError
+    );
 
-        if (memberError) {
-            console.error(
-                "Lỗi thêm thành viên:",
-                memberError
-            );
+    throw selfMemberError;
+}
 
-            throw memberError;
-        }
+
+// 3. Sau khi đã là member → thêm người còn lại
+const { error: otherMemberError } = await supabaseClient
+    .from("conversation_members")
+    .insert({
+        conversation_id: conversationId,
+        user_id: otherUserId
+    });
+
+if (otherMemberError) {
+    console.error(
+        "Lỗi thêm thành viên còn lại:",
+        otherMemberError
+    );
+
+    throw otherMemberError;
+}
 
         // 3. Trả object conversation về cho code phía dưới
         return {
