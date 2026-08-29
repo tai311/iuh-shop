@@ -22,11 +22,13 @@ const supabaseClient =
 
 
 /* =========================================================
-   CẤU HÌNH CHAT
+   CẤU HÌNH
    ========================================================= */
 
-const CHAT_BUCKET =
-    "chat-images";
+const CHAT_BUCKET = "chat-images";
+
+const ADMIN_GREETING =
+    "Xin chào! 👋 Chào mừng bạn đến với IUH SHOP. Bạn cần hỗ trợ gì, cứ nhắn cho chúng tôi nhé!";
 
 
 /* =========================================================
@@ -34,17 +36,14 @@ const CHAT_BUCKET =
    ========================================================= */
 
 let currentUser = null;
-
 let currentUserProfile = null;
 
 let currentConversationId = null;
-
 let currentOtherUser = null;
 
 let conversations = [];
 
 let selectedImage = null;
-
 let realtimeChannel = null;
 
 
@@ -53,58 +52,174 @@ let realtimeChannel = null;
    ========================================================= */
 
 const conversationList =
-    document.getElementById(
-        "conversationList"
-    );
+    document.getElementById("conversationList");
 
 const messagesArea =
-    document.getElementById(
-        "messagesArea"
-    );
+    document.getElementById("messagesArea");
 
 const messageInput =
-    document.getElementById(
-        "messageInput"
-    );
+    document.getElementById("messageInput");
 
 const imageInput =
-    document.getElementById(
-        "imageInput"
-    );
+    document.getElementById("imageInput");
 
 const imagePreview =
-    document.getElementById(
-        "imagePreview"
-    );
+    document.getElementById("imagePreview");
 
 const previewImage =
-    document.getElementById(
-        "previewImage"
-    );
+    document.getElementById("previewImage");
 
 const conversationSearch =
-    document.getElementById(
-        "conversationSearch"
-    );
+    document.getElementById("conversationSearch");
 
 const sendButton =
-    document.getElementById(
-        "sendButton"
-    );
+    document.getElementById("sendButton");
 
 const removePreview =
-    document.getElementById(
-        "removePreview"
-    );
+    document.getElementById("removePreview");
 
 const mobileBack =
-    document.getElementById(
-        "mobileBack"
-    );
+    document.getElementById("mobileBack");
 
 
 /* =========================================================
-   CẬP NHẬT HEADER KHI ĐĂNG NHẬP
+   HÀM ESCAPE HTML
+   ========================================================= */
+
+function escapeHTML(value) {
+
+    const div = document.createElement("div");
+
+    div.textContent = value ?? "";
+
+    return div.innerHTML;
+}
+
+
+/* =========================================================
+   LẤY PROFILE NGƯỜI DÙNG
+   ========================================================= */
+
+async function getUserProfile(userId) {
+
+    if (!userId) {
+        return null;
+    }
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("users")
+        .select(
+            "user_id, fullname, avatar_url, role"
+        )
+        .eq(
+            "user_id",
+            userId
+        )
+        .maybeSingle();
+
+    if (error) {
+
+        console.error(
+            "Lỗi lấy profile:",
+            error
+        );
+
+        return null;
+    }
+
+    if (!data) {
+        return null;
+    }
+
+    return {
+        id: data.user_id,
+        fullname:
+            data.fullname ||
+            "Người dùng",
+        avatar_url:
+            data.avatar_url ||
+            "",
+        role:
+            data.role ||
+            "user"
+    };
+}
+
+
+/* =========================================================
+   LẤY ADMIN
+   ========================================================= */
+
+async function getAdminUser() {
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("users")
+        .select(
+            "user_id, fullname, avatar_url, role"
+        )
+        .eq(
+            "role",
+            "admin"
+        )
+        .limit(1);
+
+    if (error) {
+
+        console.error(
+            "Không thể tìm Admin:",
+            error
+        );
+
+        return null;
+    }
+
+    if (!data || !data.length) {
+
+        console.error(
+            "Không có tài khoản role = admin."
+        );
+
+        return null;
+    }
+
+    const admin = data[0];
+
+    /*
+       QUAN TRỌNG:
+
+       Dùng đúng tên field mà toàn bộ hệ thống
+       phía dưới đang sử dụng:
+
+       fullname
+       avatar_url
+    */
+
+    return {
+        id:
+            admin.user_id,
+
+        fullname:
+            admin.fullname ||
+            "Admin IUH SHOP",
+
+        avatar_url:
+            admin.avatar_url ||
+            "",
+
+        role:
+            admin.role
+    };
+}
+
+
+/* =========================================================
+   HEADER TÀI KHOẢN
    ========================================================= */
 
 async function updateUserMenu() {
@@ -115,316 +230,171 @@ async function updateUserMenu() {
             data: {
                 user
             },
-            error: userError
-        } =
-            await supabaseClient.auth.getUser();
-
-
-        if (userError) {
-
-            console.error(
-                "Không lấy được tài khoản:",
-                userError
-            );
-
-            return;
-
-        }
-
-
-        const loginLink =
-            document.querySelector(
-                ".login-link"
-            );
-
-        const registerLink =
-            document.querySelector(
-                ".register-link"
-            );
-
-        const divider =
-            document.querySelector(
-                ".top-divider"
-            );
-
-        const userAccount =
-            document.getElementById(
-                "userAccount"
-            );
-
-        const headerAvatar =
-            document.getElementById(
-                "headerAvatar"
-            );
-
-        const headerUserName =
-            document.getElementById(
-                "headerUserName"
-            );
-
-        const adminLink =
-            document.getElementById(
-                "adminLink"
-            );
-
-
-        /* -----------------------------------------
-           CHƯA ĐĂNG NHẬP
-           ----------------------------------------- */
-
-        if (!user) {
-
-            if (loginLink) {
-
-                loginLink.style.display =
-                    "";
-
-            }
-
-
-            if (registerLink) {
-
-                registerLink.style.display =
-                    "";
-
-            }
-
-
-            if (divider) {
-
-                divider.style.display =
-                    "";
-
-            }
-
-
-            if (userAccount) {
-
-                userAccount.style.display =
-                    "none";
-
-            }
-
-
-            if (adminLink) {
-
-                adminLink.style.display =
-                    "none";
-
-            }
-
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------
-           LẤY PROFILE
-           ----------------------------------------- */
-
-        const {
-            data: profile,
             error
         } =
-            await supabaseClient
-
-                .from("users")
-
-                .select(
-                    "fullname, avatar_url, role"
-                )
-
-                .eq(
-                    "user_id",
-                    user.id
-                )
-
-                .maybeSingle();
-
+            await supabaseClient.auth.getUser();
 
         if (error) {
 
             console.error(
-                "Lỗi lấy profile:",
+                "Không lấy được tài khoản:",
                 error
             );
 
+            return;
+        }
+
+        const loginLink =
+            document.querySelector(".login-link");
+
+        const registerLink =
+            document.querySelector(".register-link");
+
+        const divider =
+            document.querySelector(".top-divider");
+
+        const userAccount =
+            document.getElementById("userAccount");
+
+        const headerAvatar =
+            document.getElementById("headerAvatar");
+
+        const headerUserName =
+            document.getElementById("headerUserName");
+
+        const adminLink =
+            document.getElementById("adminLink");
+
+
+        if (!user) {
+
+            if (loginLink)
+                loginLink.style.display = "";
+
+            if (registerLink)
+                registerLink.style.display = "";
+
+            if (divider)
+                divider.style.display = "";
+
+            if (userAccount)
+                userAccount.style.display = "none";
+
+            if (adminLink)
+                adminLink.style.display = "none";
+
+            return;
         }
 
 
+        const profile =
+            await getUserProfile(user.id);
+
         currentUserProfile =
-            profile || null;
+            profile;
 
 
-        /* -----------------------------------------
-           ADMIN LINK
-           ----------------------------------------- */
+        /* ADMIN LINK */
 
         if (adminLink) {
 
-            if (
-                profile?.role ===
-                "admin"
-            ) {
-
-                adminLink.style.display =
-                    "block";
-
-            } else {
-
-                adminLink.style.display =
-                    "none";
-
-            }
-
+            adminLink.style.display =
+                profile?.role === "admin"
+                    ? "block"
+                    : "none";
         }
 
 
-        /* -----------------------------------------
-           TÊN
-           ----------------------------------------- */
+        /* TÊN */
 
         const fullname =
             profile?.fullname ||
             user.email?.split("@")[0] ||
             "Tài khoản";
 
-
         if (headerUserName) {
 
             headerUserName.textContent =
                 fullname;
-
         }
 
 
-        /* -----------------------------------------
-           AVATAR
-           ----------------------------------------- */
+        /* AVATAR */
 
         if (headerAvatar) {
 
-            if (profile?.avatar_url) {
-
-                headerAvatar.src =
-                    profile.avatar_url;
-
-            } else {
-
-                headerAvatar.src =
-                    "../Images/default-avatar.svg";
-
-            }
-
+            headerAvatar.src =
+                profile?.avatar_url ||
+                "../Images/default-avatar.svg";
         }
 
 
-        /* -----------------------------------------
-           ẨN ĐĂNG NHẬP / ĐĂNG KÝ
-           ----------------------------------------- */
+        /* ẨN LOGIN */
 
-        if (loginLink) {
+        if (loginLink)
+            loginLink.style.display = "none";
 
-            loginLink.style.display =
-                "none";
+        if (registerLink)
+            registerLink.style.display = "none";
 
-        }
+        if (divider)
+            divider.style.display = "none";
 
-
-        if (registerLink) {
-
-            registerLink.style.display =
-                "none";
-
-        }
-
-
-        if (divider) {
-
-            divider.style.display =
-                "none";
-
-        }
-
-
-        /* -----------------------------------------
-           HIỆN TÀI KHOẢN
-           ----------------------------------------- */
-
-        if (userAccount) {
-
-            userAccount.style.display =
-                "flex";
-
-        }
+        if (userAccount)
+            userAccount.style.display = "flex";
 
     }
-
     catch (error) {
 
         console.error(
             "Lỗi cập nhật tài khoản:",
             error
         );
-
     }
-
 }
 
 
 /* =========================================================
-   DROPDOWN TÀI KHOẢN
+   ACCOUNT DROPDOWN
    ========================================================= */
 
 function setupAccountDropdown() {
 
-    const userAccountButton =
+    const button =
         document.getElementById(
             "userAccountButton"
         );
 
-    const accountDropdown =
+    const dropdown =
         document.getElementById(
             "accountDropdown"
         );
 
-
-    if (
-        !userAccountButton ||
-        !accountDropdown
-    ) {
-
+    if (!button || !dropdown) {
         return;
-
     }
 
-
-    userAccountButton.addEventListener(
+    button.addEventListener(
         "click",
-        function (event) {
+        function(event) {
 
             event.stopPropagation();
 
-            accountDropdown.classList.toggle(
+            dropdown.classList.toggle(
                 "show"
             );
-
         }
     );
-
 
     document.addEventListener(
         "click",
-        function () {
+        function() {
 
-            accountDropdown.classList.remove(
+            dropdown.classList.remove(
                 "show"
             );
-
         }
     );
-
 }
 
 
@@ -439,17 +409,13 @@ function setupLogout() {
             "logoutButton"
         );
 
-
     if (!logoutButton) {
-
         return;
-
     }
-
 
     logoutButton.addEventListener(
         "click",
-        async function () {
+        async function() {
 
             try {
 
@@ -460,7 +426,6 @@ function setupLogout() {
                         .auth
                         .signOut();
 
-
                 if (error) {
 
                     console.error(
@@ -469,18 +434,15 @@ function setupLogout() {
                     );
 
                     alert(
-                        "Đăng xuất thất bại. Vui lòng thử lại."
+                        "Đăng xuất thất bại."
                     );
 
                     return;
-
                 }
-
 
                 window.location.reload();
 
             }
-
             catch (error) {
 
                 console.error(
@@ -491,12 +453,9 @@ function setupLogout() {
                 alert(
                     "Có lỗi xảy ra khi đăng xuất."
                 );
-
             }
-
         }
     );
-
 }
 
 
@@ -506,75 +465,65 @@ function setupLogout() {
 
 function setupAccountShortcuts() {
 
-    const accountWrapper =
+    const wrapper =
         document.querySelector(
             ".account-nav-wrapper"
         );
 
-    const accountArrow =
+    const arrow =
         document.getElementById(
             "accountNavArrow"
         );
 
-    const accountShortcuts =
+    const shortcuts =
         document.getElementById(
             "accountShortcuts"
         );
 
-
     if (
-        !accountWrapper ||
-        !accountArrow ||
-        !accountShortcuts
+        !wrapper ||
+        !arrow ||
+        !shortcuts
     ) {
-
         return;
-
     }
 
-
-    accountArrow.addEventListener(
+    arrow.addEventListener(
         "click",
-        function (event) {
+        function(event) {
 
             event.preventDefault();
 
             event.stopPropagation();
 
-            accountWrapper.classList.toggle(
+            wrapper.classList.toggle(
                 "open"
             );
-
         }
     );
 
-
-    accountShortcuts.addEventListener(
+    shortcuts.addEventListener(
         "click",
-        function (event) {
+        function(event) {
 
             event.stopPropagation();
-
         }
     );
-
 
     document.addEventListener(
         "click",
-        function () {
+        function() {
 
-            accountWrapper.classList.remove(
+            wrapper.classList.remove(
                 "open"
             );
-
         }
     );
-
 }
 
 
 /* =========================================================
-   MENU ACTIVE
+   ACTIVE MENU
    ========================================================= */
 
 function setupActiveMenu() {
@@ -585,7 +534,6 @@ function setupActiveMenu() {
             .pop()
             .toLowerCase();
 
-
     document
         .querySelectorAll(
             ".navigation a.nav-item"
@@ -593,20 +541,18 @@ function setupActiveMenu() {
         .forEach(
             link => {
 
-                const linkPage =
-                    link
-                        .getAttribute("href")
-                        ?.split("/")
-                        .pop()
-                        .toLowerCase();
+                const href =
+                    link.getAttribute("href");
 
-
-                if (!linkPage) {
-
+                if (!href) {
                     return;
-
                 }
 
+                const linkPage =
+                    href
+                        .split("/")
+                        .pop()
+                        .toLowerCase();
 
                 if (
                     linkPage ===
@@ -616,17 +562,14 @@ function setupActiveMenu() {
                     link.classList.add(
                         "active"
                     );
-
                 }
-
             }
         );
-
 }
 
 
 /* =========================================================
-   GET CURRENT USER
+   LẤY USER HIỆN TẠI
    ========================================================= */
 
 async function loadCurrentUser() {
@@ -639,7 +582,6 @@ async function loadCurrentUser() {
             .auth
             .getUser();
 
-
     if (
         error ||
         !data?.user
@@ -649,170 +591,22 @@ async function loadCurrentUser() {
             "dang-nhap.html";
 
         return null;
-
     }
-
 
     currentUser =
         data.user;
 
+    currentUserProfile =
+        await getUserProfile(
+            currentUser.id
+        );
 
     return currentUser;
-
 }
 
 
 /* =========================================================
-   GET USER PROFILE
-   ========================================================= */
-
-async function getUserProfile(
-    userId
-) {
-
-    if (!userId) {
-
-        return null;
-
-    }
-
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-
-            .from("users")
-
-            .select(
-                "user_id, fullname, avatar_url, role"
-            )
-
-            .eq(
-                "user_id",
-                userId
-            )
-
-            .maybeSingle();
-
-
-    if (error) {
-
-        console.error(
-            "Lỗi lấy thông tin người dùng:",
-            error
-        );
-
-        return null;
-
-    }
-
-
-    if (!data) {
-
-        return null;
-
-    }
-
-
-    return {
-
-        id:
-            data.user_id,
-
-        fullname:
-            data.fullname,
-
-        avatar_url:
-            data.avatar_url,
-
-        role:
-            data.role
-
-    };
-
-}
-
-
-/* =========================================================
-   GET ADMIN
-   ========================================================= */
-
-async function getAdminUser() {
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-
-            .from("users")
-
-            .select(
-                "user_id, fullname, avatar_url, role"
-            )
-
-            .eq(
-                "role",
-                "admin"
-            )
-
-            .limit(1);
-
-
-    if (error) {
-
-        console.error(
-            "Không thể tìm Admin:",
-            error
-        );
-
-        return null;
-
-    }
-
-
-    if (
-        !data ||
-        !data.length
-    ) {
-
-        console.error(
-            "Không có tài khoản role = admin."
-        );
-
-        return null;
-
-    }
-
-
-    const admin =
-        data[0];
-
-
-    return {
-
-        id:
-            admin.user_id,
-
-        fullname:
-            admin.fullname ||
-            "Admin IUH SHOP",
-
-        avatar_url:
-            admin.avatar_url,
-
-        role:
-            admin.role
-
-    };
-
-}
-
-
-/* =========================================================
-   TÌM CUỘC TRÒ CHUYỆN
+   TÌM CONVERSATION VỚI MỘT USER
    ========================================================= */
 
 async function findConversationWithUser(
@@ -823,39 +617,26 @@ async function findConversationWithUser(
         !currentUser ||
         !otherUserId
     ) {
-
         return null;
-
     }
-
 
     const {
         data: memberships,
         error
     } =
         await supabaseClient
-
-            .from(
-                "conversation_members"
-            )
-
-            .select(
-                "conversation_id"
-            )
-
+            .from("conversation_members")
+            .select("conversation_id")
             .eq(
                 "user_id",
                 currentUser.id
             );
 
-
     if (
         error ||
         !memberships?.length
     ) {
-
         return null;
-
     }
 
 
@@ -869,144 +650,184 @@ async function findConversationWithUser(
 
 
         const {
-            data: member
+            data: otherMember,
+            error: memberError
         } =
             await supabaseClient
-
-                .from(
-                    "conversation_members"
-                )
-
-                .select(
-                    "user_id"
-                )
-
+                .from("conversation_members")
+                .select("user_id")
                 .eq(
                     "conversation_id",
                     conversationId
                 )
-
                 .eq(
                     "user_id",
                     otherUserId
                 )
-
                 .maybeSingle();
 
 
-        if (member) {
+        if (
+            !memberError &&
+            otherMember
+        ) {
 
             return conversationId;
-
         }
-
     }
 
-
     return null;
-
 }
 
 
 /* =========================================================
-   TẠO CUỘC TRÒ CHUYỆN
+   TẠO CONVERSATION
    ========================================================= */
 
 async function createConversation(
     otherUserId,
     isAdminChat = false
 ) {
-    try {
-        if (!currentUser) {
-            throw new Error("Chưa đăng nhập.");
-        }
 
-        if (!otherUserId) {
-            throw new Error("Không xác định được người dùng cần chat.");
-        }
+    if (!currentUser) {
 
-        // Tạo ID trước ở phía client
-        const conversationId = crypto.randomUUID();
+        throw new Error(
+            "Chưa đăng nhập."
+        );
+    }
 
-        // 1. Tạo conversation
-        // KHÔNG dùng .select() ở đây vì RLS SELECT
-        // yêu cầu user phải là member của conversation.
-        const {
-            error: conversationError
-        } = await supabaseClient
-            .from("conversations")
-            .insert({
-                id: conversationId,
-                is_admin_chat: isAdminChat
-            });
+    if (!otherUserId) {
 
-        if (conversationError) {
-            console.error(
-                "Lỗi tạo conversation:",
-                conversationError
-            );
-
-            throw conversationError;
-        }
-
-       // 2. Thêm người đang đăng nhập trước
-const { error: selfMemberError } = await supabaseClient
-    .from("conversation_members")
-    .insert({
-        conversation_id: conversationId,
-        user_id: currentUser.id
-    });
-
-if (selfMemberError) {
-    console.error(
-        "Lỗi thêm thành viên hiện tại:",
-        selfMemberError
-    );
-
-    throw selfMemberError;
-}
+        throw new Error(
+            "Không xác định được người dùng."
+        );
+    }
 
 
-// 3. Sau khi đã là member → thêm người còn lại
-const { error: otherMemberError } = await supabaseClient
-    .from("conversation_members")
-    .insert({
-        conversation_id: conversationId,
-        user_id: otherUserId
-    });
+    /* KIỂM TRA LẠI TRƯỚC KHI TẠO */
 
-if (otherMemberError) {
-    console.error(
-        "Lỗi thêm thành viên còn lại:",
-        otherMemberError
-    );
-
-    throw otherMemberError;
-}
-
-        // 3. Trả object conversation về cho code phía dưới
-        return {
-            id: conversationId,
-            is_admin_chat: isAdminChat,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            last_message: null,
-            last_message_at: null
-        };
-
-    } catch (error) {
-        console.error(
-            "Lỗi createConversation:",
-            error
+    const existing =
+        await findConversationWithUser(
+            otherUserId
         );
 
-        throw error;
+    if (existing) {
+
+        return {
+            id: existing
+        };
     }
+
+
+    const conversationId =
+        crypto.randomUUID();
+
+
+    /* TẠO CONVERSATION */
+
+    const {
+        error: conversationError
+    } =
+        await supabaseClient
+            .from("conversations")
+            .insert({
+                id:
+                    conversationId,
+
+                is_admin_chat:
+                    isAdminChat
+            });
+
+
+    if (conversationError) {
+
+        console.error(
+            "Lỗi tạo conversation:",
+            conversationError
+        );
+
+        throw conversationError;
+    }
+
+
+    /* THÊM USER HIỆN TẠI */
+
+    const {
+        error: selfError
+    } =
+        await supabaseClient
+            .from("conversation_members")
+            .insert({
+                conversation_id:
+                    conversationId,
+
+                user_id:
+                    currentUser.id
+            });
+
+
+    if (selfError) {
+
+        console.error(
+            "Lỗi thêm thành viên hiện tại:",
+            selfError
+        );
+
+        throw selfError;
+    }
+
+
+    /* THÊM USER CÒN LẠI */
+
+    const {
+        error: otherError
+    } =
+        await supabaseClient
+            .from("conversation_members")
+            .insert({
+                conversation_id:
+                    conversationId,
+
+                user_id:
+                    otherUserId
+            });
+
+
+    if (otherError) {
+
+        console.error(
+            "Lỗi thêm thành viên còn lại:",
+            otherError
+        );
+
+        throw otherError;
+    }
+
+
+    return {
+        id:
+            conversationId,
+
+        is_admin_chat:
+            isAdminChat,
+
+        created_at:
+            new Date().toISOString(),
+
+        updated_at:
+            new Date().toISOString(),
+
+        last_message:
+            null,
+
+        last_message_at:
+            null
+    };
 }
 
 
 /* =========================================================
-   ĐẢM BẢO CHAT ADMIN LUÔN CÓ
+   ĐẢM BẢO ADMIN LUÔN CÓ
    ========================================================= */
 
 async function ensureAdminChat() {
@@ -1014,14 +835,11 @@ async function ensureAdminChat() {
     const admin =
         await getAdminUser();
 
-
     if (
         !admin ||
         admin.id === currentUser.id
     ) {
-
         return null;
-
     }
 
 
@@ -1031,9 +849,7 @@ async function ensureAdminChat() {
         );
 
 
-    /* -----------------------------------------
-       CHƯA CÓ → TẠO MỚI
-       ----------------------------------------- */
+    /* NẾU CHƯA CÓ → TẠO */
 
     if (!conversationId) {
 
@@ -1043,47 +859,45 @@ async function ensureAdminChat() {
                 true
             );
 
-
         conversationId =
             conversation.id;
-
-
-        /*
-           Tạo tin nhắn chào mặc định.
-        */
-
-        
-
     }
 
+
+    /*
+       QUAN TRỌNG:
+
+       Trả đúng field:
+       fullname
+       avatar_url
+
+       Không dùng:
+       name
+       avatar
+    */
 
     return {
 
         id:
             admin.id,
 
-        name:
-            admin.fullname ||
-            "Admin IUH SHOP",
+        fullname:
+            admin.fullname,
 
-        email:
-            null,
-
-        avatar:
+        avatar_url:
             admin.avatar_url,
 
         role:
-            admin.role,
+            "admin",
 
-        conversationId
-
+        conversationId:
+            conversationId
     };
-
 }
 
 
 /* =========================================================
-   LẤY SỐ TIN CHƯA ĐỌC
+   LẤY UNREAD
    ========================================================= */
 
 async function getUnreadCount(
@@ -1091,61 +905,45 @@ async function getUnreadCount(
 ) {
 
     if (!conversationId) {
-
         return 0;
-
     }
-
 
     const {
         count,
         error
     } =
         await supabaseClient
-
             .from("messages")
-
             .select(
                 "*",
                 {
-                    count:
-                        "exact",
-
-                    head:
-                        true
+                    count: "exact",
+                    head: true
                 }
             )
-
             .eq(
                 "conversation_id",
                 conversationId
             )
-
             .eq(
                 "is_read",
                 false
             )
-
             .neq(
                 "sender_id",
                 currentUser.id
             );
 
-
     if (error) {
-
         return 0;
-
     }
 
-
     return count || 0;
-
 }
 
 
 /* =========================================================
-   LẤY CONVERSATION THEO ID
+   LẤY CONVERSATION
    ========================================================= */
 
 async function getConversationById(
@@ -1157,20 +955,13 @@ async function getConversationById(
         error
     } =
         await supabaseClient
-
-            .from(
-                "conversations"
-            )
-
+            .from("conversations")
             .select("*")
-
             .eq(
                 "id",
                 conversationId
             )
-
             .maybeSingle();
-
 
     if (error) {
 
@@ -1180,12 +971,9 @@ async function getConversationById(
         );
 
         return null;
-
     }
 
-
     return data;
-
 }
 
 
@@ -1196,20 +984,13 @@ async function getConversationById(
 async function loadConversations() {
 
     if (!conversationList) {
-
         return;
-
     }
 
-
     conversationList.innerHTML = `
-
         <div class="chat-loading">
-
             Đang tải cuộc trò chuyện...
-
         </div>
-
     `;
 
 
@@ -1218,15 +999,8 @@ async function loadConversations() {
         error
     } =
         await supabaseClient
-
-            .from(
-                "conversation_members"
-            )
-
-            .select(
-                "conversation_id"
-            )
-
+            .from("conversation_members")
+            .select("conversation_id")
             .eq(
                 "user_id",
                 currentUser.id
@@ -1240,20 +1014,13 @@ async function loadConversations() {
             error
         );
 
-
         conversationList.innerHTML = `
-
             <div class="chat-error">
-
                 Không thể tải tin nhắn.
-
             </div>
-
         `;
 
-
         return;
-
     }
 
 
@@ -1268,9 +1035,9 @@ async function loadConversations() {
     conversations = [];
 
 
-    /* -----------------------------------------
-       LOAD CÁC CONVERSATION HIỆN CÓ
-       ----------------------------------------- */
+    /* =========================================
+       LOAD CÁC CHAT ĐÃ CÓ
+       ========================================= */
 
     if (ids.length) {
 
@@ -1279,23 +1046,16 @@ async function loadConversations() {
             error: conversationError
         } =
             await supabaseClient
-
-                .from(
-                    "conversations"
-                )
-
+                .from("conversations")
                 .select("*")
-
                 .in(
                     "id",
                     ids
                 )
-
                 .order(
                     "updated_at",
                     {
-                        ascending:
-                            false
+                        ascending: false
                     }
                 );
 
@@ -1306,7 +1066,6 @@ async function loadConversations() {
                 "Lỗi conversations:",
                 conversationError
             );
-
         }
 
 
@@ -1316,40 +1075,30 @@ async function loadConversations() {
         ) {
 
             const {
-                data: otherMembers
+                data: members
             } =
                 await supabaseClient
-
                     .from(
                         "conversation_members"
                     )
-
-                    .select(
-                        "user_id"
-                    )
-
+                    .select("user_id")
                     .eq(
                         "conversation_id",
                         conversation.id
                     )
-
                     .neq(
                         "user_id",
                         currentUser.id
                     );
 
 
-            if (
-                !otherMembers?.length
-            ) {
-
+            if (!members?.length) {
                 continue;
-
             }
 
 
             const otherUserId =
-                otherMembers[0].user_id;
+                members[0].user_id;
 
 
             const profile =
@@ -1359,9 +1108,7 @@ async function loadConversations() {
 
 
             if (!profile) {
-
                 continue;
-
             }
 
 
@@ -1371,6 +1118,11 @@ async function loadConversations() {
                 );
 
 
+            const isAdmin =
+                profile.role === "admin" ||
+                conversation.is_admin_chat === true;
+
+
             conversations.push({
 
                 ...conversation,
@@ -1378,24 +1130,23 @@ async function loadConversations() {
                 otherUser:
                     profile,
 
-                unreadCount,
+                unreadCount:
+                    unreadCount,
 
                 isAdmin:
-                    profile.role ===
-                    "admin" ||
-                    conversation.is_admin_chat ===
-                    true
+                    isAdmin,
+
+                isPinned:
+                    isAdmin
 
             });
-
         }
-
     }
 
 
-    /* -----------------------------------------
-       ADMIN LUÔN PHẢI CÓ
-       ----------------------------------------- */
+    /* =========================================
+       ADMIN LUÔN CÓ
+       ========================================= */
 
     const adminChat =
         await ensureAdminChat();
@@ -1405,12 +1156,9 @@ async function loadConversations() {
 
         let adminConversation =
             conversations.find(
-
                 conversation =>
-
                     conversation.otherUser?.id ===
                     adminChat.id
-
             );
 
 
@@ -1428,8 +1176,21 @@ async function loadConversations() {
 
                     ...data,
 
-                    otherUser:
-                        adminChat,
+                    otherUser: {
+
+                        id:
+                            adminChat.id,
+
+                        fullname:
+                            adminChat.fullname,
+
+                        avatar_url:
+                            adminChat.avatar_url,
+
+                        role:
+                            "admin"
+
+                    },
 
                     unreadCount:
                         await getUnreadCount(
@@ -1437,6 +1198,9 @@ async function loadConversations() {
                         ),
 
                     isAdmin:
+                        true,
+
+                    isPinned:
                         true
 
                 };
@@ -1445,23 +1209,110 @@ async function loadConversations() {
                 conversations.push(
                     adminConversation
                 );
-
             }
 
-        } else {
+        }
+        else {
+
+            /*
+               Cập nhật lại profile Admin
+               để avatar + tên luôn chính xác.
+            */
+
+            adminConversation.otherUser =
+                {
+
+                    id:
+                        adminChat.id,
+
+                    fullname:
+                        adminChat.fullname,
+
+                    avatar_url:
+                        adminChat.avatar_url,
+
+                    role:
+                        "admin"
+
+                };
 
             adminConversation.isAdmin =
                 true;
 
+            adminConversation.isPinned =
+                true;
         }
-
     }
 
 
-    /* -----------------------------------------
-       SẮP XẾP
-       ADMIN LUÔN LÊN ĐẦU
-       ----------------------------------------- */
+    /* =========================================
+       XÓA DUPLICATE
+       ========================================= */
+
+    const unique =
+        new Map();
+
+
+    conversations.forEach(
+        conversation => {
+
+            const otherId =
+                conversation.otherUser?.id;
+
+            if (!otherId) {
+                return;
+            }
+
+            /*
+               Một người chỉ có một đoạn chat.
+            */
+
+            if (!unique.has(otherId)) {
+
+                unique.set(
+                    otherId,
+                    conversation
+                );
+
+            }
+            else {
+
+                const old =
+                    unique.get(otherId);
+
+                const oldTime =
+                    new Date(
+                        old.updated_at || 0
+                    );
+
+                const newTime =
+                    new Date(
+                        conversation.updated_at || 0
+                    );
+
+                if (
+                    newTime > oldTime
+                ) {
+
+                    unique.set(
+                        otherId,
+                        conversation
+                    );
+                }
+            }
+        }
+    );
+
+
+    conversations =
+        Array.from(
+            unique.values()
+        );
+
+
+    /* =========================================
+       ADMIN LUÔN ĐẦU
+       ========================================= */
 
     conversations.sort(
         (
@@ -1470,41 +1321,27 @@ async function loadConversations() {
         ) => {
 
             if (
-                a.isAdmin &&
-                !b.isAdmin
+                a.isPinned &&
+                !b.isPinned
             ) {
-
                 return -1;
-
             }
-
 
             if (
-                !a.isAdmin &&
-                b.isAdmin
+                !a.isPinned &&
+                b.isPinned
             ) {
-
                 return 1;
-
             }
 
-
             return (
-
                 new Date(
-                    b.updated_at ||
-                    0
-                )
-
-                -
-
+                    b.updated_at || 0
+                ) -
                 new Date(
-                    a.updated_at ||
-                    0
+                    a.updated_at || 0
                 )
-
             );
-
         }
     );
 
@@ -1512,7 +1349,6 @@ async function loadConversations() {
     renderConversationList(
         conversations
     );
-
 }
 
 
@@ -1525,9 +1361,7 @@ function renderConversationList(
 ) {
 
     if (!conversationList) {
-
         return;
-
     }
 
 
@@ -1537,22 +1371,16 @@ function renderConversationList(
     ) {
 
         conversationList.innerHTML = `
-
             <div class="chat-loading">
-
                 Chưa có cuộc trò chuyện.
-
             </div>
-
         `;
 
         return;
-
     }
 
 
     conversationList.innerHTML =
-
         list
             .map(
                 conversation => {
@@ -1565,21 +1393,19 @@ function renderConversationList(
                         conversation.isAdmin;
 
 
+                    /*
+                       KHÔNG hard-code tên Admin nữa.
+                       Luôn lấy từ users.
+                    */
+
                     const fullname =
-                        isAdmin
-
-                            ? "Admin IUH SHOP"
-
-                            :
-
-                            (
-                                user?.fullname ||
-                                "Người dùng"
-                            );
+                        user?.fullname ||
+                        "Người dùng";
 
 
                     const avatarUrl =
-    user?.avatar_url || "";
+                        user?.avatar_url ||
+                        "";
 
 
                     const active =
@@ -1594,103 +1420,113 @@ function renderConversationList(
                         <div
                             class="
                                 conversation-item
-                                ${
-                                    isAdmin
-                                        ? "admin-chat"
-                                        : ""
-                                }
+                                ${isAdmin ? "admin-chat" : ""}
+                                ${conversation.isPinned ? "pinned-chat" : ""}
                                 ${active}
                             "
-                            data-id="
-                                ${conversation.id}
-                            "
+                            data-id="${escapeHTML(
+                                conversation.id
+                            )}"
                         >
 
-                            <div
-    class="conversation-avatar"
->
+                            <!-- AVATAR -->
 
-    ${
-        avatarUrl
-            ? `
-                <img
-                    src="${escapeHTML(avatarUrl)}"
-                    alt="${escapeHTML(fullname)}"
-                >
-            `
-            : `
-                <span class="avatar-letter">
-                    ${escapeHTML(
-                        fullname
-                            .charAt(0)
-                            .toUpperCase()
-                    )}
-                </span>
-            `
-    }
+                            <div class="conversation-avatar">
 
-    <span
-        class="online-dot"
-    ></span>
+                                ${
+                                    avatarUrl
 
-</div>
+                                        ?
+
+                                        `
+                                            <img
+                                                src="${escapeHTML(
+                                                    avatarUrl
+                                                )}"
+                                                alt="${escapeHTML(
+                                                    fullname
+                                                )}"
+                                            >
+                                        `
+
+                                        :
+
+                                        `
+                                            <span class="avatar-letter">
+                                                ${escapeHTML(
+                                                    fullname
+                                                        .charAt(0)
+                                                        .toUpperCase()
+                                                )}
+                                            </span>
+                                        `
+                                }
+
+                                <span
+                                    class="online-dot"
+                                ></span>
+
+                            </div>
 
 
-                            <div
-                                class="
-                                    conversation-content
-                                "
-                            >
+                            <!-- NỘI DUNG -->
 
-                                <div
-                                    class="
-                                        conversation-top
-                                    "
-                                >
+                            <div class="conversation-content">
 
-                                    <span
-                                        class="
-                                            conversation-name
-                                        "
-                                    >
+                                <div class="conversation-top">
+
+                                    <span class="conversation-name">
+
                                         ${escapeHTML(
                                             fullname
                                         )}
+
+                                        ${
+                                            conversation.isPinned
+                                                ?
+                                                `
+                                                    <span
+                                                        class="pin-icon"
+                                                        title="Đã ghim"
+                                                    >
+                                                        📌
+                                                    </span>
+                                                `
+                                                :
+                                                ""
+                                        }
+
                                     </span>
 
 
-                                    <span
-                                        class="
-                                            conversation-time
-                                        "
-                                    >
+                                    <span class="conversation-time">
+
                                         ${
                                             formatChatDate(
                                                 conversation.updated_at
                                             )
                                         }
+
                                     </span>
 
                                 </div>
 
 
-                                <div
-                                    class="
-                                        conversation-preview
-                                    "
-                                >
+                                <div class="conversation-preview">
 
-                                    <span
-                                        class="
-                                            last-message
-                                        "
-                                    >
-                                        ${
-                                            escapeHTML(
-                                                conversation.last_message ||
-                                                "Chưa có tin nhắn"
+                                    <span class="last-message">
+
+                                        ${escapeHTML(
+                                            conversation.last_message ||
+                                            (
+                                                isAdmin
+                                                    ?
+                                                    "Xin chào! Chúng tôi có thể hỗ trợ gì cho bạn?"
+                                                    :
+                                                    "Chưa có tin nhắn"
                                             )
-                                        }
+                                        )}
+
                                     </span>
 
 
@@ -1700,17 +1536,9 @@ function renderConversationList(
                                             ?
 
                                             `
-
-                                            <span
-                                                class="
-                                                    unread-badge
-                                                "
-                                            >
-                                                ${
-                                                    conversation.unreadCount
-                                                }
-                                            </span>
-
+                                                <span class="unread-badge">
+                                                    ${conversation.unreadCount}
+                                                </span>
                                             `
 
                                             :
@@ -1723,9 +1551,7 @@ function renderConversationList(
                             </div>
 
                         </div>
-
                     `;
-
                 }
             )
             .join("");
@@ -1740,18 +1566,15 @@ function renderConversationList(
 
                 item.addEventListener(
                     "click",
-                    function () {
+                    function() {
 
                         openConversation(
                             this.dataset.id
                         );
-
                     }
                 );
-
             }
         );
-
 }
 
 
@@ -1772,9 +1595,7 @@ async function openConversation(
 
 
     if (!conversation) {
-
         return;
-
     }
 
 
@@ -1801,7 +1622,6 @@ async function openConversation(
 
         chatEmpty.style.display =
             "none";
-
     }
 
 
@@ -1809,7 +1629,6 @@ async function openConversation(
 
         activeChat.style.display =
             "flex";
-
     }
 
 
@@ -1824,7 +1643,6 @@ async function openConversation(
         chatContainer.classList.add(
             "mobile-chat"
         );
-
     }
 
 
@@ -1855,12 +1673,11 @@ async function openConversation(
     renderConversationList(
         conversations
     );
-
 }
 
 
 /* =========================================================
-   ACTIVE CHAT HEADER
+   HEADER CHAT
    ========================================================= */
 
 function renderActiveChatHeader(
@@ -1871,21 +1688,14 @@ function renderActiveChatHeader(
         conversation.otherUser;
 
 
-    const isAdmin =
-        conversation.isAdmin;
-
-
     const fullname =
-        isAdmin
+        user?.fullname ||
+        "Người dùng";
 
-            ? "Admin IUH SHOP"
 
-            :
-
-            (
-                user?.fullname ||
-                "Người dùng"
-            );
+    const avatarUrl =
+        user?.avatar_url ||
+        "";
 
 
     const avatar =
@@ -1906,40 +1716,84 @@ function renderActiveChatHeader(
         );
 
 
-    if (avatar) {
-
-        avatar.textContent =
-            isAdmin
-
-                ? "A"
-
-                : fullname
-                    .charAt(0)
-                    .toUpperCase();
-
-    }
-
+    /* =========================================
+       TÊN
+       ========================================= */
 
     if (userName) {
 
         userName.textContent =
             fullname;
-
     }
 
+
+    /* =========================================
+       AVATAR
+
+       Dùng background để không phá CSS
+       avatar hình tròn hiện tại.
+       ========================================= */
+
+    if (avatar) {
+
+        avatar.textContent = "";
+
+        avatar.innerHTML = "";
+
+
+        if (avatarUrl) {
+
+            const img =
+                document.createElement(
+                    "img"
+                );
+
+            img.src =
+                avatarUrl;
+
+            img.alt =
+                fullname;
+
+            img.style.width =
+                "100%";
+
+            img.style.height =
+                "100%";
+
+            img.style.objectFit =
+                "cover";
+
+            img.style.borderRadius =
+                "50%";
+
+            avatar.appendChild(
+                img
+            );
+
+        }
+        else {
+
+            avatar.textContent =
+                fullname
+                    .charAt(0)
+                    .toUpperCase();
+        }
+    }
+
+
+    /* =========================================
+       STATUS
+       ========================================= */
 
     if (userStatus) {
 
         userStatus.textContent =
-
-            isAdmin
-
-                ? "Hỗ trợ khách hàng · IUH SHOP"
-
-                : "Thành viên IUH SHOP";
-
+            conversation.isAdmin
+                ?
+                "Hỗ trợ khách hàng · IUH SHOP"
+                :
+                "Thành viên IUH SHOP";
     }
-
 }
 
 
@@ -1952,20 +1806,14 @@ async function loadMessages(
 ) {
 
     if (!messagesArea) {
-
         return;
-
     }
 
 
     messagesArea.innerHTML = `
-
         <div class="chat-loading">
-
             Đang tải tin nhắn...
-
         </div>
-
     `;
 
 
@@ -1974,21 +1822,16 @@ async function loadMessages(
         error
     } =
         await supabaseClient
-
             .from("messages")
-
             .select("*")
-
             .eq(
                 "conversation_id",
                 conversationId
             )
-
             .order(
                 "created_at",
                 {
-                    ascending:
-                        true
+                    ascending: true
                 }
             );
 
@@ -2000,43 +1843,66 @@ async function loadMessages(
             error
         );
 
-
         messagesArea.innerHTML = `
-
             <div class="chat-error">
-
                 Không thể tải tin nhắn.
-
             </div>
-
         `;
 
-
         return;
-
     }
 
 
-    renderMessages(
+    await renderMessages(
         data || []
     );
-
 }
 
 
 /* =========================================================
-   RENDER MESSAGES
+   RENDER TOÀN BỘ MESSAGES
    ========================================================= */
 
-async function renderMessages(messages) {
+async function renderMessages(
+    messages
+) {
 
     if (!messagesArea) {
         return;
     }
 
+
     messagesArea.innerHTML = "";
 
-    if (!messages || !messages.length) {
+
+    /*
+       Nếu là Admin và chưa có tin nhắn
+       → hiện lời chào mặc định.
+    */
+
+    const currentConversation =
+        conversations.find(
+            conversation =>
+                conversation.id ===
+                currentConversationId
+        );
+
+
+    if (
+        currentConversation?.isAdmin &&
+        (!messages || !messages.length)
+    ) {
+
+        renderAdminGreeting();
+
+        return;
+    }
+
+
+    if (
+        !messages ||
+        !messages.length
+    ) {
 
         messagesArea.innerHTML = `
             <div class="chat-loading">
@@ -2047,66 +1913,261 @@ async function renderMessages(messages) {
         return;
     }
 
-    for (const message of messages) {
 
-        await renderSingleMessage(message);
+    /*
+       Nếu Admin:
+       lời chào luôn nằm đầu đoạn chat.
+    */
 
+    if (
+        currentConversation?.isAdmin
+    ) {
+
+        renderAdminGreeting();
     }
+
+
+    for (
+        const message
+        of messages
+    ) {
+
+        await renderSingleMessage(
+            message
+        );
+    }
+
 
     scrollToBottom();
 }
 
 
 /* =========================================================
-   RENDER SINGLE MESSAGE
+   LỜI CHÀO ADMIN
    ========================================================= */
 
-async function renderSingleMessage(message) {
+function renderAdminGreeting() {
 
     if (!messagesArea) {
         return;
     }
+
+
+    const admin =
+        conversations.find(
+            conversation =>
+                conversation.id ===
+                currentConversationId &&
+                conversation.isAdmin
+        );
+
+
+    if (!admin) {
+        return;
+    }
+
+
+    const user =
+        admin.otherUser;
+
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+    row.className =
+        "message-row theirs admin-greeting";
+
+
+    /* AVATAR */
+
+    const avatar =
+        document.createElement(
+            "div"
+        );
+
+    avatar.className =
+        "message-avatar";
+
+
+    if (user?.avatar_url) {
+
+        const img =
+            document.createElement(
+                "img"
+            );
+
+        img.src =
+            user.avatar_url;
+
+        img.alt =
+            user.fullname ||
+            "Admin IUH SHOP";
+
+        img.style.width =
+            "100%";
+
+        img.style.height =
+            "100%";
+
+        img.style.objectFit =
+            "cover";
+
+        img.style.borderRadius =
+            "50%";
+
+        avatar.appendChild(
+            img
+        );
+
+    }
+    else {
+
+        avatar.textContent =
+            (
+                user?.fullname ||
+                "Admin IUH SHOP"
+            )
+                .charAt(0)
+                .toUpperCase();
+    }
+
+
+    /* BUBBLE */
+
+    const bubble =
+        document.createElement(
+            "div"
+        );
+
+    bubble.className =
+        "message-bubble";
+
+
+    const text =
+        document.createElement(
+            "div"
+        );
+
+    text.className =
+        "message-text";
+
+    text.textContent =
+        ADMIN_GREETING;
+
+
+    bubble.appendChild(
+        text
+    );
+
+
+    const time =
+        document.createElement(
+            "div"
+        );
+
+    time.className =
+        "message-time";
+
+    time.textContent =
+        "";
+
+
+    bubble.appendChild(
+        time
+    );
+
+
+    row.appendChild(
+        avatar
+    );
+
+    row.appendChild(
+        bubble
+    );
+
+
+    messagesArea.appendChild(
+        row
+    );
+}
+
+
+/* =========================================================
+   RENDER 1 MESSAGE
+   ========================================================= */
+
+async function renderSingleMessage(
+    message
+) {
+
+    if (!messagesArea) {
+        return;
+    }
+
+
+    if (!message?.id) {
+        return;
+    }
+
 
     const existing =
         document.querySelector(
             `[data-message-id="${message.id}"]`
         );
 
+
     if (existing) {
         return;
     }
 
+
     const mine =
-        message.sender_id === currentUser.id;
+        message.sender_id ===
+        currentUser.id;
 
 
     /* =========================================
-       LẤY THÔNG TIN NGƯỜI GỬI
+       LẤY PROFILE NGƯỜI GỬI
        ========================================= */
 
-    let senderProfile = null;
+    let senderProfile;
+
 
     if (mine) {
 
         senderProfile =
             currentUserProfile;
 
-    } else {
+    }
+    else {
 
         senderProfile =
             await getUserProfile(
                 message.sender_id
             );
-
     }
 
 
+    const fullname =
+        senderProfile?.fullname ||
+        "Người dùng";
+
+
+    const avatarUrl =
+        senderProfile?.avatar_url ||
+        "";
+
+
     /* =========================================
-       TẠO DÒNG MESSAGE
+       ROW
        ========================================= */
 
     const row =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     row.dataset.messageId =
         message.id;
@@ -2125,29 +2186,50 @@ async function renderSingleMessage(message) {
        ========================================= */
 
     const avatar =
-        document.createElement("img");
+        document.createElement(
+            "div"
+        );
 
     avatar.className =
         "message-avatar";
 
-    avatar.src =
-        senderProfile?.avatar_url ||
-        "";
 
-    avatar.alt =
-        senderProfile?.fullname ||
-        "Người dùng";
+    if (avatarUrl) {
 
+        const img =
+            document.createElement(
+                "img"
+            );
 
-    /* =========================================
-       NẾU KHÔNG CÓ AVATAR
-       ========================================= */
+        img.src =
+            avatarUrl;
 
-    if (!senderProfile?.avatar_url) {
+        img.alt =
+            fullname;
 
-        avatar.style.display =
-            "none";
+        img.style.width =
+            "100%";
 
+        img.style.height =
+            "100%";
+
+        img.style.objectFit =
+            "cover";
+
+        img.style.borderRadius =
+            "50%";
+
+        avatar.appendChild(
+            img
+        );
+
+    }
+    else {
+
+        avatar.textContent =
+            fullname
+                .charAt(0)
+                .toUpperCase();
     }
 
 
@@ -2156,20 +2238,24 @@ async function renderSingleMessage(message) {
        ========================================= */
 
     const bubble =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     bubble.className =
         "message-bubble";
 
 
     /* =========================================
-       ẢNH
+       IMAGE
        ========================================= */
 
     if (message.image_url) {
 
         const image =
-            document.createElement("img");
+            document.createElement(
+                "img"
+            );
 
         image.className =
             "message-image";
@@ -2183,22 +2269,22 @@ async function renderSingleMessage(message) {
         image.loading =
             "lazy";
 
+
         image.addEventListener(
             "click",
-            function () {
+            function() {
 
                 window.open(
                     message.image_url,
                     "_blank"
                 );
-
             }
         );
+
 
         bubble.appendChild(
             image
         );
-
     }
 
 
@@ -2209,7 +2295,9 @@ async function renderSingleMessage(message) {
     if (message.content) {
 
         const text =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         text.className =
             "message-text";
@@ -2217,10 +2305,10 @@ async function renderSingleMessage(message) {
         text.textContent =
             message.content;
 
+
         bubble.appendChild(
             text
         );
-
     }
 
 
@@ -2229,7 +2317,9 @@ async function renderSingleMessage(message) {
        ========================================= */
 
     const time =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     time.className =
         "message-time";
@@ -2239,13 +2329,20 @@ async function renderSingleMessage(message) {
             message.created_at
         );
 
+
     bubble.appendChild(
         time
     );
 
 
     /* =========================================
-       SẮP XẾP AVATAR + BUBBLE
+       SẮP XẾP
+
+       Người khác:
+       avatar → bubble
+
+       Người hiện tại:
+       bubble → avatar
        ========================================= */
 
     if (mine) {
@@ -2258,7 +2355,8 @@ async function renderSingleMessage(message) {
             avatar
         );
 
-    } else {
+    }
+    else {
 
         row.appendChild(
             avatar
@@ -2267,7 +2365,6 @@ async function renderSingleMessage(message) {
         row.appendChild(
             bubble
         );
-
     }
 
 
@@ -2278,7 +2375,7 @@ async function renderSingleMessage(message) {
 
 
 /* =========================================================
-   SEND MESSAGE
+   GỬI MESSAGE
    ========================================================= */
 
 async function sendMessage() {
@@ -2287,15 +2384,12 @@ async function sendMessage() {
         !currentUser ||
         !currentConversationId
     ) {
-
         return;
-
     }
 
 
     const content =
-        messageInput
-            ?.value
+        messageInput?.value
             ?.trim() ||
         "";
 
@@ -2304,17 +2398,13 @@ async function sendMessage() {
         !content &&
         !selectedImage
     ) {
-
         return;
-
     }
 
 
     if (sendButton) {
-
         sendButton.disabled =
             true;
-
     }
 
 
@@ -2324,34 +2414,25 @@ async function sendMessage() {
             null;
 
 
-        /* -----------------------------------------
-           UPLOAD ẢNH
-           ----------------------------------------- */
+        /* UPLOAD IMAGE */
 
-        if (
-            selectedImage
-        ) {
+        if (selectedImage) {
 
             imageUrl =
                 await uploadChatImage(
                     selectedImage
                 );
-
         }
 
 
-        /* -----------------------------------------
-           INSERT MESSAGE
-           ----------------------------------------- */
+        /* INSERT MESSAGE */
 
         const {
             data,
             error
         } =
             await supabaseClient
-
                 .from("messages")
-
                 .insert({
 
                     conversation_id:
@@ -2376,22 +2457,16 @@ async function sendMessage() {
                         false
 
                 })
-
                 .select()
-
                 .single();
 
 
         if (error) {
-
             throw error;
-
         }
 
 
-        /* -----------------------------------------
-           CẬP NHẬT CONVERSATION
-           ----------------------------------------- */
+        /* UPDATE CONVERSATION */
 
         const preview =
             content ||
@@ -2399,46 +2474,40 @@ async function sendMessage() {
 
 
         await updateConversationLastMessage(
-
             currentConversationId,
-
             preview
-
         );
 
 
-        /* -----------------------------------------
-           RESET INPUT
-           ----------------------------------------- */
+        /* CLEAR INPUT */
 
         if (messageInput) {
-
-            messageInput.value =
-                "";
-
+            messageInput.value = "";
         }
 
 
         removeSelectedImage();
 
 
-        /* -----------------------------------------
-           HIỂN THỊ NGAY
-           ----------------------------------------- */
+        /*
+           Hiển thị ngay.
 
-         if (data) {
+           Realtime cũng nhận được message
+           nhưng renderSingleMessage sẽ kiểm tra
+           data-message-id nên không bị trùng.
+        */
 
-    await renderSingleMessage(
-        data
-    );
+        if (data) {
 
-    scrollToBottom();
-}
+            await renderSingleMessage(
+                data
+            );
+
+            scrollToBottom();
+        }
 
 
-        /* -----------------------------------------
-           CẬP NHẬT LOCAL LIST
-           ----------------------------------------- */
+        /* UPDATE LOCAL */
 
         const conversation =
             conversations.find(
@@ -2458,9 +2527,12 @@ async function sendMessage() {
 
             conversation.updated_at =
                 new Date().toISOString();
-
         }
 
+
+        /*
+           ADMIN vẫn ghim đầu.
+        */
 
         conversations.sort(
             (
@@ -2469,34 +2541,27 @@ async function sendMessage() {
             ) => {
 
                 if (
-                    a.isAdmin &&
-                    !b.isAdmin
+                    a.isPinned &&
+                    !b.isPinned
                 ) {
-
                     return -1;
-
                 }
-
 
                 if (
-                    !a.isAdmin &&
-                    b.isAdmin
+                    !a.isPinned &&
+                    b.isPinned
                 ) {
-
                     return 1;
-
                 }
 
-
-                return new Date(
-                    b.updated_at ||
-                    0
-                ) -
-                new Date(
-                    a.updated_at ||
-                    0
+                return (
+                    new Date(
+                        b.updated_at || 0
+                    ) -
+                    new Date(
+                        a.updated_at || 0
+                    )
                 );
-
             }
         );
 
@@ -2506,7 +2571,6 @@ async function sendMessage() {
         );
 
     }
-
     catch (error) {
 
         console.error(
@@ -2514,37 +2578,28 @@ async function sendMessage() {
             error
         );
 
-
         alert(
             error?.message ||
-            "Không thể gửi tin nhắn. Vui lòng thử lại."
+            "Không thể gửi tin nhắn."
         );
 
     }
-
     finally {
 
         if (sendButton) {
-
             sendButton.disabled =
                 false;
-
         }
-
 
         if (messageInput) {
-
             messageInput.focus();
-
         }
-
     }
-
 }
 
 
 /* =========================================================
-   UPLOAD CHAT IMAGE
+   UPLOAD ẢNH
    ========================================================= */
 
 async function uploadChatImage(
@@ -2552,9 +2607,7 @@ async function uploadChatImage(
 ) {
 
     if (!file) {
-
         return null;
-
     }
 
 
@@ -2567,7 +2620,6 @@ async function uploadChatImage(
         throw new Error(
             "File được chọn không phải hình ảnh."
         );
-
     }
 
 
@@ -2579,7 +2631,6 @@ async function uploadChatImage(
         throw new Error(
             "Ảnh không được vượt quá 10MB."
         );
-
     }
 
 
@@ -2591,7 +2642,8 @@ async function uploadChatImage(
 
 
     const safeExtension =
-        extension || "jpg";
+        extension ||
+        "jpg";
 
 
     const filename =
@@ -2606,30 +2658,24 @@ async function uploadChatImage(
         error
     } =
         await supabaseClient.storage
-
             .from(
                 CHAT_BUCKET
             )
-
             .upload(
                 path,
                 file,
                 {
-
                     cacheControl:
                         "3600",
 
                     upsert:
                         false
-
                 }
             );
 
 
     if (error) {
-
         throw error;
-
     }
 
 
@@ -2637,18 +2683,15 @@ async function uploadChatImage(
         data
     } =
         supabaseClient.storage
-
             .from(
                 CHAT_BUCKET
             )
-
             .getPublicUrl(
                 path
             );
 
 
     return data.publicUrl;
-
 }
 
 
@@ -2657,27 +2700,19 @@ async function uploadChatImage(
    ========================================================= */
 
 async function updateConversationLastMessage(
-
     conversationId,
-
     message
-
 ) {
 
     const now =
-        new Date()
-            .toISOString();
+        new Date().toISOString();
 
 
     const {
         error
     } =
         await supabaseClient
-
-            .from(
-                "conversations"
-            )
-
+            .from("conversations")
             .update({
 
                 last_message:
@@ -2690,7 +2725,6 @@ async function updateConversationLastMessage(
                     now
 
             })
-
             .eq(
                 "id",
                 conversationId
@@ -2703,14 +2737,12 @@ async function updateConversationLastMessage(
             "Lỗi cập nhật conversation:",
             error
         );
-
     }
-
 }
 
 
 /* =========================================================
-   MARK MESSAGES AS READ
+   MARK AS READ
    ========================================================= */
 
 async function markMessagesAsRead(
@@ -2718,9 +2750,7 @@ async function markMessagesAsRead(
 ) {
 
     if (!conversationId) {
-
         return;
-
     }
 
 
@@ -2728,26 +2758,21 @@ async function markMessagesAsRead(
         error
     } =
         await supabaseClient
-
             .from("messages")
-
             .update({
 
                 is_read:
                     true
 
             })
-
             .eq(
                 "conversation_id",
                 conversationId
             )
-
             .neq(
                 "sender_id",
                 currentUser.id
             )
-
             .eq(
                 "is_read",
                 false
@@ -2760,9 +2785,7 @@ async function markMessagesAsRead(
             "Lỗi đánh dấu đã đọc:",
             error
         );
-
     }
-
 }
 
 
@@ -2774,9 +2797,7 @@ function subscribeToMessages(
     conversationId
 ) {
 
-    if (
-        realtimeChannel
-    ) {
+    if (realtimeChannel) {
 
         supabaseClient
             .removeChannel(
@@ -2785,22 +2806,16 @@ function subscribeToMessages(
 
         realtimeChannel =
             null;
-
     }
 
 
     realtimeChannel =
-
         supabaseClient
-
             .channel(
                 `chat-${conversationId}`
             )
-
             .on(
-
                 "postgres_changes",
-
                 {
 
                     event:
@@ -2824,9 +2839,17 @@ function subscribeToMessages(
 
 
                     /*
-                       Nếu tin nhắn đã có
-                       thì không render lại.
+                       Chỉ render nếu đúng
+                       conversation đang mở.
                     */
+
+                    if (
+                        currentConversationId !==
+                        conversationId
+                    ) {
+                        return;
+                    }
+
 
                     const existing =
                         document.querySelector(
@@ -2834,22 +2857,13 @@ function subscribeToMessages(
                         );
 
 
-                    if (existing) {
+                    if (!existing) {
 
-                        return;
-
+                        await renderSingleMessage(
+                            message
+                        );
                     }
 
-
-                    await renderSingleMessage(
-                        message
-                    );
-
-
-                    /*
-                       Nếu người khác gửi
-                       → đánh dấu đã đọc.
-                    */
 
                     if (
                         message.sender_id !==
@@ -2859,16 +2873,13 @@ function subscribeToMessages(
                         await markMessagesAsRead(
                             conversationId
                         );
-
                     }
 
 
                     scrollToBottom();
 
 
-                    /*
-                       Cập nhật preview.
-                    */
+                    /* UPDATE PREVIEW */
 
                     const conversation =
                         conversations.find(
@@ -2897,27 +2908,52 @@ function subscribeToMessages(
                         ) {
 
                             conversation.unreadCount =
-                                currentConversationId ===
-                                conversationId
-                                    ? 0
-                                    : (
-                                        conversation.unreadCount +
-                                        1
-                                    );
-
+                                0;
                         }
-
                     }
+
+
+                    /*
+                       Admin vẫn ghim.
+                    */
+
+                    conversations.sort(
+                        (
+                            a,
+                            b
+                        ) => {
+
+                            if (
+                                a.isPinned &&
+                                !b.isPinned
+                            ) {
+                                return -1;
+                            }
+
+                            if (
+                                !a.isPinned &&
+                                b.isPinned
+                            ) {
+                                return 1;
+                            }
+
+                            return (
+                                new Date(
+                                    b.updated_at || 0
+                                ) -
+                                new Date(
+                                    a.updated_at || 0
+                                )
+                            );
+                        }
+                    );
 
 
                     renderConversationList(
                         conversations
                     );
-
                 }
-
             )
-
             .subscribe(
                 status => {
 
@@ -2925,22 +2961,20 @@ function subscribeToMessages(
                         "Realtime chat:",
                         status
                     );
-
                 }
             );
-
 }
 
 
 /* =========================================================
-   SEARCH CHAT
+   TÌM KIẾM CHAT
    ========================================================= */
 
 if (conversationSearch) {
 
     conversationSearch.addEventListener(
         "input",
-        function () {
+        function() {
 
             const keyword =
                 this.value
@@ -2955,7 +2989,6 @@ if (conversationSearch) {
                 );
 
                 return;
-
             }
 
 
@@ -2984,19 +3017,13 @@ if (conversationSearch) {
 
 
                         return (
-
                             name.includes(
                                 keyword
-                            )
-
-                            ||
-
+                            ) ||
                             last.includes(
                                 keyword
                             )
-
                         );
-
                     }
                 );
 
@@ -3004,10 +3031,8 @@ if (conversationSearch) {
             renderConversationList(
                 filtered
             );
-
         }
     );
-
 }
 
 
@@ -3019,16 +3044,14 @@ if (imageInput) {
 
     imageInput.addEventListener(
         "change",
-        function () {
+        function() {
 
             const file =
                 this.files?.[0];
 
 
             if (!file) {
-
                 return;
-
             }
 
 
@@ -3046,7 +3069,6 @@ if (imageInput) {
                     "";
 
                 return;
-
             }
 
 
@@ -3063,7 +3085,6 @@ if (imageInput) {
                     "";
 
                 return;
-
             }
 
 
@@ -3081,31 +3102,27 @@ if (imageInput) {
 
 
                 reader.onload =
-                    function (event) {
+                    function(event) {
 
                         previewImage.src =
                             event.target.result;
 
                         imagePreview.style.display =
                             "block";
-
                     };
 
 
                 reader.readAsDataURL(
                     file
                 );
-
             }
-
         }
     );
-
 }
 
 
 /* =========================================================
-   XÓA ẢNH ĐANG CHỌN
+   XÓA ẢNH
    ========================================================= */
 
 function removeSelectedImage() {
@@ -3118,7 +3135,6 @@ function removeSelectedImage() {
 
         imageInput.value =
             "";
-
     }
 
 
@@ -3126,7 +3142,6 @@ function removeSelectedImage() {
 
         imagePreview.style.display =
             "none";
-
     }
 
 
@@ -3134,9 +3149,7 @@ function removeSelectedImage() {
 
         previewImage.src =
             "";
-
     }
-
 }
 
 
@@ -3146,7 +3159,6 @@ if (removePreview) {
         "click",
         removeSelectedImage
     );
-
 }
 
 
@@ -3160,7 +3172,6 @@ if (sendButton) {
         "click",
         sendMessage
     );
-
 }
 
 
@@ -3172,28 +3183,19 @@ if (messageInput) {
 
     messageInput.addEventListener(
         "keydown",
-        function (event) {
+        function(event) {
 
             if (
-
-                event.key ===
-                "Enter"
-
-                &&
-
+                event.key === "Enter" &&
                 !event.shiftKey
-
             ) {
 
                 event.preventDefault();
 
                 sendMessage();
-
             }
-
         }
     );
-
 }
 
 
@@ -3205,7 +3207,7 @@ if (mobileBack) {
 
     mobileBack.addEventListener(
         "click",
-        function () {
+        function() {
 
             const chatContainer =
                 document.querySelector(
@@ -3218,7 +3220,6 @@ if (mobileBack) {
                 chatContainer.classList.remove(
                     "mobile-chat"
                 );
-
             }
 
 
@@ -3238,7 +3239,6 @@ if (mobileBack) {
 
                 activeChat.style.display =
                     "none";
-
             }
 
 
@@ -3246,21 +3246,17 @@ if (mobileBack) {
 
                 chatEmpty.style.display =
                     "flex";
-
             }
 
 
             currentConversationId =
                 null;
 
-
             currentOtherUser =
                 null;
 
 
-            if (
-                realtimeChannel
-            ) {
+            if (realtimeChannel) {
 
                 supabaseClient
                     .removeChannel(
@@ -3269,17 +3265,14 @@ if (mobileBack) {
 
                 realtimeChannel =
                     null;
-
             }
 
 
             renderConversationList(
                 conversations
             );
-
         }
     );
-
 }
 
 
@@ -3290,21 +3283,17 @@ if (mobileBack) {
 function scrollToBottom() {
 
     if (!messagesArea) {
-
         return;
-
     }
 
 
     requestAnimationFrame(
-        function () {
+        function() {
 
             messagesArea.scrollTop =
                 messagesArea.scrollHeight;
-
         }
     );
-
 }
 
 
@@ -3317,9 +3306,7 @@ function formatChatDate(
 ) {
 
     if (!date) {
-
         return "";
-
     }
 
 
@@ -3339,9 +3326,7 @@ function formatChatDate(
     if (sameDay) {
 
         return d.toLocaleTimeString(
-
             "vi-VN",
-
             {
 
                 hour:
@@ -3349,18 +3334,13 @@ function formatChatDate(
 
                 minute:
                     "2-digit"
-
             }
-
         );
-
     }
 
 
     return d.toLocaleDateString(
-
         "vi-VN",
-
         {
 
             day:
@@ -3368,11 +3348,8 @@ function formatChatDate(
 
             month:
                 "2-digit"
-
         }
-
     );
-
 }
 
 
@@ -3385,9 +3362,7 @@ function formatMessageTime(
 ) {
 
     if (!date) {
-
         return "";
-
     }
 
 
@@ -3396,9 +3371,7 @@ function formatMessageTime(
 
 
     return d.toLocaleTimeString(
-
         "vi-VN",
-
         {
 
             hour:
@@ -3406,43 +3379,17 @@ function formatMessageTime(
 
             minute:
                 "2-digit"
-
         }
-
     );
-
 }
 
 
 /* =========================================================
-   ESCAPE HTML
-   ========================================================= */
-
-function escapeHTML(
-    value
-) {
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    div.textContent =
-        value ?? "";
-
-
-    return div.innerHTML;
-
-}
-
-
-/* =========================================================
-   AUTH STATE CHANGE
+   AUTH STATE
    ========================================================= */
 
 supabaseClient.auth.onAuthStateChange(
-    function (
+    function(
         event,
         session
     ) {
@@ -3460,9 +3407,7 @@ supabaseClient.auth.onAuthStateChange(
 
             window.location.href =
                 "dang-nhap.html";
-
         }
-
     }
 );
 
@@ -3475,60 +3420,46 @@ async function initChat() {
 
     try {
 
-        /*
-           Header
-        */
+        /* HEADER */
 
         await updateUserMenu();
 
 
-        /*
-           Lấy user hiện tại
-        */
+        /* USER */
 
         const user =
             await loadCurrentUser();
 
 
         if (!user) {
-
             return;
-
         }
 
 
-        /*
-           Load toàn bộ chat
-        */
+        /* LOAD CHAT */
 
         await loadConversations();
 
 
         /*
-           Tự động mở Admin
+           ADMIN TỰ ĐỘNG MỞ
         */
 
         const adminConversation =
             conversations.find(
-
                 conversation =>
                     conversation.isAdmin
-
             );
 
 
-        if (
-            adminConversation
-        ) {
+        if (adminConversation) {
 
             await openConversation(
                 adminConversation.id
             );
-
         }
 
     }
-
     catch (error) {
 
         console.error(
@@ -3540,19 +3471,12 @@ async function initChat() {
         if (conversationList) {
 
             conversationList.innerHTML = `
-
                 <div class="chat-error">
-
                     Không thể khởi động hệ thống trò chuyện.
-
                 </div>
-
             `;
-
         }
-
     }
-
 }
 
 
@@ -3562,15 +3486,16 @@ async function initChat() {
 
 document.addEventListener(
     "DOMContentLoaded",
-    async function () {
+    async function() {
 
         setupAccountDropdown();
+
+        setupLogout();
 
         setupAccountShortcuts();
 
         setupActiveMenu();
 
         await initChat();
-
     }
 );
