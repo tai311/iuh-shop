@@ -916,94 +916,84 @@ async function createConversation(
     otherUserId,
     isAdminChat = false
 ) {
+    try {
+        if (!currentUser) {
+            throw new Error("Chưa đăng nhập.");
+        }
 
-    const {
-        data: conversation,
-        error
-    } =
-        await supabaseClient
+        if (!otherUserId) {
+            throw new Error("Không xác định được người dùng cần chat.");
+        }
 
-            .from(
-                "conversations"
-            )
+        // Tạo ID trước ở phía client
+        const conversationId = crypto.randomUUID();
 
+        // 1. Tạo conversation
+        // KHÔNG dùng .select() ở đây vì RLS SELECT
+        // yêu cầu user phải là member của conversation.
+        const {
+            error: conversationError
+        } = await supabaseClient
+            .from("conversations")
             .insert({
+                id: conversationId,
+                is_admin_chat: isAdminChat
+            });
 
-                is_admin_chat:
-                    isAdminChat
+        if (conversationError) {
+            console.error(
+                "Lỗi tạo conversation:",
+                conversationError
+            );
 
-            })
+            throw conversationError;
+        }
 
-            .select()
+        // 2. Thêm 2 thành viên
+        const members = [
+            {
+                conversation_id: conversationId,
+                user_id: currentUser.id
+            },
+            {
+                conversation_id: conversationId,
+                user_id: otherUserId
+            }
+        ];
 
-            .single();
+        const {
+            error: memberError
+        } = await supabaseClient
+            .from("conversation_members")
+            .insert(members);
 
+        if (memberError) {
+            console.error(
+                "Lỗi thêm thành viên:",
+                memberError
+            );
 
-    if (error) {
+            throw memberError;
+        }
 
+        // 3. Trả object conversation về cho code phía dưới
+        return {
+            id: conversationId,
+            is_admin_chat: isAdminChat,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            last_message: null,
+            last_message_at: null
+        };
+
+    } catch (error) {
         console.error(
-            "Lỗi tạo conversation:",
+            "Lỗi createConversation:",
             error
         );
 
         throw error;
-
     }
-
-
-    const members = [
-
-        {
-
-            conversation_id:
-                conversation.id,
-
-            user_id:
-                currentUser.id
-
-        },
-
-        {
-
-            conversation_id:
-                conversation.id,
-
-            user_id:
-                otherUserId
-
-        }
-
-    ];
-
-
-    const {
-        error: memberError
-    } =
-        await supabaseClient
-
-            .from(
-                "conversation_members"
-            )
-
-            .insert(
-                members
-            );
-
-
-    if (memberError) {
-
-        console.error(
-            "Lỗi thêm thành viên:",
-            memberError
-        );
-
-        throw memberError;
-
-    }
-
-
-    return conversation;
-
 }
 
 
