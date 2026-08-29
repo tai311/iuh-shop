@@ -1977,7 +1977,7 @@ function renderAdminGreeting() {
         );
 
     row.className =
-        "message-row theirs admin-greeting";
+    "message-row mine admin-greeting";
 
 
     /* AVATAR */
@@ -2079,13 +2079,8 @@ function renderAdminGreeting() {
     );
 
 
-    row.appendChild(
-        avatar
-    );
-
-    row.appendChild(
-        bubble
-    );
+    row.appendChild(bubble);
+row.appendChild(avatar);
 
 
     messagesArea.appendChild(
