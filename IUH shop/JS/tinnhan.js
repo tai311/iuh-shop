@@ -1688,6 +1688,17 @@ async function openConversation(
 
     currentOtherUser =
         conversation.otherUser;
+    
+    if (
+    window.IUHChatNotification &&
+    typeof window.IUHChatNotification
+        .setCurrentConversation === "function"
+) {
+    window.IUHChatNotification
+        .setCurrentConversation(
+            conversationId
+        );
+}
 
 
     const chatEmpty =
