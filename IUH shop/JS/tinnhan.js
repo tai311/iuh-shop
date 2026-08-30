@@ -4366,26 +4366,213 @@ async function initChat() {
 
     try {
 
-        /* HEADER */
+        /* =========================================
+           HEADER
+           ========================================= */
 
         await updateUserMenu();
 
 
-        /* USER */
+        /* =========================================
+           USER HIỆN TẠI
+           ========================================= */
 
         const user =
             await loadCurrentUser();
-
 
         if (!user) {
             return;
         }
 
 
-        /* LOAD CHAT */
+        /* =========================================
+           ĐỌC THAM SỐ TỪ URL
+           
+           Ví dụ:
+           tinnhan.html?
+           product=123&
+           seller=456&
+           productName=Áo
+           ========================================= */
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const sellerId =
+            params.get("seller");
+
+        const productId =
+            params.get("product");
+
+        const productName =
+            params.get("productName");
+
+
+        /* =========================================
+           LOAD DANH SÁCH CHAT
+           ========================================= */
 
         await loadConversations();
-        subscribeToMessages();
+
+
+        /* =================================================
+           TRƯỜNG HỢP ĐI TỪ NÚT "CHAT NGƯỜI BÁN"
+           ================================================= */
+
+        if (sellerId) {
+
+            console.log(
+                "IUH SHOP - Mở chat người bán:",
+                {
+                    sellerId,
+                    productId,
+                    productName
+                }
+            );
+
+
+            /* -----------------------------------------
+               KHÔNG CHO CHAT VỚI CHÍNH MÌNH
+               ----------------------------------------- */
+
+            if (
+                String(sellerId) ===
+                String(currentUser.id)
+            ) {
+
+                showToast(
+                    "Bạn không thể nhắn tin cho chính mình."
+                );
+
+                return;
+            }
+
+
+            /* -----------------------------------------
+               TÌM CHAT ĐÃ CÓ
+               ----------------------------------------- */
+
+            let conversationId =
+                await findConversationWithUser(
+                    sellerId
+                );
+
+
+            /* -----------------------------------------
+               CHƯA CÓ CHAT → TẠO CHAT MỚI
+               ----------------------------------------- */
+
+            if (!conversationId) {
+
+                console.log(
+                    "IUH SHOP - Chưa có chat, đang tạo..."
+                );
+
+
+                const newConversation =
+                    await createConversation(
+                        sellerId,
+                        false
+                    );
+
+
+                if (
+                    !newConversation ||
+                    !newConversation.id
+                ) {
+
+                    throw new Error(
+                        "Không thể tạo cuộc trò chuyện với người bán."
+                    );
+                }
+
+
+                conversationId =
+                    newConversation.id;
+
+
+                console.log(
+                    "IUH SHOP - Đã tạo conversation:",
+                    conversationId
+                );
+
+
+                /*
+                   Load lại danh sách để
+                   conversation mới xuất hiện
+                   trong danh sách bên trái.
+                */
+
+                await loadConversations();
+            }
+
+
+            /* -----------------------------------------
+               TÌM LẠI TRONG MẢNG conversations
+               ----------------------------------------- */
+
+            const targetConversation =
+                conversations.find(
+                    conversation =>
+                        String(
+                            conversation.id
+                        ) ===
+                        String(
+                            conversationId
+                        )
+                );
+
+
+            if (targetConversation) {
+
+                /*
+                   MỞ ĐÚNG ĐOẠN CHAT NGƯỜI BÁN
+                */
+
+                await openConversation(
+                    targetConversation.id
+                );
+
+            }
+            else {
+
+                console.error(
+                    "Không tìm thấy conversation vừa tạo:",
+                    conversationId
+                );
+
+                showToast(
+                    "Không thể mở cuộc trò chuyện."
+                );
+            }
+
+
+            /*
+               QUAN TRỌNG:
+
+               Có sellerId thì KHÔNG mở Admin.
+            */
+
+            return;
+        }
+
+
+        /* =================================================
+           KHÔNG CÓ sellerId
+           
+           → KHÔNG TỰ ĐỘNG MỞ CHAT NÀO
+           
+           → Hiện màn hình chờ
+           
+           Đây chính là hành vi bạn yêu cầu trước đó.
+           ================================================= */
+
+        console.log(
+            "IUH SHOP - Không có chat được chọn."
+        );
+
 
     }
     catch (error) {
