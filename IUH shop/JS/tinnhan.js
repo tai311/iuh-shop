@@ -4506,6 +4506,73 @@ async function initChat() {
                 */
 
                 await loadConversations();
+
+                /* =========================================
+   MỞ CHAT TỪ TRANG CÁ NHÂN
+========================================= */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const sellerId =
+    params.get("seller");
+
+
+if (sellerId) {
+
+    /*
+     * Kiểm tra cuộc trò chuyện
+     * với người này đã tồn tại chưa
+     */
+
+    const existingConversation =
+        conversations.find(
+            conversation =>
+                String(
+                    conversation.otherUser?.id
+                ) ===
+                String(sellerId)
+        );
+
+
+    if (existingConversation) {
+
+        /*
+         * Đã có cuộc trò chuyện
+         * → mở luôn
+         */
+
+        await openConversation(
+            existingConversation.id
+        );
+
+    } else {
+
+        /*
+         * Chưa có cuộc trò chuyện
+         * → tạo cuộc trò chuyện mới
+         */
+
+        const newConversation =
+            await createConversationWithUser(
+                sellerId
+            );
+
+        if (newConversation) {
+
+            await loadConversations();
+
+            await openConversation(
+                newConversation.id
+            );
+
+        }
+
+    }
+
+}
             }
 
 

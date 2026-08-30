@@ -841,7 +841,12 @@ function setupProfileOwnerUI(profile) {
 
     const changeAvatarButton =
         document.getElementById("changeAvatarButton");
+    
+    const profileActionArea =
+    document.getElementById("profileActionArea");
 
+const messageUserButton =
+    document.getElementById("messageUserButton");
 
         /* ==========================================
        BÁO CÁO NGƯỜI DÙNG
@@ -858,24 +863,121 @@ function setupProfileOwnerUI(profile) {
         );
 
 
-    if (profileReportArea) {
+    /* ==========================================
+   CỤM NÚT NHẮN TIN + BÁO CÁO
+========================================== */
 
-        if (
-            isProfileOwner ||
-            !currentProfileUserId
-        ) {
+if (profileActionArea) {
 
-            // Đang xem chính mình
-            profileReportArea.hidden = true;
+    if (
+        isProfileOwner ||
+        !currentProfileUserId
+    ) {
 
-        } else {
+        // Đang xem chính mình
+        profileActionArea.hidden = true;
 
-            // Đang xem người khác
-            profileReportArea.hidden = false;
+    } else {
 
-        }
+        // Đang xem người khác
+        profileActionArea.hidden = false;
 
     }
+
+}
+
+
+/* ==========================================
+   NÚT NHẮN TIN
+========================================== */
+
+if (messageUserButton) {
+
+    messageUserButton.onclick =
+        async function () {
+
+            if (!currentProfileUserId) {
+                return;
+            }
+
+            /*
+             * Kiểm tra người đang đăng nhập
+             */
+            const {
+                data: {
+                    user
+                },
+                error
+            } =
+                await supabaseClient
+                    .auth
+                    .getUser();
+
+            if (
+                error ||
+                !user
+            ) {
+
+                alert(
+                    "Vui lòng đăng nhập để nhắn tin."
+                );
+
+                return;
+            }
+
+
+            /*
+             * Không cho tự nhắn tin cho chính mình
+             */
+            if (
+                user.id ===
+                currentProfileUserId
+            ) {
+
+                return;
+            }
+
+
+            /*
+             * Chuyển sang trang tin nhắn
+             *
+             * seller = ID người đang xem
+             */
+            const params =
+                new URLSearchParams({
+
+                    seller:
+                        currentProfileUserId
+
+                });
+
+
+            window.location.href =
+                `tinnhan.html?${params.toString()}`;
+
+        };
+
+}
+
+
+/* ==========================================
+   NÚT BÁO CÁO
+========================================== */
+
+if (reportUserButton) {
+
+    reportUserButton.onclick =
+        function () {
+
+            openUserReportModal(
+                currentProfileUserId,
+                profile?.fullname ||
+                "Người dùng"
+            );
+
+        };
+
+}
 
 
     if (reportUserButton) {

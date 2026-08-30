@@ -2630,12 +2630,99 @@ body {
    NÚT BÁO CÁO NGƯỜI DÙNG
 ========================================= */
 
-.profile-report-area {
+/* =========================================
+   CỤM NÚT HÀNH ĐỘNG PROFILE
+========================================= */
+
+.profile-action-area {
     position: absolute;
     top: 35px;
     right: 40px;
 
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
     margin: 0;
+}
+
+/* =========================================
+   NÚT NHẮN TIN
+========================================= */
+
+.message-user-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 38px;
+    padding: 0 16px;
+
+    border: 1px solid #29479a;
+    border-radius: 8px;
+
+    background: #29479a;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.message-user-button:hover {
+    background: #203b87;
+    border-color: #203b87;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(41, 71, 154, 0.20);
+}
+
+.message-user-button:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================
+   NÚT BÁO CÁO
+========================================= */
+
+.report-user-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 38px;
+    padding: 0 16px;
+
+    border: 1px solid #e2b8b8;
+    border-radius: 8px;
+
+    background: #fff7f7;
+    color: #c0392b;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.report-user-button:hover {
+    background: #fff0f0;
+    border-color: #d99a9a;
+    color: #a93226;
 }
 
 .report-user-button {
@@ -2996,6 +3083,16 @@ body {
     .profile-report-submit {
         width: 100%;
     }
+
+    .profile-action-area {
+    position: static;
+
+    justify-content: center;
+
+    margin-top: 15px;
+
+    flex-wrap: wrap;
+}
 
 }
 
