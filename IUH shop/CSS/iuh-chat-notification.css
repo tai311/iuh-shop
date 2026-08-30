@@ -219,6 +219,17 @@
 
 }
 
+/* =========================================================
+   KHÔNG HIỆN TÊN + PREVIEW TRONG BÓNG
+   BÓNG CHỈ HIỆN AVATAR + BADGE
+   ========================================================= */
+
+.iuh-chat-bubble-tooltip,
+.iuh-chat-bubble-preview {
+
+    display: none !important;
+
+}
 
 /* =========================================================
    MINI CHAT
@@ -434,6 +445,8 @@
     display: flex;
 
     width: 100%;
+
+    box-sizing: border-box;
 }
 
 
@@ -455,14 +468,21 @@
 
     position: relative;
 
-    max-width: 78%;
+    width: fit-content;
+
+    max-width: 75%;
 
 }
-
 
 .iuh-mini-message {
 
     position: relative;
+
+    width: fit-content;
+
+    max-width: 100%;
+
+    box-sizing: border-box;
 
     padding: 9px 12px;
 
@@ -478,6 +498,8 @@
     line-height: 1.45;
 
     word-break: break-word;
+
+    white-space: pre-wrap;
 }
 
 
