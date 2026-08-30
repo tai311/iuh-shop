@@ -366,13 +366,1159 @@
 
     }
 
-    /* =========================================================
+   /* =========================================================
    MINI CHAT
    ========================================================= */
 
-let activeMiniChat =
-    null;
+let activeMiniChat = null;
 
+
+/* =========================================================
+   RENDER REACTION SUMMARY
+   ========================================================= */
+
+function renderMiniReactionSummary(
+    message,
+    wrapper
+) {
+
+    const reactions =
+        message.reactions || [];
+
+
+    if (!reactions.length) {
+        return;
+    }
+
+
+    const grouped = {};
+
+
+    reactions.forEach(
+        item => {
+
+            grouped[item.reaction] =
+                (
+                    grouped[item.reaction] ||
+                    0
+                ) + 1;
+
+        }
+    );
+
+
+    const summary =
+        document.createElement("div");
+
+    summary.className =
+        "iuh-mini-reaction-summary";
+
+
+    Object.entries(grouped)
+        .forEach(
+            ([emoji, count]) => {
+
+                const chip =
+                    document.createElement("span");
+
+                chip.className =
+                    "iuh-mini-reaction-chip";
+
+                chip.textContent =
+                    count > 1
+                        ? `${emoji} ${count}`
+                        : emoji;
+
+                summary.appendChild(
+                    chip
+                );
+
+            }
+        );
+
+
+    wrapper.appendChild(
+        summary
+    );
+
+}
+
+
+/* =========================================================
+   ACTIONS CỦA TIN NHẮN
+   ========================================================= */
+
+function createMiniMessageActions(
+    message,
+    mine,
+    container
+) {
+
+    if (
+        message.recalled_at
+    ) {
+
+        return null;
+
+    }
+
+
+    const actions =
+        document.createElement("div");
+
+    actions.className =
+        "iuh-mini-message-actions";
+
+
+    /* ===============================
+       REACTION
+       =============================== */
+
+    const reactionButton =
+        document.createElement("button");
+
+    reactionButton.type =
+        "button";
+
+    reactionButton.className =
+        "iuh-mini-action-btn";
+
+    reactionButton.textContent =
+        "☺";
+
+    reactionButton.title =
+        "Thả cảm xúc";
+
+
+    const picker =
+        document.createElement("div");
+
+    picker.className =
+        "iuh-mini-reaction-picker";
+
+
+    [
+        "👍",
+        "❤️",
+        "😂",
+        "😮",
+        "😢"
+    ].forEach(
+        emoji => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.type =
+                "button";
+
+            button.textContent =
+                emoji;
+
+
+            button.addEventListener(
+                "click",
+                async event => {
+
+                    event.stopPropagation();
+
+                    await toggleMiniReaction(
+                        message,
+                        emoji
+                    );
+
+                    picker.classList.remove(
+                        "show"
+                    );
+
+                }
+            );
+
+
+            picker.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    reactionButton.addEventListener(
+        "click",
+        event => {
+
+            event.stopPropagation();
+
+            picker.classList.toggle(
+                "show"
+            );
+
+        }
+    );
+
+
+    actions.appendChild(
+        reactionButton
+    );
+
+    actions.appendChild(
+        picker
+    );
+
+
+    /* ===============================
+       TIN CỦA MÌNH
+       =============================== */
+
+    if (mine) {
+
+        /* CHỈNH SỬA */
+
+        if (
+            message.content &&
+            !message.image_url
+        ) {
+
+            const editButton =
+                document.createElement(
+                    "button"
+                );
+
+            editButton.type =
+                "button";
+
+            editButton.className =
+                "iuh-mini-action-btn";
+
+            editButton.textContent =
+                "✎";
+
+            editButton.title =
+                "Chỉnh sửa";
+
+
+            editButton.addEventListener(
+                "click",
+                async event => {
+
+                    event.stopPropagation();
+
+                    await editMiniMessage(
+                        message
+                    );
+
+                }
+            );
+
+
+            actions.appendChild(
+                editButton
+            );
+
+        }
+
+
+        /* THU HỒI */
+
+        const recallButton =
+            document.createElement(
+                "button"
+            );
+
+        recallButton.type =
+            "button";
+
+        recallButton.className =
+            "iuh-mini-action-btn";
+
+        recallButton.textContent =
+            "↩";
+
+        recallButton.title =
+            "Thu hồi";
+
+
+        recallButton.addEventListener(
+            "click",
+            async event => {
+
+                event.stopPropagation();
+
+                await recallMiniMessage(
+                    message
+                );
+
+            }
+        );
+
+
+        actions.appendChild(
+            recallButton
+        );
+
+    }
+
+
+    return actions;
+
+}
+
+
+/* =========================================================
+   RENDER 1 MESSAGE
+   ========================================================= */
+
+async function renderMiniMessage(
+    message,
+    container
+) {
+
+    const mine =
+        message.sender_id ===
+        currentUser.id;
+
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+    row.className =
+        "iuh-mini-message-row " +
+        (
+            mine
+                ? "mine"
+                : "other"
+        );
+
+
+    row.dataset.messageId =
+        message.id;
+
+
+    const wrapper =
+        document.createElement(
+            "div"
+        );
+
+    wrapper.className =
+        "iuh-mini-message-wrapper";
+
+
+    const bubble =
+        document.createElement(
+            "div"
+        );
+
+    bubble.className =
+        "iuh-mini-message " +
+        (
+            mine
+                ? "mine"
+                : "other"
+        );
+
+
+    /* ===============================
+       THU HỒI
+       =============================== */
+
+    if (
+        message.recalled_at
+    ) {
+
+        bubble.classList.add(
+            "recalled"
+        );
+
+        bubble.textContent =
+            "Tin nhắn đã được thu hồi";
+
+    }
+
+    else {
+
+        /* IMAGE */
+
+        if (
+            message.image_url
+        ) {
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.className =
+                "iuh-mini-message-image";
+
+            image.src =
+                message.image_url;
+
+            image.alt =
+                "Hình ảnh";
+
+            image.loading =
+                "lazy";
+
+
+            image.addEventListener(
+                "click",
+                () => {
+
+                    window.open(
+                        message.image_url,
+                        "_blank"
+                    );
+
+                }
+            );
+
+
+            bubble.appendChild(
+                image
+            );
+
+        }
+
+
+        /* TEXT */
+
+        if (
+            message.content
+        ) {
+
+            const text =
+                document.createElement(
+                    "div"
+                );
+
+            text.className =
+                "iuh-mini-message-text";
+
+            text.textContent =
+                message.content;
+
+
+            bubble.appendChild(
+                text
+            );
+
+        }
+
+
+        /* ĐÃ CHỈNH SỬA */
+
+        if (
+            message.edited_at
+        ) {
+
+            const edited =
+                document.createElement(
+                    "span"
+                );
+
+            edited.className =
+                "iuh-mini-edited";
+
+            edited.textContent =
+                "Đã chỉnh sửa";
+
+
+            bubble.appendChild(
+                edited
+            );
+
+        }
+
+    }
+
+
+    wrapper.appendChild(
+        bubble
+    );
+
+
+    /* REACTION SUMMARY */
+
+    if (
+        !message.recalled_at
+    ) {
+
+        renderMiniReactionSummary(
+            message,
+            wrapper
+        );
+
+    }
+
+
+    /* ACTIONS */
+
+    if (
+        !message.recalled_at
+    ) {
+
+        const actions =
+            createMiniMessageActions(
+                message,
+                mine,
+                container
+            );
+
+
+        if (actions) {
+
+            wrapper.appendChild(
+                actions
+            );
+
+        }
+
+    }
+
+
+    row.appendChild(
+        wrapper
+    );
+
+
+    container.appendChild(
+        row
+    );
+
+}
+
+
+/* =========================================================
+   LOAD REACTIONS
+   ========================================================= */
+
+async function loadMiniReactions(
+    messages
+) {
+
+    if (
+        !messages?.length
+    ) {
+
+        return messages || [];
+
+    }
+
+
+    const ids =
+        messages.map(
+            message =>
+                message.id
+        );
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from(
+                "message_reactions"
+            )
+            .select(
+                "message_id, user_id, reaction"
+            )
+            .in(
+                "message_id",
+                ids
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi reaction mini:",
+            error
+        );
+
+        return messages;
+
+    }
+
+
+    const map =
+        new Map();
+
+
+    (data || []).forEach(
+        reaction => {
+
+            if (
+                !map.has(
+                    reaction.message_id
+                )
+            ) {
+
+                map.set(
+                    reaction.message_id,
+                    []
+                );
+
+            }
+
+
+            map.get(
+                reaction.message_id
+            ).push(
+                reaction
+            );
+
+        }
+    );
+
+
+    return messages.map(
+        message => ({
+
+            ...message,
+
+            reactions:
+                map.get(
+                    message.id
+                ) || []
+
+        })
+    );
+
+}
+
+
+/* =========================================================
+   LOAD MINI CHAT
+   ========================================================= */
+
+async function loadMiniChatMessages(
+    conversationId,
+    container
+) {
+
+    container.innerHTML = `
+        <div class="iuh-mini-empty">
+            Đang tải tin nhắn...
+        </div>
+    `;
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .select(
+                "id, sender_id, content, image_url, recalled_at, edited_at, created_at, message_type"
+            )
+            .eq(
+                "conversation_id",
+                conversationId
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi load mini chat:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="iuh-mini-empty">
+                Không thể tải tin nhắn.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    const messages =
+        await loadMiniReactions(
+            data || []
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    if (!messages.length) {
+
+        container.innerHTML = `
+            <div class="iuh-mini-empty">
+                Chưa có tin nhắn.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    for (
+        const message
+        of messages
+    ) {
+
+        await renderMiniMessage(
+            message,
+            container
+        );
+
+    }
+
+
+    container.scrollTop =
+        container.scrollHeight;
+
+}
+
+
+/* =========================================================
+   REACTION
+   ========================================================= */
+
+async function toggleMiniReaction(
+    message,
+    emoji
+) {
+
+    const existing =
+        message.reactions?.find(
+            item =>
+                item.user_id ===
+                currentUser.id
+        );
+
+
+    if (
+        existing &&
+        existing.reaction ===
+            emoji
+    ) {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from(
+                    "message_reactions"
+                )
+                .delete()
+                .eq(
+                    "message_id",
+                    message.id
+                )
+                .eq(
+                    "user_id",
+                    currentUser.id
+                );
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi xóa reaction:",
+                error
+            );
+
+            return;
+
+        }
+
+    }
+
+    else {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from(
+                    "message_reactions"
+                )
+                .upsert(
+                    {
+
+                        message_id:
+                            message.id,
+
+                        user_id:
+                            currentUser.id,
+
+                        reaction:
+                            emoji
+
+                    },
+                    {
+
+                        onConflict:
+                            "message_id,user_id"
+
+                    }
+                );
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi reaction:",
+                error
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    if (
+        activeMiniChat
+    ) {
+
+        await loadMiniChatMessages(
+            activeMiniChat.conversationId,
+            activeMiniChat.messages
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CHỈNH SỬA
+   ========================================================= */
+
+async function editMiniMessage(
+    message
+) {
+
+    if (
+        message.sender_id !==
+        currentUser.id
+    ) {
+
+        return;
+
+    }
+
+
+    const newContent =
+        prompt(
+            "Chỉnh sửa tin nhắn:",
+            message.content || ""
+        );
+
+
+    if (
+        newContent === null
+    ) {
+
+        return;
+
+    }
+
+
+    const value =
+        newContent.trim();
+
+
+    if (!value) {
+
+        alert(
+            "Tin nhắn không được để trống."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        value ===
+        message.content
+    ) {
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .update({
+
+                content:
+                    value,
+
+                edited_at:
+                    new Date()
+                        .toISOString()
+
+            })
+            .eq(
+                "id",
+                message.id
+            )
+            .eq(
+                "sender_id",
+                currentUser.id
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi chỉnh sửa:",
+            error
+        );
+
+        alert(
+            "Không thể chỉnh sửa tin nhắn."
+        );
+
+        return;
+
+    }
+
+
+    await syncMiniConversationPreview(
+        activeMiniChat.conversationId
+    );
+
+
+    await loadMiniChatMessages(
+        activeMiniChat.conversationId,
+        activeMiniChat.messages
+    );
+
+}
+
+
+/* =========================================================
+   THU HỒI
+   ========================================================= */
+
+async function recallMiniMessage(
+    message
+) {
+
+    if (
+        message.sender_id !==
+        currentUser.id
+    ) {
+
+        return;
+
+    }
+
+
+    const accepted =
+        confirm(
+            "Bạn có chắc muốn thu hồi tin nhắn này?"
+        );
+
+
+    if (!accepted) {
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .update({
+
+                content:
+                    null,
+
+                image_url:
+                    null,
+
+                recalled_at:
+                    new Date()
+                        .toISOString()
+
+            })
+            .eq(
+                "id",
+                message.id
+            )
+            .eq(
+                "sender_id",
+                currentUser.id
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi thu hồi:",
+            error
+        );
+
+        alert(
+            "Không thể thu hồi tin nhắn."
+        );
+
+        return;
+
+    }
+
+
+    await syncMiniConversationPreview(
+        activeMiniChat.conversationId
+    );
+
+
+    await loadMiniChatMessages(
+        activeMiniChat.conversationId,
+        activeMiniChat.messages
+    );
+
+}
+
+
+/* =========================================================
+   SYNC PREVIEW
+   ========================================================= */
+
+async function syncMiniConversationPreview(
+    conversationId
+) {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .select(
+                "content, image_url, recalled_at, created_at, sender_id"
+            )
+            .eq(
+                "conversation_id",
+                conversationId
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            )
+            .limit(1)
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi sync preview:",
+            error
+        );
+
+        return;
+
+    }
+
+
+    let preview =
+        null;
+
+
+    if (data) {
+
+        if (
+            data.recalled_at
+        ) {
+
+            preview =
+                "Tin nhắn đã được thu hồi";
+
+        }
+
+        else {
+
+            preview =
+                data.content ||
+                (
+                    data.image_url
+                        ? "[Hình ảnh]"
+                        : ""
+                );
+
+
+            if (
+                data.sender_id ===
+                currentUser.id
+            ) {
+
+                preview =
+                    `Bạn: ${preview}`;
+
+            }
+
+        }
+
+    }
+
+
+    const now =
+        new Date()
+            .toISOString();
+
+
+    await supabaseClient
+        .from("conversations")
+        .update({
+
+            last_message:
+                preview,
+
+            last_message_at:
+                data?.created_at ||
+                null,
+
+            updated_at:
+                data?.created_at ||
+                now
+
+        })
+        .eq(
+            "id",
+            conversationId
+        );
+
+}
+
+
+/* =========================================================
+   MỞ MINI CHAT
+   ========================================================= */
 
 async function openMiniChat(
     conversationData
@@ -387,11 +1533,6 @@ async function openMiniChat(
     } = conversationData;
 
 
-    /*
-     * Nếu đang mở mini chat khác
-     * thì đóng trước.
-     */
-
     closeMiniChat();
 
 
@@ -400,13 +1541,8 @@ async function openMiniChat(
             "div"
         );
 
-
     miniChat.className =
         "iuh-mini-chat";
-
-
-    miniChat.id =
-        "iuhMiniChat";
 
 
     /* =====================================================
@@ -418,16 +1554,16 @@ async function openMiniChat(
             "div"
         );
 
-
     header.className =
         "iuh-mini-chat-header";
 
+
+    /* USER */
 
     const userInfo =
         document.createElement(
             "div"
         );
-
 
     userInfo.className =
         "iuh-mini-chat-user";
@@ -438,11 +1574,9 @@ async function openMiniChat(
             "img"
         );
 
-
     avatar.src =
         user?.avatar_url ||
         DEFAULT_AVATAR;
-
 
     avatar.onerror =
         function() {
@@ -458,47 +1592,135 @@ async function openMiniChat(
             "div"
         );
 
-
     name.className =
         "iuh-mini-chat-name";
-
 
     name.textContent =
         user?.fullname ||
         "Người dùng";
 
 
+    /*
+     * CHỈ TÊN được click
+     * → mở trang tinnhan.html
+     */
+
+    name.title =
+        "Mở trang tin nhắn";
+
+
+    name.addEventListener(
+        "click",
+        () => {
+
+            openConversation(
+                user?.id
+            );
+
+        }
+    );
+
+
     userInfo.appendChild(
         avatar
     );
-
 
     userInfo.appendChild(
         name
     );
 
 
+    /* =====================================================
+       HEADER BUTTONS
+       ===================================================== */
+
+    const headerButtons =
+        document.createElement(
+            "div"
+        );
+
+    headerButtons.className =
+        "iuh-mini-chat-header-buttons";
+
+
+    /* THU NHỎ */
+
+    const minimizeButton =
+        document.createElement(
+            "button"
+        );
+
+    minimizeButton.type =
+        "button";
+
+    minimizeButton.className =
+        "iuh-mini-chat-minimize";
+
+    minimizeButton.innerHTML =
+        "−";
+
+    minimizeButton.title =
+        "Thu nhỏ thành bong bóng";
+
+
+    minimizeButton.addEventListener(
+        "click",
+        event => {
+
+            event.stopPropagation();
+
+
+            /*
+             * Lấy tin cuối để khi thu nhỏ
+             * bóng vẫn có preview đúng.
+             */
+
+            minimizeMiniChat(
+                conversationData
+            );
+
+        }
+    );
+
+
+    /* ĐÓNG */
+
     const closeButton =
         document.createElement(
             "button"
         );
 
+    closeButton.type =
+        "button";
 
     closeButton.className =
         "iuh-mini-chat-close";
 
-
-    closeButton.type =
-        "button";
-
-
     closeButton.innerHTML =
         "×";
+
+    closeButton.title =
+        "Đóng";
 
 
     closeButton.addEventListener(
         "click",
-        closeMiniChat
+        event => {
+
+            event.stopPropagation();
+
+            closeMiniChat();
+
+        }
+    );
+
+
+    headerButtons.appendChild(
+        minimizeButton
+    );
+
+    headerButtons.appendChild(
+        closeButton
     );
 
 
@@ -506,14 +1728,13 @@ async function openMiniChat(
         userInfo
     );
 
-
     header.appendChild(
-        closeButton
+        headerButtons
     );
 
 
     /* =====================================================
-       MESSAGES
+       MESSAGE AREA
        ===================================================== */
 
     const messages =
@@ -521,16 +1742,8 @@ async function openMiniChat(
             "div"
         );
 
-
     messages.className =
         "iuh-mini-chat-messages";
-
-
-    messages.innerHTML = `
-        <div class="iuh-mini-empty">
-            Đang tải tin nhắn...
-        </div>
-    `;
 
 
     /* =====================================================
@@ -542,7 +1755,6 @@ async function openMiniChat(
             "div"
         );
 
-
     inputArea.className =
         "iuh-mini-chat-input-area";
 
@@ -552,14 +1764,11 @@ async function openMiniChat(
             "input"
         );
 
-
-    input.className =
-        "iuh-mini-chat-input";
-
-
     input.type =
         "text";
 
+    input.className =
+        "iuh-mini-chat-input";
 
     input.placeholder =
         "Nhập tin nhắn...";
@@ -570,14 +1779,11 @@ async function openMiniChat(
             "button"
         );
 
-
-    sendButton.className =
-        "iuh-mini-chat-send";
-
-
     sendButton.type =
         "button";
 
+    sendButton.className =
+        "iuh-mini-chat-send";
 
     sendButton.innerHTML =
         "➤";
@@ -587,25 +1793,22 @@ async function openMiniChat(
         input
     );
 
-
     inputArea.appendChild(
         sendButton
     );
 
 
     /* =====================================================
-       GẮN CỬA SỔ
+       GẮN MINI CHAT
        ===================================================== */
 
     miniChat.appendChild(
         header
     );
 
-
     miniChat.appendChild(
         messages
     );
-
 
     miniChat.appendChild(
         inputArea
@@ -622,13 +1825,17 @@ async function openMiniChat(
         element:
             miniChat,
 
-        conversationId,
+        conversationId:
+            conversationId,
 
-        user,
+        user:
+            user,
 
-        messages,
+        messages:
+            messages,
 
-        input
+        input:
+            input
 
     };
 
@@ -644,9 +1851,7 @@ async function openMiniChat(
     );
 
 
-    /* =====================================================
-       LOAD TIN
-       ===================================================== */
+    /* LOAD */
 
     await loadMiniChatMessages(
         conversationId,
@@ -654,27 +1859,21 @@ async function openMiniChat(
     );
 
 
-    /*
-     * Đánh dấu đã đọc khi thực sự mở chat.
-     */
+    /* MARK READ */
 
     await markMiniChatAsRead(
         conversationId
     );
 
 
-    /*
-     * Bóng của conversation này biến mất.
-     */
+    /* BÓNG BIẾN MẤT */
 
     removeBubble(
         conversationId
     );
 
 
-    /*
-     * Gửi bằng nút.
-     */
+    /* SEND */
 
     sendButton.addEventListener(
         "click",
@@ -689,10 +1888,6 @@ async function openMiniChat(
         }
     );
 
-
-    /*
-     * Enter để gửi.
-     */
 
     input.addEventListener(
         "keydown",
@@ -718,6 +1913,323 @@ async function openMiniChat(
 
 
     input.focus();
+
+}
+
+
+/* =========================================================
+   THU NHỎ → TRỞ LẠI BÓNG
+   ========================================================= */
+
+async function minimizeMiniChat(
+    conversationData
+) {
+
+    closeMiniChat();
+
+
+    /*
+     * Chat đã đọc hết nên unread = 0.
+     * Bóng vẫn tồn tại nhưng không có chấm đỏ.
+     */
+
+    createBubble({
+
+        ...conversationData,
+
+        unreadCount:
+            0
+
+    });
+
+}
+
+
+/* =========================================================
+   ĐÓNG MINI CHAT
+   ========================================================= */
+
+function closeMiniChat() {
+
+    if (
+        !activeMiniChat
+    ) {
+
+        return;
+
+    }
+
+
+    const element =
+        activeMiniChat.element;
+
+
+    element.classList.remove(
+        "show"
+    );
+
+
+    setTimeout(
+        () => {
+
+            element.remove();
+
+        },
+        180
+    );
+
+
+    activeMiniChat =
+        null;
+
+}
+
+
+/* =========================================================
+   MARK READ
+   ========================================================= */
+
+async function markMiniChatAsRead(
+    conversationId
+) {
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .update({
+
+                is_read:
+                    true
+
+            })
+            .eq(
+                "conversation_id",
+                conversationId
+            )
+            .neq(
+                "sender_id",
+                currentUser.id
+            )
+            .eq(
+                "is_read",
+                false
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi mark read:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   GỬI TIN
+   ========================================================= */
+
+async function sendMiniChatMessage(
+    conversationId,
+    input,
+    container
+) {
+
+    const content =
+        input.value.trim();
+
+
+    if (!content) {
+
+        return;
+
+    }
+
+
+    input.disabled =
+        true;
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("messages")
+                .insert({
+
+                    conversation_id:
+                        conversationId,
+
+                    sender_id:
+                        currentUser.id,
+
+                    content:
+                        content,
+
+                    message_type:
+                        "text",
+
+                    image_url:
+                        null,
+
+                    is_read:
+                        false
+
+                })
+                .select()
+                .single();
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi gửi mini chat:",
+                error
+            );
+
+            alert(
+                "Không thể gửi tin nhắn."
+            );
+
+            return;
+
+        }
+
+
+        input.value =
+            "";
+
+
+        /*
+         * Tự render ngay.
+         * Không phải chờ Realtime.
+         */
+
+        await loadMiniChatMessages(
+            conversationId,
+            container
+        );
+
+
+        await syncMiniConversationPreview(
+            conversationId
+        );
+
+
+        container.scrollTop =
+            container.scrollHeight;
+
+    }
+
+    finally {
+
+        input.disabled =
+            false;
+
+        input.focus();
+
+    }
+
+}
+
+
+/* =========================================================
+   REALTIME → MINI CHAT
+   ========================================================= */
+
+async function appendIncomingMiniMessage(
+    message
+) {
+
+    if (
+        !activeMiniChat
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        activeMiniChat.conversationId !==
+        message.conversation_id
+    ) {
+
+        return false;
+
+    }
+
+
+    /*
+     * Lấy reaction của tin mới.
+     */
+
+    const {
+        data:
+            reactions
+    } =
+        await supabaseClient
+            .from(
+                "message_reactions"
+            )
+            .select(
+                "message_id, user_id, reaction"
+            )
+            .eq(
+                "message_id",
+                message.id
+            );
+
+
+    const fullMessage = {
+
+        ...message,
+
+        reactions:
+            reactions || []
+
+    };
+
+
+    const existing =
+        activeMiniChat.messages
+            .querySelector(
+                `[data-message-id="${message.id}"]`
+            );
+
+
+    if (!existing) {
+
+        await renderMiniMessage(
+            fullMessage,
+            activeMiniChat.messages
+        );
+
+    }
+
+
+    activeMiniChat.messages.scrollTop =
+        activeMiniChat.messages.scrollHeight;
+
+
+    /*
+     * Mini chat đang mở → đọc ngay.
+     */
+
+    await markMiniChatAsRead(
+        message.conversation_id
+    );
+
+
+    return true;
 
 }
 
@@ -1177,12 +2689,24 @@ async function sendMiniChatMessage(
             "iuh-chat-bubble-badge";
 
 
-        badge.textContent =
-            unreadCount > 99
-                ? "99+"
-                : String(
-                    unreadCount || 1
-                );
+        if (unreadCount > 0) {
+
+    badge.textContent =
+        unreadCount > 99
+            ? "99+"
+            : String(unreadCount);
+
+    if (unreadCount >= 10) {
+        badge.classList.add("wide");
+    }
+
+}
+else {
+
+    badge.style.display =
+        "none";
+
+}
 
 
         avatarWrap.appendChild(
@@ -1389,12 +2913,32 @@ async function sendMiniChatMessage(
 
         if (badge) {
 
-            badge.textContent =
-                unreadCount > 99
-                    ? "99+"
-                    : String(
-                        unreadCount || 1
-                    );
+           if (badge) {
+
+    if (unreadCount > 0) {
+
+        badge.style.display =
+            "flex";
+
+        badge.textContent =
+            unreadCount > 99
+                ? "99+"
+                : String(unreadCount);
+
+        badge.classList.toggle(
+            "wide",
+            unreadCount >= 10
+        );
+
+    }
+    else {
+
+        badge.style.display =
+            "none";
+
+    }
+
+}
 
         }
 
