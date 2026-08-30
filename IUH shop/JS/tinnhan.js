@@ -1119,27 +1119,30 @@ async function loadConversations() {
 
 
             const isAdmin =
-                profile.role === "admin" ||
-                conversation.is_admin_chat === true;
+    profile.role === "admin";
+
+const isPinned =
+    profile.role === "admin" &&
+    currentUserProfile?.role !== "admin";
 
 
             conversations.push({
 
-                ...conversation,
+    ...conversation,
 
-                otherUser:
-                    profile,
+    otherUser:
+        profile,
 
-                unreadCount:
-                    unreadCount,
+    unreadCount:
+        unreadCount,
 
-                isAdmin:
-                    isAdmin,
+    isAdmin:
+        isAdmin,
 
-                isPinned:
-                    isAdmin
+    isPinned:
+        isPinned
 
-            });
+});
         }
     }
 
@@ -1481,20 +1484,6 @@ function renderConversationList(
                                             fullname
                                         )}
 
-                                        ${
-                                            conversation.isPinned
-                                                ?
-                                                `
-                                                    <span
-                                                        class="pin-icon"
-                                                        title="Đã ghim"
-                                                    >
-                                                        📌
-                                                    </span>
-                                                `
-                                                :
-                                                ""
-                                        }
 
                                     </span>
 
@@ -1787,13 +1776,11 @@ function renderActiveChatHeader(
 
     if (userStatus) {
 
-        userStatus.textContent =
-            conversation.isAdmin
-                ?
-                "Hỗ trợ khách hàng · IUH SHOP"
-                :
-                "Thành viên IUH SHOP";
-    }
+    userStatus.textContent =
+        user?.role === "admin"
+            ? "Hỗ trợ khách hàng · IUH SHOP"
+            : "Thành viên IUH SHOP";
+}
 }
 
 
@@ -1853,9 +1840,95 @@ async function loadMessages(
     }
 
 
+    const messages =
+        data || [];
+
+
+    /* =========================================
+       LẤY REACTION
+       ========================================= */
+
+    if (messages.length) {
+
+        const messageIds =
+            messages.map(
+                item =>
+                    item.id
+            );
+
+
+        const {
+            data: reactions,
+            error: reactionError
+        } =
+            await supabaseClient
+                .from(
+                    "message_reactions"
+                )
+                .select(
+                    "id, message_id, user_id, reaction"
+                )
+                .in(
+                    "message_id",
+                    messageIds
+                );
+
+
+        if (!reactionError) {
+
+            const reactionMap =
+                {};
+
+
+            for (
+                const reaction
+                of reactions || []
+            ) {
+
+                if (
+                    !reactionMap[
+                        reaction.message_id
+                    ]
+                ) {
+
+                    reactionMap[
+                        reaction.message_id
+                    ] = [];
+                }
+
+
+                reactionMap[
+                    reaction.message_id
+                ].push(
+                    reaction
+                );
+            }
+
+
+            for (
+                const message
+                of messages
+            ) {
+
+                message.reactions =
+                    reactionMap[
+                        message.id
+                    ] ||
+                    [];
+            }
+        }
+
+    }
+
+
+    /* =========================================
+       RENDER MESSAGES
+       ========================================= */
+
     await renderMessages(
-        data || []
+        messages
     );
+
 }
 
 
@@ -1889,7 +1962,7 @@ async function renderMessages(
 
 
     if (
-        currentConversation?.isAdmin &&
+        currentConversation?.is_admin_chat === true &&
         (!messages || !messages.length)
     ) {
 
@@ -1920,7 +1993,7 @@ async function renderMessages(
     */
 
     if (
-        currentConversation?.isAdmin
+        currentConversation?.is_admin_chat === true
     ) {
 
         renderAdminGreeting();
@@ -1941,6 +2014,51 @@ async function renderMessages(
     scrollToBottom();
 }
 
+function createMessageAvatar(
+    profile
+) {
+
+    const avatar =
+        document.createElement(
+            "div"
+        );
+
+    avatar.className =
+        "message-avatar";
+
+
+    if (profile?.avatar_url) {
+
+        const img =
+            document.createElement(
+                "img"
+            );
+
+        img.src =
+            profile.avatar_url;
+
+        img.alt =
+            profile.fullname ||
+            "Người dùng";
+
+        avatar.appendChild(img);
+
+    }
+
+    else {
+
+        avatar.textContent =
+            (
+                profile?.fullname ||
+                "N"
+            )
+                .charAt(0)
+                .toUpperCase();
+    }
+
+
+    return avatar;
+}
 
 /* =========================================================
    LỜI CHÀO ADMIN
@@ -1952,23 +2070,25 @@ function renderAdminGreeting() {
         return;
     }
 
-
-    const admin =
+    const conversation =
         conversations.find(
-            conversation =>
-                conversation.id ===
-                currentConversationId &&
-                conversation.isAdmin
+            item =>
+                item.id ===
+                currentConversationId
         );
 
-
-    if (!admin) {
+    if (!conversation) {
         return;
     }
 
 
-    const user =
-        admin.otherUser;
+    /*
+       Lời chào luôn là do Admin gửi.
+    */
+
+    const amIAdmin =
+        currentUserProfile?.role ===
+        "admin";
 
 
     const row =
@@ -1977,64 +2097,23 @@ function renderAdminGreeting() {
         );
 
     row.className =
-    "message-row mine admin-greeting";
+        "message-row " +
+        (
+            amIAdmin
+                ? "mine"
+                : "theirs"
+        ) +
+        " admin-greeting";
 
 
-    /* AVATAR */
-
-    const avatar =
+    const stack =
         document.createElement(
             "div"
         );
 
-    avatar.className =
-        "message-avatar";
+    stack.className =
+        "message-stack";
 
-
-    if (user?.avatar_url) {
-
-        const img =
-            document.createElement(
-                "img"
-            );
-
-        img.src =
-            user.avatar_url;
-
-        img.alt =
-            user.fullname ||
-            "Admin IUH SHOP";
-
-        img.style.width =
-            "100%";
-
-        img.style.height =
-            "100%";
-
-        img.style.objectFit =
-            "cover";
-
-        img.style.borderRadius =
-            "50%";
-
-        avatar.appendChild(
-            img
-        );
-
-    }
-    else {
-
-        avatar.textContent =
-            (
-                user?.fullname ||
-                "Admin IUH SHOP"
-            )
-                .charAt(0)
-                .toUpperCase();
-    }
-
-
-    /* BUBBLE */
 
     const bubble =
         document.createElement(
@@ -2056,36 +2135,46 @@ function renderAdminGreeting() {
     text.textContent =
         ADMIN_GREETING;
 
+    bubble.appendChild(text);
 
-    bubble.appendChild(
-        text
-    );
-
-
-    const time =
-        document.createElement(
-            "div"
-        );
-
-    time.className =
-        "message-time";
-
-    time.textContent =
-        "";
+    stack.appendChild(bubble);
 
 
-    bubble.appendChild(
-        time
-    );
+    /*
+       ADMIN ĐANG XEM
+       → đây là tin của mình
+       → KHÔNG avatar.
+    */
+
+    if (amIAdmin) {
+
+        row.appendChild(stack);
+
+    }
+
+    /*
+       USER ĐANG XEM
+       → Admin là người bên kia
+       → CÓ avatar Admin.
+    */
+
+    else {
+
+        const adminProfile =
+            conversation.otherUser;
+
+        const avatar =
+            createMessageAvatar(
+                adminProfile
+            );
+
+        row.appendChild(avatar);
+
+        row.appendChild(stack);
+    }
 
 
-    row.appendChild(bubble);
-row.appendChild(avatar);
-
-
-    messagesArea.appendChild(
-        row
-    );
+    messagesArea.appendChild(row);
 }
 
 
@@ -2097,12 +2186,10 @@ async function renderSingleMessage(
     message
 ) {
 
-    if (!messagesArea) {
-        return;
-    }
-
-
-    if (!message?.id) {
+    if (
+        !messagesArea ||
+        !message?.id
+    ) {
         return;
     }
 
@@ -2111,7 +2198,6 @@ async function renderSingleMessage(
         document.querySelector(
             `[data-message-id="${message.id}"]`
         );
-
 
     if (existing) {
         return;
@@ -2123,41 +2209,17 @@ async function renderSingleMessage(
         currentUser.id;
 
 
-    /* =========================================
-       LẤY PROFILE NGƯỜI GỬI
-       ========================================= */
-
-    let senderProfile;
-
-
-    if (mine) {
-
-        senderProfile =
-            currentUserProfile;
-
-    }
-    else {
-
-        senderProfile =
-            await getUserProfile(
+    const senderProfile =
+        mine
+            ? currentUserProfile
+            : await getUserProfile(
                 message.sender_id
             );
-    }
 
 
-    const fullname =
-        senderProfile?.fullname ||
-        "Người dùng";
-
-
-    const avatarUrl =
-        senderProfile?.avatar_url ||
-        "";
-
-
-    /* =========================================
+    /* ===============================
        ROW
-       ========================================= */
+       =============================== */
 
     const row =
         document.createElement(
@@ -2168,69 +2230,29 @@ async function renderSingleMessage(
         message.id;
 
     row.className =
-        "message-row " +
-        (
+        `message-row ${
             mine
                 ? "mine"
                 : "theirs"
-        );
+        }`;
 
 
-    /* =========================================
-       AVATAR
-       ========================================= */
+    /* ===============================
+       STACK
+       =============================== */
 
-    const avatar =
+    const stack =
         document.createElement(
             "div"
         );
 
-    avatar.className =
-        "message-avatar";
+    stack.className =
+        "message-stack";
 
 
-    if (avatarUrl) {
-
-        const img =
-            document.createElement(
-                "img"
-            );
-
-        img.src =
-            avatarUrl;
-
-        img.alt =
-            fullname;
-
-        img.style.width =
-            "100%";
-
-        img.style.height =
-            "100%";
-
-        img.style.objectFit =
-            "cover";
-
-        img.style.borderRadius =
-            "50%";
-
-        avatar.appendChild(
-            img
-        );
-
-    }
-    else {
-
-        avatar.textContent =
-            fullname
-                .charAt(0)
-                .toUpperCase();
-    }
-
-
-    /* =========================================
+    /* ===============================
        BUBBLE
-       ========================================= */
+       =============================== */
 
     const bubble =
         document.createElement(
@@ -2241,75 +2263,118 @@ async function renderSingleMessage(
         "message-bubble";
 
 
-    /* =========================================
-       IMAGE
-       ========================================= */
+    /*
+       ĐÃ THU HỒI
+    */
 
-    if (message.image_url) {
+    if (message.recalled_at) {
 
-        const image =
-            document.createElement(
-                "img"
-            );
-
-        image.className =
-            "message-image";
-
-        image.src =
-            message.image_url;
-
-        image.alt =
-            "Hình ảnh";
-
-        image.loading =
-            "lazy";
-
-
-        image.addEventListener(
-            "click",
-            function() {
-
-                window.open(
-                    message.image_url,
-                    "_blank"
-                );
-            }
+        bubble.classList.add(
+            "recalled"
         );
 
-
-        bubble.appendChild(
-            image
-        );
-    }
-
-
-    /* =========================================
-       TEXT
-       ========================================= */
-
-    if (message.content) {
-
-        const text =
+        const recalled =
             document.createElement(
                 "div"
             );
 
-        text.className =
-            "message-text";
+        recalled.className =
+            "message-recalled";
 
-        text.textContent =
-            message.content;
-
+        recalled.textContent =
+            "Tin nhắn đã được thu hồi";
 
         bubble.appendChild(
-            text
+            recalled
         );
     }
 
+    else {
 
-    /* =========================================
-       TIME
-       ========================================= */
+        /* IMAGE */
+
+        if (message.image_url) {
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.className =
+                "message-image";
+
+            image.src =
+                message.image_url;
+
+            image.alt =
+                "Hình ảnh";
+
+            image.loading =
+                "lazy";
+
+            image.addEventListener(
+                "click",
+                function() {
+
+                    window.open(
+                        message.image_url,
+                        "_blank"
+                    );
+                }
+            );
+
+            bubble.appendChild(
+                image
+            );
+        }
+
+
+        /* TEXT */
+
+        if (message.content) {
+
+            const text =
+                document.createElement(
+                    "div"
+                );
+
+            text.className =
+                "message-text";
+
+            text.textContent =
+                message.content;
+
+            bubble.appendChild(
+                text
+            );
+        }
+
+
+        /*
+           ĐÃ CHỈNH SỬA
+        */
+
+        if (message.edited_at) {
+
+            const edited =
+                document.createElement(
+                    "span"
+                );
+
+            edited.className =
+                "edited-label";
+
+            edited.textContent =
+                "Đã chỉnh sửa";
+
+            bubble.appendChild(
+                edited
+            );
+        }
+    }
+
+
+    /* TIME */
 
     const time =
         document.createElement(
@@ -2324,41 +2389,77 @@ async function renderSingleMessage(
             message.created_at
         );
 
+    bubble.appendChild(time);
 
-    bubble.appendChild(
-        time
-    );
+    stack.appendChild(bubble);
 
 
-    /* =========================================
-       SẮP XẾP
+    /* ===============================
+       REACTIONS
+       =============================== */
 
-       Người khác:
-       avatar → bubble
+    if (
+        !message.recalled_at
+    ) {
 
-       Người hiện tại:
-       bubble → avatar
-       ========================================= */
+        renderReactionSummary(
+            message,
+            stack
+        );
+    }
+
+
+    /* ===============================
+       ACTION BUTTONS
+       =============================== */
+
+    if (
+        !message.recalled_at
+    ) {
+
+        const actions =
+            createMessageActions(
+                message,
+                mine
+            );
+
+        stack.appendChild(
+            actions
+        );
+    }
+
+
+    /*
+       TIN CỦA MÌNH
+       → chỉ bubble
+       → KHÔNG avatar.
+    */
 
     if (mine) {
 
         row.appendChild(
-            bubble
+            stack
         );
-
-        row.appendChild(
-            avatar
-        );
-
     }
+
+    /*
+       TIN NGƯỜI KIA
+       → avatar + bubble.
+    */
+
     else {
 
+        const avatar =
+            createMessageAvatar(
+                senderProfile
+            );
+
         row.appendChild(
             avatar
         );
 
         row.appendChild(
-            bubble
+            stack
         );
     }
 
@@ -2368,6 +2469,672 @@ async function renderSingleMessage(
     );
 }
 
+function createMessageActions(
+    message,
+    mine
+) {
+
+    const actions =
+        document.createElement(
+            "div"
+        );
+
+    actions.className =
+        "message-actions";
+
+
+    /* REACTION */
+
+    const reactionButton =
+        document.createElement(
+            "button"
+        );
+
+    reactionButton.type =
+        "button";
+
+    reactionButton.className =
+        "message-action-button";
+
+    reactionButton.innerHTML =
+        "☺";
+
+    reactionButton.title =
+        "Thả cảm xúc";
+
+
+    const reactionPicker =
+        document.createElement(
+            "div"
+        );
+
+    reactionPicker.className =
+        "reaction-picker";
+
+
+    const emojis =
+        [
+            "👍",
+            "❤️",
+            "😂",
+            "😮",
+            "😢"
+        ];
+
+
+    emojis.forEach(
+        emoji => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.type =
+                "button";
+
+            button.textContent =
+                emoji;
+
+
+            button.addEventListener(
+                "click",
+                async function(event) {
+
+                    event.stopPropagation();
+
+                    await toggleReaction(
+                        message,
+                        emoji
+                    );
+
+                    reactionPicker.classList.remove(
+                        "show"
+                    );
+                }
+            );
+
+
+            reactionPicker.appendChild(
+                button
+            );
+        }
+    );
+
+
+    reactionButton.addEventListener(
+        "click",
+        function(event) {
+
+            event.stopPropagation();
+
+            reactionPicker.classList.toggle(
+                "show"
+            );
+        }
+    );
+
+
+    actions.appendChild(
+        reactionButton
+    );
+
+    actions.appendChild(
+        reactionPicker
+    );
+
+
+    /* CHỈ TIN CỦA MÌNH */
+
+    if (mine) {
+
+        /* EDIT */
+
+        if (
+            message.content &&
+            !message.image_url
+        ) {
+
+            const editButton =
+                document.createElement(
+                    "button"
+                );
+
+            editButton.type =
+                "button";
+
+            editButton.className =
+                "message-action-button";
+
+            editButton.textContent =
+                "✎";
+
+            editButton.title =
+                "Chỉnh sửa";
+
+
+            editButton.addEventListener(
+                "click",
+                async function() {
+
+                    await editMessage(
+                        message
+                    );
+                }
+            );
+
+
+            actions.appendChild(
+                editButton
+            );
+        }
+
+
+        /* RECALL */
+
+        const recallButton =
+            document.createElement(
+                "button"
+            );
+
+        recallButton.type =
+            "button";
+
+        recallButton.className =
+            "message-action-button";
+
+        recallButton.textContent =
+            "↩";
+
+        recallButton.title =
+            "Thu hồi";
+
+
+        recallButton.addEventListener(
+            "click",
+            async function() {
+
+                await recallMessage(
+                    message
+                );
+            }
+        );
+
+
+        actions.appendChild(
+            recallButton
+        );
+    }
+
+
+    return actions;
+}
+
+async function toggleReaction(
+    message,
+    emoji
+) {
+
+    const existing =
+        message.reactions?.find(
+            item =>
+                item.user_id ===
+                currentUser.id
+        );
+
+
+    /*
+       Bấm lại cùng reaction
+       → xóa reaction.
+    */
+
+    if (
+        existing &&
+        existing.reaction ===
+        emoji
+    ) {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from(
+                    "message_reactions"
+                )
+                .delete()
+                .eq(
+                    "message_id",
+                    message.id
+                )
+                .eq(
+                    "user_id",
+                    currentUser.id
+                );
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi xóa cảm xúc:",
+                error
+            );
+
+            return;
+        }
+    }
+
+    else {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from(
+                    "message_reactions"
+                )
+                .upsert(
+                    {
+
+                        message_id:
+                            message.id,
+
+                        user_id:
+                            currentUser.id,
+
+                        reaction:
+                            emoji
+
+                    },
+                    {
+                        onConflict:
+                            "message_id,user_id"
+                    }
+                );
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi thả cảm xúc:",
+                error
+            );
+
+            return;
+        }
+    }
+
+
+    await loadMessages(
+        currentConversationId
+    );
+}
+
+function renderReactionSummary(
+    message,
+    stack
+) {
+
+    const reactions =
+        message.reactions ||
+        [];
+
+
+    if (!reactions.length) {
+        return;
+    }
+
+
+    const grouped =
+        {};
+
+
+    reactions.forEach(
+        item => {
+
+            grouped[
+                item.reaction
+            ] =
+                (
+                    grouped[
+                        item.reaction
+                    ] ||
+                    0
+                ) + 1;
+        }
+    );
+
+
+    const container =
+        document.createElement(
+            "div"
+        );
+
+    container.className =
+        "reaction-summary";
+
+
+    Object.entries(
+        grouped
+    )
+        .forEach(
+            (
+                [
+                    emoji,
+                    count
+                ]
+            ) => {
+
+                const chip =
+                    document.createElement(
+                        "span"
+                    );
+
+                chip.className =
+                    "reaction-chip";
+
+                chip.textContent =
+                    count > 1
+                        ? `${emoji} ${count}`
+                        : emoji;
+
+
+                container.appendChild(
+                    chip
+                );
+            }
+        );
+
+
+    stack.appendChild(
+        container
+    );
+}
+
+async function editMessage(
+    message
+) {
+
+    if (
+        message.sender_id !==
+        currentUser.id
+    ) {
+        return;
+    }
+
+
+    const newContent =
+        prompt(
+            "Chỉnh sửa tin nhắn:",
+            message.content || ""
+        );
+
+
+    if (newContent === null) {
+        return;
+    }
+
+
+    const value =
+        newContent.trim();
+
+
+    if (!value) {
+
+        alert(
+            "Tin nhắn không được để trống."
+        );
+
+        return;
+    }
+
+
+    if (
+        value ===
+        message.content
+    ) {
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .update({
+
+                content:
+                    value,
+
+                edited_at:
+                    new Date()
+                        .toISOString()
+
+            })
+            .eq(
+                "id",
+                message.id
+            )
+            .eq(
+                "sender_id",
+                currentUser.id
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi chỉnh sửa:",
+            error
+        );
+
+        alert(
+            "Không thể chỉnh sửa tin nhắn."
+        );
+
+        return;
+    }
+
+
+    await syncConversationPreview(
+        currentConversationId
+    );
+
+
+    await loadMessages(
+        currentConversationId
+    );
+}
+
+async function recallMessage(
+    message
+) {
+
+    if (
+        message.sender_id !==
+        currentUser.id
+    ) {
+        return;
+    }
+
+
+    const accepted =
+        confirm(
+            "Bạn có chắc muốn thu hồi tin nhắn này?"
+        );
+
+
+    if (!accepted) {
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .update({
+
+                content:
+                    null,
+
+                image_url:
+                    null,
+
+                recalled_at:
+                    new Date()
+                        .toISOString()
+
+            })
+            .eq(
+                "id",
+                message.id
+            )
+            .eq(
+                "sender_id",
+                currentUser.id
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi thu hồi:",
+            error
+        );
+
+        alert(
+            "Không thể thu hồi tin nhắn."
+        );
+
+        return;
+    }
+
+
+    await syncConversationPreview(
+        currentConversationId
+    );
+
+
+    await loadMessages(
+        currentConversationId
+    );
+}
+
+async function syncConversationPreview(
+    conversationId
+) {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .select(
+                "content, image_url, recalled_at, created_at"
+            )
+            .eq(
+                "conversation_id",
+                conversationId
+            )
+            .order(
+                "created_at",
+                {
+                    ascending:
+                        false
+                }
+            )
+            .limit(1)
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi đồng bộ preview:",
+            error
+        );
+
+        return;
+    }
+
+
+    let preview =
+        null;
+
+
+    if (data) {
+
+        if (data.recalled_at) {
+
+            preview =
+                "Tin nhắn đã được thu hồi";
+
+        }
+
+        else {
+
+            preview =
+                data.content ||
+                (
+                    data.image_url
+                        ? "[Hình ảnh]"
+                        : ""
+                );
+        }
+    }
+
+
+    const now =
+        new Date()
+            .toISOString();
+
+
+    await supabaseClient
+        .from("conversations")
+        .update({
+
+            last_message:
+                preview,
+
+            last_message_at:
+                data?.created_at ||
+                null,
+
+            updated_at:
+                now
+
+        })
+        .eq(
+            "id",
+            conversationId
+        );
+
+
+    const local =
+        conversations.find(
+            item =>
+                item.id ===
+                conversationId
+        );
+
+
+    if (local) {
+
+        local.last_message =
+            preview;
+
+        local.updated_at =
+            now;
+    }
+
+
+    renderConversationList(
+        conversations
+    );
+}
 
 /* =========================================================
    GỬI MESSAGE
