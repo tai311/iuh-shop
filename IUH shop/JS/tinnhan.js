@@ -976,6 +976,48 @@ async function getConversationById(
     return data;
 }
 
+/* =========================================================
+   LẤY TIN NHẮN CUỐI CÙNG
+========================================================= */
+
+async function getLatestMessage(conversationId) {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .select(
+                "id, sender_id, content, image_url, recalled_at, created_at"
+            )
+            .eq(
+                "conversation_id",
+                conversationId
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            )
+            .limit(1)
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi lấy tin nhắn cuối:",
+            error
+        );
+
+        return null;
+    }
+
+
+    return data || null;
+}
 
 /* =========================================================
    LOAD CONVERSATIONS
@@ -1117,6 +1159,11 @@ async function loadConversations() {
                     conversation.id
                 );
 
+            const latestMessage =
+    await getLatestMessage(
+        conversation.id
+    );
+
 
             const isAdmin =
     profile.role === "admin";
@@ -1124,6 +1171,37 @@ async function loadConversations() {
 const isPinned =
     profile.role === "admin" &&
     currentUserProfile?.role !== "admin";
+
+    let preview = null;
+
+if (latestMessage) {
+
+    if (latestMessage.recalled_at) {
+
+        preview =
+            "Tin nhắn đã được thu hồi";
+
+    } else {
+
+        preview =
+            latestMessage.content ||
+            (
+                latestMessage.image_url
+                    ? "[Hình ảnh]"
+                    : ""
+            );
+    }
+}
+
+
+if (
+    latestMessage &&
+    latestMessage.sender_id === currentUser.id
+) {
+
+    preview =
+        `Bạn: ${preview}`;
+}
 
 
             conversations.push({
@@ -1140,7 +1218,23 @@ const isPinned =
         isAdmin,
 
     isPinned:
-        isPinned
+        isPinned,
+
+    last_message:
+        preview,
+
+    last_message_at:
+        latestMessage?.created_at ||
+        conversation.last_message_at ||
+        null,
+
+    updated_at:
+        latestMessage?.created_at ||
+        conversation.updated_at,
+
+    lastMessageIsMine:
+        latestMessage?.sender_id ===
+        currentUser.id
 
 });
         }
@@ -1506,15 +1600,15 @@ function renderConversationList(
                                     <span class="last-message">
 
                                         ${escapeHTML(
-                                            conversation.last_message ||
-                                            (
-                                                isAdmin
-                                                    ?
-                                                    "Xin chào! Chúng tôi có thể hỗ trợ gì cho bạn?"
-                                                    :
-                                                    "Chưa có tin nhắn"
-                                            )
-                                        )}
+    conversation.last_message ||
+    (
+        isAdmin
+            ?
+            "Xin chào! Chúng tôi có thể hỗ trợ gì cho bạn?"
+            :
+            "Chưa có tin nhắn"
+    )
+)}
 
                                     </span>
 
@@ -3028,8 +3122,8 @@ async function syncConversationPreview(
         await supabaseClient
             .from("messages")
             .select(
-                "content, image_url, recalled_at, created_at"
-            )
+    "content, image_url, recalled_at, created_at, sender_id"
+)
             .eq(
                 "conversation_id",
                 conversationId
@@ -3072,12 +3166,22 @@ async function syncConversationPreview(
         else {
 
             preview =
-                data.content ||
-                (
-                    data.image_url
-                        ? "[Hình ảnh]"
-                        : ""
-                );
+    data.content ||
+    (
+        data.image_url
+            ? "[Hình ảnh]"
+            : ""
+    );
+
+
+if (
+    data.sender_id ===
+    currentUser.id
+) {
+
+    preview =
+        `Bạn: ${preview}`;
+}
         }
     }
 
@@ -3099,7 +3203,7 @@ async function syncConversationPreview(
                 null,
 
             updated_at:
-                now
+    data?.created_at || now
 
         })
         .eq(
@@ -3624,9 +3728,33 @@ function subscribeToMessages() {
                         Cập nhật tin cuối
                     */
 
-                    conversation.last_message =
-                        message.content ||
-                        "[Hình ảnh]";
+                    let preview =
+    message.content ||
+    "[Hình ảnh]";
+
+
+if (
+    message.sender_id ===
+    currentUser.id
+) {
+
+    preview =
+        `Bạn: ${preview}`;
+}
+
+
+conversation.last_message =
+    preview;
+
+conversation.last_message_at =
+    message.created_at;
+
+conversation.updated_at =
+    message.created_at;
+
+conversation.lastMessageIsMine =
+    message.sender_id ===
+    currentUser.id;
 
                     conversation.last_message_at =
                         message.created_at;
