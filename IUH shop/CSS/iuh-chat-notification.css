@@ -18,89 +18,120 @@
     pointer-events: none;
 }
 
-/* =========================
-   BÓNG CHAT
-   ========================= */
+/* =========================================================
+   BÓNG CHAT NHỎ
+   ========================================================= */
+
+.iuh-global-chat-notifications {
+    position: fixed;
+
+    right: 24px;
+    bottom: 92px; /* tránh nút Về đầu trang */
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    gap: 9px;
+
+    z-index: 2147483000;
+
+    pointer-events: none;
+}
+
 
 .iuh-chat-bubble {
     position: relative;
 
-    width: 62px;
-    height: 62px;
+    width: 48px;
+    height: 48px;
 
     border-radius: 50%;
+
     background: #ffffff;
 
     box-shadow:
-        0 8px 26px rgba(20, 48, 105, 0.20),
-        0 2px 8px rgba(0, 0, 0, 0.10);
+        0 4px 14px rgba(20, 48, 105, 0.20),
+        0 1px 5px rgba(0, 0, 0, 0.10);
 
     cursor: pointer;
+
     pointer-events: auto;
 
     opacity: 0;
+
     transform:
-        translateY(18px)
+        translateY(12px)
         scale(0.85);
 
     animation:
         iuhChatBubbleShow
-        0.25s ease forwards;
+        0.22s ease forwards;
 
     transition:
-        transform 0.20s ease,
-        box-shadow 0.20s ease;
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
 }
+
 
 .iuh-chat-bubble:hover {
+
     transform:
         translateY(-2px)
-        scale(1.06);
+        scale(1.08);
 
     box-shadow:
-        0 12px 32px rgba(20, 48, 105, 0.25),
-        0 3px 10px rgba(0, 0, 0, 0.10);
+        0 7px 20px rgba(20, 48, 105, 0.24);
+
 }
 
-/* =========================
+
+/* =========================================================
    AVATAR
-   ========================= */
+   ========================================================= */
 
 .iuh-chat-bubble-avatar {
+
     position: relative;
 
-    width: 62px;
-    height: 62px;
+    width: 48px;
+    height: 48px;
 
     border-radius: 50%;
+
     overflow: hidden;
 
     background: #edf2ff;
 }
 
+
 .iuh-chat-bubble-avatar img {
-    display: block;
 
     width: 100%;
     height: 100%;
 
+    display: block;
+
     object-fit: cover;
+
 }
 
-/* =========================
-   SỐ TIN CHƯA ĐỌC
-   ========================= */
+
+/* =========================================================
+   SỐ TIN
+   ========================================================= */
 
 .iuh-chat-bubble-badge {
+
     position: absolute;
 
-    top: -3px;
-    right: -3px;
+    top: -4px;
+    right: -5px;
 
-    min-width: 21px;
-    height: 21px;
+    min-width: 18px;
+    height: 18px;
 
-    padding: 0 5px;
+    padding: 0 4px;
 
     border-radius: 999px;
 
@@ -109,6 +140,7 @@
     justify-content: center;
 
     background: #e53935;
+
     color: #ffffff;
 
     border: 2px solid #ffffff;
@@ -118,31 +150,35 @@
         Arial,
         sans-serif;
 
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
 
     line-height: 1;
 }
 
-/* =========================
+
+/* =========================================================
    NÚT X
-   ========================= */
+   ========================================================= */
 
 .iuh-chat-bubble-close {
+
     position: absolute;
 
     top: -7px;
     left: -7px;
 
-    width: 22px;
-    height: 22px;
+    width: 19px;
+    height: 19px;
 
     padding: 0;
 
     border: 2px solid #ffffff;
+
     border-radius: 50%;
 
     background: #68738a;
+
     color: #ffffff;
 
     display: flex;
@@ -150,37 +186,60 @@
     justify-content: center;
 
     font-family: Arial, sans-serif;
-    font-size: 15px;
-    font-weight: 500;
 
-    line-height: 1;
+    font-size: 13px;
 
     cursor: pointer;
 
     opacity: 0;
     visibility: hidden;
 
-    transform: scale(0.75);
+    transform: scale(0.7);
 
     transition:
-        opacity 0.16s ease,
-        visibility 0.16s ease,
-        transform 0.16s ease,
-        background 0.16s ease;
-
-    z-index: 5;
+        opacity 0.15s ease,
+        visibility 0.15s ease,
+        transform 0.15s ease;
 }
+
 
 .iuh-chat-bubble:hover
 .iuh-chat-bubble-close {
+
     opacity: 1;
+
     visibility: visible;
 
     transform: scale(1);
+
 }
 
-.iuh-chat-bubble-close:hover {
-    background: #333b4d;
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .iuh-global-chat-notifications {
+
+        right: 14px;
+
+        bottom: 78px;
+
+        gap: 8px;
+
+    }
+
+
+    .iuh-chat-bubble,
+    .iuh-chat-bubble-avatar {
+
+        width: 44px;
+        height: 44px;
+
+    }
+
 }
 
 /* =========================
@@ -360,4 +419,359 @@
     .iuh-chat-bubble:hover {
         transform: none;
     }
+}
+
+/* =========================================================
+   CỬA SỔ CHAT MINI
+   ========================================================= */
+
+.iuh-mini-chat {
+
+    position: fixed;
+
+    right: 24px;
+
+    bottom: 158px;
+
+    width: 330px;
+    height: 430px;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.20);
+
+    overflow: hidden;
+
+    z-index: 2147483001;
+
+    display: flex;
+
+    flex-direction: column;
+
+    opacity: 0;
+
+    transform:
+        translateY(15px)
+        scale(0.96);
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease;
+}
+
+
+.iuh-mini-chat.show {
+
+    opacity: 1;
+
+    transform:
+        translateY(0)
+        scale(1);
+
+    pointer-events: auto;
+
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.iuh-mini-chat-header {
+
+    height: 58px;
+
+    padding: 0 13px;
+
+    background: #24459b;
+
+    color: #ffffff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+}
+
+
+.iuh-mini-chat-user {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-width: 0;
+
+}
+
+
+.iuh-mini-chat-user img {
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 2px solid #ffffff;
+
+}
+
+
+.iuh-mini-chat-name {
+
+    font-family:
+        "Be Vietnam Pro",
+        Arial,
+        sans-serif;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+}
+
+
+/* =========================================================
+   NÚT ĐÓNG
+   ========================================================= */
+
+.iuh-mini-chat-close {
+
+    width: 30px;
+    height: 30px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.iuh-mini-chat-close:hover {
+
+    background:
+        rgba(255,255,255,0.15);
+
+}
+
+
+/* =========================================================
+   KHU VỰC TIN NHẮN
+   ========================================================= */
+
+.iuh-mini-chat-messages {
+
+    flex: 1;
+
+    padding: 14px;
+
+    overflow-y: auto;
+
+    background: #f5f7fb;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+}
+
+
+/* =========================================================
+   TIN NHẮN
+   ========================================================= */
+
+.iuh-mini-message {
+
+    max-width: 76%;
+
+    padding: 8px 11px;
+
+    border-radius: 13px;
+
+    font-family:
+        "Be Vietnam Pro",
+        Arial,
+        sans-serif;
+
+    font-size: 12px;
+
+    line-height: 1.45;
+
+    word-break: break-word;
+
+}
+
+
+.iuh-mini-message.other {
+
+    align-self: flex-start;
+
+    background: #ffffff;
+
+    color: #202838;
+
+    border-bottom-left-radius: 4px;
+
+}
+
+
+.iuh-mini-message.mine {
+
+    align-self: flex-end;
+
+    background: #24459b;
+
+    color: #ffffff;
+
+    border-bottom-right-radius: 4px;
+
+}
+
+
+.iuh-mini-empty {
+
+    margin: auto;
+
+    color: #8a93a5;
+
+    font-family:
+        "Be Vietnam Pro",
+        Arial,
+        sans-serif;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+.iuh-mini-chat-input-area {
+
+    padding: 9px;
+
+    background: #ffffff;
+
+    border-top: 1px solid #e6e9ef;
+
+    display: flex;
+
+    gap: 7px;
+
+}
+
+
+.iuh-mini-chat-input {
+
+    flex: 1;
+
+    height: 38px;
+
+    padding: 0 12px;
+
+    border: 1px solid #dfe3eb;
+
+    border-radius: 20px;
+
+    outline: none;
+
+    font-family:
+        "Be Vietnam Pro",
+        Arial,
+        sans-serif;
+
+    font-size: 12px;
+
+}
+
+
+.iuh-mini-chat-input:focus {
+
+    border-color: #24459b;
+
+}
+
+
+.iuh-mini-chat-send {
+
+    width: 38px;
+    height: 38px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #24459b;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+}
+
+
+.iuh-mini-chat-send:hover {
+
+    background: #19367e;
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .iuh-mini-chat {
+
+        right: 10px;
+        left: 10px;
+
+        bottom: 130px;
+
+        width: auto;
+
+        height: 420px;
+
+        border-radius: 14px;
+
+    }
+
 }

@@ -366,6 +366,685 @@
 
     }
 
+    /* =========================================================
+   MINI CHAT
+   ========================================================= */
+
+let activeMiniChat =
+    null;
+
+
+async function openMiniChat(
+    conversationData
+) {
+
+    const {
+
+        conversationId,
+
+        user
+
+    } = conversationData;
+
+
+    /*
+     * Nếu đang mở mini chat khác
+     * thì đóng trước.
+     */
+
+    closeMiniChat();
+
+
+    const miniChat =
+        document.createElement(
+            "div"
+        );
+
+
+    miniChat.className =
+        "iuh-mini-chat";
+
+
+    miniChat.id =
+        "iuhMiniChat";
+
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
+    const header =
+        document.createElement(
+            "div"
+        );
+
+
+    header.className =
+        "iuh-mini-chat-header";
+
+
+    const userInfo =
+        document.createElement(
+            "div"
+        );
+
+
+    userInfo.className =
+        "iuh-mini-chat-user";
+
+
+    const avatar =
+        document.createElement(
+            "img"
+        );
+
+
+    avatar.src =
+        user?.avatar_url ||
+        DEFAULT_AVATAR;
+
+
+    avatar.onerror =
+        function() {
+
+            this.src =
+                DEFAULT_AVATAR;
+
+        };
+
+
+    const name =
+        document.createElement(
+            "div"
+        );
+
+
+    name.className =
+        "iuh-mini-chat-name";
+
+
+    name.textContent =
+        user?.fullname ||
+        "Người dùng";
+
+
+    userInfo.appendChild(
+        avatar
+    );
+
+
+    userInfo.appendChild(
+        name
+    );
+
+
+    const closeButton =
+        document.createElement(
+            "button"
+        );
+
+
+    closeButton.className =
+        "iuh-mini-chat-close";
+
+
+    closeButton.type =
+        "button";
+
+
+    closeButton.innerHTML =
+        "×";
+
+
+    closeButton.addEventListener(
+        "click",
+        closeMiniChat
+    );
+
+
+    header.appendChild(
+        userInfo
+    );
+
+
+    header.appendChild(
+        closeButton
+    );
+
+
+    /* =====================================================
+       MESSAGES
+       ===================================================== */
+
+    const messages =
+        document.createElement(
+            "div"
+        );
+
+
+    messages.className =
+        "iuh-mini-chat-messages";
+
+
+    messages.innerHTML = `
+        <div class="iuh-mini-empty">
+            Đang tải tin nhắn...
+        </div>
+    `;
+
+
+    /* =====================================================
+       INPUT
+       ===================================================== */
+
+    const inputArea =
+        document.createElement(
+            "div"
+        );
+
+
+    inputArea.className =
+        "iuh-mini-chat-input-area";
+
+
+    const input =
+        document.createElement(
+            "input"
+        );
+
+
+    input.className =
+        "iuh-mini-chat-input";
+
+
+    input.type =
+        "text";
+
+
+    input.placeholder =
+        "Nhập tin nhắn...";
+
+
+    const sendButton =
+        document.createElement(
+            "button"
+        );
+
+
+    sendButton.className =
+        "iuh-mini-chat-send";
+
+
+    sendButton.type =
+        "button";
+
+
+    sendButton.innerHTML =
+        "➤";
+
+
+    inputArea.appendChild(
+        input
+    );
+
+
+    inputArea.appendChild(
+        sendButton
+    );
+
+
+    /* =====================================================
+       GẮN CỬA SỔ
+       ===================================================== */
+
+    miniChat.appendChild(
+        header
+    );
+
+
+    miniChat.appendChild(
+        messages
+    );
+
+
+    miniChat.appendChild(
+        inputArea
+    );
+
+
+    document.body.appendChild(
+        miniChat
+    );
+
+
+    activeMiniChat = {
+
+        element:
+            miniChat,
+
+        conversationId,
+
+        user,
+
+        messages,
+
+        input
+
+    };
+
+
+    requestAnimationFrame(
+        () => {
+
+            miniChat.classList.add(
+                "show"
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       LOAD TIN
+       ===================================================== */
+
+    await loadMiniChatMessages(
+        conversationId,
+        messages
+    );
+
+
+    /*
+     * Đánh dấu đã đọc khi thực sự mở chat.
+     */
+
+    await markMiniChatAsRead(
+        conversationId
+    );
+
+
+    /*
+     * Bóng của conversation này biến mất.
+     */
+
+    removeBubble(
+        conversationId
+    );
+
+
+    /*
+     * Gửi bằng nút.
+     */
+
+    sendButton.addEventListener(
+        "click",
+        () => {
+
+            sendMiniChatMessage(
+                conversationId,
+                input,
+                messages
+            );
+
+        }
+    );
+
+
+    /*
+     * Enter để gửi.
+     */
+
+    input.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Enter"
+            ) {
+
+                event.preventDefault();
+
+                sendMiniChatMessage(
+                    conversationId,
+                    input,
+                    messages
+                );
+
+            }
+
+        }
+    );
+
+
+    input.focus();
+
+}
+
+
+/* =========================================================
+   ĐÓNG MINI CHAT
+   ========================================================= */
+
+function closeMiniChat() {
+
+    if (
+        !activeMiniChat
+    ) {
+
+        return;
+
+    }
+
+
+    const element =
+        activeMiniChat.element;
+
+
+    element.classList.remove(
+        "show"
+    );
+
+
+    setTimeout(
+        () => {
+
+            element.remove();
+
+        },
+        180
+    );
+
+
+    activeMiniChat =
+        null;
+
+}
+
+
+/* =========================================================
+   LOAD TIN NHẮN
+   ========================================================= */
+
+async function loadMiniChatMessages(
+    conversationId,
+    container
+) {
+
+    const {
+
+        data,
+
+        error
+
+    } =
+        await supabaseClient
+            .from("messages")
+            .select(
+                "id, sender_id, content, image_url, recalled_at, created_at"
+            )
+            .eq(
+                "conversation_id",
+                conversationId
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Load mini chat:",
+            error
+        );
+
+
+        container.innerHTML = `
+            <div class="iuh-mini-empty">
+                Không thể tải tin nhắn.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        "";
+
+
+    if (
+        !data ||
+        !data.length
+    ) {
+
+        container.innerHTML = `
+            <div class="iuh-mini-empty">
+                Chưa có tin nhắn.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    data.forEach(
+        message => {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "iuh-mini-message " +
+                (
+                    message.sender_id ===
+                    currentUser.id
+                        ? "mine"
+                        : "other"
+                );
+
+
+            if (
+                message.recalled_at
+            ) {
+
+                item.textContent =
+                    "Tin nhắn đã được thu hồi";
+
+            }
+            else if (
+                message.content
+            ) {
+
+                item.textContent =
+                    message.content;
+
+            }
+            else if (
+                message.image_url
+            ) {
+
+                item.textContent =
+                    "📷 Hình ảnh";
+
+            }
+
+
+            container.appendChild(
+                item
+            );
+
+        }
+    );
+
+
+    container.scrollTop =
+        container.scrollHeight;
+
+}
+
+
+/* =========================================================
+   MARK READ
+   ========================================================= */
+
+async function markMiniChatAsRead(
+    conversationId
+) {
+
+    const {
+
+        error
+
+    } =
+        await supabaseClient
+            .from("messages")
+            .update({
+                is_read: true
+            })
+            .eq(
+                "conversation_id",
+                conversationId
+            )
+            .neq(
+                "sender_id",
+                currentUser.id
+            )
+            .eq(
+                "is_read",
+                false
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Mark mini chat read:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   GỬI TIN NHẮN
+   ========================================================= */
+
+async function sendMiniChatMessage(
+    conversationId,
+    input,
+    container
+) {
+
+    const content =
+        input.value.trim();
+
+
+    if (!content) {
+
+        return;
+
+    }
+
+
+    input.disabled =
+        true;
+
+
+    try {
+
+        const {
+
+            data,
+
+            error
+
+        } =
+            await supabaseClient
+                .from("messages")
+                .insert({
+
+                    conversation_id:
+                        conversationId,
+
+                    sender_id:
+                        currentUser.id,
+
+                    content:
+                        content,
+
+                    is_read:
+                        false
+
+                })
+                .select()
+                .single();
+
+
+        if (error) {
+
+            console.error(
+                "Send mini chat:",
+                error
+            );
+
+            alert(
+                "Không thể gửi tin nhắn."
+            );
+
+            return;
+
+        }
+
+
+        const item =
+            document.createElement(
+                "div"
+            );
+
+
+        item.className =
+            "iuh-mini-message mine";
+
+
+        item.textContent =
+            data.content;
+
+
+        container.appendChild(
+            item
+        );
+
+
+        container.scrollTop =
+            container.scrollHeight;
+
+
+        input.value =
+            "";
+
+    }
+    finally {
+
+        input.disabled =
+            false;
+
+        input.focus();
+
+    }
+
+}
 
     /* =========================================================
        9. TẠO BÓNG CHAT
@@ -638,26 +1317,23 @@
            ===================================================== */
 
         bubble.addEventListener(
-            "click",
-            event => {
+    "click",
+    event => {
 
-                if (
-                    event.target.closest(
-                        ".iuh-chat-bubble-close"
-                    )
-                ) {
+        if (
+            event.target.closest(
+                ".iuh-chat-bubble-close"
+            )
+        ) {
+            return;
+        }
 
-                    return;
-
-                }
-
-
-                openConversation(
-                    user?.id
-                );
-
-            }
+        openMiniChat(
+            conversationData
         );
+
+    }
+);
 
 
         root.appendChild(
