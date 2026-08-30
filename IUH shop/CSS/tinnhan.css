@@ -3380,3 +3380,36 @@ body {
 .message-recalled {
     font-style: italic;
 }
+
+/* =====================================================
+   FIX: KHÔNG CHO TIN NHẮN BỊ ÉP XUỐNG DÒNG
+===================================================== */
+
+.message-stack {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    width: fit-content;
+    max-width: 70%;
+    min-width: 0;
+}
+
+.message-bubble {
+    width: fit-content;
+    max-width: min(520px, 65vw);
+
+    padding: 10px 14px;
+    box-sizing: border-box;
+
+    white-space: normal;
+}
+
+.message-text {
+    white-space: pre-wrap;
+    word-break: normal;
+    overflow-wrap: break-word;
+
+    font-size: 10px;
+    line-height: 1.6;
+}
