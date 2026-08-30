@@ -4507,72 +4507,43 @@ async function initChat() {
 
                 await loadConversations();
 
-                /* =========================================
-   MỞ CHAT TỪ TRANG CÁ NHÂN
-========================================= */
+              /* -----------------------------------------
+   TÌM LẠI TRONG MẢNG conversations
+----------------------------------------- */
 
-const params =
-    new URLSearchParams(
-        window.location.search
+const targetConversation =
+    conversations.find(
+        conversation =>
+            String(
+                conversation.id
+            ) ===
+            String(
+                conversationId
+            )
     );
 
-const sellerId =
-    params.get("seller");
 
+if (targetConversation) {
 
-if (sellerId) {
-
-    /*
-     * Kiểm tra cuộc trò chuyện
-     * với người này đã tồn tại chưa
-     */
-
-    const existingConversation =
-        conversations.find(
-            conversation =>
-                String(
-                    conversation.otherUser?.id
-                ) ===
-                String(sellerId)
-        );
-
-
-    if (existingConversation) {
-
-        /*
-         * Đã có cuộc trò chuyện
-         * → mở luôn
-         */
-
-        await openConversation(
-            existingConversation.id
-        );
-
-    } else {
-
-        /*
-         * Chưa có cuộc trò chuyện
-         * → tạo cuộc trò chuyện mới
-         */
-
-        const newConversation =
-            await createConversationWithUser(
-                sellerId
-            );
-
-        if (newConversation) {
-
-            await loadConversations();
-
-            await openConversation(
-                newConversation.id
-            );
-
-        }
-
-    }
+    await openConversation(
+        targetConversation.id
+    );
 
 }
+else {
+
+    console.error(
+        "Không tìm thấy conversation vừa tạo:",
+        conversationId
+    );
+
+    showToast(
+        "Không thể mở cuộc trò chuyện."
+    );
+}
+
+
+return;
             }
 
 
