@@ -3608,3 +3608,49 @@ body {
     min-width: 13px;
     font-size: 8px;
 }
+
+/* =========================================
+   FIX TÍCH XANH + TÊN ADMIN TRONG CHAT
+========================================= */
+
+/* Tên người dùng trong header chat */
+#chatUserName {
+    color: var(--chat-text) !important;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Ép tên bên trong không bị xanh lá */
+#chatUserName .chat-header-name-text {
+    color: var(--chat-text) !important;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Tích xanh trong header */
+#chatUserName .chat-verified-badge,
+#chatUserName .chat-verified-badge-header {
+    width: 13px !important;
+    height: 13px !important;
+    min-width: 13px !important;
+    max-width: 13px !important;
+    min-height: 13px !important;
+    max-height: 13px !important;
+
+    flex: 0 0 13px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 8px !important;
+    line-height: 1 !important;
+
+    border-radius: 50%;
+    background: #1877f2;
+    color: #ffffff !important;
+}
