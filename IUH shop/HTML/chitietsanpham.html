@@ -9,12 +9,14 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
-
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
     <link rel="stylesheet" href="../CSS/chitietsanpham.css">
 </head>
 
@@ -50,6 +52,18 @@
                             </svg>
                         </button>
                     </form>
+
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+    <span class="message-unread-dot"></span>
+
+</a>
 
                     <!-- KHU VỰC TÀI KHOẢN -->
 
@@ -895,7 +909,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- JS -->
-
+<script src="../JS/iuh-chat-notification.js"></script>
 <script src="../JS/chitietsanpham.js"></script>
 
 <script src="../JS/vedau.js"></script>

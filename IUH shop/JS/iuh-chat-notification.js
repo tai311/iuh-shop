@@ -1588,16 +1588,79 @@ async function openMiniChat(
 
 
     const name =
+    document.createElement(
+        "div"
+    );
+
+name.className =
+    "iuh-mini-chat-name";
+
+
+const nameText =
+    document.createElement(
+        "span"
+    );
+
+nameText.className =
+    "iuh-mini-chat-name-text";
+
+nameText.textContent =
+    user?.fullname ||
+    "Người dùng";
+
+
+name.appendChild(
+    nameText
+);
+
+
+/* TÍCH XANH */
+
+if (
+    user?.hasVerifiedBadge
+) {
+
+    const badge =
         document.createElement(
-            "div"
+            "span"
         );
 
-    name.className =
-        "iuh-mini-chat-name";
+    badge.className =
+        "iuh-mini-chat-verified";
 
-    name.textContent =
-        user?.fullname ||
-        "Người dùng";
+    badge.textContent =
+        "✓";
+
+
+    if (
+        user.role === "admin"
+    ) {
+
+        badge.title =
+            "Tài khoản Admin";
+
+    }
+    else if (
+        user.role === "moderator"
+    ) {
+
+        badge.title =
+            "Tài khoản Quản trị viên";
+
+    }
+    else {
+
+        badge.title =
+            "Đã xác thực sinh viên";
+
+    }
+
+
+    name.appendChild(
+        badge
+    );
+
+}
 
 
     /*
@@ -2873,8 +2936,8 @@ else {
             await supabaseClient
                 .from("users")
                 .select(
-                    "user_id, fullname, avatar_url, role"
-                )
+    "user_id, fullname, avatar_url, role, student_verified"
+)
                 .eq(
                     "user_id",
                     userId
@@ -2901,24 +2964,41 @@ else {
         }
 
 
-        return {
+        const role =
+    data.role || "user";
 
-            id:
-                data.user_id,
+const studentVerified =
+    data.student_verified === true;
 
-            fullname:
-                data.fullname ||
-                "Người dùng",
+const hasVerifiedBadge =
+    role === "admin" ||
+    role === "moderator" ||
+    studentVerified;
 
-            avatar_url:
-                data.avatar_url ||
-                "",
 
-            role:
-                data.role ||
-                "user"
+return {
 
-        };
+    id:
+        data.user_id,
+
+    fullname:
+        data.fullname ||
+        "Người dùng",
+
+    avatar_url:
+        data.avatar_url ||
+        "",
+
+    role:
+        role,
+
+    student_verified:
+        studentVerified,
+
+    hasVerifiedBadge:
+        hasVerifiedBadge
+
+};
 
     }
 

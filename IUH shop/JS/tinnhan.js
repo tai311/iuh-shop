@@ -112,8 +112,8 @@ async function getUserProfile(userId) {
     } = await supabaseClient
         .from("users")
         .select(
-            "user_id, fullname, avatar_url, role"
-        )
+    "user_id, fullname, avatar_url, role, student_verified"
+)
         .eq(
             "user_id",
             userId
@@ -134,18 +134,39 @@ async function getUserProfile(userId) {
         return null;
     }
 
-    return {
-        id: data.user_id,
-        fullname:
-            data.fullname ||
-            "Người dùng",
-        avatar_url:
-            data.avatar_url ||
-            "",
-        role:
-            data.role ||
-            "user"
-    };
+    const role =
+    data.role || "user";
+
+const studentVerified =
+    data.student_verified === true;
+
+const hasVerifiedBadge =
+    role === "admin" ||
+    role === "moderator" ||
+    studentVerified;
+
+
+return {
+    id:
+        data.user_id,
+
+    fullname:
+        data.fullname ||
+        "Người dùng",
+
+    avatar_url:
+        data.avatar_url ||
+        "",
+
+    role:
+        role,
+
+    student_verified:
+        studentVerified,
+
+    hasVerifiedBadge:
+        hasVerifiedBadge
+};
 }
 
 
@@ -161,7 +182,7 @@ async function getAdminUser() {
     } = await supabaseClient
         .from("users")
         .select(
-            "user_id, fullname, avatar_url, role"
+         "user_id, fullname, avatar_url, role, student_verified"
         )
         .eq(
             "role",
@@ -213,7 +234,12 @@ async function getAdminUser() {
             "",
 
         role:
-            admin.role
+            admin.role,
+        student_verified:
+        admin.student_verified === true,
+
+    hasVerifiedBadge:
+        true
     };
 }
 
@@ -1572,14 +1598,34 @@ function renderConversationList(
 
                                 <div class="conversation-top">
 
-                                    <span class="conversation-name">
+                                    <div class="conversation-name-row">
 
-                                        ${escapeHTML(
-                                            fullname
-                                        )}
+    <span class="conversation-name">
+        ${escapeHTML(fullname)}
+    </span>
 
+    ${
+        user?.hasVerifiedBadge
+            ?
+            `
+                <span
+                    class="chat-verified-badge chat-verified-badge-small"
+                    title="${
+                        user?.role === "admin"
+                            ? "Tài khoản Admin"
+                            : user?.role === "moderator"
+                                ? "Tài khoản Quản trị viên"
+                                : "Đã xác thực sinh viên"
+                    }"
+                >
+                    ✓
+                </span>
+            `
+            :
+            ""
+    }
 
-                                    </span>
+</div>
 
 
                                     <span class="conversation-time">
@@ -1811,9 +1857,71 @@ function renderActiveChatHeader(
 
     if (userName) {
 
-        userName.textContent =
-            fullname;
+    userName.innerHTML = "";
+
+    const nameText =
+        document.createElement(
+            "span"
+        );
+
+    nameText.className =
+        "chat-header-name-text";
+
+    nameText.textContent =
+        fullname;
+
+    userName.appendChild(
+        nameText
+    );
+
+
+    if (
+        user?.hasVerifiedBadge
+    ) {
+
+        const badge =
+            document.createElement(
+                "span"
+            );
+
+        badge.className =
+            "chat-verified-badge chat-verified-badge-header";
+
+        badge.textContent =
+            "✓";
+
+
+        if (
+            user.role === "admin"
+        ) {
+
+            badge.title =
+                "Tài khoản Admin";
+
+        }
+        else if (
+            user.role === "moderator"
+        ) {
+
+            badge.title =
+                "Tài khoản Quản trị viên";
+
+        }
+        else {
+
+            badge.title =
+                "Đã xác thực sinh viên";
+
+        }
+
+
+        userName.appendChild(
+            badge
+        );
+
     }
+
+}
 
 
     /* =========================================
