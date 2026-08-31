@@ -3584,12 +3584,9 @@ body {
 ========================================= */
 
 #chatUserName {
-
     display: flex;
-
     align-items: center;
-
-    gap: 5px;
+    gap: 4px;
 }
 
 
@@ -3606,12 +3603,8 @@ body {
 
 
 .chat-verified-badge-header {
-
-    width: 15px;
-
-    height: 15px;
-
-    min-width: 15px;
-
-    font-size: 9px;
+    width: 13px;
+    height: 13px;
+    min-width: 13px;
+    font-size: 8px;
 }

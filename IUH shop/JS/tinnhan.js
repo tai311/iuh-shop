@@ -903,22 +903,27 @@ async function ensureAdminChat() {
     */
 
     return {
+    id:
+        admin.id,
 
-        id:
-            admin.id,
+    fullname:
+        admin.fullname,
 
-        fullname:
-            admin.fullname,
+    avatar_url:
+        admin.avatar_url,
 
-        avatar_url:
-            admin.avatar_url,
+    role:
+        "admin",
 
-        role:
-            "admin",
+    student_verified:
+        admin.student_verified === true,
 
-        conversationId:
-            conversationId
-    };
+    hasVerifiedBadge:
+        true,
+
+    conversationId:
+        conversationId
+};
 }
 
 
@@ -1301,19 +1306,25 @@ if (
 
                     otherUser: {
 
-                        id:
-                            adminChat.id,
+    id:
+        adminChat.id,
 
-                        fullname:
-                            adminChat.fullname,
+    fullname:
+        adminChat.fullname,
 
-                        avatar_url:
-                            adminChat.avatar_url,
+    avatar_url:
+        adminChat.avatar_url,
 
-                        role:
-                            "admin"
+    role:
+        "admin",
 
-                    },
+    student_verified:
+        adminChat.student_verified === true,
+
+    hasVerifiedBadge:
+        true
+
+},
 
                     unreadCount:
                         await getUnreadCount(
@@ -1342,22 +1353,27 @@ if (
                để avatar + tên luôn chính xác.
             */
 
-            adminConversation.otherUser =
-                {
+            adminConversation.otherUser = {
 
-                    id:
-                        adminChat.id,
+    id:
+        adminChat.id,
 
-                    fullname:
-                        adminChat.fullname,
+    fullname:
+        adminChat.fullname,
 
-                    avatar_url:
-                        adminChat.avatar_url,
+    avatar_url:
+        adminChat.avatar_url,
 
-                    role:
-                        "admin"
+    role:
+        "admin",
 
-                };
+    student_verified:
+        adminChat.student_verified === true,
+
+    hasVerifiedBadge:
+        true
+
+};
 
             adminConversation.isAdmin =
                 true;
