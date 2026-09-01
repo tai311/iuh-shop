@@ -922,3 +922,143 @@
     }
 
 }
+
+/* =====================================================
+   PRODUCT CARD - MINI CHAT
+===================================================== */
+
+.iuh-mini-product-card {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 9px;
+
+    margin-bottom: 8px;
+
+    background: #ffffff;
+
+    border: 1px solid #e3e7ef;
+
+    border-radius: 11px;
+}
+
+
+.iuh-mini-product-image {
+
+    width: 55px;
+
+    height: 55px;
+
+    min-width: 55px;
+
+    overflow: hidden;
+
+    border-radius: 8px;
+
+    background: #f3f5f8;
+}
+
+
+.iuh-mini-product-image img {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+.iuh-mini-product-info {
+
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.iuh-mini-product-label {
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    color: #8a94a6;
+
+    letter-spacing: .3px;
+}
+
+
+.iuh-mini-product-name {
+
+    margin-top: 2px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    line-height: 1.3;
+
+    color: #202838;
+
+    display: -webkit-box;
+
+    -webkit-line-clamp: 2;
+
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+}
+
+
+.iuh-mini-product-price {
+
+    margin-top: 3px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    color: #304a9f;
+}
+
+
+.iuh-mini-product-button {
+
+    margin-top: 3px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #304a9f;
+
+    font-family:
+        "Be Vietnam Pro",
+        Arial,
+        sans-serif;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.iuh-mini-product-button:hover {
+
+    text-decoration: underline;
+}

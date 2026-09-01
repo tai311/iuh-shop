@@ -3654,3 +3654,150 @@ body {
     background: #1877f2;
     color: #ffffff !important;
 }
+
+/* =====================================================
+   PRODUCT CARD TRONG CHAT
+===================================================== */
+
+.chat-product-card {
+
+    width: min(
+        430px,
+        calc(100% - 24px)
+    );
+
+    margin: 12px auto 16px;
+
+    padding: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border: 1px solid #e3e7ef;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(20, 35, 70, 0.06);
+}
+
+
+.chat-product-card-image {
+
+    width: 68px;
+
+    height: 68px;
+
+    min-width: 68px;
+
+    overflow: hidden;
+
+    border-radius: 10px;
+
+    background: #f3f5f8;
+}
+
+
+.chat-product-card-image img {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+.chat-product-card-info {
+
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.chat-product-card-label {
+
+    margin-bottom: 3px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: .35px;
+
+    color: #8a94a6;
+}
+
+
+.chat-product-card-name {
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    line-height: 1.35;
+
+    color: #1d2738;
+
+    display: -webkit-box;
+
+    -webkit-line-clamp: 2;
+
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+}
+
+
+.chat-product-card-price {
+
+    margin-top: 4px;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    color: #24479b;
+}
+
+
+.chat-product-card-link {
+
+    margin-top: 5px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #24479b;
+
+    font-family:
+        "Be Vietnam Pro",
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.chat-product-card-link:hover {
+
+    text-decoration: underline;
+}

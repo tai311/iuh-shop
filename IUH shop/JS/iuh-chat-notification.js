@@ -1015,7 +1015,7 @@ async function loadMiniChatMessages(
         await supabaseClient
             .from("messages")
             .select(
-                "id, sender_id, content, image_url, recalled_at, edited_at, created_at, message_type"
+              "id, sender_id, product_id, content, image_url, recalled_at, edited_at, created_at, message_type"
             )
             .eq(
                 "conversation_id",
@@ -1070,17 +1070,38 @@ async function loadMiniChatMessages(
     }
 
 
-    for (
-        const message
-        of messages
+    let miniProductCardShown =
+    new Set();
+
+
+for (
+    const message
+    of messages
+) {
+
+    if (
+        message.product_id &&
+        !miniProductCardShown.has(
+            message.product_id
+        )
     ) {
 
-        await renderMiniMessage(
-            message,
+        await renderMiniProductCard(
+            message.product_id,
             container
         );
 
+        miniProductCardShown.add(
+            message.product_id
+        );
     }
+
+
+    await renderMiniMessage(
+        message,
+        container
+    );
+}
 
 
     container.scrollTop =
@@ -3902,3 +3923,146 @@ return {
     };
 
 })();
+
+async function renderMiniProductCard(
+    productId,
+    container
+) {
+
+    if (
+        !productId ||
+        !container
+    ) {
+        return;
+    }
+
+
+    const {
+        data: product,
+        error
+    } =
+        await supabaseClient
+            .from("products")
+            .select(`
+                id,
+                name,
+                price,
+                image_urls
+            `)
+            .eq(
+                "id",
+                productId
+            )
+            .maybeSingle();
+
+
+    if (
+        error ||
+        !product
+    ) {
+        console.error(
+            "Không tải được sản phẩm:",
+            error
+        );
+
+        return;
+    }
+
+
+    let imageUrl =
+        DEFAULT_AVATAR;
+
+
+    if (
+        Array.isArray(
+            product.image_urls
+        ) &&
+        product.image_urls.length
+    ) {
+
+        imageUrl =
+            product.image_urls[0];
+
+    }
+
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+    card.className =
+        "iuh-mini-product-card";
+
+
+    card.innerHTML = `
+
+        <div class="iuh-mini-product-image">
+            <img
+                src="${escapeHTML(imageUrl)}"
+                alt="${escapeHTML(
+                    product.name ||
+                    "Sản phẩm"
+                )}"
+            >
+        </div>
+
+        <div class="iuh-mini-product-info">
+
+            <div class="iuh-mini-product-label">
+                SẢN PHẨM
+            </div>
+
+            <div class="iuh-mini-product-name">
+                ${escapeHTML(
+                    product.name ||
+                    "Sản phẩm"
+                )}
+            </div>
+
+            <div class="iuh-mini-product-price">
+                ${
+                    Number.isFinite(
+                        Number(product.price)
+                    )
+                        ? Number(
+                            product.price
+                        ).toLocaleString(
+                            "vi-VN"
+                        ) + "đ"
+                        : "Liên hệ"
+                }
+            </div>
+
+            <button
+                type="button"
+                class="iuh-mini-product-button"
+            >
+                Xem sản phẩm →
+            </button>
+
+        </div>
+    `;
+
+
+    card
+        .querySelector(
+            ".iuh-mini-product-button"
+        )
+        .addEventListener(
+            "click",
+            function() {
+
+                window.location.href =
+                    `chitietsanpham.html?id=${encodeURIComponent(
+                        product.id
+                    )}`;
+
+            }
+        );
+
+
+    container.appendChild(
+        card
+    );
+}

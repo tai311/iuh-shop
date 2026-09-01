@@ -42,6 +42,7 @@ let currentConversationId = null;
 let currentOtherUser = null;
 
 let conversations = [];
+let pendingProductId = null;
 
 let selectedImage = null;
 let realtimeChannel = null;
@@ -2401,6 +2402,213 @@ function renderAdminGreeting() {
     messagesArea.appendChild(row);
 }
 
+async function getProductById(productId) {
+
+    if (!productId) {
+        return null;
+    }
+
+    const {
+        data: product,
+        error
+    } =
+        await supabaseClient
+            .from("products")
+            .select(`
+                id,
+                name,
+                price,
+                image_urls
+            `)
+            .eq(
+                "id",
+                productId
+            )
+            .maybeSingle();
+
+    if (error) {
+
+        console.error(
+            "IUH SHOP - Lỗi lấy sản phẩm chat:",
+            error
+        );
+
+        return null;
+    }
+
+    return product || null;
+}
+
+async function renderProductCard(
+    productId
+) {
+
+    if (
+        !messagesArea ||
+        !productId
+    ) {
+        return;
+    }
+
+
+    /*
+     * Không render trùng cùng một sản phẩm
+     */
+    if (
+        messagesArea.querySelector(
+            `[data-product-card-id="${productId}"]`
+        )
+    ) {
+        return;
+    }
+
+
+    const product =
+        await getProductById(
+            productId
+        );
+
+
+    if (!product) {
+        return;
+    }
+
+
+    let imageUrl =
+        "../Images/default-product.png";
+
+
+    if (
+        Array.isArray(
+            product.image_urls
+        ) &&
+        product.image_urls.length
+    ) {
+
+        imageUrl =
+            product.image_urls[0];
+
+    }
+    else if (
+        typeof product.image_urls ===
+        "string"
+    ) {
+
+        try {
+
+            const parsed =
+                JSON.parse(
+                    product.image_urls
+                );
+
+            if (
+                Array.isArray(parsed) &&
+                parsed.length
+            ) {
+                imageUrl =
+                    parsed[0];
+            }
+
+        }
+        catch {
+
+            if (
+                product.image_urls.trim()
+            ) {
+                imageUrl =
+                    product.image_urls;
+            }
+
+        }
+
+    }
+
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+    card.className =
+        "chat-product-card";
+
+    card.dataset.productCardId =
+        product.id;
+
+
+    card.innerHTML = `
+
+        <div class="chat-product-card-image">
+            <img
+                src="${escapeHTML(imageUrl)}"
+                alt="${escapeHTML(
+                    product.name ||
+                    "Sản phẩm"
+                )}"
+            >
+        </div>
+
+        <div class="chat-product-card-info">
+
+            <div class="chat-product-card-label">
+                SẢN PHẨM ĐANG TRAO ĐỔI
+            </div>
+
+            <div class="chat-product-card-name">
+                ${escapeHTML(
+                    product.name ||
+                    "Sản phẩm"
+                )}
+            </div>
+
+            <div class="chat-product-card-price">
+                ${
+                    Number.isFinite(
+                        Number(product.price)
+                    )
+                        ? Number(
+                            product.price
+                        ).toLocaleString(
+                            "vi-VN"
+                        ) + "đ"
+                        : "Liên hệ"
+                }
+            </div>
+
+            <button
+                type="button"
+                class="chat-product-card-link"
+            >
+                Xem sản phẩm →
+            </button>
+
+        </div>
+    `;
+
+
+    const viewButton =
+        card.querySelector(
+            ".chat-product-card-link"
+        );
+
+
+    viewButton.addEventListener(
+        "click",
+        function() {
+
+            window.location.href =
+                `chitietsanpham.html?id=${encodeURIComponent(
+                    product.id
+                )}`;
+
+        }
+    );
+
+
+    messagesArea.appendChild(
+        card
+    );
+}
 
 /* =========================================================
    RENDER 1 MESSAGE
@@ -2426,7 +2634,19 @@ async function renderSingleMessage(
     if (existing) {
         return;
     }
+    
+    /*
+ * Nếu tin nhắn gắn với sản phẩm
+ * → hiện Product Card trước tin đó.
+ */
+if (
+    message.product_id
+) {
 
+    await renderProductCard(
+        message.product_id
+    );
+}
 
     const mine =
         message.sender_id ===
@@ -3422,6 +3642,8 @@ async function sendMessage() {
 
 
         /* INSERT MESSAGE */
+        const productIdForMessage =
+    pendingProductId || null;
 
         const {
             data,
@@ -3431,28 +3653,31 @@ async function sendMessage() {
                 .from("messages")
                 .insert({
 
-                    conversation_id:
-                        currentConversationId,
+            conversation_id:
+                currentConversationId,
 
-                    sender_id:
-                        currentUser.id,
+            sender_id:
+                currentUser.id,
 
-                    content:
-                        content ||
-                        null,
+            product_id:
+                productIdForMessage,
 
-                    message_type:
-                        imageUrl
-                            ? "image"
-                            : "text",
+            content:
+                content ||
+                null,
 
-                    image_url:
-                        imageUrl,
+            message_type:
+                imageUrl
+                    ? "image"
+                    : "text",
 
-                    is_read:
-                        false
+            image_url:
+                imageUrl,
 
-                })
+            is_read:
+                false
+
+        })
                 .select()
                 .single();
 
@@ -3460,6 +3685,14 @@ async function sendMessage() {
         if (error) {
             throw error;
         }
+
+        /*
+ * Chỉ tin nhắn đầu tiên được gửi
+ * từ trang sản phẩm mang product_id.
+ */
+if (productIdForMessage) {
+    pendingProductId = null;
+}
 
 
         /* UPDATE CONVERSATION */
@@ -4543,6 +4776,9 @@ async function initChat() {
 
         const productName =
             params.get("productName");
+
+        pendingProductId =
+    productId || null;
 
 
         /* =========================================
