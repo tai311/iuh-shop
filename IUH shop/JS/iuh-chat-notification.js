@@ -3922,9 +3922,7 @@ return {
 
     };
 
-})();
-
-async function renderMiniProductCard(
+    async function renderMiniProductCard(
     productId,
     container
 ) {
@@ -4066,3 +4064,6 @@ async function renderMiniProductCard(
         card
     );
 }
+
+})();
+
