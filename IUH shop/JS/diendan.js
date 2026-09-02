@@ -5151,6 +5151,1279 @@ supabaseClient
     );
 
 
+/* =========================================================
+   BÀI VIẾT CHÍNH THỨC
+========================================================= */
+
+let articleEditingId = null;
+let selectedArticleImage = null;
+
+
+/* =========================================================
+   KIỂM TRA QUYỀN ADMIN
+========================================================= */
+
+function isArticleAdmin() {
+
+    if (!currentProfile) {
+        return false;
+    }
+
+    return (
+        currentProfile.role === "admin" ||
+        currentProfile.role === "moderator"
+    );
+}
+
+
+/* =========================================================
+   MỞ MODAL
+========================================================= */
+
+function openArticleModal(article = null) {
+
+    if (!requireLogin()) {
+        return;
+    }
+
+    if (!isArticleAdmin()) {
+        alert(
+            "Bạn không có quyền đăng bài viết."
+        );
+
+        return;
+    }
+
+    const modal =
+        document.getElementById(
+            "articleModal"
+        );
+
+    const titleInput =
+        document.getElementById(
+            "articleTitleInput"
+        );
+
+    const categoryInput =
+        document.getElementById(
+            "articleCategoryInput"
+        );
+
+    const editor =
+        document.getElementById(
+            "articleEditor"
+        );
+
+    const modalTitle =
+        document.getElementById(
+            "articleModalTitle"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "saveArticleButton"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+
+    articleEditingId =
+        article?.id || null;
+
+
+    if (article) {
+
+        modalTitle.textContent =
+            "Chỉnh sửa bài viết";
+
+        saveButton.innerHTML = `
+            <i class="fa-solid fa-floppy-disk"></i>
+            Lưu thay đổi
+        `;
+
+        titleInput.value =
+            article.title || "";
+
+        categoryInput.value =
+            article.category ||
+            "THÔNG BÁO";
+
+        editor.innerHTML =
+            article.content || "";
+
+    } else {
+
+        modalTitle.textContent =
+            "Đăng bài viết";
+
+        saveButton.innerHTML = `
+            <i class="fa-solid fa-paper-plane"></i>
+            Đăng bài viết
+        `;
+
+        titleInput.value =
+            "";
+
+        categoryInput.value =
+            "THÔNG BÁO";
+
+        editor.innerHTML =
+            "";
+
+    }
+
+
+    modal.classList.add(
+        "show"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+
+    setTimeout(
+        () => titleInput.focus(),
+        100
+    );
+}
+
+
+/* =========================================================
+   ĐÓNG MODAL
+========================================================= */
+
+function closeArticleModal() {
+
+    const modal =
+        document.getElementById(
+            "articleModal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.remove(
+        "show"
+    );
+
+    document.body.style.overflow =
+        "";
+
+    articleEditingId =
+        null;
+
+    selectedArticleImage =
+        null;
+
+    const imageInput =
+        document.getElementById(
+            "articleImageInput"
+        );
+
+    const preview =
+        document.getElementById(
+            "articleImagePreview"
+        );
+
+    const previewImg =
+        document.getElementById(
+            "articlePreviewImg"
+        );
+
+    if (imageInput) {
+        imageInput.value =
+            "";
+    }
+
+    if (preview) {
+        preview.hidden =
+            true;
+    }
+
+    if (previewImg) {
+        previewImg.src =
+            "";
+    }
+}
+
+
+/* =========================================================
+   UPLOAD ẢNH BÀI VIẾT
+========================================================= */
+
+async function uploadArticleImage(
+    file
+) {
+
+    if (!file) {
+        return null;
+    }
+
+    if (!currentUser) {
+        throw new Error(
+            "Bạn chưa đăng nhập."
+        );
+    }
+
+
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ];
+
+
+    if (
+        !allowedTypes.includes(
+            file.type
+        )
+    ) {
+
+        throw new Error(
+            "Chỉ hỗ trợ JPG, PNG hoặc WEBP."
+        );
+    }
+
+
+    if (
+        file.size >
+        8 * 1024 * 1024
+    ) {
+
+        throw new Error(
+            "Ảnh không được lớn hơn 8MB."
+        );
+    }
+
+
+    const extension =
+        file.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+
+    const fileName =
+        `${crypto.randomUUID()}.${extension}`;
+
+
+    const path =
+        `articles/${currentUser.id}/${fileName}`;
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .storage
+            .from(
+                "forum-images"
+            )
+            .upload(
+                path,
+                file,
+                {
+                    cacheControl:
+                        "3600",
+
+                    upsert:
+                        false,
+
+                    contentType:
+                        file.type
+                }
+            );
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    const {
+        data
+    } =
+        supabaseClient
+            .storage
+            .from(
+                "forum-images"
+            )
+            .getPublicUrl(
+                path
+            );
+
+
+    return data.publicUrl;
+}
+
+
+/* =========================================================
+   LOAD BÀI VIẾT
+========================================================= */
+
+async function loadOfficialArticles() {
+
+    const list =
+        document.getElementById(
+            "officialArticleList"
+        );
+
+    if (!list) {
+        return;
+    }
+
+
+    list.innerHTML = `
+        <div class="forum-loading">
+            <div class="forum-loading-spinner"></div>
+            <span>Đang tải bài viết...</span>
+        </div>
+    `;
+
+
+    const {
+        data: articles,
+        error
+    } =
+        await supabaseClient
+            .from(
+                "forum_articles"
+            )
+            .select("*")
+            .order(
+                "created_at",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Load articles error:",
+            error
+        );
+
+        list.innerHTML = `
+            <div class="forum-empty">
+                <i class="fa-regular fa-newspaper"></i>
+
+                <h3>
+                    Không thể tải bài viết
+                </h3>
+
+                <p>
+                    Vui lòng thử lại sau.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    window.__forumArticles =
+    articles || [];
+
+
+    if (!articles?.length) {
+
+        list.innerHTML = `
+            <div class="forum-empty">
+
+                <i class="fa-regular fa-newspaper"></i>
+
+                <h3>
+                    Chưa có bài viết
+                </h3>
+
+                <p>
+                    Hiện chưa có nội dung chính thức nào.
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const authorIds =
+        [
+            ...new Set(
+                articles.map(
+                    article =>
+                        article.author_id
+                )
+            )
+        ];
+
+
+    let profiles = [];
+
+
+    if (authorIds.length) {
+
+        const {
+            data
+        } =
+            await supabaseClient
+                .from("users")
+                .select(`
+                    user_id,
+                    fullname,
+                    avatar_url,
+                    role,
+                    student_verified
+                `)
+                .in(
+                    "user_id",
+                    authorIds
+                );
+
+        profiles =
+            data || [];
+    }
+
+
+    list.innerHTML =
+        articles
+            .map(
+                article => {
+
+                    const author =
+                        profiles.find(
+                            profile =>
+                                profile.user_id ===
+                                article.author_id
+                        ) || {};
+
+
+                    return createArticleCard(
+                        article,
+                        author
+                    );
+                }
+            )
+            .join("");
+
+
+    bindArticleEvents();
+
+}
+
+
+/* =========================================================
+   TẠO CARD BÀI VIẾT
+========================================================= */
+
+function createArticleCard(
+    article,
+    author
+) {
+
+    const name =
+        author.fullname ||
+        "IUH SHOP";
+
+
+    const avatar =
+        author.avatar_url ||
+        DEFAULT_AVATAR;
+
+
+    const verified =
+        hasVerifiedBadge(
+            author
+        );
+
+
+    const plainText =
+        document.createElement(
+            "div"
+        );
+
+
+    plainText.innerHTML =
+        article.content || "";
+
+
+    const excerpt =
+        (
+            plainText.textContent ||
+            ""
+        )
+            .replace(
+                /\s+/g,
+                " "
+            )
+            .trim()
+            .slice(
+                0,
+                180
+            );
+
+
+    const canManage =
+        currentUser &&
+        currentUser.id ===
+            article.author_id;
+
+
+    return `
+        <article
+            class="official-article-card"
+            data-article-id="${article.id}"
+        >
+
+            ${
+                article.image_url
+                    ? `
+                        <div class="article-card-image">
+
+                            <img
+                                src="${escapeHTML(article.image_url)}"
+                                alt="${escapeHTML(article.title || "Bài viết")}"
+                                onerror="this.style.display='none'"
+                            >
+
+                        </div>
+                    `
+                    : ""
+            }
+
+
+            <div class="article-card-body">
+
+                <div class="article-card-category">
+                    ${escapeHTML(
+                        article.category ||
+                        "THÔNG BÁO"
+                    )}
+                </div>
+
+
+                <h3 class="article-card-title">
+                    ${escapeHTML(
+                        article.title ||
+                        "Bài viết"
+                    )}
+                </h3>
+
+
+                <p class="article-card-excerpt">
+                    ${escapeHTML(
+                        excerpt ||
+                        "Xem nội dung bài viết..."
+                    )}
+                </p>
+
+
+                <div class="article-card-meta">
+
+                    <div class="article-card-author">
+
+                        <img
+                            src="${escapeHTML(avatar)}"
+                            alt="${escapeHTML(name)}"
+                            onerror="this.src='${DEFAULT_AVATAR}'"
+                        >
+
+                        <span>
+                            ${escapeHTML(name)}
+                        </span>
+
+                        ${
+                            verified
+                                ? `
+                                    <span
+                                        class="forum-verified-badge"
+                                        title="${escapeHTML(
+                                            getVerifiedTitle(
+                                                author
+                                            )
+                                        )}"
+                                    >
+                                        <i class="fa-solid fa-check"></i>
+                                    </span>
+                                `
+                                : ""
+                        }
+
+                    </div>
+
+                    <span>•</span>
+
+                    <span>
+                        ${timeAgo(
+                            article.created_at
+                        )}
+                    </span>
+
+                </div>
+
+
+                <div class="article-card-actions">
+
+                    <button
+                        type="button"
+                        class="article-read-button"
+                        data-action="read"
+                    >
+                        <i class="fa-regular fa-eye"></i>
+                        Đọc bài
+                    </button>
+
+                    ${
+                        canManage
+                            ? `
+                                <button
+                                    type="button"
+                                    class="article-edit-button"
+                                    data-action="edit"
+                                >
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                    Sửa
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="article-delete-button"
+                                    data-action="delete"
+                                >
+                                    <i class="fa-regular fa-trash-can"></i>
+                                    Xóa
+                                </button>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+/* =========================================================
+   EVENT BÀI VIẾT
+========================================================= */
+
+function bindArticleEvents() {
+
+    document
+        .querySelectorAll(
+            ".official-article-card"
+        )
+        .forEach(
+            card => {
+
+                const articleId =
+                    card.dataset.articleId;
+
+
+                const article =
+                    window.__forumArticles?.find(
+                        item =>
+                            String(item.id) ===
+                            String(articleId)
+                    );
+
+
+                card
+                    .querySelector(
+                        '[data-action="read"]'
+                    )
+                    ?.addEventListener(
+                        "click",
+                        () => {
+
+                            if (article) {
+                                openArticleViewer(
+                                    article
+                                );
+                            }
+
+                        }
+                    );
+
+
+                card
+                    .querySelector(
+                        '[data-action="edit"]'
+                    )
+                    ?.addEventListener(
+                        "click",
+                        () => {
+
+                            if (article) {
+                                openArticleModal(
+                                    article
+                                );
+                            }
+
+                        }
+                    );
+
+
+                card
+                    .querySelector(
+                        '[data-action="delete"]'
+                    )
+                    ?.addEventListener(
+                        "click",
+                        async () => {
+
+                            if (!article) {
+                                return;
+                            }
+
+                            await deleteArticle(
+                                article.id
+                            );
+
+                        }
+                    );
+
+            }
+        );
+}
+
+
+/* =========================================================
+   XÓA BÀI
+========================================================= */
+
+async function deleteArticle(
+    articleId
+) {
+
+    if (!requireLogin()) {
+        return;
+    }
+
+
+    if (
+        !confirm(
+            "Bạn chắc chắn muốn xóa bài viết này?"
+        )
+    ) {
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from(
+                "forum_articles"
+            )
+            .delete()
+            .eq(
+                "id",
+                articleId
+            )
+            .eq(
+                "author_id",
+                currentUser.id
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Delete article error:",
+            error
+        );
+
+        alert(
+            "Không thể xóa bài viết."
+        );
+
+        return;
+    }
+
+
+    await loadOfficialArticles();
+
+}
+
+
+/* =========================================================
+   VIEW BÀI VIẾT
+========================================================= */
+
+function openArticleViewer(
+    article
+) {
+
+    const modal =
+        document.getElementById(
+            "articleModal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+
+    const modalBox =
+        modal.querySelector(
+            ".article-modal-box"
+        );
+
+
+    modalBox.innerHTML = `
+
+        <div class="article-modal-header">
+
+            <div>
+
+                <span class="article-modal-eyebrow">
+                    IUH SHOP INFORMATION
+                </span>
+
+                <h2>
+                    ${escapeHTML(
+                        article.title ||
+                        "Bài viết"
+                    )}
+                </h2>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="article-modal-close"
+                onclick="closeArticleModal()"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <div
+            style="
+                padding: 25px 28px 30px;
+            "
+        >
+
+            ${
+                article.image_url
+                    ? `
+                        <img
+                            src="${escapeHTML(article.image_url)}"
+                            alt="${escapeHTML(article.title || "Bài viết")}"
+                            style="
+                                width:100%;
+                                max-height:420px;
+                                object-fit:cover;
+                                border-radius:12px;
+                                margin-bottom:22px;
+                            "
+                        >
+                    `
+                    : ""
+            }
+
+
+            <div class="article-full-content">
+                ${article.content || ""}
+            </div>
+
+        </div>
+
+    `;
+
+
+    modal.classList.add(
+        "show"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+}
+
+function setupOfficialArticles() {
+
+    const adminButton =
+        document.getElementById(
+            "adminCreateArticle"
+        );
+
+    adminButton?.addEventListener(
+        "click",
+        function () {
+
+            openArticleModal();
+
+        }
+    );
+
+
+    document
+        .getElementById(
+            "closeArticleModal"
+        )
+        ?.addEventListener(
+            "click",
+            closeArticleModal
+        );
+
+
+    document
+        .getElementById(
+            "cancelArticleButton"
+        )
+        ?.addEventListener(
+            "click",
+            closeArticleModal
+        );
+
+
+    document
+        .getElementById(
+            "articleModalOverlay"
+        )
+        ?.addEventListener(
+            "click",
+            closeArticleModal
+        );
+
+
+    document
+        .getElementById(
+            "articleImageInput"
+        )
+        ?.addEventListener(
+            "change",
+            function () {
+
+                const file =
+                    this.files?.[0];
+
+                if (!file) {
+                    return;
+                }
+
+
+                selectedArticleImage =
+                    file;
+
+
+                const preview =
+                    document.getElementById(
+                        "articleImagePreview"
+                    );
+
+                const image =
+                    document.getElementById(
+                        "articlePreviewImg"
+                    );
+
+
+                image.src =
+                    URL.createObjectURL(
+                        file
+                    );
+
+                preview.hidden =
+                    false;
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "removeArticleImage"
+        )
+        ?.addEventListener(
+            "click",
+            function () {
+
+                selectedArticleImage =
+                    null;
+
+                document
+                    .getElementById(
+                        "articleImageInput"
+                    )
+                    .value =
+                    "";
+
+                document
+                    .getElementById(
+                        "articleImagePreview"
+                    )
+                    .hidden =
+                    true;
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "saveArticleButton"
+        )
+        ?.addEventListener(
+            "click",
+            saveArticle
+        );
+
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key ===
+                "Escape"
+            ) {
+
+                const modal =
+                    document.getElementById(
+                        "articleModal"
+                    );
+
+                if (
+                    modal?.classList.contains(
+                        "show"
+                    )
+                ) {
+
+                    closeArticleModal();
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+async function saveArticle() {
+
+    if (!requireLogin()) {
+        return;
+    }
+
+
+    if (!isArticleAdmin()) {
+
+        alert(
+            "Bạn không có quyền thực hiện chức năng này."
+        );
+
+        return;
+    }
+
+
+    const titleInput =
+        document.getElementById(
+            "articleTitleInput"
+        );
+
+    const categoryInput =
+        document.getElementById(
+            "articleCategoryInput"
+        );
+
+    const editor =
+        document.getElementById(
+            "articleEditor"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "saveArticleButton"
+        );
+
+
+    const title =
+        titleInput.value.trim();
+
+    const category =
+        categoryInput.value;
+
+    const content =
+        editor.innerHTML.trim();
+
+
+    if (!title) {
+
+        alert(
+            "Vui lòng nhập tiêu đề bài viết."
+        );
+
+        titleInput.focus();
+
+        return;
+    }
+
+
+    if (!content) {
+
+        alert(
+            "Vui lòng nhập nội dung bài viết."
+        );
+
+        editor.focus();
+
+        return;
+    }
+
+
+    saveButton.disabled =
+        true;
+
+
+    saveButton.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Đang lưu...
+    `;
+
+
+    try {
+
+        let imageUrl =
+            null;
+
+
+        if (selectedArticleImage) {
+
+            imageUrl =
+                await uploadArticleImage(
+                    selectedArticleImage
+                );
+
+        }
+
+
+        if (articleEditingId) {
+
+            const updateData = {
+                title,
+                category,
+                content
+            };
+
+
+            if (imageUrl) {
+                updateData.image_url =
+                    imageUrl;
+            }
+
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .from(
+                        "forum_articles"
+                    )
+                    .update(
+                        updateData
+                    )
+                    .eq(
+                        "id",
+                        articleEditingId
+                    )
+                    .eq(
+                        "author_id",
+                        currentUser.id
+                    );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            alert(
+                "Đã cập nhật bài viết."
+            );
+
+        } else {
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .from(
+                        "forum_articles"
+                    )
+                    .insert({
+
+                        author_id:
+                            currentUser.id,
+
+                        title,
+
+                        category,
+
+                        content,
+
+                        image_url:
+                            imageUrl
+
+                    });
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            alert(
+                "Đã đăng bài viết."
+            );
+
+        }
+
+
+        closeArticleModal();
+
+        await loadOfficialArticles();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Save article error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Không thể lưu bài viết."
+        );
+
+    }
+    finally {
+
+        saveButton.disabled =
+            false;
+
+        saveButton.innerHTML = `
+            <i class="fa-solid fa-paper-plane"></i>
+            Đăng bài viết
+        `;
+
+    }
+
+}
 
 /* =========================================================
    INIT
@@ -5182,6 +6455,10 @@ document.addEventListener(
 
 
         scrollToSharedPost();
+
+        setupOfficialArticles();
+
+await loadOfficialArticles();
 
     }
 );

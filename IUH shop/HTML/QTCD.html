@@ -1,0 +1,1493 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUY TẮC CỘNG ĐỒNG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FONT AWESOME -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/QTCD.css">
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+                     
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+</a>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+    
+    <!-- =====================================================
+     QUY TẮC CỘNG ĐỒNG IUH SHOP
+===================================================== -->
+
+<main class="terms-page community-page">
+
+    <!-- =========================
+         HERO
+    ========================== -->
+    <section class="terms-hero community-hero">
+
+        <div class="terms-hero-content">
+
+            <span class="terms-eyebrow">
+                IUH SHOP • CỘNG ĐỒNG SINH VIÊN
+            </span>
+
+            <h1>
+                Quy tắc<br>
+                cộng đồng
+            </h1>
+
+            <p>
+                Cùng xây dựng một diễn đàn IUH SHOP
+                văn minh, tích cực, hữu ích và an toàn
+                cho tất cả sinh viên.
+            </p>
+
+            <div class="terms-version">
+                Phiên bản 1.0
+                <span>•</span>
+                Cập nhật lần đầu
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         NỘI DUNG
+    ========================== -->
+    <section class="terms-content">
+
+        <div class="terms-layout">
+
+
+            <!-- =========================
+                 SIDEBAR
+            ========================== -->
+            <aside class="terms-sidebar">
+
+                <div class="terms-sidebar-inner">
+
+                    <span>
+                        NỘI DUNG
+                    </span>
+
+                    <a href="#purpose">
+                        01. Mục đích cộng đồng
+                    </a>
+
+                    <a href="#behavior">
+                        02. Quy tắc ứng xử
+                    </a>
+
+                    <a href="#posting">
+                        03. Quy định đăng bài
+                    </a>
+
+                    <a href="#comment">
+                        04. Quy định bình luận
+                    </a>
+
+                    <a href="#prohibited">
+                        05. Nội dung không được phép
+                    </a>
+
+                    <a href="#spam">
+                        06. Spam & quảng cáo
+                    </a>
+
+                    <a href="#privacy">
+                        07. Quyền riêng tư
+                    </a>
+
+                    <a href="#report">
+                        08. Báo cáo vi phạm
+                    </a>
+
+                    <a href="#handling">
+                        09. Xử lý vi phạm
+                    </a>
+
+                    <a href="#commitment">
+                        10. Cam kết cộng đồng
+                    </a>
+
+                </div>
+
+            </aside>
+
+
+
+            <!-- =========================
+                 ARTICLE
+            ========================== -->
+            <article class="terms-article">
+
+
+                <!-- =========================
+                     5 NGUYÊN TẮC CỐT LÕI
+                ========================== -->
+
+                <div class="community-principles">
+
+                    <div class="community-principles-title">
+                        <span>NGUYÊN TẮC CỐT LÕI</span>
+                        <h2>
+                            5 điều cùng nhau xây dựng
+                        </h2>
+                    </div>
+
+
+                    <div class="principles-grid">
+
+                        <div class="principle-card">
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-handshake"></i>
+                            </div>
+
+                            <strong>
+                                Tôn trọng
+                            </strong>
+
+                            <p>
+                                Tôn trọng thành viên khác
+                                và những quan điểm khác biệt.
+                            </p>
+                        </div>
+
+
+                        <div class="principle-card">
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-comments"></i>
+                            </div>
+
+                            <strong>
+                                Văn minh
+                            </strong>
+
+                            <p>
+                                Giao tiếp lịch sự,
+                                tranh luận mang tính xây dựng.
+                            </p>
+                        </div>
+
+
+                        <div class="principle-card">
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-lightbulb"></i>
+                            </div>
+
+                            <strong>
+                                Hữu ích
+                            </strong>
+
+                            <p>
+                                Chia sẻ thông tin có giá trị
+                                và phù hợp với cộng đồng.
+                            </p>
+                        </div>
+
+
+                        <div class="principle-card">
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+
+                            <strong>
+                                An toàn
+                            </strong>
+
+                            <p>
+                                Bảo vệ thông tin cá nhân
+                                và quyền riêng tư của mọi người.
+                            </p>
+                        </div>
+
+
+                        <div class="principle-card">
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-ban"></i>
+                            </div>
+
+                            <strong>
+                                Không spam
+                            </strong>
+
+                            <p>
+                                Không spam, lừa đảo hoặc
+                                thao túng hoạt động cộng đồng.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================
+                     01
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="purpose"
+                >
+
+                    <div class="section-number">
+                        01
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            MỤC ĐÍCH
+                        </span>
+
+                        <h2>
+                            Diễn đàn dành cho sinh viên
+                        </h2>
+
+                        <p>
+                            Diễn đàn IUH SHOP được xây dựng nhằm
+                            tạo không gian để sinh viên giao lưu,
+                            chia sẻ kiến thức, trao đổi kinh nghiệm
+                            học tập, mua bán, đời sống sinh viên
+                            và các chủ đề phù hợp với cộng đồng.
+                        </p>
+
+                        <p>
+                            Mỗi thành viên đều có quyền đóng góp
+                            ý kiến và chia sẻ nội dung, đồng thời
+                            có trách nhiệm tôn trọng những thành
+                            viên khác.
+                        </p>
+
+
+                        <div class="terms-note">
+
+                            <strong>
+                                Mục tiêu cộng đồng
+                            </strong>
+
+                            <span>
+                                Chia sẻ kiến thức • Kết nối sinh viên
+                                • Trao đổi tích cực • Xây dựng cộng đồng
+                                văn minh
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     02
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="behavior"
+                >
+
+                    <div class="section-number">
+                        02
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            ỨNG XỬ
+                        </span>
+
+                        <h2>
+                            Tôn trọng lẫn nhau
+                        </h2>
+
+                        <p>
+                            Khi tham gia diễn đàn, thành viên cần
+                            giao tiếp lịch sự và tôn trọng những
+                            người dùng khác.
+                        </p>
+
+                        <ul class="community-list">
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Sử dụng ngôn ngữ lịch sự, tôn trọng.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Không xúc phạm, lăng mạ hoặc công kích cá nhân.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Không phân biệt đối xử hoặc miệt thị người khác.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Tôn trọng những quan điểm khác biệt.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Tranh luận dựa trên nội dung, không công kích người đưa ra ý kiến.
+                            </li>
+
+                        </ul>
+
+
+                        <div class="terms-note warning">
+
+                            <strong>
+                                Lưu ý
+                            </strong>
+
+                            <span>
+                                Không đồng ý với một ý kiến không có nghĩa
+                                là được phép xúc phạm người khác.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     03
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="posting"
+                >
+
+                    <div class="section-number">
+                        03
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            ĐĂNG BÀI
+                        </span>
+
+                        <h2>
+                            Quy định khi đăng bài
+                        </h2>
+
+                        <p>
+                            Người dùng cần đảm bảo bài viết có nội dung
+                            rõ ràng, phù hợp với chủ đề diễn đàn và
+                            không gây ảnh hưởng tiêu cực đến cộng đồng.
+                        </p>
+
+                        <ul class="community-list">
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Đặt tiêu đề rõ ràng và phản ánh đúng nội dung.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Đăng bài đúng chủ đề và phù hợp với diễn đàn.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Cung cấp thông tin chính xác và có trách nhiệm.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Kiểm tra nội dung trước khi đăng.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Không đăng cùng một nội dung nhiều lần.
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     04
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="comment"
+                >
+
+                    <div class="section-number">
+                        04
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            BÌNH LUẬN
+                        </span>
+
+                        <h2>
+                            Hãy góp ý thay vì công kích
+                        </h2>
+
+                        <p>
+                            Bình luận nên tập trung vào nội dung bài viết
+                            và mang tính xây dựng. Mỗi thành viên đều có
+                            trách nhiệm giữ cho phần thảo luận tích cực.
+                        </p>
+
+                        <div class="community-two-column">
+
+                            <div>
+
+                                <h3>
+                                    Nên làm
+                                </h3>
+
+                                <ul class="community-list">
+
+                                    <li>
+                                        <i class="fa-solid fa-check"></i>
+                                        Đóng góp ý kiến xây dựng.
+                                    </li>
+
+                                    <li>
+                                        <i class="fa-solid fa-check"></i>
+                                        Trao đổi lịch sự.
+                                    </li>
+
+                                    <li>
+                                        <i class="fa-solid fa-check"></i>
+                                        Tôn trọng ý kiến khác biệt.
+                                    </li>
+
+                                </ul>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3>
+                                    Không nên
+                                </h3>
+
+                                <ul class="community-list danger-list">
+
+                                    <li>
+                                        <i class="fa-solid fa-xmark"></i>
+                                        Chửi bới hoặc xúc phạm.
+                                    </li>
+
+                                    <li>
+                                        <i class="fa-solid fa-xmark"></i>
+                                        Cố tình gây tranh cãi.
+                                    </li>
+
+                                    <li>
+                                        <i class="fa-solid fa-xmark"></i>
+                                        Spam nhiều bình luận giống nhau.
+                                    </li>
+
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     05
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="prohibited"
+                >
+
+                    <div class="section-number">
+                        05
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            NỘI DUNG
+                        </span>
+
+                        <h2>
+                            Nội dung không được phép
+                        </h2>
+
+                        <p>
+                            Những nội dung dưới đây không được phép
+                            xuất hiện trên diễn đàn IUH SHOP.
+                        </p>
+
+
+                        <div class="community-warning-grid">
+
+                            <div class="community-warning-card">
+
+                                <div class="warning-icon">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                </div>
+
+                                <h3>
+                                    Nội dung gây hại
+                                </h3>
+
+                                <p>
+                                    Không đăng nội dung đe dọa,
+                                    kích động bạo lực, quấy rối,
+                                    bắt nạt hoặc thù ghét.
+                                </p>
+
+                            </div>
+
+
+                            <div class="community-warning-card">
+
+                                <div class="warning-icon">
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                </div>
+
+                                <h3>
+                                    Nội dung không phù hợp
+                                </h3>
+
+                                <p>
+                                    Không đăng nội dung phản cảm,
+                                    khiêu dâm, lừa đảo, giả mạo
+                                    hoặc vi phạm pháp luật.
+                                </p>
+
+                            </div>
+
+
+                            <div class="community-warning-card">
+
+                                <div class="warning-icon">
+                                    <i class="fa-solid fa-user-lock"></i>
+                                </div>
+
+                                <h3>
+                                    Xâm phạm quyền riêng tư
+                                </h3>
+
+                                <p>
+                                    Không công khai thông tin cá nhân
+                                    của người khác khi chưa được đồng ý.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     06
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="spam"
+                >
+
+                    <div class="section-number">
+                        06
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            SPAM
+                        </span>
+
+                        <h2>
+                            Spam & quảng cáo
+                        </h2>
+
+                        <p>
+                            Diễn đàn được xây dựng để trao đổi và chia sẻ,
+                            không phải nơi để spam hoặc thao túng tương tác.
+                        </p>
+
+                        <ul class="community-list">
+
+                            <li>
+                                <i class="fa-solid fa-ban"></i>
+                                Không đăng cùng một bài viết nhiều lần.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-ban"></i>
+                                Không bình luận hàng loạt để tăng lượt hiển thị.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-ban"></i>
+                                Không sử dụng tài khoản giả để thao túng tương tác.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-ban"></i>
+                                Không quảng cáo nội dung không liên quan.
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     07
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="privacy"
+                >
+
+                    <div class="section-number">
+                        07
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            QUYỀN RIÊNG TƯ
+                        </span>
+
+                        <h2>
+                            Bảo vệ thông tin của cộng đồng
+                        </h2>
+
+                        <p>
+                            Mỗi thành viên có trách nhiệm bảo vệ thông tin
+                            cá nhân của mình và tôn trọng quyền riêng tư
+                            của người khác.
+                        </p>
+
+                        <div class="privacy-grid">
+
+                            <div class="privacy-item">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>
+                                    Số điện thoại
+                                </span>
+                            </div>
+
+                            <div class="privacy-item">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span>
+                                    Địa chỉ cá nhân
+                                </span>
+                            </div>
+
+                            <div class="privacy-item">
+                                <i class="fa-solid fa-user-lock"></i>
+                                <span>
+                                    Thông tin tài khoản
+                                </span>
+                            </div>
+
+                            <div class="privacy-item">
+                                <i class="fa-solid fa-image"></i>
+                                <span>
+                                    Hình ảnh riêng tư
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <p>
+                            Không đăng tải thông tin cá nhân của người khác
+                            khi chưa được sự đồng ý.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     08
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="report"
+                >
+
+                    <div class="section-number">
+                        08
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            BÁO CÁO
+                        </span>
+
+                        <h2>
+                            Thấy nội dung không phù hợp?
+                        </h2>
+
+                        <p>
+                            Nếu phát hiện bài viết hoặc bình luận vi phạm
+                            quy tắc cộng đồng, thành viên có thể sử dụng
+                            chức năng <strong>Báo cáo</strong> để thông báo
+                            cho quản trị viên.
+                        </p>
+
+                        <div class="report-flow">
+
+                            <div class="report-step">
+                                <span>01</span>
+                                <strong>Phát hiện</strong>
+                                <small>
+                                    Nội dung vi phạm
+                                </small>
+                            </div>
+
+                            <div class="report-arrow">
+                                →
+                            </div>
+
+                            <div class="report-step">
+                                <span>02</span>
+                                <strong>Báo cáo</strong>
+                                <small>
+                                    Chọn lý do phù hợp
+                                </small>
+                            </div>
+
+                            <div class="report-arrow">
+                                →
+                            </div>
+
+                            <div class="report-step">
+                                <span>03</span>
+                                <strong>Kiểm tra</strong>
+                                <small>
+                                    Quản trị viên xem xét
+                                </small>
+                            </div>
+
+                            <div class="report-arrow">
+                                →
+                            </div>
+
+                            <div class="report-step">
+                                <span>04</span>
+                                <strong>Xử lý</strong>
+                                <small>
+                                    Theo mức độ vi phạm
+                                </small>
+                            </div>
+
+                        </div>
+
+
+                        <div class="terms-note warning">
+
+                            <strong>
+                                Lưu ý
+                            </strong>
+
+                            <span>
+                                Không sử dụng chức năng báo cáo để trả đũa
+                                hoặc cố ý gây ảnh hưởng đến thành viên khác.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     09
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="handling"
+                >
+
+                    <div class="section-number">
+                        09
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            XỬ LÝ
+                        </span>
+
+                        <h2>
+                            Xử lý vi phạm
+                        </h2>
+
+                        <p>
+                            Tùy theo mức độ và tính chất vi phạm,
+                            IUH SHOP có thể áp dụng một hoặc nhiều
+                            biện pháp xử lý.
+                        </p>
+
+
+                        <div class="handling-list">
+
+                            <div class="handling-item">
+
+                                <span class="handling-number">
+                                    01
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Nhắc nhở
+                                    </strong>
+
+                                    <p>
+                                        Áp dụng đối với các trường hợp
+                                        vi phạm nhẹ hoặc lần đầu.
+                                    </p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="handling-item">
+
+                                <span class="handling-number">
+                                    02
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Ẩn / Xóa nội dung
+                                    </strong>
+
+                                    <p>
+                                        Nội dung vi phạm có thể bị
+                                        ẩn hoặc xóa khỏi diễn đàn.
+                                    </p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="handling-item">
+
+                                <span class="handling-number">
+                                    03
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Hạn chế tài khoản
+                                    </strong>
+
+                                    <p>
+                                        Tài khoản có thể bị hạn chế
+                                        một số chức năng trong thời gian
+                                        nhất định.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="handling-item">
+
+                                <span class="handling-number">
+                                    04
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        Khóa tài khoản
+                                    </strong>
+
+                                    <p>
+                                        Áp dụng đối với các trường hợp
+                                        vi phạm nghiêm trọng hoặc tái phạm
+                                        nhiều lần.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="terms-note">
+
+                            <strong>
+                                Nguyên tắc xử lý
+                            </strong>
+
+                            <span>
+                                Mức xử lý được xem xét dựa trên nội dung,
+                                mức độ vi phạm và lịch sử vi phạm của tài khoản.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     10
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="commitment"
+                >
+
+                    <div class="section-number">
+                        10
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            CAM KẾT
+                        </span>
+
+                        <h2>
+                            Cùng tạo nên một diễn đàn tốt hơn
+                        </h2>
+
+                        <p>
+                            Khi tham gia diễn đàn IUH SHOP, mỗi thành viên
+                            được khuyến khích đóng góp tích cực và cùng
+                            xây dựng môi trường cộng đồng thân thiện.
+                        </p>
+
+
+                        <div class="commitment-grid">
+
+                            <div>
+                                <i class="fa-solid fa-heart"></i>
+                                <strong>
+                                    Tôn trọng
+                                </strong>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-share-nodes"></i>
+                                <strong>
+                                    Chia sẻ
+                                </strong>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-comments"></i>
+                                <strong>
+                                    Tranh luận
+                                </strong>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-flag"></i>
+                                <strong>
+                                    Báo cáo
+                                </strong>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-user-check"></i>
+                                <strong>
+                                    Chịu trách nhiệm
+                                </strong>
+                            </div>
+
+                        </div>
+
+
+                        <div class="community-final">
+
+                            <div class="community-final-icon">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    IUH SHOP
+                                </span>
+
+                                <h3>
+                                    Một cộng đồng tốt được tạo nên
+                                    từ cách mỗi thành viên đối xử
+                                    với nhau.
+                                </h3>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+     <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/QTCD.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+</body>
+</html>

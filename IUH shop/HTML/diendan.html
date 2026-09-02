@@ -691,7 +691,7 @@
                         </ul>
 
 
-                        <a href="dieukhoandang.html">
+                        <a href="QTCD.html">
 
                             Xem quy định đầy đủ
 
@@ -767,6 +767,178 @@
 
 </main>
 
+<!-- =====================================================
+     MODAL ĐĂNG BÀI VIẾT - ADMIN
+====================================================== -->
+
+<div
+    id="articleModal"
+    class="article-modal"
+>
+
+    <div
+        class="article-modal-overlay"
+        id="articleModalOverlay"
+    ></div>
+
+    <div class="article-modal-box">
+
+        <div class="article-modal-header">
+
+            <div>
+                <span class="article-modal-eyebrow">
+                    IUH SHOP INFORMATION
+                </span>
+
+                <h2 id="articleModalTitle">
+                    Đăng bài viết
+                </h2>
+            </div>
+
+            <button
+                type="button"
+                id="closeArticleModal"
+                class="article-modal-close"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <!-- TIÊU ĐỀ -->
+
+        <div class="article-form-group">
+
+            <label for="articleTitleInput">
+                Tiêu đề bài viết
+            </label>
+
+            <input
+                type="text"
+                id="articleTitleInput"
+                maxlength="200"
+                placeholder="Nhập tiêu đề bài viết..."
+            >
+
+        </div>
+
+
+        <!-- DANH MỤC -->
+
+        <div class="article-form-group">
+
+            <label for="articleCategoryInput">
+                Danh mục
+            </label>
+
+            <select id="articleCategoryInput">
+
+                <option value="THÔNG BÁO">
+                    THÔNG BÁO
+                </option>
+
+                <option value="CHÍNH SÁCH">
+                    CHÍNH SÁCH
+                </option>
+
+                <option value="HƯỚNG DẪN">
+                    HƯỚNG DẪN
+                </option>
+
+                <option value="TIN TỨC">
+                    TIN TỨC
+                </option>
+
+                <option value="CỘNG ĐỒNG">
+                    CỘNG ĐỒNG
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ẢNH -->
+
+        <div class="article-form-group">
+
+            <label for="articleImageInput">
+                Ảnh đại diện bài viết
+            </label>
+
+            <input
+                type="file"
+                id="articleImageInput"
+                accept="image/jpeg,image/png,image/webp"
+            >
+
+            <div
+                id="articleImagePreview"
+                class="article-image-preview"
+                hidden
+            >
+                <img
+                    id="articlePreviewImg"
+                    src=""
+                    alt="Ảnh bài viết"
+                >
+
+                <button
+                    type="button"
+                    id="removeArticleImage"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+        </div>
+
+
+        <!-- NỘI DUNG -->
+
+        <div class="article-form-group">
+
+            <label>
+                Nội dung bài viết
+            </label>
+
+            <div
+                id="articleEditor"
+                class="article-editor"
+                contenteditable="true"
+                data-placeholder="Nhập nội dung bài viết..."
+            ></div>
+
+        </div>
+
+
+        <!-- ACTION -->
+
+        <div class="article-modal-footer">
+
+            <button
+                type="button"
+                id="cancelArticleButton"
+                class="article-cancel-button"
+            >
+                Hủy
+            </button>
+
+            <button
+                type="button"
+                id="saveArticleButton"
+                class="article-save-button"
+            >
+                <i class="fa-solid fa-paper-plane"></i>
+                Đăng bài viết
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
      <!-- =========================
      FOOTER
