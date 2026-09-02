@@ -20,7 +20,166 @@ const supabaseClient =
 const DEFAULT_AVATAR =
     "../Images/default-avatar.svg";
 
+/* =========================================================
+   CẬP NHẬT HEADER KHI ĐĂNG NHẬP
+========================================================= */
 
+async function updateUserMenu() {
+
+    try {
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await supabaseClient
+                .auth
+                .getUser();
+
+
+        if (userError) {
+
+            console.error(
+                "Không lấy được tài khoản:",
+                userError
+            );
+
+            return;
+        }
+
+
+        /* LẤY PHẦN TỬ HEADER */
+
+        const loginLink =
+            document.querySelector(".login-link");
+
+        const registerLink =
+            document.querySelector(".register-link");
+
+        const divider =
+            document.querySelector(".top-divider");
+
+        const userAccount =
+            document.getElementById(
+                "userAccount"
+            );
+
+        const headerAvatar =
+            document.getElementById(
+                "headerAvatar"
+            );
+
+        const headerUserName =
+            document.getElementById(
+                "headerUserName"
+            );
+
+
+        /* CHƯA ĐĂNG NHẬP */
+
+        if (!user) {
+
+            if (loginLink) {
+                loginLink.style.display = "";
+            }
+
+            if (registerLink) {
+                registerLink.style.display = "";
+            }
+
+            if (divider) {
+                divider.style.display = "";
+            }
+
+            if (userAccount) {
+                userAccount.style.display = "none";
+            }
+
+            return;
+        }
+
+
+        /* ĐÃ ĐĂNG NHẬP */
+
+        const {
+            data: profile
+        } =
+            await supabaseClient
+                .from("users")
+                .select(
+                    "fullname, avatar_url, role"
+                )
+                .eq(
+                    "user_id",
+                    user.id
+                )
+                .maybeSingle();
+
+
+        /* TÊN */
+
+        const fullname =
+            profile?.fullname ||
+            user.email?.split("@")[0] ||
+            "Tài khoản";
+
+
+        if (headerUserName) {
+
+            headerUserName.textContent =
+                fullname;
+
+        }
+
+
+        /* AVATAR */
+
+        if (headerAvatar) {
+
+            headerAvatar.src =
+                profile?.avatar_url ||
+                "../Images/default-avatar.svg";
+
+        }
+
+
+        /* ẨN ĐĂNG NHẬP / ĐĂNG KÝ */
+
+        if (loginLink) {
+            loginLink.style.display = "none";
+        }
+
+        if (registerLink) {
+            registerLink.style.display = "none";
+        }
+
+        if (divider) {
+            divider.style.display = "none";
+        }
+
+
+        /* HIỆN TÀI KHOẢN */
+
+        if (userAccount) {
+
+            userAccount.style.display =
+                "flex";
+
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi cập nhật tài khoản:",
+            error
+        );
+
+    }
+
+}
 
 /* =========================================================
    STATE
@@ -4984,6 +5143,8 @@ supabaseClient
 
             await loadCurrentUser();
 
+            await updateUserMenu();
+
             await loadForumPosts();
 
         }
@@ -5000,6 +5161,8 @@ document.addEventListener(
     async function () {
 
         setupActiveNavigation();
+
+        await updateUserMenu();
 
         setupForumTabs();
 
