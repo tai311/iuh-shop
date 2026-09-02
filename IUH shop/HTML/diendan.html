@@ -1,0 +1,1198 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIỄN ĐÀN IUH SHOP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FONT AWESOME -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/diendan.css">
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+                     
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+</a>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+    
+    <main class="forum-page">
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="forum-hero">
+
+        <!-- DECOR -->
+
+        <div class="forum-hero-grid"></div>
+
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+        <div class="hero-orb hero-orb-3"></div>
+
+        <div class="hero-book-icon">
+            <i class="fa-solid fa-book-open"></i>
+        </div>
+
+        <div class="hero-chat-icon">
+            <i class="fa-solid fa-comments"></i>
+        </div>
+
+        <div class="hero-user-icon">
+            <i class="fa-solid fa-user-group"></i>
+        </div>
+
+
+        <div class="forum-hero-content">
+
+            <div class="forum-eyebrow">
+                <i class="fa-solid fa-sparkles"></i>
+                IUH SHOP COMMUNITY
+            </div>
+
+            <h1>Diễn đàn</h1>
+
+            <p>
+                Nơi sinh viên IUH chia sẻ kiến thức,
+                kinh nghiệm và kết nối với nhau.
+            </p>
+
+            <div class="hero-mini-info">
+
+                <span>
+                    <i class="fa-solid fa-comments"></i>
+                    Chia sẻ
+                </span>
+
+                <span>
+                    <i class="fa-solid fa-user-group"></i>
+                    Kết nối
+                </span>
+
+                <span>
+                    <i class="fa-solid fa-lightbulb"></i>
+                    Học hỏi
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         CONTAINER
+    ====================================================== -->
+
+    <section class="forum-container">
+
+
+        <!-- =================================================
+             TAB
+        ================================================== -->
+
+        <div class="forum-tabs">
+
+            <button
+                type="button"
+                id="discussionTab"
+                class="forum-tab active"
+            >
+                <i class="fa-solid fa-comments"></i>
+                <span>Thảo luận</span>
+            </button>
+
+
+            <button
+                type="button"
+                id="articleTab"
+                class="forum-tab"
+            >
+                <i class="fa-solid fa-newspaper"></i>
+                <span>Bài viết</span>
+            </button>
+
+        </div>
+
+
+
+        <!-- =================================================
+             THẢO LUẬN
+        ================================================== -->
+
+        <section
+            id="discussionContent"
+            class="forum-tab-content active"
+        >
+
+            <div class="discussion-layout">
+
+
+                <!-- =========================================
+                     MAIN FEED
+                ========================================== -->
+
+                <div class="discussion-main">
+
+
+                    <!-- =====================================
+                         CREATE POST CARD
+                    ====================================== -->
+
+                    <div class="create-post-card">
+
+                        <div class="create-post-top">
+
+                            <button
+                                type="button"
+                                id="currentUserAvatar"
+                                class="forum-avatar"
+                                aria-label="Ảnh đại diện"
+                            >
+
+                                <img
+                                    id="forumCurrentAvatar"
+                                    src="../Images/default-avatar.svg"
+                                    alt="Avatar"
+                                >
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                id="openCreatePost"
+                                class="create-post-input"
+                            >
+
+                                Bạn đang nghĩ gì?
+
+                            </button>
+
+                        </div>
+
+
+                        <div class="create-post-actions">
+
+
+                            <button
+                                type="button"
+                                id="createPhotoPost"
+                                class="create-post-action"
+                            >
+
+                                <i
+                                    class="fa-solid fa-image"
+                                    style="color:#35a56f;"
+                                ></i>
+
+                                <span>Ảnh</span>
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                id="createDiscussionPost"
+                                class="create-post-action"
+                            >
+
+                                <i
+                                    class="fa-solid fa-message"
+                                    style="color:#3558ad;"
+                                ></i>
+
+                                <span>Thảo luận</span>
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                id="createQuestionPost"
+                                class="create-post-action"
+                            >
+
+                                <i
+                                    class="fa-solid fa-circle-question"
+                                    style="color:#df9e35;"
+                                ></i>
+
+                                <span>Đặt câu hỏi</span>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =====================================
+                         TOOLBAR
+                    ====================================== -->
+
+                    <div class="discussion-toolbar">
+
+                        <div class="discussion-filter-title">
+
+                            <i class="fa-solid fa-list"></i>
+
+                            <span>
+                                Bài viết mới nhất
+                            </span>
+
+                        </div>
+
+
+                        <div class="forum-sort-wrapper">
+
+                            <button
+                                type="button"
+                                id="discussionSort"
+                                class="discussion-sort"
+                            >
+
+                                <span id="sortText">
+                                    Mới nhất
+                                </span>
+
+                                <i class="fa-solid fa-chevron-down"></i>
+
+                            </button>
+
+
+                            <div
+                                id="forumSortMenu"
+                                class="forum-sort-menu"
+                            >
+
+                                <button
+                                    type="button"
+                                    data-sort="newest"
+                                >
+                                    <i class="fa-regular fa-clock"></i>
+                                    Mới nhất
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-sort="popular"
+                                >
+                                    <i class="fa-solid fa-fire"></i>
+                                    Nổi bật
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =====================================
+                         LOADING
+                    ====================================== -->
+
+                    <div
+                        id="forumLoading"
+                        class="forum-loading"
+                    >
+
+                        <div class="forum-loading-spinner"></div>
+
+                        <span>
+                            Đang tải bài viết...
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- =====================================
+                         FEED
+                    ====================================== -->
+
+                    <div
+                        id="discussionFeed"
+                        class="discussion-feed"
+                    ></div>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     SIDEBAR
+                ========================================== -->
+
+                <aside class="discussion-sidebar">
+
+
+                    <!-- VỀ DIỄN ĐÀN -->
+
+                    <div class="forum-side-card">
+
+                        <div class="side-card-title">
+
+                            <i class="fa-solid fa-circle-info"></i>
+
+                            <span>Về diễn đàn</span>
+
+                        </div>
+
+                        <p>
+                            Đây là không gian để sinh viên IUH
+                            chia sẻ kiến thức, trao đổi kinh nghiệm
+                            và kết nối với cộng đồng.
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- CHỦ ĐỀ -->
+
+                    <div class="forum-side-card">
+
+                        <div class="side-card-title">
+
+                            <i class="fa-solid fa-hashtag"></i>
+
+                            <span>Chủ đề phổ biến</span>
+
+                        </div>
+
+
+                        <div class="forum-topics">
+
+                            <button type="button">
+                                #Học_tập
+                            </button>
+
+                            <button type="button">
+                                #Sách_giáo_trình
+                            </button>
+
+                            <button type="button">
+                                #Kinh_nghiệm
+                            </button>
+
+                            <button type="button">
+                                #Đời_sống_sinh_viên
+                            </button>
+
+                            <button type="button">
+                                #Mua_bán
+                            </button>
+
+                            <button type="button">
+                                #IUH
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- RULE -->
+
+                    <div class="forum-side-card forum-rules">
+
+                        <div class="side-card-title">
+
+                            <i class="fa-solid fa-shield-halved"></i>
+
+                            <span>Quy tắc cộng đồng</span>
+
+                        </div>
+
+
+                        <ul>
+
+                            <li>
+                                Tôn trọng các thành viên khác.
+                            </li>
+
+                            <li>
+                                Không đăng nội dung spam.
+                            </li>
+
+                            <li>
+                                Không đăng nội dung vi phạm pháp luật.
+                            </li>
+
+                            <li>
+                                Không sử dụng diễn đàn để lừa đảo.
+                            </li>
+
+                        </ul>
+
+
+                        <a href="dieukhoandang.html">
+
+                            Xem quy định đầy đủ
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </a>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             TAB BÀI VIẾT
+        ================================================== -->
+
+        <section
+            id="articleContent"
+            class="forum-tab-content"
+        >
+
+            <div class="official-articles">
+
+
+                <div class="official-articles-header">
+
+                    <div>
+
+                        <div class="forum-eyebrow article-eyebrow">
+                            IUH SHOP INFORMATION
+                        </div>
+
+                        <h2>Bài viết</h2>
+
+                        <p>
+                            Thông tin, chính sách và những nội dung
+                            chính thức từ IUH SHOP.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="adminCreateArticle"
+                        class="admin-create-article"
+                    >
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        Đăng bài viết
+
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="officialArticleList"
+                    class="official-article-list"
+                ></div>
+
+            </div>
+
+        </section>
+
+    </section>
+
+</main>
+
+
+     <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/diendan.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+<!-- =====================================================
+     CREATE POST MODAL
+===================================================== -->
+
+<div
+    id="createPostModal"
+    class="create-post-modal"
+>
+
+    <div class="create-post-overlay"></div>
+
+
+    <div class="create-post-dialog">
+
+
+        <!-- HEADER -->
+
+        <div class="create-post-header">
+
+            <div class="create-post-header-center">
+
+                <div class="create-post-small-title">
+                    IUH SHOP COMMUNITY
+                </div>
+
+                <h2>
+                    Tạo bài viết
+                </h2>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="closeCreatePost"
+                class="create-post-close"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+
+        <!-- USER -->
+
+        <div class="create-post-user">
+
+            <div class="create-post-avatar">
+
+                <img
+                    id="createPostAvatar"
+                    src="../Images/default-avatar.svg"
+                    alt="Avatar"
+                >
+
+            </div>
+
+
+            <div class="create-post-user-info">
+
+
+                <div class="create-post-name">
+
+                    <span id="createPostName">
+                        Đang tải...
+                    </span>
+
+
+                    <span
+                        id="createPostVerified"
+                        class="forum-verified-badge"
+                        hidden
+                    >
+
+                        <i class="fa-solid fa-check"></i>
+
+                    </span>
+
+                </div>
+
+
+                <div class="create-post-privacy">
+
+                    <span>
+                        <i class="fa-solid fa-earth-americas"></i>
+                        Công khai
+                    </span>
+
+                    <span class="privacy-dot">•</span>
+
+                    <span id="createPostTypeLabel">
+                        Thảo luận
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- POST TYPE -->
+
+        <div class="create-post-type">
+
+            <button
+                type="button"
+                class="create-type-button active"
+                data-type="discussion"
+            >
+
+                <i class="fa-solid fa-comments"></i>
+
+                Thảo luận
+
+            </button>
+
+
+            <button
+                type="button"
+                class="create-type-button"
+                data-type="question"
+            >
+
+                <i class="fa-solid fa-circle-question"></i>
+
+                Đặt câu hỏi
+
+            </button>
+
+        </div>
+
+
+
+        <!-- TEXT AREA WRAPPER -->
+
+        <div class="create-post-editor">
+
+            <textarea
+                id="createPostContent"
+                class="create-post-textarea"
+                maxlength="5000"
+                placeholder="Bạn đang nghĩ gì?"
+            ></textarea>
+
+
+            <!-- @ MENTION -->
+
+            <div
+                id="mentionDropdown"
+                class="mention-dropdown"
+            ></div>
+
+
+            <div class="create-post-counter">
+
+                <span id="createPostCounter">
+                    0
+                </span>
+
+                / 5000
+
+            </div>
+
+        </div>
+
+
+
+        <!-- IMAGE PREVIEW -->
+
+        <div
+            id="createPostImagePreview"
+            class="create-post-image-preview"
+            hidden
+        >
+
+            <img
+                id="createPostPreviewImg"
+                src=""
+                alt="Ảnh bài viết"
+            >
+
+
+            <button
+                type="button"
+                id="removePostImage"
+                class="remove-post-image"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+
+        <!-- ADD -->
+
+        <div class="create-post-add">
+
+            <div>
+
+                <strong>
+                    Thêm vào bài viết
+                </strong>
+
+                <small>
+                    Làm bài viết sinh động hơn
+                </small>
+
+            </div>
+
+
+            <label
+                for="createPostImage"
+                class="create-post-image-button"
+            >
+
+                <span class="image-button-icon">
+
+                    <i class="fa-solid fa-image"></i>
+
+                </span>
+
+                <span>Ảnh</span>
+
+            </label>
+
+
+            <input
+                type="file"
+                id="createPostImage"
+                accept="image/jpeg,image/png,image/webp"
+                hidden
+            >
+
+        </div>
+
+
+
+        <!-- TIP -->
+
+        <div class="create-post-tip">
+
+            <i class="fa-solid fa-at"></i>
+
+            <span>
+                Gõ <strong>@</strong> để nhắc đến sinh viên khác.
+            </span>
+
+        </div>
+
+
+
+        <!-- SUBMIT -->
+
+        <div class="create-post-footer">
+
+            <button
+                type="button"
+                id="submitCreatePost"
+                class="submit-create-post"
+            >
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+                <span>Đăng bài</span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>
