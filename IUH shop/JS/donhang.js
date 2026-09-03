@@ -2423,6 +2423,53 @@ async function updateOrderStatus(
             return;
         }
 
+        /* =========================================
+   GIẢI NGÂN ONLINE
+   ADMIN -> SELLER
+========================================= */
+
+if (newStatus === "completed") {
+
+    const {
+        data: settlementData,
+        error: settlementError
+    } = await db.rpc(
+        "settle_online_order",
+        {
+            p_order_id:
+                Number(orderId)
+        }
+    );
+
+
+    if (settlementError) {
+
+        console.error(
+            "Lỗi giải ngân:",
+            settlementError
+        );
+
+        alert(
+            "Đơn đã hoàn tất nhưng giải ngân thất bại:\n\n" +
+            settlementError.message
+        );
+
+        return;
+    }
+
+
+    if (
+        settlementData?.settled === true
+    ) {
+
+        alert(
+            "✓ Đơn hàng đã hoàn tất.\n\n" +
+            "Tiền đã được giải ngân vào Ví IUH của người bán."
+        );
+
+    }
+}
+
 
         alert(
             "✓ Đã cập nhật trạng thái đơn hàng."

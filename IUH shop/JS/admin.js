@@ -23,6 +23,414 @@ let currentFilter = "all";
 let products = [];
 let currentProductFilter = "all";
 
+/* =========================================
+   DASHBOARD ADMIN - DATABASE
+========================================= */
+
+let adminStats = {
+    totalUsers: 0,
+    totalProducts: 0,
+    totalOrders: 0,
+    pendingOrders: 0
+};
+
+
+/* =========================================
+   FORMAT TIỀN
+========================================= */
+
+function formatAdminCurrency(value) {
+    return new Intl.NumberFormat("vi-VN").format(
+        Number(value) || 0
+    ) + "đ";
+}
+
+
+/* =========================================
+   TẢI THỐNG KÊ DASHBOARD
+========================================= */
+
+async function loadAdminDashboardStats() {
+
+    try {
+
+        /* ==============================
+           TỔNG NGƯỜI DÙNG
+        ============================== */
+
+        const {
+            count: userCount,
+            error: userError
+        } = await supabaseClient
+            .from("users")
+            .select("*", {
+                count: "exact",
+                head: true
+            });
+
+        if (userError) {
+            throw userError;
+        }
+
+
+        /* ==============================
+           TỔNG SẢN PHẨM
+        ============================== */
+
+        const {
+            count: productCount,
+            error: productError
+        } = await supabaseClient
+            .from("products")
+            .select("*", {
+                count: "exact",
+                head: true
+            });
+
+        if (productError) {
+            throw productError;
+        }
+
+
+        /* ==============================
+           TỔNG ĐƠN HÀNG
+        ============================== */
+
+        const {
+            count: orderCount,
+            error: orderError
+        } = await supabaseClient
+            .from("orders")
+            .select("*", {
+                count: "exact",
+                head: true
+            });
+
+        if (orderError) {
+            throw orderError;
+        }
+
+
+        /* ==============================
+           ĐƠN CHỜ XỬ LÝ
+           
+           pending + confirmed
+        ============================== */
+
+        const {
+            count: pendingCount,
+            error: pendingError
+        } = await supabaseClient
+            .from("orders")
+            .select("*", {
+                count: "exact",
+                head: true
+            })
+            .in("status", [
+                "pending",
+                "confirmed"
+            ]);
+
+        if (pendingError) {
+            throw pendingError;
+        }
+
+
+        adminStats.totalUsers =
+            userCount || 0;
+
+        adminStats.totalProducts =
+            productCount || 0;
+
+        adminStats.totalOrders =
+            orderCount || 0;
+
+        adminStats.pendingOrders =
+            pendingCount || 0;
+
+
+        updateAdminDashboardStats();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi tải thống kê Admin:",
+            error
+        );
+
+        updateAdminDashboardStats(true);
+    }
+}
+
+
+/* =========================================
+   HIỂN THỊ THỐNG KÊ
+========================================= */
+
+function updateAdminDashboardStats(
+    hasError = false
+) {
+
+    const totalUsers =
+        document.getElementById(
+            "totalUsers"
+        );
+
+    const totalProducts =
+        document.getElementById(
+            "totalProducts"
+        );
+
+    const totalOrders =
+        document.getElementById(
+            "totalOrders"
+        );
+
+    const pendingItems =
+        document.getElementById(
+            "pendingItems"
+        );
+
+
+    if (hasError) {
+
+        if (totalUsers) {
+            totalUsers.textContent = "!";
+        }
+
+        if (totalProducts) {
+            totalProducts.textContent = "!";
+        }
+
+        if (totalOrders) {
+            totalOrders.textContent = "!";
+        }
+
+        if (pendingItems) {
+            pendingItems.textContent = "!";
+        }
+
+        return;
+    }
+
+
+    if (totalUsers) {
+        totalUsers.textContent =
+            adminStats.totalUsers;
+    }
+
+    if (totalProducts) {
+        totalProducts.textContent =
+            adminStats.totalProducts;
+    }
+
+    if (totalOrders) {
+        totalOrders.textContent =
+            adminStats.totalOrders;
+    }
+
+    if (pendingItems) {
+        pendingItems.textContent =
+            adminStats.pendingOrders;
+    }
+}
+
+
+/* =========================================
+   REALTIME ADMIN
+========================================= */
+
+function setupAdminRealtime() {
+
+    /* ==============================
+       USERS
+    ============================== */
+
+    supabaseClient
+        .channel("admin-users-realtime")
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "users"
+            },
+            async function () {
+
+                await loadAdminDashboardStats();
+
+                /*
+                   Nếu đang mở quản lý user
+                   thì tải lại danh sách
+                */
+                const verificationSection =
+                    document.getElementById(
+                        "verificationSection"
+                    );
+
+                if (
+                    verificationSection &&
+                    verificationSection.classList.contains("show")
+                ) {
+                    await loadUsers();
+                }
+            }
+        )
+        .subscribe();
+
+
+    /* ==============================
+       PRODUCTS
+    ============================== */
+
+    supabaseClient
+        .channel("admin-products-realtime")
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "products"
+            },
+            async function () {
+
+                await loadAdminDashboardStats();
+
+                /*
+                   Nếu đang mở quản lý sản phẩm
+                   thì tải lại danh sách
+                */
+                const productsSection =
+                    document.getElementById(
+                        "productsSection"
+                    );
+
+                if (
+                    productsSection &&
+                    productsSection.classList.contains("show")
+                ) {
+                    await loadProducts();
+                }
+            }
+        )
+        .subscribe();
+
+
+    /* ==============================
+       ORDERS
+    ============================== */
+
+    supabaseClient
+        .channel("admin-orders-realtime")
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "orders"
+            },
+            async function () {
+
+                console.log(
+                    "Admin: orders thay đổi"
+                );
+
+                await loadAdminDashboardStats();
+
+                /*
+                   Nếu sau này có khu vực
+                   quản lý đơn hàng thì
+                   có thể reload tại đây.
+                */
+                if (
+                    typeof loadAdminOrders ===
+                    "function"
+                ) {
+                    await loadAdminOrders();
+                }
+            }
+        )
+        .subscribe();
+
+
+    /* ==============================
+       WALLET ADMIN
+    ============================== */
+
+    supabaseClient
+        .channel("admin-wallet-realtime")
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "iuh_wallets"
+            },
+            async function () {
+
+                if (
+                    typeof loadAdminWallet ===
+                    "function"
+                ) {
+                    await loadAdminWallet();
+                }
+            }
+        )
+        .subscribe();
+
+
+    /* ==============================
+       WALLET TRANSACTIONS
+    ============================== */
+
+    supabaseClient
+        .channel("admin-wallet-transactions-realtime")
+        .on(
+            "postgres_changes",
+            {
+                event: "INSERT",
+                schema: "public",
+                table: "wallet_transactions"
+            },
+            async function () {
+
+                if (
+                    typeof loadAdminWallet ===
+                    "function"
+                ) {
+                    await loadAdminWallet();
+                }
+
+                if (
+                    typeof loadAdminWalletHistory ===
+                    "function"
+                ) {
+                    await loadAdminWalletHistory();
+                }
+            }
+        )
+        .subscribe();
+}
+
+
+/* =========================================
+   KHỞI TẠO DASHBOARD
+========================================= */
+
+async function initAdminDashboard() {
+
+    /*
+       Tải số liệu ngay khi mở trang
+    */
+    await loadAdminDashboardStats();
+
+    /*
+       Bật realtime
+    */
+    setupAdminRealtime();
+}
+
 
 /* =========================================
    KIỂM TRA ADMIN
@@ -1274,6 +1682,920 @@ document.addEventListener(
     }
 );
 
+/* =========================================
+   QUẢN LÝ ĐƠN HÀNG ADMIN
+========================================= */
+
+let adminOrders = [];
+let currentOrderFilter = "all";
+
+
+/* =========================================
+   MỞ / ĐÓNG QUẢN LÝ ĐƠN HÀNG
+========================================= */
+
+function setupOrderManagement() {
+
+    const manageOrders =
+        document.getElementById(
+            "manageOrders"
+        );
+
+    const ordersSection =
+        document.getElementById(
+            "ordersSection"
+        );
+
+    const closeOrders =
+        document.getElementById(
+            "closeOrders"
+        );
+
+
+    if (
+        !manageOrders ||
+        !ordersSection
+    ) {
+        console.error(
+            "Không tìm thấy khu vực quản lý đơn hàng."
+        );
+
+        return;
+    }
+
+
+    /* ==============================
+       MỞ
+    ============================== */
+
+    manageOrders.addEventListener(
+        "click",
+        async function () {
+
+            ordersSection.classList.add(
+                "show"
+            );
+
+            ordersSection.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+
+            ordersSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+
+            await loadAdminOrders();
+
+        }
+    );
+
+
+    /* ==============================
+       ĐÓNG
+    ============================== */
+
+    if (closeOrders) {
+
+        closeOrders.addEventListener(
+            "click",
+            function () {
+
+                ordersSection.classList.remove(
+                    "show"
+                );
+
+                ordersSection.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+
+            }
+        );
+
+    }
+
+
+    setupOrderFilters();
+
+}
+
+
+/* =========================================
+   TẢI ĐƠN HÀNG TỪ DATABASE
+========================================= */
+
+async function loadAdminOrders() {
+
+    const list =
+        document.getElementById(
+            "ordersList"
+        );
+
+
+    if (!list) {
+        return;
+    }
+
+
+    list.innerHTML = `
+        <div class="products-loading">
+            Đang tải đơn hàng...
+        </div>
+    `;
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+
+            .from("orders")
+
+            .select(`
+                id,
+                order_code,
+                buyer_id,
+                recipient_name,
+                recipient_phone,
+                recipient_address,
+                shipping_method,
+                shipping_fee,
+                payment_method,
+                subtotal,
+                total_amount,
+                status,
+                created_at,
+                updated_at
+            `)
+
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        adminOrders =
+            data || [];
+
+
+        await attachOrderBuyers();
+
+        renderAdminOrders();
+
+        updateAdminOrderSummary();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Lỗi tải đơn hàng Admin:",
+            error
+        );
+
+
+        list.innerHTML = `
+            <div class="products-error">
+
+                Không thể tải danh sách đơn hàng.
+
+                <br><br>
+
+                ${escapeHtml(
+                    error.message || ""
+                )}
+
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================================
+   LẤY THÔNG TIN NGƯỜI MUA
+========================================= */
+
+async function attachOrderBuyers() {
+
+    const buyerIds = [
+        ...new Set(
+            adminOrders
+                .map(
+                    order =>
+                        order.buyer_id
+                )
+                .filter(Boolean)
+        )
+    ];
+
+
+    if (
+        buyerIds.length === 0
+    ) {
+        return;
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+
+            .from("users")
+
+            .select(`
+                user_id,
+                fullname,
+                email,
+                avatar_url
+            `)
+
+            .in(
+                "user_id",
+                buyerIds
+            );
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    const buyerMap =
+        new Map(
+            (data || []).map(
+                user => [
+                    String(
+                        user.user_id
+                    ),
+                    user
+                ]
+            )
+        );
+
+
+    adminOrders =
+        adminOrders.map(
+            order => ({
+
+                ...order,
+
+                buyer:
+                    buyerMap.get(
+                        String(
+                            order.buyer_id
+                        )
+                    ) || null
+
+            })
+        );
+
+}
+
+
+/* =========================================
+   FILTER ĐƠN HÀNG
+========================================= */
+
+function setupOrderFilters() {
+
+    const buttons =
+        document.querySelectorAll(
+            "[data-order-filter]"
+        );
+
+
+    buttons.forEach(
+        function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    buttons.forEach(
+                        function (item) {
+
+                            item.classList.remove(
+                                "active"
+                            );
+
+                        }
+                    );
+
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    currentOrderFilter =
+                        button.dataset.orderFilter ||
+                        "all";
+
+
+                    renderAdminOrders();
+
+                    updateAdminOrderSummary();
+
+                }
+            );
+
+        }
+    );
+
+
+    const searchInput =
+        document.getElementById(
+            "ordersSearch"
+        );
+
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
+            "input",
+            function () {
+
+                renderAdminOrders();
+
+                updateAdminOrderSummary();
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   LỌC ĐƠN
+========================================= */
+
+function getFilteredAdminOrders() {
+
+    const searchInput =
+        document.getElementById(
+            "ordersSearch"
+        );
+
+
+    const keyword =
+        (
+            searchInput?.value ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    return adminOrders.filter(
+        function (order) {
+
+            const status =
+                order.status ||
+                "pending";
+
+
+            let filterMatch = true;
+
+
+            if (
+                currentOrderFilter !==
+                "all"
+            ) {
+
+                filterMatch =
+                    status ===
+                    currentOrderFilter;
+
+            }
+
+
+            const orderCode =
+                String(
+                    order.order_code ||
+                    ""
+                ).toLowerCase();
+
+
+            const buyerName =
+                String(
+                    order.buyer?.fullname ||
+                    order.recipient_name ||
+                    ""
+                ).toLowerCase();
+
+
+            const buyerEmail =
+                String(
+                    order.buyer?.email ||
+                    ""
+                ).toLowerCase();
+
+
+            const searchMatch =
+                !keyword ||
+
+                orderCode.includes(
+                    keyword
+                ) ||
+
+                buyerName.includes(
+                    keyword
+                ) ||
+
+                buyerEmail.includes(
+                    keyword
+                );
+
+
+            return (
+                filterMatch &&
+                searchMatch
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   HIỂN THỊ ĐƠN
+========================================= */
+
+function renderAdminOrders() {
+
+    const list =
+        document.getElementById(
+            "ordersList"
+        );
+
+
+    if (!list) {
+        return;
+    }
+
+
+    const filtered =
+        getFilteredAdminOrders();
+
+
+    if (
+        filtered.length === 0
+    ) {
+
+        list.innerHTML = `
+            <div class="products-empty">
+                Không tìm thấy đơn hàng phù hợp.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        filtered
+            .map(
+                createAdminOrderCard
+            )
+            .join("");
+
+}
+
+
+/* =========================================
+   CARD ĐƠN HÀNG
+========================================= */
+
+function createAdminOrderCard(
+    order
+) {
+
+    const status =
+        order.status ||
+        "pending";
+
+
+    const statusText = {
+
+        pending:
+            "Chờ xử lý",
+
+        confirmed:
+            "Đã xác nhận",
+
+        shipping:
+            "Đang giao",
+
+        delivered:
+            "Đã giao",
+
+        completed:
+            "Hoàn thành",
+
+        cancelled:
+            "Đã hủy"
+
+    }[status] || status;
+
+
+    const statusClass = {
+
+        pending:
+            "is-hidden",
+
+        confirmed:
+            "is-active",
+
+        shipping:
+            "is-active",
+
+        delivered:
+            "is-active",
+
+        completed:
+            "is-active",
+
+        cancelled:
+            "is-hidden"
+
+    }[status] || "";
+
+
+    const total =
+        Number(
+            order.total_amount
+        ) || 0;
+
+
+    const createdAt =
+        order.created_at
+            ? new Date(
+                order.created_at
+            ).toLocaleString(
+                "vi-VN"
+            )
+            : "";
+
+
+    const paymentText = {
+
+        qr:
+            "QR",
+
+        iuh_wallet:
+            "IUH Wallet",
+
+        cod:
+            "COD"
+
+    }[
+        order.payment_method
+    ] ||
+        order.payment_method ||
+        "Không xác định";
+
+
+    return `
+
+        <article
+            class="product-admin-card"
+        >
+
+            <div
+                class="product-admin-info"
+            >
+
+                <div
+                    class="product-admin-title-row"
+                >
+
+                    <strong
+                        class="product-admin-name"
+                    >
+                        Đơn ${
+                            escapeHtml(
+                                order.order_code ||
+                                "#" + order.id
+                            )
+                        }
+                    </strong>
+
+
+                    <span
+                        class="product-admin-status ${statusClass}"
+                    >
+                        ${escapeHtml(
+                            statusText
+                        )}
+                    </span>
+
+                </div>
+
+
+                <span
+                    class="product-admin-meta"
+                >
+                    Người mua:
+                    ${escapeHtml(
+                        order.buyer?.fullname ||
+                        order.recipient_name ||
+                        "Không xác định"
+                    )}
+                </span>
+
+
+                <span
+                    class="product-admin-meta"
+                >
+                    Thanh toán:
+                    ${escapeHtml(
+                        paymentText
+                    )}
+                    · Tổng:
+                    ${formatAdminCurrency(
+                        total
+                    )}
+                </span>
+
+
+                <span
+                    class="product-admin-meta"
+                >
+                    ${
+                        createdAt
+                            ? escapeHtml(
+                                createdAt
+                            )
+                            : ""
+                    }
+                </span>
+
+            </div>
+
+
+            <div
+                class="product-admin-actions"
+            >
+
+                <select
+                    class="admin-order-status"
+                    data-order-id="${
+                        escapeAttribute(
+                            order.id
+                        )
+                    }"
+                >
+
+                    <option
+                        value="pending"
+                        ${
+                            status === "pending"
+                                ? "selected"
+                                : ""
+                        }
+                    >
+                        Chờ xử lý
+                    </option>
+
+                    <option
+                        value="confirmed"
+                        ${
+                            status === "confirmed"
+                                ? "selected"
+                                : ""
+                        }
+                    >
+                        Đã xác nhận
+                    </option>
+
+                    <option
+                        value="shipping"
+                        ${
+                            status === "shipping"
+                                ? "selected"
+                                : ""
+                        }
+                    >
+                        Đang giao
+                    </option>
+
+                    <option
+                        value="delivered"
+                        ${
+                            status === "delivered"
+                                ? "selected"
+                                : ""
+                        }
+                    >
+                        Đã giao
+                    </option>
+
+                    <option
+                        value="completed"
+                        ${
+                            status === "completed"
+                                ? "selected"
+                                : ""
+                        }
+                    >
+                        Hoàn thành
+                    </option>
+
+                    <option
+                        value="cancelled"
+                        ${
+                            status === "cancelled"
+                                ? "selected"
+                                : ""
+                        }
+                    >
+                        Đã hủy
+                    </option>
+
+                </select>
+
+            </div>
+
+        </article>
+
+    `;
+
+}
+
+
+/* =========================================
+   THỐNG KÊ ĐƠN
+========================================= */
+
+function updateAdminOrderSummary() {
+
+    const summary =
+        document.getElementById(
+            "ordersSummary"
+        );
+
+
+    if (!summary) {
+        return;
+    }
+
+
+    const pending =
+        adminOrders.filter(
+            order =>
+                order.status ===
+                    "pending" ||
+                order.status ===
+                    "confirmed"
+        ).length;
+
+
+    const shipping =
+        adminOrders.filter(
+            order =>
+                order.status ===
+                "shipping"
+        ).length;
+
+
+    const completed =
+        adminOrders.filter(
+            order =>
+                order.status ===
+                "completed"
+        ).length;
+
+
+    summary.textContent =
+        `Có ${adminOrders.length} đơn hàng · ` +
+        `${pending} chờ xử lý · ` +
+        `${shipping} đang giao · ` +
+        `${completed} hoàn thành`;
+
+}
+
+
+/* =========================================
+   ĐỔI TRẠNG THÁI ĐƠN
+========================================= */
+
+document.addEventListener(
+    "change",
+    async function (event) {
+
+        const select =
+            event.target.closest(
+                ".admin-order-status"
+            );
+
+
+        if (!select) {
+            return;
+        }
+
+
+        const orderId =
+            select.dataset.orderId;
+
+
+        const newStatus =
+            select.value;
+
+
+        if (!orderId) {
+            return;
+        }
+
+
+        try {
+
+            select.disabled = true;
+
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .rpc(
+                        "update_order_status",
+                        {
+                            p_order_id:
+                                Number(
+                                    orderId
+                                ),
+
+                            p_new_status:
+                                newStatus
+                        }
+                    );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            await loadAdminOrders();
+
+            await loadAdminDashboardStats();
+
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Lỗi cập nhật trạng thái đơn:",
+                error
+            );
+
+
+            alert(
+                error.message ||
+                "Không thể cập nhật trạng thái đơn hàng."
+            );
+
+
+            await loadAdminOrders();
+
+        }
+
+        finally {
+
+            select.disabled =
+                false;
+
+        }
+
+    }
+);
+
 
 /* =========================================
    MỞ / ĐÓNG QUẢN LÝ NGƯỜI DÙNG
@@ -2317,6 +3639,8 @@ document.addEventListener(
             return;
         }
 
+        await initAdminDashboard();
+
 
         /*
            Khởi tạo các chức năng
@@ -2325,6 +3649,8 @@ document.addEventListener(
         setupLogout();
 
 setupProductManagement();
+
+setupOrderManagement();
 
 setupUserManagement();
 

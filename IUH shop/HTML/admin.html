@@ -587,6 +587,142 @@
 
         </section>
 
+        <!-- =====================================
+     QUẢN LÝ ĐƠN HÀNG
+====================================== -->
+
+<section
+    class="products-section"
+    id="ordersSection"
+    aria-hidden="true"
+>
+
+    <div class="products-heading">
+
+        <div>
+
+            <span class="admin-label">
+                ĐƠN HÀNG
+            </span>
+
+            <h2>
+                Quản lý đơn hàng
+            </h2>
+
+            <p>
+                Theo dõi và xử lý các đơn hàng
+                của IUH SHOP.
+            </p>
+
+        </div>
+
+        <button
+            type="button"
+            class="products-close"
+            id="closeOrders"
+        >
+            Đóng
+        </button>
+
+    </div>
+
+
+    <!-- THANH TÌM KIẾM + LỌC -->
+
+    <div class="products-toolbar">
+
+        <div class="products-search">
+
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <circle
+                    cx="11"
+                    cy="11"
+                    r="7"
+                ></circle>
+
+                <path
+                    d="M16 16l5 5"
+                ></path>
+
+            </svg>
+
+            <input
+                type="search"
+                id="ordersSearch"
+                placeholder="Tìm mã đơn hoặc người mua..."
+            >
+
+        </div>
+
+
+        <div class="products-filter">
+
+            <button
+                type="button"
+                class="product-filter-button active"
+                data-order-filter="all"
+            >
+                Tất cả
+            </button>
+
+            <button
+                type="button"
+                class="product-filter-button"
+                data-order-filter="pending"
+            >
+                Chờ xử lý
+            </button>
+
+            <button
+                type="button"
+                class="product-filter-button"
+                data-order-filter="shipping"
+            >
+                Đang giao
+            </button>
+
+            <button
+                type="button"
+                class="product-filter-button"
+                data-order-filter="completed"
+            >
+                Hoàn thành
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- THỐNG KÊ -->
+
+    <div
+        class="products-summary"
+        id="ordersSummary"
+    >
+        Chưa tải danh sách đơn hàng.
+    </div>
+
+
+    <!-- DANH SÁCH ĐƠN -->
+
+    <div
+        class="products-list"
+        id="ordersList"
+    >
+
+        <div class="products-loading">
+            Bấm “Quản lý đơn hàng”
+            để tải danh sách.
+        </div>
+
+    </div>
+
+</section>
+
     </main>
 
 

@@ -165,6 +165,21 @@ function formatPrice(value) {
     ).format(number);
 }
 
+/* =========================================================
+   GIÁ NGƯỜI MUA
+   Giá trong products.price là giá người bán muốn nhận.
+   Người mua trả thêm 5% phí sàn.
+========================================================= */
+
+const PLATFORM_FEE_RATE = 0.05;
+
+function getBuyerPrice(sellerPrice) {
+    const price = Number(sellerPrice) || 0;
+
+    return Math.round(
+        price * (1 + PLATFORM_FEE_RATE)
+    );
+}
 
 /* =========================================================
    8. XỬ LÝ IMAGE_URLS
@@ -390,15 +405,20 @@ function renderProduct(product) {
     }
 
 
-    /* Giá */
+    /* Giá người mua */
 
-    if (productPrice) {
+const sellerPrice =
+    Number(product.price) || 0;
 
-        productPrice.textContent =
-            formatPrice(
-                product.price
-            );
-    }
+const buyerPrice =
+    getBuyerPrice(sellerPrice);
+
+if (productPrice) {
+    productPrice.textContent =
+        formatPrice(
+            buyerPrice
+        );
+}
 
 
     /* Số lượng */

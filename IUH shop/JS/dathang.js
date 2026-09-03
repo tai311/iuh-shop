@@ -1185,16 +1185,20 @@ function renderItems() {
                         );
 
 
-                    const price =
-                        Number(
-                            item.price
-                        ) || 0;
+                    const sellerPrice =
+    Number(
+        item.price
+    ) || 0;
 
+const buyerUnitPrice =
+    Math.round(
+        sellerPrice *
+        (1 + PLATFORM_FEE_RATE)
+    );
 
-                    const total =
-                        quantity *
-                        price;
-
+const total =
+    quantity *
+    buyerUnitPrice;
 
                     return `
 
@@ -1231,9 +1235,9 @@ function renderItems() {
                                 <div class="price-box">
 
                                     <strong>
-                                        ${formatCurrency(
-                                            price
-                                        )}
+                                       ${formatCurrency(
+    buyerUnitPrice
+)}
                                     </strong>
 
                                     <span class="qty-tag">
@@ -1335,7 +1339,14 @@ function renderEmpty() {
 
 /* =========================================================
    21. TIỀN
-   ========================================================= */
+========================================================= */
+
+const PLATFORM_FEE_RATE = 0.05;
+
+
+/* =========================================================
+   PHÍ TRUNG GIAN
+========================================================= */
 
 function getShippingFee() {
 
@@ -1344,14 +1355,18 @@ function getShippingFee() {
             'input[name="shippingMethod"]:checked'
         );
 
-
     return shipping?.value === "mid"
         ? 5000
         : 0;
 }
 
 
-function getSubtotal() {
+/* =========================================================
+   GIÁ NGƯỜI BÁN
+   Đây là giá lưu trong products.price
+========================================================= */
+
+function getSellerSubtotal() {
 
     return checkoutItems.reduce(
         (
@@ -1361,46 +1376,77 @@ function getSubtotal() {
 
             return total +
                 (
-                    Number(
-                        item.price
-                    ) *
-                    Number(
-                        item.quantityInCart
-                    )
+                    Number(item.price || 0) *
+                    Number(item.quantityInCart || 0)
                 );
+
         },
         0
     );
 }
 
 
-function getTotal() {
+/* =========================================================
+   PHÍ SÀN 5%
+========================================================= */
 
-    return (
-        getSubtotal() +
-        getShippingFee()
+function getPlatformFee() {
+
+    return Math.round(
+        getSellerSubtotal() *
+        PLATFORM_FEE_RATE
     );
 }
 
 
+/* =========================================================
+   TIỀN HÀNG NGƯỜI MUA PHẢI TRẢ
+========================================================= */
+
+function getBuyerSubtotal() {
+
+    return (
+        getSellerSubtotal() +
+        getPlatformFee()
+    );
+}
+
+
+/* =========================================================
+   TỔNG THANH TOÁN
+========================================================= */
+
+function getTotal() {
+
+    return (
+        getBuyerSubtotal() +
+        getShippingFee()
+    );
+}
+
 function updateSummary() {
 
-    const subtotal =
-        getSubtotal();
+    const sellerSubtotal =
+        getSellerSubtotal();
 
-    const shipping =
+    const platformFee =
+        getPlatformFee();
+
+    const buyerSubtotal =
+        getBuyerSubtotal();
+
+    const shippingFee =
         getShippingFee();
 
     const total =
-        subtotal +
-        shipping;
+        getTotal();
 
 
     if (subtotalEl) {
 
         subtotalEl.textContent =
             formatCurrency(
-                subtotal
+                buyerSubtotal
             );
     }
 
@@ -1409,7 +1455,7 @@ function updateSummary() {
 
         shippingFeeEl.textContent =
             formatCurrency(
-                shipping
+                shippingFee
             );
     }
 
@@ -1421,9 +1467,6 @@ function updateSummary() {
                 total
             );
     }
-
-
-    updateWalletPreview();
 }
 
 
@@ -2348,7 +2391,7 @@ function buildOrder() {
             paymentMethod,
 
         subtotal:
-            getSubtotal(),
+    getBuyerSubtotal(),
 
         total_amount:
             getTotal(),
@@ -2606,6 +2649,73 @@ async function submitOrder() {
                 "Không thể tạo đơn hàng."
             );
         }
+
+        /* =========================================
+   6. THANH TOÁN ONLINE -> VÍ ADMIN
+========================================= */
+
+if (
+    paymentMethod === "iuh_wallet" ||
+    paymentMethod === "qr"
+) {
+
+    const createdOrderId =
+        data?.order_id ||
+        data?.id;
+
+
+    if (!createdOrderId) {
+
+        throw new Error(
+            "Đơn đã được tạo nhưng không lấy được ID đơn hàng để thanh toán."
+        );
+    }
+
+
+    const {
+        data: paymentData,
+        error: paymentError
+    } =
+        await db.rpc(
+            "pay_order_to_admin",
+            {
+                p_order_id:
+                    Number(
+                        createdOrderId
+                    )
+            }
+        );
+
+
+    if (paymentError) {
+
+        console.error(
+            "Lỗi thanh toán online:",
+            paymentError
+        );
+
+        throw new Error(
+            paymentError.message ||
+            "Không thể xử lý thanh toán online."
+        );
+    }
+
+
+    if (
+        !paymentData?.success
+    ) {
+
+        throw new Error(
+            "Không thể chuyển tiền thanh toán vào Ví Admin."
+        );
+    }
+
+
+    console.log(
+        "IUH SHOP: Thanh toán online thành công:",
+        paymentData
+    );
+}
 
 
         /* =========================================

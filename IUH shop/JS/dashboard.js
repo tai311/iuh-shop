@@ -565,69 +565,131 @@ document.addEventListener(
 );
 
 /* =====================================================
-   IUH SHOP DASHBOARD
+   IUH SHOP - DASHBOARD
+   PHẦN TỪ DÒNG 567 TRỞ XUỐNG
 ===================================================== */
 
 
 /* =====================================================
-   CẤU HÌNH
+   CẤU HÌNH PHÍ
 ===================================================== */
 
+// Phí sàn: 5% trên TIỀN HÀNG của 1 đơn
 const PLATFORM_FEE_RATE = 0.05;
 
-/*
-    PHÍ CHẬM THANH TOÁN: 0,1% / ngày
-
-    0,1% = 0.001
-*/
-
+// Phí chậm thanh toán: 0,1% / ngày
 const DAILY_LATE_RATE = 0.001;
 
+// Thời hạn thanh toán phí COD
 const PAYMENT_DEADLINE_DAYS = 7;
+
+// Phí qua trung gian
+const INTERMEDIARY_SHIPPING_FEE = 5000;
 
 
 /* =====================================================
-   LẤY USER HIỆN TẠI
+   BIẾN DÙNG CHUNG
 ===================================================== */
 
-function getCurrentUser() {
+let dashboardUser = null;
+let dashboardProfile = null;
+
+let orders = [];
+let wallet = null;
+let walletTransactions = [];
+
+let revenueChart = null;
+
+let currentPaymentOrderId = null;
+
+
+/* =====================================================
+   USER HIỆN TẠI
+===================================================== */
+
+async function loadDashboardUser() {
 
     try {
 
-        return JSON.parse(
-            localStorage.getItem("currentUser")
-        );
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } = await supabaseClient.auth.getUser();
 
-    } catch {
 
-        return null;
+        if (userError) {
+
+            console.error(
+                "Không lấy được tài khoản:",
+                userError
+            );
+
+            return null;
+        }
+
+
+        if (!user) {
+
+            dashboardUser = null;
+            dashboardProfile = null;
+
+            return null;
+        }
+
+
+        dashboardUser = user;
+
+
+        const {
+            data: profile,
+            error: profileError
+        } = await supabaseClient
+            .from("users")
+            .select("*")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+
+        if (profileError) {
+
+            console.error(
+                "Không lấy được thông tin người dùng:",
+                profileError
+            );
+        }
+
+
+        dashboardProfile =
+            profile || null;
+
+
+        return user;
 
     }
+    catch (error) {
 
+        console.error(
+            "Lỗi load user:",
+            error
+        );
+
+        return null;
+    }
 }
 
 
-const currentUser = getCurrentUser();
-
-
 /* =====================================================
-   XÁC ĐỊNH QUYỀN
+   KIỂM TRA ADMIN
 ===================================================== */
 
 function isPrivilegedAccount() {
 
-    if (!currentUser) {
-
-        return false;
-
-    }
-
-
     const role =
         String(
-            currentUser.role ||
-            currentUser.userRole ||
-            currentUser.type ||
+            dashboardProfile?.role ||
+            dashboardUser?.user_metadata?.role ||
             ""
         )
         .toLowerCase()
@@ -635,73 +697,27 @@ function isPrivilegedAccount() {
 
 
     return (
-
         role === "admin" ||
-
+        role === "administrator" ||
         role === "quản trị viên" ||
-
-        role === "quan tri vien" ||
-
-        role === "administrator"
-
+        role === "quan tri vien"
     );
-
 }
 
 
-const IS_PRIVILEGED =
-    isPrivilegedAccount();
-
-
 /* =====================================================
-   LẤY ĐƠN HÀNG
-===================================================== */
-
-function getOrders() {
-
-    try {
-
-        const data =
-            JSON.parse(
-                localStorage.getItem("orders")
-            );
-
-
-        return Array.isArray(data)
-
-            ? data
-
-            : [];
-
-    }
-
-    catch {
-
-        return [];
-
-    }
-
-}
-
-
-let orders =
-    getOrders();
-
-
-/* =====================================================
-   HELPER
+   TRẠNG THÁI ĐƠN
 ===================================================== */
 
 function normalizeStatus(order) {
 
     return String(
-        order.status ||
-        order.orderStatus ||
+        order?.status ||
+        order?.order_status ||
         ""
     )
     .toLowerCase()
     .trim();
-
 }
 
 
@@ -712,105 +728,486 @@ function isCompleted(order) {
 
 
     return (
-
         status === "completed" ||
-
-        status === "hoàn thành" ||
-
-        status === "hoan thanh" ||
-
         status === "delivered" ||
-
+        status === "hoàn thành" ||
+        status === "hoan thanh" ||
         status === "đã giao" ||
-
         status === "da giao"
-
     );
+}
 
+
+function isCancelled(order) {
+
+    const status =
+        normalizeStatus(order);
+
+
+    return (
+        status === "cancelled" ||
+        status === "canceled" ||
+        status === "hủy" ||
+        status === "huy" ||
+        status === "đã hủy" ||
+        status === "da huy"
+    );
+}
+
+
+/* =====================================================
+   PHƯƠNG THỨC THANH TOÁN
+===================================================== */
+
+function getPaymentMethod(order) {
+
+    return String(
+        order?.payment_method ||
+        order?.paymentMethod ||
+        order?.payment ||
+        ""
+    )
+    .toLowerCase()
+    .trim();
 }
 
 
 function isCOD(order) {
 
     const method =
-        String(
-            order.paymentMethod ||
-            order.payment ||
-            ""
-        )
-        .toLowerCase();
+        getPaymentMethod(order);
 
 
     return (
-
+        method === "cod" ||
         method.includes("cod") ||
-
+        method.includes("cash") ||
+        method.includes("tiền mặt") ||
+        method.includes("tien mat") ||
         method.includes("nhận hàng") ||
-
         method.includes("nhan hang")
-
     );
+}
 
+
+function isOnlinePayment(order) {
+
+    const method =
+        getPaymentMethod(order);
+
+
+    return (
+        method === "qr" ||
+        method === "iuh_wallet" ||
+        method === "wallet" ||
+        method.includes("qr") ||
+        method.includes("wallet") ||
+        method.includes("online") ||
+        method.includes("ví") ||
+        method.includes("vi")
+    );
 }
 
 
 /* =====================================================
-   LẤY GIÁ NGƯỜI BÁN
+   MÃ ĐƠN
 ===================================================== */
 
-function getSellerPrice(order) {
+function getOrderId(order) {
 
-    return Number(
-
-        order.sellerPrice ||
-
-        order.productPrice ||
-
-        order.price ||
-
-        order.amount ||
-
-        0
-
+    return (
+        order?.id ??
+        order?.order_id ??
+        order?.orderId ??
+        null
     );
+}
 
+
+function getOrderCode(order) {
+
+    return (
+        order?.order_code ||
+        order?.orderCode ||
+        `#${getOrderId(order) || ""}`
+    );
 }
 
 
 /* =====================================================
-   TÍNH PHÍ SÀN
+   LẤY ITEMS
+===================================================== */
+
+function getOrderItems(order) {
+
+    if (
+        Array.isArray(
+            order?.order_items
+        )
+    ) {
+        return order.order_items;
+    }
+
+
+    if (
+        Array.isArray(
+            order?.items
+        )
+    ) {
+        return order.items;
+    }
+
+
+    return [];
+}
+
+
+/* =====================================================
+   LẤY ITEM CỦA SELLER HIỆN TẠI
+===================================================== */
+
+function getSellerItems(order) {
+
+    if (!dashboardUser) {
+        return [];
+    }
+
+
+    const items =
+        getOrderItems(order);
+
+
+    return items.filter(
+        item =>
+            String(
+                item?.seller_id ??
+                item?.sellerId ??
+                ""
+            )
+            ===
+            String(
+                dashboardUser.id
+            )
+    );
+}
+
+
+/* =====================================================
+   TIỀN HÀNG CỦA 1 ITEM
+===================================================== */
+
+function getItemSubtotal(item) {
+
+    const subtotal =
+        Number(
+            item?.subtotal ??
+            (
+                Number(
+                    item?.price || 0
+                ) *
+                Number(
+                    item?.quantity || 0
+                )
+            )
+        );
+
+
+    return Number.isFinite(
+        subtotal
+    )
+        ? subtotal
+        : 0;
+}
+
+
+/* =====================================================
+   TỔNG TIỀN HÀNG CỦA ĐƠN
+===================================================== */
+
+function getOrderProductTotal(order) {
+
+    const items =
+        getOrderItems(order);
+
+
+    if (
+        items.length > 0
+    ) {
+
+        return items.reduce(
+            (
+                total,
+                item
+            ) => {
+
+                return (
+                    total +
+                    getItemSubtotal(
+                        item
+                    )
+                );
+
+            },
+            0
+        );
+    }
+
+
+    return Number(
+        order?.subtotal ||
+        order?.product_total ||
+        order?.productTotal ||
+        order?.sellerPrice ||
+        order?.productPrice ||
+        order?.price ||
+        0
+    );
+}
+
+
+/* =====================================================
+   TỔNG TIỀN HÀNG CỦA SELLER
+===================================================== */
+
+function getSellerProductTotal(order) {
+
+    const sellerItems =
+        getSellerItems(order);
+
+
+    /*
+        Nếu xác định được seller_id
+        thì chỉ tính phần hàng của seller.
+    */
+
+    if (
+        sellerItems.length > 0
+    ) {
+
+        return sellerItems.reduce(
+            (
+                total,
+                item
+            ) => {
+
+                return (
+                    total +
+                    getItemSubtotal(
+                        item
+                    )
+                );
+
+            },
+            0
+        );
+    }
+
+
+    /*
+        Fallback cho dữ liệu đơn cũ.
+    */
+
+    return getOrderProductTotal(
+        order
+    );
+}
+
+
+/* =====================================================
+   PHÍ TRUNG GIAN / SHIP
+===================================================== */
+
+function getShippingFee(order) {
+
+    /*
+        Lấy trực tiếp shipping_fee
+        từ bảng orders.
+    */
+
+    const dbShippingFee =
+        Number(
+            order?.shipping_fee ??
+            order?.shippingFee ??
+            0
+        );
+
+
+    if (
+        Number.isFinite(
+            dbShippingFee
+        ) &&
+        dbShippingFee > 0
+    ) {
+
+        return dbShippingFee;
+    }
+
+
+    /*
+        Fallback:
+
+        Nếu đơn có shipping method
+        là qua trung gian → 5.000đ.
+
+        Gặp trực tiếp → 0đ.
+    */
+
+    const method =
+        String(
+            order?.shipping_method ||
+            order?.shippingMethod ||
+            ""
+        )
+        .toLowerCase()
+        .trim();
+
+
+    if (
+        method.includes("trung gian") ||
+        method.includes("trung_gian") ||
+        method.includes("intermediary") ||
+        method.includes("shipping") ||
+        method.includes("delivery")
+    ) {
+
+        return INTERMEDIARY_SHIPPING_FEE;
+    }
+
+
+    return 0;
+}
+
+
+/* =====================================================
+   TIỀN KHÁCH PHẢI TRẢ
+===================================================== */
+
+function getCustomerTotal(order) {
+
+    /*
+        Ưu tiên total_amount từ DB.
+    */
+
+    if (
+        order?.total_amount !== undefined &&
+        order?.total_amount !== null
+    ) {
+
+        return Number(
+            order.total_amount
+        );
+    }
+
+
+    /*
+        Fallback:
+        tiền hàng + phí trung gian.
+    */
+
+    return (
+        getOrderProductTotal(order) +
+        getShippingFee(order)
+    );
+}
+
+
+/* =====================================================
+   PHÍ SÀN 5%
 ===================================================== */
 
 function calculatePlatformFee(order) {
 
-    /*
-        Admin / Quản trị viên:
-        Dashboard không ghi nhận phí.
-    */
-
-    if (IS_PRIVILEGED) {
-
+    if (
+        isPrivilegedAccount()
+    ) {
         return 0;
-
     }
 
 
-    const sellerPrice =
-        getSellerPrice(order);
+    /*
+        QUAN TRỌNG:
+
+        Phí sàn chỉ tính trên TIỀN HÀNG.
+
+        Không tính:
+        - phí ship
+        - phí trung gian
+    */
+
+    const sellerProductTotal =
+        getSellerProductTotal(
+            order
+        );
 
 
     return (
-
-        sellerPrice *
+        sellerProductTotal *
         PLATFORM_FEE_RATE
-
     );
-
 }
 
 
 /* =====================================================
-   TÍNH SỐ NGÀY QUÁ HẠN
+   TIỀN SELLER NHẬN
+===================================================== */
+
+function calculateSellerReceive(order) {
+
+    const sellerProductTotal =
+        getSellerProductTotal(
+            order
+        );
+
+    /*
+        ONLINE:
+        Người mua đã thanh toán phí sàn
+        cùng với tiền hàng.
+
+        Vì vậy người bán nhận đủ
+        100% giá người bán đặt.
+    */
+
+    if (
+        isOnlinePayment(order)
+    ) {
+
+        return sellerProductTotal;
+    }
+
+    /*
+        COD:
+        Người bán nhận đủ tiền hàng
+        từ khách.
+
+        Phí sàn thanh toán riêng.
+    */
+
+    return sellerProductTotal;
+}
+
+
+/* =====================================================
+   NGÀY HOÀN THÀNH
+===================================================== */
+
+function getCompletedDate(order) {
+
+    return (
+        order?.completed_at ||
+        order?.completedAt ||
+        order?.completed_date ||
+        order?.completedDate ||
+        order?.updated_at ||
+        order?.updatedAt ||
+        order?.created_at ||
+        order?.createdAt ||
+        null
+    );
+}
+
+
+/* =====================================================
+   SỐ NGÀY QUÁ HẠN
 ===================================================== */
 
 function calculateOverdueDays(
@@ -818,9 +1215,7 @@ function calculateOverdueDays(
 ) {
 
     if (!completedDate) {
-
         return 0;
-
     }
 
 
@@ -831,13 +1226,11 @@ function calculateOverdueDays(
 
 
     if (
-        isNaN(
+        Number.isNaN(
             completed.getTime()
         )
     ) {
-
         return 0;
-
     }
 
 
@@ -848,10 +1241,8 @@ function calculateOverdueDays(
 
 
     deadline.setDate(
-
         deadline.getDate() +
         PAYMENT_DEADLINE_DAYS
-
     );
 
 
@@ -862,9 +1253,7 @@ function calculateOverdueDays(
     if (
         now <= deadline
     ) {
-
         return 0;
-
     }
 
 
@@ -874,7 +1263,6 @@ function calculateOverdueDays(
 
 
     return Math.floor(
-
         difference /
         (
             1000 *
@@ -882,14 +1270,12 @@ function calculateOverdueDays(
             60 *
             24
         )
-
     );
-
 }
 
 
 /* =====================================================
-   TÍNH PHÍ SAU KHI QUÁ HẠN
+   PHÍ CHẬM
 ===================================================== */
 
 function calculateFeeWithLateCharge(
@@ -898,130 +1284,444 @@ function calculateFeeWithLateCharge(
 ) {
 
     if (
-
         baseFee <= 0 ||
-
         overdueDays <= 0
-
     ) {
 
         return baseFee;
-
     }
 
 
     /*
-        Công thức:
+        0,1% / ngày trên phí gốc.
 
-        F = P × (1 + r)^n
+        Ví dụ:
+        Phí sàn = 10.000đ
+        Trễ 5 ngày
 
-        P = phí gốc
-        r = 0,1% / ngày
-        n = số ngày quá hạn
+        10.000 × 0,1% × 5
+        = 50đ
 
-        0,1% = 0.001
+        Tổng = 10.050đ
     */
 
-
     return (
-
-        baseFee *
-
-        Math.pow(
-
-            1 +
-            DAILY_LATE_RATE,
-
+        baseFee +
+        (
+            baseFee *
+            DAILY_LATE_RATE *
             overdueDays
-
         )
-
     );
-
 }
 
 
 /* =====================================================
-   VÍ IUH SHOP
-   ĐỒNG BỘ VỚI localStorage CỦA TRANG VÍ
+   KIỂM TRA PHÍ ĐÃ THANH TOÁN
 ===================================================== */
 
-function getDashboardWalletBalance() {
+function isFeePaid(order) {
 
-    const user =
-        currentUser;
+    /*
+        Online:
+        phí được hệ thống tự động tách
+        ngay lúc thanh toán.
+    */
 
+    if (
+        isOnlinePayment(order)
+    ) {
 
-    const identity =
-
-        user?.id ||
-
-        user?.userId ||
-
-        user?.email ||
-
-        user?.username ||
-
-        "guest";
+        return true;
+    }
 
 
-    const key =
+    const orderCode =
+        String(
+            getOrderCode(order)
+        )
+        .toLowerCase();
 
-        "iuhWallet_" +
 
-        String(identity)
-            .replace(
-                /[^a-zA-Z0-9_-]/g,
-                "_"
+    const orderId =
+        String(
+            getOrderId(order)
+        );
+
+
+    /*
+        COD:
+        tìm transaction phí.
+
+        Cho phép cả type = fee
+        và payment nếu RPC hiện tại
+        đang dùng pay_iuh_wallet().
+    */
+
+    return walletTransactions.some(
+        transaction => {
+
+            const description =
+                String(
+                    transaction?.description ||
+                    ""
+                )
+                .toLowerCase();
+
+
+            const title =
+                String(
+                    transaction?.title ||
+                    ""
+                )
+                .toLowerCase();
+
+
+            const type =
+                String(
+                    transaction?.type ||
+                    ""
+                )
+                .toLowerCase();
+
+
+            const isFeeTransaction =
+                (
+                    type === "fee"
+                )
+                ||
+                (
+                    type === "payment" &&
+                    description.includes(
+                        "thanh toán phí sàn"
+                    )
+                )
+                ||
+                (
+                    title.includes(
+                        "phí sàn"
+                    )
+                )
+                ||
+                (
+                    title.includes(
+                        "phi san"
+                    )
+                );
+
+
+            if (
+                !isFeeTransaction
+            ) {
+                return false;
+            }
+
+
+            return (
+                description.includes(
+                    orderCode
+                )
+                ||
+                description.includes(
+                    orderId
+                )
             );
+        }
+    );
+}
+
+
+/* =====================================================
+   LOAD WALLET
+===================================================== */
+
+async function loadWallet() {
+
+    if (!dashboardUser) {
+
+        wallet = null;
+        walletTransactions = [];
+
+        return;
+    }
 
 
     try {
 
-        const savedWallet =
+        /*
+            Đảm bảo Wallet tồn tại.
+        */
 
-            localStorage.getItem(
-                key
+        await supabaseClient
+            .rpc(
+                "ensure_iuh_wallet"
             );
 
 
-        if (!savedWallet) {
+        /*
+            Lấy Wallet.
+        */
 
-            return 0;
+        const {
+            data: walletData,
+            error: walletError
+        } =
+            await supabaseClient
+                .from(
+                    "iuh_wallets"
+                )
+                .select("*")
+                .eq(
+                    "user_id",
+                    dashboardUser.id
+                )
+                .maybeSingle();
 
+
+        if (walletError) {
+
+            console.error(
+                "Lỗi lấy Wallet:",
+                walletError
+            );
+
+            wallet = null;
+
+        }
+        else {
+
+            wallet =
+                walletData || null;
         }
 
 
-        const wallet =
+        /*
+            Lấy giao dịch.
+        */
 
-            JSON.parse(
-                savedWallet
+        const {
+            data: transactions,
+            error: transactionError
+        } =
+            await supabaseClient
+                .from(
+                    "wallet_transactions"
+                )
+                .select("*")
+                .eq(
+                    "user_id",
+                    dashboardUser.id
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                )
+                .limit(200);
+
+
+        if (transactionError) {
+
+            console.error(
+                "Lỗi lấy giao dịch:",
+                transactionError
             );
 
+            walletTransactions = [];
 
-        return Number(
+        }
+        else {
 
-            wallet?.balance || 0
-
-        );
+            walletTransactions =
+                Array.isArray(
+                    transactions
+                )
+                    ? transactions
+                    : [];
+        }
 
     }
-
     catch (error) {
 
         console.error(
-
-            "Không đọc được Ví IUH SHOP:",
-
+            "Lỗi load Wallet:",
             error
-
         );
 
+        wallet = null;
+        walletTransactions = [];
+    }
+}
 
-        return 0;
 
+/* =====================================================
+   KIỂM TRA ĐƠN CÓ LIÊN QUAN USER
+===================================================== */
+
+function isOrderRelevant(order) {
+
+    if (!dashboardUser) {
+        return false;
     }
 
+
+    /*
+        Người mua.
+    */
+
+    if (
+        String(
+            order?.buyer_id ??
+            order?.buyerId ??
+            ""
+        )
+        ===
+        String(
+            dashboardUser.id
+        )
+    ) {
+
+        return true;
+    }
+
+
+    /*
+        Người bán.
+    */
+
+    return getOrderItems(
+        order
+    )
+    .some(
+        item =>
+            String(
+                item?.seller_id ??
+                item?.sellerId ??
+                ""
+            )
+            ===
+            String(
+                dashboardUser.id
+            )
+    );
+}
+
+
+/* =====================================================
+   LOAD ORDERS
+===================================================== */
+
+async function loadOrders() {
+
+    if (!dashboardUser) {
+
+        orders = [];
+
+        return;
+    }
+
+
+    try {
+
+        /*
+            Ưu tiên RPC để tránh lỗi RLS
+            khi orders và order_items
+            tham chiếu lẫn nhau.
+        */
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .rpc(
+                    "get_my_orders"
+                );
+
+
+        if (
+            !error &&
+            Array.isArray(data)
+        ) {
+
+            orders =
+                data.filter(
+                    isOrderRelevant
+                );
+
+            return;
+        }
+
+
+        /*
+            Fallback nếu RPC chưa có.
+        */
+
+        const {
+            data: directOrders,
+            error: directError
+        } =
+            await supabaseClient
+                .from("orders")
+                .select(`
+                    *,
+                    order_items (
+                        id,
+                        order_id,
+                        product_id,
+                        seller_id,
+                        product_name,
+                        product_image,
+                        price,
+                        quantity,
+                        subtotal,
+                        created_at
+                    )
+                `)
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        if (directError) {
+
+            console.error(
+                "Lỗi lấy đơn hàng:",
+                directError
+            );
+
+            orders = [];
+
+            return;
+        }
+
+
+        orders =
+            (
+                Array.isArray(
+                    directOrders
+                )
+                    ? directOrders
+                    : []
+            )
+            .filter(
+                isOrderRelevant
+            );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi load orders:",
+            error
+        );
+
+        orders = [];
+    }
 }
 
 
@@ -1031,245 +1731,390 @@ function getDashboardWalletBalance() {
 
 function calculateDashboard() {
 
-    const completed =
-
+    const relevantOrders =
         orders.filter(
-
-            order =>
-                isCompleted(order)
-
+            isOrderRelevant
         );
 
 
     /*
-        DOANH THU
-    */
-
-    const revenue =
-
-        completed.reduce(
-
-            (total, order) => {
-
-                return (
-
-                    total +
-
-                    getSellerPrice(
-                        order
-                    )
-
-                );
-
-            },
-
-            0
-
-        );
-
-
-    /*
-        TỔNG ĐƠN
-    */
-
-    const totalOrders =
-
-        orders.length;
-
-
-    /*
-        ĐƠN HOÀN THÀNH
+        Chỉ đơn hoàn thành
+        mới tính doanh thu/phí.
     */
 
     const completedOrders =
-
-        completed.length;
+        relevantOrders.filter(
+            order =>
+                isCompleted(order) &&
+                !isCancelled(order)
+        );
 
 
     /*
-        ĐƠN ĐANG XỬ LÝ
+        =================================================
+        DOANH THU SELLER
+        =================================================
     */
 
-    const processingOrders =
+    const revenue =
+        completedOrders.reduce(
+            (
+                total,
+                order
+            ) => {
 
-        orders.filter(
+                const sellerItems =
+                    getSellerItems(
+                        order
+                    );
 
-            order =>
-                !isCompleted(order)
 
-        ).length;
+                if (
+                    sellerItems.length === 0
+                ) {
+
+                    return total;
+                }
+
+
+                return (
+                    total +
+                    calculateSellerReceive(
+                        order
+                    )
+                );
+
+            },
+            0
+        );
 
 
     /*
-        PHÍ SÀN
+        =================================================
+        PHÍ
+        =================================================
     */
 
     let totalFee = 0;
-
     let outstandingFee = 0;
 
     const feeItems = [];
 
 
-    /*
-        Admin / Quản trị viên:
-        không tính công nợ phí.
-    */
+    if (
+        !isPrivilegedAccount()
+    ) {
 
-    if (!IS_PRIVILEGED) {
-
-        completed.forEach(
+        completedOrders.forEach(
             order => {
 
-                /*
-                    Chỉ COD mới tạo công nợ.
-
-                    Thanh toán online:
-                    hệ thống đã xử lý phí tự động.
-                */
-
-                if (
-                    !isCOD(order)
-                ) {
-
-                    return;
-
-                }
-
-
-                const baseFee =
-
-                    calculatePlatformFee(
+                const sellerItems =
+                    getSellerItems(
                         order
                     );
 
 
-                const completedDate =
+                if (
+                    sellerItems.length === 0
+                ) {
 
-                    order.completedAt ||
-
-                    order.completedDate ||
-
-                    order.updatedAt ||
-
-                    order.createdAt;
-
-
-                const overdueDays =
-
-                    calculateOverdueDays(
-                        completedDate
-                    );
-
-
-                const finalFee =
-
-                    calculateFeeWithLateCharge(
-
-                        baseFee,
-
-                        overdueDays
-
-                    );
-
-
-                totalFee +=
-                    finalFee;
+                    return;
+                }
 
 
                 /*
-                    Kiểm tra đã thanh toán chưa
+                    Tiền hàng của seller.
                 */
 
-                const paid =
+                const sellerProductTotal =
+                    sellerItems.reduce(
+                        (
+                            total,
+                            item
+                        ) => {
 
-                    order.platformFeePaid === true ||
+                            return (
+                                total +
+                                getItemSubtotal(
+                                    item
+                                )
+                            );
 
-                    order.feePaid === true;
+                        },
+                        0
+                    );
 
 
-                if (!paid) {
+                /*
+                    Phí sàn 5%.
+                */
 
-                    outstandingFee +=
-                        finalFee;
+                const baseFee =
+                    sellerProductTotal *
+                    PLATFORM_FEE_RATE;
+
+
+                if (
+                    baseFee <= 0
+                ) {
+
+                    return;
+                }
+
+
+                /*
+                    Phí trung gian/ship.
+                */
+
+                const shippingFee =
+                    getShippingFee(
+                        order
+                    );
+
+
+                /*
+                    Tổng khách trả.
+                */
+
+                const customerTotal =
+                    getCustomerTotal(
+                        order
+                    );
+
+
+                /*
+                    =================================================
+                    ONLINE
+                    =================================================
+                */
+
+                if (
+                    isOnlinePayment(
+                        order
+                    )
+                ) {
+
+                    /*
+                        Phí online đã được
+                        tự động tách khi thanh toán.
+                    */
 
 
                     feeItems.push({
 
                         id:
+                            getOrderId(
+                                order
+                            ),
 
-                            order.id ||
-
-                            order.orderId,
-
+                        orderCode:
+                            getOrderCode(
+                                order
+                            ),
 
                         product:
+                            getOrderProductNames(
+                                order
+                            ),
 
-                            order.productName ||
+                        productTotal:
+                            sellerProductTotal,
 
-                            order.name ||
+                        shippingFee,
 
-                            "Đơn hàng",
-
+                        customerTotal,
 
                         baseFee,
 
+                        finalFee:
+                            baseFee,
+
+                        overdueDays: 0,
+
+                        paymentMethod:
+                            getPaymentMethod(
+                                order
+                            ),
+
+                        paid: true,
+
+                        autoPaid: true,
+
+                        completedDate:
+                            getCompletedDate(
+                                order
+                            )
+                    });
+
+
+                    return;
+                }
+
+
+                /*
+                    =================================================
+                    COD
+                    =================================================
+                */
+
+                if (
+                    isCOD(order)
+                ) {
+
+                    const overdueDays =
+                        calculateOverdueDays(
+                            getCompletedDate(
+                                order
+                            )
+                        );
+
+
+                    const finalFee =
+    calculateFeeWithLateCharge(
+        baseFee,
+        overdueDays
+    );
+
+
+const paid =
+    isFeePaid(
+        order
+    );
+
+
+/*
+    Chỉ tính vào Chi phí
+    nếu CHƯA thanh toán.
+*/
+if (!paid) {
+
+    totalFee +=
+        finalFee;
+
+    outstandingFee +=
+        finalFee;
+}
+
+                    feeItems.push({
+
+                        id:
+                            getOrderId(
+                                order
+                            ),
+
+                        orderCode:
+                            getOrderCode(
+                                order
+                            ),
+
+                        product:
+                            getOrderProductNames(
+                                order
+                            ),
+
+                        productTotal:
+                            sellerProductTotal,
+
+                        shippingFee,
+
+                        customerTotal,
+
+                        baseFee,
 
                         finalFee,
 
-
                         overdueDays,
 
+                        paymentMethod:
+                            "COD",
 
-                        completedDate
+                        paid,
 
+                        autoPaid: false,
+
+                        completedDate:
+                            getCompletedDate(
+                                order
+                            )
                     });
-
                 }
 
             }
-
         );
-
     }
 
-
-    /*
-        VÍ IUH SHOP
-
-        Dashboard và trang Ví sử dụng
-        cùng một dữ liệu localStorage.
-    */
-
-    const walletBalance =
-
-        getDashboardWalletBalance();
-
-
-    /*
-        TRẢ DỮ LIỆU DASHBOARD
-    */
 
     return {
 
         revenue,
 
-        totalOrders,
+        totalOrders:
+            relevantOrders.length,
 
-        completedOrders,
+        completedOrders:
+            completedOrders.length,
 
-        processingOrders,
+        processingOrders:
+            relevantOrders.filter(
+                order =>
+                    !isCompleted(order) &&
+                    !isCancelled(order)
+            ).length,
 
         totalFee,
 
         outstandingFee,
 
-        walletBalance,
+        walletBalance:
+            Number(
+                wallet?.balance || 0
+            ),
 
         feeItems
-
     };
+}
 
+
+/* =====================================================
+   TÊN SẢN PHẨM
+===================================================== */
+
+function getOrderProductNames(order) {
+
+    const items =
+        getSellerItems(
+            order
+        );
+
+
+    if (
+        items.length === 0
+    ) {
+
+        return (
+            order?.product_name ||
+            order?.productName ||
+            "Đơn hàng"
+        );
+    }
+
+
+    const names =
+        items
+            .map(
+                item =>
+                    item?.product_name ||
+                    item?.productName ||
+                    "Sản phẩm"
+            )
+            .filter(Boolean);
+
+
+    return [
+        ...new Set(
+            names
+        )
+    ].join(", ");
 }
 
 
@@ -1279,40 +2124,70 @@ function calculateDashboard() {
 
 function formatMoney(value) {
 
-    return Number(
-        value || 0
-    )
-    .toLocaleString(
-        "vi-VN"
-    ) + "đ";
+    const amount =
+        Number(
+            value || 0
+        );
 
+
+    return (
+        Math.round(
+            amount
+        )
+        .toLocaleString(
+            "vi-VN"
+        ) +
+        "đ"
+    );
 }
 
 
 /* =====================================================
-   ANIMATION ĐẾM SỐ
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(value) {
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+}
+
+
+/* =====================================================
+   ANIMATION SỐ
 ===================================================== */
 
 function animateNumber(
-
     element,
-
     target,
-
-    duration = 900,
-
+    duration = 800,
     formatter = formatMoney
-
 ) {
 
     if (!element) {
-
         return;
-
     }
-
-
-    const start = 0;
 
 
     const startTime =
@@ -1324,53 +2199,30 @@ function animateNumber(
     ) {
 
         const progress =
-
             Math.min(
-
                 (
                     currentTime -
                     startTime
-                )
-                /
+                ) /
                 duration,
-
                 1
-
             );
 
 
-        /*
-            easeOut
-        */
-
         const eased =
-
             1 -
-
             Math.pow(
-
-                1 -
-                progress,
-
+                1 - progress,
                 3
-
             );
 
 
         const value =
-
-            start +
-
-            (
-                target -
-                start
-            ) *
-
+            target *
             eased;
 
 
         element.textContent =
-
             formatter(
                 value
             );
@@ -1383,164 +2235,142 @@ function animateNumber(
             requestAnimationFrame(
                 update
             );
-
         }
-
     }
 
 
     requestAnimationFrame(
         update
     );
-
 }
 
 
 /* =====================================================
-   HIỂN THỊ SỐ
+   RENDER STATS
 ===================================================== */
 
 function renderStats() {
 
     const data =
-
         calculateDashboard();
 
 
     animateNumber(
-
         document.getElementById(
             "totalRevenue"
         ),
-
         data.revenue
-
     );
 
 
     animateNumber(
-
         document.getElementById(
             "totalFee"
         ),
-
         data.totalFee
-
     );
 
 
     animateNumber(
-
         document.getElementById(
             "totalOrders"
         ),
-
         data.totalOrders,
-
         700,
-
         value =>
-
             Math.round(
                 value
             )
             .toLocaleString(
                 "vi-VN"
             )
-
     );
 
 
     animateNumber(
-
         document.getElementById(
             "completedOrders"
         ),
-
         data.completedOrders,
-
         700,
-
         value =>
-
             Math.round(
                 value
             )
             .toLocaleString(
                 "vi-VN"
             )
-
     );
 
 
     const processingElement =
-
         document.getElementById(
             "processingOrders"
         );
 
 
-    if (processingElement) {
+    if (
+        processingElement
+    ) {
 
         processingElement.textContent =
-
-            data.processingOrders;
-
+            data.processingOrders
+                .toLocaleString(
+                    "vi-VN"
+                );
     }
 
 
-    /*
-        SỐ DƯ VÍ
-    */
-
     const walletElement =
-
         document.getElementById(
             "walletBalance"
         );
 
 
-    if (walletElement) {
+    if (
+        walletElement
+    ) {
 
         walletElement.textContent =
-
             formatMoney(
                 data.walletBalance
             );
-
     }
 
 
-    /*
-        PHÍ CẦN THANH TOÁN
-    */
-
-    animateNumber(
-
+    const outstandingElement =
         document.getElementById(
             "outstandingFee"
-        ),
+        );
 
-        data.outstandingFee
 
-    );
+    if (
+        outstandingElement
+    ) {
+
+        outstandingElement.textContent =
+            formatMoney(
+                data.outstandingFee
+            );
+    }
 
 
     const debtStatus =
-
         document.getElementById(
             "debtStatus"
         );
 
 
-    if (debtStatus) {
+    if (
+        debtStatus
+    ) {
 
-        if (IS_PRIVILEGED) {
+        if (
+            isPrivilegedAccount()
+        ) {
 
             debtStatus.textContent =
-
                 "Tài khoản quản trị · Không phát sinh phí";
-
         }
 
         else if (
@@ -1548,71 +2378,51 @@ function renderStats() {
         ) {
 
             debtStatus.textContent =
-
                 "Có khoản phí cần thanh toán";
-
         }
 
         else {
 
             debtStatus.textContent =
-
                 "Không có khoản phí cần thanh toán";
-
         }
-
     }
 
 
-    /*
-        Admin / quản trị viên:
-        phí dashboard luôn = 0
-    */
-
-    if (IS_PRIVILEGED) {
-
-        const feeDescription =
-
-            document.getElementById(
-                "feeDescription"
-            );
+    const feeDescription =
+        document.getElementById(
+            "feeDescription"
+        );
 
 
-        if (feeDescription) {
+    if (
+        feeDescription
+    ) {
 
-            feeDescription.textContent =
-
-                "Tài khoản quản trị · Không tính phí sàn";
-
-        }
-
+        feeDescription.textContent =
+            "Phí sàn 5% trên tiền hàng mỗi đơn. Phí qua trung gian 5.000đ do người mua thanh toán.";
     }
-
 }
 
 
 /* =====================================================
-   RENDER FEE
+   RENDER PHÍ
 ===================================================== */
 
 function renderFees() {
 
     const container =
-
         document.getElementById(
             "feeList"
         );
 
 
     if (!container) {
-
         return;
-
     }
 
 
     const data =
-
         calculateDashboard();
 
 
@@ -1620,7 +2430,9 @@ function renderFees() {
         ADMIN
     */
 
-    if (IS_PRIVILEGED) {
+    if (
+        isPrivilegedAccount()
+    ) {
 
         container.innerHTML = `
 
@@ -1641,12 +2453,10 @@ function renderFees() {
 
                 </div>
 
-
                 <div class="fee-detail">
 
-                    Admin và Quản trị viên tự xử lý
-                    các khoản phí nội bộ. Dashboard
-                    không ghi nhận công nợ phí sàn.
+                    Admin không phát sinh
+                    phí sàn.
 
                 </div>
 
@@ -1655,12 +2465,11 @@ function renderFees() {
         `;
 
         return;
-
     }
 
 
     /*
-        KHÔNG CÓ PHÍ
+        CHƯA CÓ PHÍ
     */
 
     if (
@@ -1672,13 +2481,13 @@ function renderFees() {
             <div class="fee-item">
 
                 <strong>
-                    Không có khoản phí cần thanh toán
+                    Chưa có khoản phí nào
                 </strong>
 
                 <div class="fee-detail">
 
-                    Các khoản phí của bạn hiện đã được
-                    xử lý đầy đủ.
+                    Phí sàn sẽ xuất hiện
+                    sau khi đơn hàng hoàn thành.
 
                 </div>
 
@@ -1687,25 +2496,113 @@ function renderFees() {
         `;
 
         return;
-
     }
 
 
     /*
-        CÓ PHÍ
+        DANH SÁCH PHÍ
     */
 
     container.innerHTML =
-
         data.feeItems
-
             .map(
-
                 item => {
 
-                    const overdue =
+                    /*
+                        ONLINE
+                    */
 
-                        item.overdueDays > 0;
+                    if (
+                        item.autoPaid
+                    ) {
+
+                        return `
+
+                            <div class="fee-item">
+
+                                <div class="fee-top">
+
+                                    <strong>
+                                        ${escapeHtml(
+                                            item.orderCode
+                                        )}
+                                    </strong>
+
+                                    <span
+                                        class="fee-amount"
+                                        style="color:#35845c"
+                                    >
+                                        ${formatMoney(
+                                            item.finalFee
+                                        )}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="fee-detail">
+
+                                    ${escapeHtml(
+                                        item.product
+                                    )}
+
+                                    <br>
+
+                                    Tiền hàng:
+                                    ${formatMoney(
+                                        item.productTotal
+                                    )}
+
+                                    <br>
+
+                                    Phí trung gian:
+                                    ${formatMoney(
+                                        item.shippingFee
+                                    )}
+
+                                    <br>
+
+                                    Tổng khách trả:
+                                    ${formatMoney(
+                                        item.customerTotal
+                                    )}
+
+                                    <br>
+
+                                    Phí sàn 5%:
+                                    ${formatMoney(
+                                        item.baseFee
+                                    )}
+
+                                </div>
+
+
+                                <div
+                                    style="
+                                        margin-top:10px;
+                                        color:#35845c;
+                                        font-weight:600;
+                                    "
+                                >
+                                    ✓ Đã tự động khấu trừ khi thanh toán online
+                                </div>
+
+                            </div>
+
+                        `;
+                    }
+
+
+                    /*
+                        COD
+                    */
+
+                    const lateFee =
+                        Math.max(
+                            0,
+                            item.finalFee -
+                            item.baseFee
+                        );
 
 
                     return `
@@ -1713,677 +2610,542 @@ function renderFees() {
                         <div
                             class="
                                 fee-item
-                                ${overdue
-                                    ? "overdue"
-                                    : ""}
+                                ${
+                                    item.overdueDays > 0
+                                        ? "overdue"
+                                        : ""
+                                }
                             "
                         >
 
-                            <div
-                                class="fee-top"
-                            >
+                            <div class="fee-top">
 
                                 <strong>
-
-                                    ${item.product}
-
+                                    ${escapeHtml(
+                                        item.orderCode
+                                    )}
                                 </strong>
-
 
                                 <span
                                     class="fee-amount"
                                 >
-
                                     ${formatMoney(
                                         item.finalFee
                                     )}
-
                                 </span>
 
                             </div>
 
 
-                            <div
-                                class="fee-detail"
-                            >
+                            <div class="fee-detail">
 
-                                Phí gốc:
-
-                                ${formatMoney(
-                                    item.baseFee
+                                ${escapeHtml(
+                                    item.product
                                 )}
 
                                 <br>
 
+                                Tiền hàng:
+                                ${formatMoney(
+                                    item.productTotal
+                                )}
+
+                                <br>
+
+                                Phí trung gian:
+                                ${formatMoney(
+                                    item.shippingFee
+                                )}
+
+                                <br>
+
+                                Tổng khách trả:
+                                ${formatMoney(
+                                    item.customerTotal
+                                )}
+
+                                <br>
+
+                                Phí sàn 5%:
+                                ${formatMoney(
+                                    item.baseFee
+                                )}
 
                                 ${
-                                    overdue
+                                    item.overdueDays > 0
 
                                     ?
 
                                     `
+                                        <br>
 
-                                    Quá hạn:
-                                    ${item.overdueDays}
-                                    ngày · Đã áp dụng
-                                    phí chậm thanh toán
+                                        Quá hạn:
+                                        ${item.overdueDays}
+                                        ngày
 
+                                        <br>
+
+                                        Phí chậm:
+                                        ${formatMoney(
+                                            lateFee
+                                        )}
                                     `
 
                                     :
 
                                     `
+                                        <br>
 
-                                    Hạn thanh toán:
-                                    07 ngày kể từ khi
-                                    đơn hoàn thành
-
+                                        Hạn thanh toán:
+                                        ${PAYMENT_DEADLINE_DAYS}
+                                        ngày
                                     `
                                 }
 
                             </div>
 
 
-                            <button
+                            ${
+                                item.paid
 
-                                class="
-                                    pay-fee-button
-                                "
+                                ?
 
-                                onclick="
-                                    payPlatformFee(
-                                        '${item.id}'
-                                    )
-                                "
+                                `
+                                    <div
+                                        style="
+                                            margin-top:10px;
+                                            color:#35845c;
+                                            font-weight:600;
+                                        "
+                                    >
+                                        ✓ Đã thanh toán phí
+                                    </div>
+                                `
 
-                            >
+                                :
 
-                                Thanh toán phí
-
-                            </button>
+                                `
+                                    <button
+                                        class="pay-fee-button"
+                                        onclick="
+                                            payPlatformFee(
+                                                '${String(
+                                                    item.id
+                                                )}'
+                                            )
+                                        "
+                                    >
+                                        Thanh toán phí
+                                    </button>
+                                `
+                            }
 
                         </div>
 
                     `;
-
                 }
-
             )
-
             .join("");
-
 }
 
 
 /* =====================================================
-   THANH TOÁN PHÍ - MỞ POPUP MÔ PHỎNG
+   THANH TOÁN PHÍ COD
 ===================================================== */
 
-let currentPaymentOrderId =
-    null;
-
-
-function payPlatformFee(
+async function payPlatformFee(
     orderId
 ) {
 
+    if (!dashboardUser) {
+
+        alert(
+            "Vui lòng đăng nhập."
+        );
+
+        return;
+    }
+
+
     const order =
-
         orders.find(
-
             item =>
-
                 String(
-                    item.id ||
-                    item.orderId
+                    getOrderId(
+                        item
+                    )
                 )
-
                 ===
-
                 String(
                     orderId
                 )
-
         );
 
 
     if (!order) {
 
         alert(
-            "Không tìm thấy khoản phí cần thanh toán."
+            "Không tìm thấy đơn hàng."
         );
 
         return;
-
     }
+
+
+    if (
+        !isCOD(order)
+    ) {
+
+        alert(
+            "Đơn này không phải COD."
+        );
+
+        return;
+    }
+
+
+    if (
+        isFeePaid(order)
+    ) {
+
+        alert(
+            "Khoản phí của đơn này đã được thanh toán."
+        );
+
+        return;
+    }
+
+
+    const sellerProductTotal =
+        getSellerProductTotal(
+            order
+        );
+
+
+    const baseFee =
+        sellerProductTotal *
+        PLATFORM_FEE_RATE;
+
+
+    const overdueDays =
+        calculateOverdueDays(
+            getCompletedDate(
+                order
+            )
+        );
+
+
+    const finalFee =
+        calculateFeeWithLateCharge(
+            baseFee,
+            overdueDays
+        );
 
 
     currentPaymentOrderId =
         orderId;
 
 
-    const baseFee =
-
-        calculatePlatformFee(
-            order
-        );
-
-
-    const completedDate =
-
-        order.completedAt ||
-
-        order.completedDate ||
-
-        order.updatedAt ||
-
-        order.createdAt;
-
-
-    const overdueDays =
-
-        calculateOverdueDays(
-            completedDate
-        );
-
-
-    const finalFee =
-
-        calculateFeeWithLateCharge(
-
-            baseFee,
-
-            overdueDays
-
-        );
-
-
-    /*
-        Số tiền
-    */
-
     const amountElement =
-
         document.getElementById(
             "paymentAmount"
         );
 
 
-    if (amountElement) {
+    if (
+        amountElement
+    ) {
 
         amountElement.textContent =
-
             formatMoney(
                 finalFee
             );
-
     }
 
 
-    /*
-        Mã giao dịch
-    */
-
     const transactionElement =
-
         document.getElementById(
             "paymentTransaction"
         );
 
 
-    if (transactionElement) {
+    if (
+        transactionElement
+    ) {
 
         transactionElement.textContent =
-
             generateTransactionCode();
-
     }
 
 
-    /*
-        Mở popup
-    */
-
     const modal =
-
         document.getElementById(
             "paymentModal"
         );
 
 
-    if (modal) {
+    if (
+        modal
+    ) {
 
         modal.classList.add(
             "active"
         );
 
-
         document.body.style.overflow =
             "hidden";
-
     }
-
 }
 
 
 /* =====================================================
-   TẠO MÃ GIAO DỊCH MÔ PHỎNG
+   MÃ GIAO DỊCH
 ===================================================== */
 
 function generateTransactionCode() {
 
-    const timestamp =
-
+    return (
+        "IUH" +
         Date.now()
             .toString()
-            .slice(-8);
-
-
-    const random =
-
+            .slice(-8) +
         Math.floor(
-
             1000 +
-
             Math.random() *
             9000
-
-        );
-
-
-    return (
-
-        `IUH${timestamp}${random}`
-
+        )
     );
-
 }
 
 
 /* =====================================================
-   ĐÓNG POPUP
+   ĐÓNG MODAL
 ===================================================== */
 
 function closePaymentModal() {
 
     const modal =
-
         document.getElementById(
             "paymentModal"
         );
 
 
-    if (modal) {
+    if (
+        modal
+    ) {
 
         modal.classList.remove(
             "active"
         );
-
     }
 
 
     document.body.style.overflow =
         "";
 
+
+    currentPaymentOrderId =
+        null;
 }
 
 
 /* =====================================================
-   XÁC NHẬN THANH TOÁN MÔ PHỎNG
+   XÁC NHẬN THANH TOÁN PHÍ
 ===================================================== */
 
-function confirmPayment() {
+async function confirmPayment() {
 
     if (
         currentPaymentOrderId === null
     ) {
 
         return;
-
     }
 
 
-    const index =
-
-        orders.findIndex(
-
-            order =>
-
-                String(
-                    order.id ||
-                    order.orderId
-                )
-
-                ===
-
-                String(
-                    currentPaymentOrderId
-                )
-
-        );
-
-
-    if (
-        index === -1
-    ) {
+    if (!dashboardUser) {
 
         alert(
-            "Không tìm thấy khoản phí."
+            "Vui lòng đăng nhập."
         );
 
         return;
-
     }
 
 
-    /*
-        Tính lại khoản phí hiện tại
-        trước khi trừ tiền.
-    */
-
-    const baseFee =
-
-        calculatePlatformFee(
-            orders[index]
+    const order =
+        orders.find(
+            item =>
+                String(
+                    getOrderId(
+                        item
+                    )
+                )
+                ===
+                String(
+                    currentPaymentOrderId
+                )
         );
 
 
-    const completedDate =
+    if (!order) {
 
-        orders[index].completedAt ||
+        alert(
+            "Không tìm thấy đơn hàng."
+        );
 
-        orders[index].completedDate ||
+        return;
+    }
 
-        orders[index].updatedAt ||
 
-        orders[index].createdAt;
+    if (
+        !isCOD(order)
+    ) {
+
+        alert(
+            "Chỉ đơn COD mới cần thanh toán phí."
+        );
+
+        return;
+    }
+
+
+    const sellerProductTotal =
+        getSellerProductTotal(
+            order
+        );
+
+
+    const baseFee =
+        sellerProductTotal *
+        PLATFORM_FEE_RATE;
 
 
     const overdueDays =
-
         calculateOverdueDays(
-            completedDate
+            getCompletedDate(
+                order
+            )
         );
 
 
     const finalFee =
-
         calculateFeeWithLateCharge(
-
             baseFee,
-
             overdueDays
-
         );
-
-
-    /*
-        Lấy Ví IUH SHOP
-    */
-
-    const user =
-        currentUser;
-
-
-    const identity =
-
-        user?.id ||
-
-        user?.userId ||
-
-        user?.email ||
-
-        user?.username ||
-
-        "guest";
-
-
-    const walletKey =
-
-        "iuhWallet_" +
-
-        String(identity)
-            .replace(
-                /[^a-zA-Z0-9_-]/g,
-                "_"
-            );
-
-
-    let wallet;
 
 
     try {
 
-        wallet =
+        /*
+            Trừ tiền từ IUH Wallet.
 
-            JSON.parse(
+            Không dùng localStorage.
+        */
 
-                localStorage.getItem(
-                    walletKey
-                )
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .rpc(
+                    "pay_platform_fee",
+                    {
 
+                        p_amount:
+                            finalFee,
+
+                        p_description:
+                            `Thanh toán phí sàn đơn ${getOrderCode(order)}`
+                    }
+                );
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi thanh toán phí:",
+                error
             );
 
-    }
 
-    catch {
+            alert(
+                error.message ||
+                "Thanh toán phí thất bại."
+            );
 
-        wallet = null;
-
-    }
-
-
-    if (!wallet) {
-
-        wallet = {
-
-            balance: 0,
-
-            pending: 0,
-
-            totalReceived: 0,
-
-            transactions: [],
-
-            updatedAt:
-                new Date().toISOString()
-
-        };
-
-    }
+            return;
+        }
 
 
-    wallet.balance =
-        Number(
-            wallet.balance || 0
-        );
+        closePaymentModal();
 
-
-    /*
-        Kiểm tra số dư Ví
-    */
-
-    if (
-        wallet.balance <
-        finalFee
-    ) {
 
         alert(
-
-            "Số dư Ví IUH SHOP không đủ để thanh toán khoản phí này."
-
-        );
-
-        return;
-
-    }
-
-
-    /*
-        Trừ tiền khỏi Ví
-    */
-
-    wallet.balance -=
-        finalFee;
-
-
-    /*
-        Ghi lịch sử giao dịch
-    */
-
-    if (
-        !Array.isArray(
-            wallet.transactions
-        )
-    ) {
-
-        wallet.transactions = [];
-
-    }
-
-
-    wallet.transactions.unshift({
-
-        id:
-            generateTransactionCode(),
-
-        type:
-            "fee",
-
-        title:
-            "Thanh toán phí sàn",
-
-        amount:
-            finalFee,
-
-        description:
-
-            orders[index].productName ||
-
-            orders[index].name ||
-
-            "Đơn hàng",
-
-        createdAt:
-            new Date().toISOString()
-
-    });
-
-
-    wallet.transactions =
-        wallet.transactions.slice(
-            0,
-            100
+            "✓ Thanh toán phí thành công!\n\n" +
+            `Đơn: ${getOrderCode(order)}\n` +
+            `Phí: ${formatMoney(finalFee)}`
         );
 
 
-    wallet.updatedAt =
-        new Date().toISOString();
+        await refreshDashboard();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi thanh toán phí:",
+            error
+        );
 
 
-    /*
-        Lưu Ví
-    */
-
-    localStorage.setItem(
-
-        walletKey,
-
-        JSON.stringify(
-            wallet
-        )
-
-    );
-
-
-    /*
-        Đánh dấu đơn đã thanh toán
-    */
-
-    orders[index].platformFeePaid =
-        true;
-
-
-    orders[index].feePaid =
-        true;
-
-
-    orders[index].feePaidAt =
-        new Date().toISOString();
-
-
-    /*
-        Lưu trạng thái đơn hàng
-    */
-
-    localStorage.setItem(
-
-        "orders",
-
-        JSON.stringify(
-            orders
-        )
-
-    );
-
-
-    /*
-        Đóng popup
-    */
-
-    closePaymentModal();
-
-
-    /*
-        Thông báo mô phỏng
-    */
-
-    alert(
-
-        "✓ Thanh toán mô phỏng thành công!\n\n" +
-
-        "Khoản phí đã được trừ khỏi Ví IUH SHOP."
-
-    );
-
-
-    /*
-        Cập nhật lại Dashboard
-    */
-
-    renderDashboard();
-
-
-    currentPaymentOrderId =
-        null;
-
+        alert(
+            "Có lỗi xảy ra khi thanh toán phí."
+        );
+    }
 }
 
 
 /* =====================================================
-   RENDER ORDERS
+   RENDER ĐƠN GẦN ĐÂY
 ===================================================== */
 
 function renderOrders() {
 
     const container =
-
         document.getElementById(
             "recentOrders"
         );
 
 
     if (!container) {
-
         return;
-
     }
 
 
     const recent =
-
         [...orders]
-            .reverse()
+            .sort(
+                (
+                    a,
+                    b
+                ) => {
+
+                    return (
+                        new Date(
+                            b?.created_at ||
+                            b?.createdAt ||
+                            0
+                        ) -
+                        new Date(
+                            a?.created_at ||
+                            a?.createdAt ||
+                            0
+                        )
+                    );
+                }
+            )
             .slice(
                 0,
                 5
@@ -2391,7 +3153,7 @@ function renderOrders() {
 
 
     if (
-        !recent.length
+        recent.length === 0
     ) {
 
         container.innerHTML = `
@@ -2405,7 +3167,7 @@ function renderOrders() {
                     </strong>
 
                     <span>
-                        Các đơn hàng của bạn sẽ xuất hiện tại đây.
+                        Các đơn hàng sẽ xuất hiện tại đây.
                     </span>
 
                 </div>
@@ -2415,62 +3177,95 @@ function renderOrders() {
         `;
 
         return;
-
     }
 
 
     container.innerHTML =
-
         recent
-
             .map(
-
                 order => {
+
+                    const sellerItems =
+                        getSellerItems(
+                            order
+                        );
+
+
+                    const items =
+                        sellerItems.length > 0
+                            ? sellerItems
+                            : getOrderItems(
+                                order
+                            );
+
+
+                    const total =
+                        items.reduce(
+                            (
+                                sum,
+                                item
+                            ) => {
+
+                                return (
+                                    sum +
+                                    getItemSubtotal(
+                                        item
+                                    )
+                                );
+
+                            },
+                            0
+                        );
+
+
+                    const productName =
+                        items.length > 0
+                            ? (
+                                items[0]
+                                    ?.product_name ||
+                                items[0]
+                                    ?.productName ||
+                                "Sản phẩm"
+                            )
+                            : "Đơn hàng";
+
 
                     return `
 
-                        <div
-                            class="order-item"
-                        >
+                        <div class="order-item">
 
-                            <div
-                                class="order-info"
-                            >
+                            <div class="order-info">
 
                                 <strong>
-
-                                    ${
-                                        order.productName ||
-
-                                        order.name ||
-
-                                        "Đơn hàng"
-                                    }
-
+                                    ${escapeHtml(
+                                        productName
+                                    )}
                                 </strong>
-
 
                                 <span>
 
-                                    ${
-                                        order.status ||
+                                    ${escapeHtml(
+                                        getOrderCode(
+                                            order
+                                        )
+                                    )}
 
+                                    ·
+
+                                    ${escapeHtml(
+                                        order?.status ||
                                         "Đang xử lý"
-                                    }
+                                    )}
 
                                 </span>
 
                             </div>
 
 
-                            <div
-                                class="order-price"
-                            >
+                            <div class="order-price">
 
                                 ${formatMoney(
-                                    getSellerPrice(
-                                        order
-                                    )
+                                    total
                                 )}
 
                             </div>
@@ -2478,103 +3273,92 @@ function renderOrders() {
                         </div>
 
                     `;
-
                 }
-
             )
-
             .join("");
-
 }
 
 
 /* =====================================================
-   CHART - DOANH THU THEO THÁNG
+   CHART DOANH THU
 ===================================================== */
-
-let revenueChart =
-    null;
-
 
 function renderChart() {
 
     const canvas =
-
         document.getElementById(
             "revenueChart"
         );
 
 
     if (!canvas) {
-
         return;
-
     }
 
 
     const ctx =
-
         canvas.getContext(
             "2d"
         );
 
 
     const monthlyRevenue =
-
         Array(
             12
-        ).fill(0);
+        )
+        .fill(0);
 
 
     orders.forEach(
         order => {
 
             if (
-                !isCompleted(order)
+                !isCompleted(order) ||
+                isCancelled(order)
             ) {
 
                 return;
-
             }
 
 
-            const date =
-
-                new Date(
-
-                    order.completedAt ||
-
-                    order.completedDate ||
-
-                    order.updatedAt ||
-
-                    order.createdAt
-
+            const sellerItems =
+                getSellerItems(
+                    order
                 );
 
 
             if (
-                isNaN(
+                sellerItems.length === 0
+            ) {
+
+                return;
+            }
+
+
+            const date =
+                new Date(
+                    getCompletedDate(
+                        order
+                    )
+                );
+
+
+            if (
+                Number.isNaN(
                     date.getTime()
                 )
             ) {
 
                 return;
-
             }
 
 
-            const month =
-
-                date.getMonth();
-
-
-            monthlyRevenue[month] +=
-
-                getSellerPrice(
+            monthlyRevenue[
+                date.getMonth()
+            ] +=
+                calculateSellerReceive(
                     order
                 );
-
         }
     );
 
@@ -2582,55 +3366,43 @@ function renderChart() {
     const labels = [
 
         "T1",
-
         "T2",
-
         "T3",
-
         "T4",
-
         "T5",
-
         "T6",
-
         "T7",
-
         "T8",
-
         "T9",
-
         "T10",
-
         "T11",
-
         "T12"
 
     ];
 
 
-    if (revenueChart) {
+    if (
+        revenueChart
+    ) {
 
         revenueChart.destroy();
 
+        revenueChart =
+            null;
     }
 
 
     revenueChart =
-
         new Chart(
-
             ctx,
-
             {
 
                 type:
                     "bar",
 
-
                 data: {
 
                     labels,
-
 
                     datasets: [
 
@@ -2639,22 +3411,17 @@ function renderChart() {
                             label:
                                 "Doanh thu",
 
-
                             data:
                                 monthlyRevenue,
-
 
                             borderRadius:
                                 8,
 
-
                             backgroundColor:
                                 "#29499c"
-
                         }
 
                     ]
-
                 },
 
 
@@ -2663,10 +3430,8 @@ function renderChart() {
                     responsive:
                         true,
 
-
                     maintainAspectRatio:
                         false,
-
 
                     plugins: {
 
@@ -2674,9 +3439,7 @@ function renderChart() {
 
                             display:
                                 false
-
                         }
-
                     },
 
 
@@ -2687,7 +3450,6 @@ function renderChart() {
                             beginAtZero:
                                 true,
 
-
                             ticks: {
 
                                 callback:
@@ -2695,228 +3457,209 @@ function renderChart() {
                                         value
                                     ) {
 
-                                        return
-
+                                        return (
                                             Number(
                                                 value
                                             )
                                             .toLocaleString(
                                                 "vi-VN"
                                             ) +
-
-                                            "đ";
-
+                                            "đ"
+                                        );
                                     }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         );
-
 }
 
 
 /* =====================================================
-   DATE
+   NGÀY
 ===================================================== */
 
 function renderDate() {
 
     const element =
-
         document.getElementById(
             "dashboardDate"
         );
 
 
     if (!element) {
-
         return;
-
     }
 
 
-    const now =
-        new Date();
-
-
     element.textContent =
+        new Date()
+            .toLocaleDateString(
+                "vi-VN",
+                {
 
-        now.toLocaleDateString(
+                    day:
+                        "2-digit",
 
-            "vi-VN",
+                    month:
+                        "2-digit",
 
-            {
-
-                day:
-                    "2-digit",
-
-                month:
-                    "2-digit",
-
-                year:
-                    "numeric"
-
-            }
-
-        );
-
+                    year:
+                        "numeric"
+                }
+            );
 }
 
 
 /* =====================================================
-   DASHBOARD
+   REFRESH
 ===================================================== */
 
-function renderDashboard() {
+async function refreshDashboard() {
 
-    orders =
-        getOrders();
+    try {
 
-
-    renderStats();
+        await loadDashboardUser();
 
 
-    renderFees();
+        if (!dashboardUser) {
+
+            orders = [];
+
+            wallet = null;
+
+            walletTransactions = [];
+
+            renderStats();
+
+            renderFees();
+
+            renderOrders();
+
+            renderChart();
+
+            renderDate();
+
+            return;
+        }
 
 
-    renderOrders();
-
-
-    renderChart();
-
-
-    renderDate();
-
-}
-
-
-/* =====================================================
-   CẬP NHẬT THEO THỜI GIAN
-===================================================== */
-
-/*
-    Không cần mở website liên tục.
-
-    Khi người dùng mở lại Dashboard,
-    hệ thống sẽ lấy thời gian hiện tại
-    và tính lại số ngày quá hạn.
-
-    Trong lúc trang đang mở,
-    cập nhật mỗi 60 giây.
-*/
-
-setInterval(
-
-    function() {
-
-        orders =
-            getOrders();
+        await Promise.all([
+            loadOrders(),
+            loadWallet()
+        ]);
 
 
         renderStats();
 
-
         renderFees();
 
-    },
+        renderOrders();
 
-    60 * 1000
+        renderChart();
 
-);
+        renderDate();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi refresh dashboard:",
+            error
+        );
+    }
+}
 
 
-/*
-    Khi quay lại tab Dashboard,
-    tính lại ngay lập tức.
-*/
+/* =====================================================
+   TỰ ĐỘNG CẬP NHẬT
+===================================================== */
+
+let dashboardRefreshTimer = null;
+
+
+function startDashboardTimer() {
+
+    if (
+        dashboardRefreshTimer
+    ) {
+
+        clearInterval(
+            dashboardRefreshTimer
+        );
+    }
+
+
+    dashboardRefreshTimer =
+        setInterval(
+            function() {
+
+                refreshDashboard();
+
+            },
+            60 * 1000
+        );
+}
+
+
+/* =====================================================
+   KHI QUAY LẠI TAB
+===================================================== */
 
 document.addEventListener(
-
     "visibilitychange",
-
     function() {
 
         if (
             !document.hidden
         ) {
 
-            orders =
-                getOrders();
-
-
-            renderStats();
-
-
-            renderFees();
-
+            refreshDashboard();
         }
-
     }
-
-);
-
-
-/*
-    Nếu trang Ví thay đổi localStorage,
-    Dashboard cập nhật số dư.
-*/
-
-window.addEventListener(
-
-    "storage",
-
-    function(event) {
-
-        if (
-            event.key &&
-            event.key.startsWith(
-                "iuhWallet_"
-            )
-        ) {
-
-            renderStats();
-
-        }
-
-
-        if (
-            event.key ===
-            "orders"
-        ) {
-
-            orders =
-                getOrders();
-
-
-            renderDashboard();
-
-        }
-
-    }
-
 );
 
 
 /* =====================================================
-   INIT
+   AUTH CHANGE
+===================================================== */
+
+supabaseClient.auth.onAuthStateChange(
+    function(
+        event,
+        session
+    ) {
+
+        console.log(
+            "Dashboard Auth:",
+            event
+        );
+
+
+        setTimeout(
+            function() {
+
+                refreshDashboard();
+
+            },
+            0
+        );
+    }
+);
+
+
+/* =====================================================
+   KHỞI ĐỘNG
 ===================================================== */
 
 document.addEventListener(
-
     "DOMContentLoaded",
+    async function() {
 
-    function() {
+        await refreshDashboard();
 
-        renderDashboard();
+        startDashboardTimer();
 
     }
-
 );
