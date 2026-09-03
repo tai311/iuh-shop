@@ -6426,6 +6426,128 @@ async function saveArticle() {
 }
 
 /* =========================================================
+   DROPDOWN TÀI KHOẢN - HEADER
+========================================================= */
+
+function setupAccountDropdown() {
+
+    const userAccountButton =
+        document.getElementById("userAccountButton");
+
+    const accountDropdown =
+        document.getElementById("accountDropdown");
+
+    if (!userAccountButton || !accountDropdown) {
+        return;
+    }
+
+    function closeDropdown() {
+        accountDropdown.style.display = "none";
+    }
+
+    function toggleDropdown(event) {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!document.body.classList.contains("logged-in")) {
+            closeDropdown();
+            return;
+        }
+
+        const isOpen =
+            accountDropdown.style.display === "block";
+
+        accountDropdown.style.display =
+            isOpen ? "none" : "block";
+    }
+
+    closeDropdown();
+
+    userAccountButton.addEventListener(
+        "click",
+        toggleDropdown
+    );
+
+    accountDropdown.addEventListener(
+        "click",
+        function (event) {
+            event.stopPropagation();
+        }
+    );
+
+    document.addEventListener(
+        "click",
+        function () {
+            closeDropdown();
+        }
+    );
+}
+
+
+/* =========================================================
+   TÀI KHOẢN Ở TẦNG 1
+========================================================= */
+
+function setupAccountNavDropdown() {
+
+    const accountWrapper =
+        document.querySelector(".account-nav-wrapper");
+
+    const accountArrow =
+        document.getElementById("accountNavArrow");
+
+    const accountShortcuts =
+        document.getElementById("accountShortcuts");
+
+    if (
+        !accountWrapper ||
+        !accountArrow ||
+        !accountShortcuts
+    ) {
+        return;
+    }
+
+
+    /* BẤM MŨI TÊN */
+
+    accountArrow.addEventListener(
+        "click",
+        function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            accountWrapper.classList.toggle("open");
+
+        }
+    );
+
+
+    /* BẤM VÀO MENU */
+
+    accountShortcuts.addEventListener(
+        "click",
+        function (event) {
+            event.stopPropagation();
+        }
+    );
+
+
+    /* BẤM RA NGOÀI */
+
+    document.addEventListener(
+        "click",
+        function () {
+
+            accountWrapper.classList.remove("open");
+
+        }
+    );
+
+}
+
+/* =========================================================
    INIT
 ========================================================= */
 
@@ -6436,6 +6558,12 @@ document.addEventListener(
         setupActiveNavigation();
 
         await updateUserMenu();
+
+           /* DROPDOWN HEADER */
+        setupAccountDropdown();
+
+        /* TÀI KHOẢN TẦNG 1 */
+        setupAccountNavDropdown();
 
         setupForumTabs();
 

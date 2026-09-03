@@ -1688,1066 +1688,6 @@ body {
 
 }
 
-:root {
-
-    --blue: #29499c;
-    --blue-dark: #182542;
-
-    --yellow: #e4bc3d;
-
-    --green: #39865f;
-
-    --red: #bd4e4e;
-
-    --text: #1c2740;
-    --muted: #788399;
-
-    --border: #e4e9f2;
-
-    --bg: #f6f8fc;
-
-}
-
-
-* {
-    box-sizing: border-box;
-}
-
-
-body {
-
-    margin: 0;
-
-    font-family:
-        "Be Vietnam Pro",
-        sans-serif;
-
-    background: var(--bg);
-
-    color: var(--text);
-
-}
-
-
-.wallet-page {
-
-    width: 100%;
-
-    padding:
-        65px
-        clamp(20px, 6vw, 110px)
-        100px;
-
-}
-
-
-/* =====================================================
-   HEADING
-===================================================== */
-
-.wallet-heading {
-
-    display: flex;
-
-    align-items: flex-end;
-
-    justify-content: space-between;
-
-    gap: 25px;
-
-    margin-bottom: 32px;
-
-}
-
-
-.wallet-heading > div span {
-
-    color: var(--blue);
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-    letter-spacing: 2px;
-
-}
-
-
-.wallet-heading h1 {
-
-    margin:
-        8px 0 10px;
-
-    font-size:
-        clamp(32px, 4vw, 48px);
-
-    letter-spacing: -1.5px;
-
-}
-
-
-.wallet-heading p {
-
-    margin: 0;
-
-    color: var(--muted);
-
-    font-size: 13px;
-
-}
-
-
-.dashboard-link {
-
-    padding:
-        11px 17px;
-
-    border:
-        1px solid #dce3f3;
-
-    border-radius: 12px;
-
-    background: white;
-
-    color: var(--blue);
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-    text-decoration: none;
-
-}
-
-
-/* =====================================================
-   MAIN WALLET
-===================================================== */
-
-.wallet-main-card {
-
-    position: relative;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 30px;
-
-    padding: 35px;
-
-    overflow: hidden;
-
-    border-radius: 28px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #243f8e,
-            #3857a9
-        );
-
-    box-shadow:
-        0 20px 50px
-        rgba(40,65,130,.18);
-
-}
-
-
-.wallet-main-card::before {
-
-    content: "";
-
-    position: absolute;
-
-    width: 270px;
-
-    height: 270px;
-
-    right: -90px;
-
-    top: -130px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(228,188,61,.18);
-
-    filter: blur(5px);
-
-}
-
-
-.wallet-main-left {
-
-    position: relative;
-
-    z-index: 2;
-
-}
-
-
-.wallet-main-left span {
-
-    color:
-        rgba(255,255,255,.66);
-
-    font-size: 9px;
-
-    font-weight: 800;
-
-    letter-spacing: 1.7px;
-
-}
-
-
-.wallet-main-left strong {
-
-    display: block;
-
-    margin:
-        8px 0;
-
-    color: white;
-
-    font-size:
-        clamp(32px, 5vw, 48px);
-
-    letter-spacing: -1.5px;
-
-}
-
-
-.wallet-main-left small {
-
-    color:
-        rgba(255,255,255,.66);
-
-    font-size: 9px;
-
-}
-
-
-.wallet-actions {
-
-    position: relative;
-
-    z-index: 2;
-
-    display: flex;
-
-    gap: 10px;
-
-}
-
-
-.wallet-btn {
-
-    padding:
-        13px 19px;
-
-    border-radius: 12px;
-
-    font-family: inherit;
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-    cursor: pointer;
-
-}
-
-
-.wallet-btn span {
-
-    margin-right: 4px;
-
-    font-size: 15px;
-
-}
-
-
-.deposit-btn {
-
-    border: none;
-
-    background: white;
-
-    color: var(--blue);
-
-}
-
-
-.withdraw-btn {
-
-    border:
-        1px solid
-        rgba(255,255,255,.4);
-
-    background:
-        rgba(255,255,255,.08);
-
-    color: white;
-
-}
-
-
-/* =====================================================
-   SUMMARY
-===================================================== */
-
-.wallet-summary {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    gap: 18px;
-
-    margin-top: 18px;
-
-}
-
-
-.summary-card {
-
-    padding: 23px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius: 20px;
-
-    background: white;
-
-}
-
-
-.summary-card span {
-
-    color: #8c96a9;
-
-    font-size: 9px;
-
-    font-weight: 800;
-
-    letter-spacing: .8px;
-
-}
-
-
-.summary-card strong {
-
-    display: block;
-
-    margin:
-        7px 0 4px;
-
-    font-size: 22px;
-
-}
-
-
-.summary-card small {
-
-    color: #9aa4b7;
-
-    font-size: 9px;
-
-}
-
-
-.fee-number {
-
-    color: var(--red);
-
-}
-
-
-/* =====================================================
-   NOTICE
-===================================================== */
-
-.wallet-notice {
-
-    display: flex;
-
-    gap: 13px;
-
-    margin-top: 20px;
-
-    padding: 17px 20px;
-
-    border:
-        1px solid #f0df9f;
-
-    border-radius: 16px;
-
-    background:
-        #fff9e9;
-
-}
-
-
-.notice-icon {
-
-    width: 25px;
-
-    height: 25px;
-
-    flex-shrink: 0;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 50%;
-
-    background: #ead18a;
-
-    color: #755b15;
-
-    font-size: 11px;
-
-    font-weight: 800;
-
-}
-
-
-.wallet-notice strong {
-
-    display: block;
-
-    margin-bottom: 3px;
-
-    color: #6f5b22;
-
-    font-size: 10px;
-
-}
-
-
-.wallet-notice p {
-
-    margin: 0;
-
-    color: #7b6c43;
-
-    font-size: 9px;
-
-    line-height: 1.7;
-
-}
-
-
-/* =====================================================
-   TRANSACTIONS
-===================================================== */
-
-.transaction-section {
-
-    margin-top: 28px;
-
-    padding: 28px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius: 24px;
-
-    background: white;
-
-}
-
-
-.section-heading {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-}
-
-
-.section-heading span {
-
-    color: var(--blue);
-
-    font-size: 9px;
-
-    font-weight: 800;
-
-    letter-spacing: 1.5px;
-
-}
-
-
-.section-heading h2 {
-
-    margin:
-        5px 0 0;
-
-    font-size: 20px;
-
-}
-
-
-.clear-filter-btn {
-
-    padding:
-        8px 13px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius: 9px;
-
-    background: white;
-
-    color: var(--muted);
-
-    font-family: inherit;
-
-    font-size: 9px;
-
-    cursor: pointer;
-
-}
-
-
-.transaction-list {
-
-    margin-top: 20px;
-
-}
-
-
-.transaction-item {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 15px;
-
-    padding:
-        15px 0;
-
-    border-bottom:
-        1px solid #edf0f5;
-
-}
-
-
-.transaction-item:last-child {
-
-    border-bottom: none;
-
-}
-
-
-.transaction-left {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 13px;
-
-}
-
-
-.transaction-icon {
-
-    width: 40px;
-
-    height: 40px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 12px;
-
-    font-weight: 800;
-
-}
-
-
-.transaction-icon.in {
-
-    background: #edf8f2;
-
-    color: var(--green);
-
-}
-
-
-.transaction-icon.out {
-
-    background: #fff0f0;
-
-    color: var(--red);
-
-}
-
-
-.transaction-info strong {
-
-    display: block;
-
-    font-size: 11px;
-
-}
-
-
-.transaction-info span {
-
-    display: block;
-
-    margin-top: 4px;
-
-    color: #9aa4b7;
-
-    font-size: 8px;
-
-}
-
-
-.transaction-amount {
-
-    font-size: 11px;
-
-    font-weight: 800;
-
-}
-
-
-.transaction-amount.in {
-
-    color: var(--green);
-
-}
-
-
-.transaction-amount.out {
-
-    color: var(--red);
-
-}
-
-
-.empty-transaction {
-
-    padding: 35px;
-
-    text-align: center;
-
-    color: #9aa4b7;
-
-    font-size: 10px;
-
-}
-
-
-/* =====================================================
-   MODAL
-===================================================== */
-
-.wallet-modal {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 9999;
-
-    display: none;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 20px;
-
-}
-
-
-.wallet-modal.active {
-
-    display: flex;
-
-}
-
-
-.wallet-modal-overlay {
-
-    position: absolute;
-
-    inset: 0;
-
-    background:
-        rgba(14,24,48,.55);
-
-    backdrop-filter:
-        blur(8px);
-
-}
-
-
-.wallet-modal-box {
-
-    position: relative;
-
-    z-index: 2;
-
-    width: min(100%, 430px);
-
-    padding: 30px;
-
-    border-radius: 24px;
-
-    background: white;
-
-    box-shadow:
-        0 30px 80px
-        rgba(15,30,70,.25);
-
-    animation:
-        walletModalIn .25s ease;
-
-}
-
-
-@keyframes walletModalIn {
-
-    from {
-
-        opacity: 0;
-
-        transform:
-            translateY(20px)
-            scale(.97);
-
-    }
-
-    to {
-
-        opacity: 1;
-
-        transform:
-            translateY(0)
-            scale(1);
-
-    }
-
-}
-
-
-.modal-close {
-
-    position: absolute;
-
-    top: 14px;
-
-    right: 15px;
-
-    width: 32px;
-
-    height: 32px;
-
-    border: none;
-
-    border-radius: 50%;
-
-    background: #f1f3f7;
-
-    color: #7d8798;
-
-    font-size: 19px;
-
-    cursor: pointer;
-
-}
-
-
-.modal-label {
-
-    color: var(--blue);
-
-    font-size: 9px;
-
-    font-weight: 800;
-
-    letter-spacing: 1.5px;
-
-}
-
-
-.wallet-modal-box h2 {
-
-    margin:
-        7px 0 7px;
-
-    font-size: 23px;
-
-}
-
-
-.wallet-modal-box > p {
-
-    margin:
-        0 0 20px;
-
-    color: var(--muted);
-
-    font-size: 10px;
-
-    line-height: 1.6;
-
-}
-
-
-.wallet-modal-box label {
-
-    display: block;
-
-    margin:
-        13px 0 6px;
-
-    color: #66738b;
-
-    font-size: 9px;
-
-    font-weight: 700;
-
-}
-
-
-.wallet-modal-box select,
-.wallet-modal-box input {
-
-    width: 100%;
-
-    padding:
-        12px 13px;
-
-    border:
-        1px solid #dfe5ef;
-
-    border-radius: 10px;
-
-    outline: none;
-
-    background: white;
-
-    color: var(--text);
-
-    font-family: inherit;
-
-    font-size: 10px;
-
-}
-
-
-.wallet-modal-box input:focus,
-.wallet-modal-box select:focus {
-
-    border-color: var(--blue);
-
-}
-
-
-.available-balance {
-
-    margin-bottom: 15px;
-
-    padding: 13px;
-
-    border-radius: 12px;
-
-    background: #f3f6ff;
-
-    color: #77839a;
-
-    font-size: 9px;
-
-}
-
-
-.available-balance strong {
-
-    color: var(--blue);
-
-}
-
-
-.demo-note {
-
-    margin-top: 15px;
-
-    padding: 11px 13px;
-
-    border-radius: 11px;
-
-    background: #fff9e9;
-
-    color: #796b43;
-
-    font-size: 8.5px;
-
-    line-height: 1.6;
-
-}
-
-
-.modal-primary-btn {
-
-    width: 100%;
-
-    margin-top: 17px;
-
-    padding: 13px;
-
-    border: none;
-
-    border-radius: 11px;
-
-    background: var(--blue);
-
-    color: white;
-
-    font-family: inherit;
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-    cursor: pointer;
-
-}
-
-
-/* =====================================================
-   RESPONSIVE
-===================================================== */
-
-@media (max-width: 900px) {
-
-    .wallet-summary {
-
-        grid-template-columns:
-            1fr 1fr;
-
-    }
-
-    .summary-card:last-child {
-
-        grid-column:
-            1 / -1;
-
-    }
-
-}
-
-
-@media (max-width: 650px) {
-
-    .wallet-page {
-
-        padding:
-            40px 18px 70px;
-
-    }
-
-
-    .wallet-heading {
-
-        display: block;
-
-    }
-
-
-    .dashboard-link {
-
-        display: inline-block;
-
-        margin-top: 18px;
-
-    }
-
-
-    .wallet-main-card {
-
-        display: block;
-
-        padding: 25px;
-
-    }
-
-
-    .wallet-actions {
-
-        margin-top: 23px;
-
-    }
-
-
-    .wallet-btn {
-
-        flex: 1;
-
-    }
-
-
-    .wallet-summary {
-
-        grid-template-columns: 1fr;
-
-    }
-
-
-    .summary-card:last-child {
-
-        grid-column: auto;
-
-    }
-
-
-    .transaction-section {
-
-        padding: 20px;
-
-    }
-
-
-    .transaction-amount {
-
-        font-size: 10px;
-
-    }
-
-
-    .wallet-modal-box {
-
-        padding: 25px 20px;
-
-    }
-
-}
-
 /* =====================================================
    ICON TIN NHẮN - TẦNG 1
 ===================================================== */
@@ -2771,28 +1711,24 @@ body {
         color 0.2s ease,
         background 0.2s ease,
         transform 0.2s ease;
-
-    position: relative;
 }
 
-
 /* Hover */
-
 .top-message-icon:hover {
     color: var(--iuh-yellow);
     background: rgba(255, 255, 255, 0.10);
     transform: translateY(-1px);
 }
 
-
 /* Icon Font Awesome */
-
 .top-message-icon i {
     line-height: 1;
 }
 
-
-/* Chấm đỏ khi có tin nhắn chưa đọc */
+/* Chấm đỏ tin nhắn chưa đọc */
+.top-message-icon {
+    position: relative;
+}
 
 .message-unread-dot {
     position: absolute;
@@ -2810,4 +1746,954 @@ body {
     border-radius: 50%;
 
     display: none;
+}
+
+
+/* ================================
+   NỘI DUNG CHÍNH - ĐẶT HÀNG
+================================ */
+
+.checkout-page {
+    max-width: 1200px;
+    margin: 35px auto 60px;
+    padding: 0 20px;
+    font-family: "Be Vietnam Pro", sans-serif;
+    color: #222;
+}
+
+.checkout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 25px;
+}
+
+.page-label {
+    display: inline-block;
+    color: #1557b0;
+    background: #edf4ff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.checkout-header h1 {
+    margin: 0;
+    font-size: 30px;
+    color: #123d72;
+}
+
+.checkout-header p {
+    margin: 6px 0 0;
+    color: #777;
+    font-size: 12px;
+}
+
+.back-link {
+    color: #1557b0;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* ================================
+   PROGRESS
+================================ */
+
+.checkout-progress {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    background: #fff;
+    border: 1px solid #e1e7ef;
+    border-radius: 14px;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #aaa;
+}
+
+.progress-step > span {
+    width: 31px;
+    height: 31px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #edf0f4;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.progress-step.active {
+    color: #1557b0;
+}
+
+.progress-step.active > span {
+    background: #1557b0;
+    color: #fff;
+}
+
+.progress-step strong {
+    display: block;
+    font-size: 11px;
+}
+
+.progress-step small {
+    display: block;
+    font-size: 9px;
+    margin-top: 2px;
+}
+
+.progress-line {
+    flex: 1;
+    height: 2px;
+    background: #e1e5eb;
+    margin: 0 18px;
+}
+
+.progress-line.active {
+    background: #8bb1df;
+}
+
+
+/* ================================
+   LAYOUT
+================================ */
+
+.checkout-shell {
+    display: grid;
+    grid-template-columns: 1.55fr .75fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.checkout-main {
+    display: grid;
+    gap: 17px;
+}
+
+
+/* ================================
+   CARD
+================================ */
+
+.checkout-card {
+    background: #fff;
+    border: 1px solid #e1e7ef;
+    border-radius: 16px;
+    padding: 21px;
+    box-shadow: 0 8px 25px rgba(30, 60, 100, .06);
+}
+
+.card-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 18px;
+}
+
+.heading-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #edf4ff;
+    border-radius: 10px;
+    font-size: 18px;
+}
+
+.card-heading h2 {
+    margin: 0;
+    font-size: 16px;
+    color: #1d2d44;
+}
+
+.card-heading p {
+    margin: 4px 0 0;
+    color: #8a94a3;
+    font-size: 10px;
+}
+
+.item-count {
+    margin-left: auto;
+    background: #edf4ff;
+    color: #1557b0;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+
+/* ================================
+   FORM
+================================ */
+
+.checkout-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.field {
+    display: grid;
+    gap: 6px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
+}
+
+.field label {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.field label span {
+    color: #dc3545;
+}
+
+.field input,
+.field textarea {
+    width: 100%;
+    border: 1px solid #dce3ec;
+    border-radius: 9px;
+    padding: 10px 12px;
+    outline: none;
+    font-size: 11px;
+    color: #333;
+    transition: .2s;
+}
+
+.field input {
+    height: 42px;
+}
+
+.field textarea {
+    min-height: 78px;
+    resize: vertical;
+}
+
+.field textarea.note-input {
+    min-height: 60px;
+}
+
+.field input:focus,
+.field textarea:focus {
+    border-color: #6d9fd9;
+    box-shadow: 0 0 0 3px rgba(21, 87, 176, .07);
+}
+
+
+/* ================================
+   PHƯƠNG THỨC
+================================ */
+
+.choice-group {
+    display: grid;
+    gap: 9px;
+}
+
+.option-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 13px;
+    border: 1px solid #e0e6ee;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.option-box:hover {
+    border-color: #a9c2df;
+    background: #fafcff;
+}
+
+.option-box.selected {
+    border-color: #80a9db;
+    background: #f7faff;
+}
+
+.option-box input {
+    position: absolute;
+    opacity: 0;
+}
+
+.option-radio {
+    width: 17px;
+    height: 17px;
+    border: 2px solid #c7d0dc;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.option-box.selected .option-radio {
+    border-color: #1557b0;
+}
+
+.option-box.selected .option-radio::after {
+    content: "";
+    display: block;
+    width: 7px;
+    height: 7px;
+    margin: 3px;
+    border-radius: 50%;
+    background: #1557b0;
+}
+
+.option-content {
+    flex: 1;
+}
+
+.option-content strong {
+    display: block;
+    font-size: 11px;
+}
+
+.option-content small {
+    display: block;
+    color: #858f9f;
+    font-size: 9px;
+    margin-top: 3px;
+}
+
+.option-price {
+    color: #1557b0;
+    font-size: 10px;
+}
+
+.option-price.free {
+    color: #27864e;
+}
+
+.payment-badge {
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: #eaf2ff;
+    color: #1557b0;
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.wallet-badge {
+    background: #fff5cf;
+    color: #a77c00;
+    border: 1px solid #ead37c;
+}
+
+
+/* ================================
+   CHI TIẾT THANH TOÁN
+================================ */
+
+.payment-detail-box {
+    margin-top: 14px;
+    padding: 17px;
+    border-radius: 13px;
+    border: 1px solid #dce6f2;
+    background: #f8fbff;
+}
+
+.payment-detail-box.hidden {
+    display: none;
+}
+
+
+/* ================================
+   QR
+================================ */
+
+.payment-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.payment-detail-header strong {
+    font-size: 12px;
+}
+
+.payment-detail-header p {
+    margin: 4px 0 0;
+    color: #8993a1;
+    font-size: 9px;
+}
+
+.qr-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    margin: 17px 0;
+}
+
+.qr-image-wrapper {
+    width: 175px;
+    height: 175px;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #dfe5ed;
+    border-radius: 10px;
+}
+
+.qr-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.qr-instruction {
+    display: grid;
+    gap: 12px;
+}
+
+.qr-instruction div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qr-instruction span {
+    width: 23px;
+    height: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1557b0;
+    color: white;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.qr-instruction p {
+    margin: 0;
+    color: #657187;
+    font-size: 9px;
+}
+
+.confirm-payment-button {
+    width: 100%;
+    height: 42px;
+    border: none;
+    border-radius: 9px;
+    background: #1557b0;
+    color: white;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.confirm-payment-button:hover {
+    background: #0d438b;
+}
+
+.payment-status {
+    min-height: 17px;
+    margin-top: 8px;
+    text-align: center;
+    color: #777;
+    font-size: 9px;
+}
+
+.payment-status.success {
+    color: #27864e;
+    font-weight: 700;
+}
+
+
+/* ================================
+   VÍ IUH
+================================ */
+
+.wallet-payment-box {
+    background: linear-gradient(145deg, #fffdf4, #fff9df);
+    border-color: #efdc91;
+}
+
+.wallet-header {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.wallet-symbol {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff0b3;
+    border-radius: 10px;
+    font-size: 19px;
+}
+
+.wallet-header strong {
+    font-size: 12px;
+}
+
+.wallet-header p {
+    margin: 3px 0 0;
+    color: #8b8a78;
+    font-size: 9px;
+}
+
+.wallet-balance-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding: 13px;
+    background: rgba(255,255,255,.8);
+    border: 1px solid #efdf9f;
+    border-radius: 10px;
+}
+
+.wallet-balance-box span {
+    color: #777;
+    font-size: 10px;
+}
+
+.wallet-balance-box strong {
+    color: #9c7400;
+    font-size: 17px;
+}
+
+.wallet-after-payment {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.wallet-after-payment div {
+    padding: 11px;
+    background: rgba(255,255,255,.7);
+    border-radius: 9px;
+}
+
+.wallet-after-payment span {
+    display: block;
+    color: #888;
+    font-size: 8px;
+}
+
+.wallet-after-payment strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+}
+
+.wallet-status {
+    margin-top: 10px;
+    padding: 9px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.75);
+    color: #856e1c;
+    font-size: 9px;
+}
+
+.wallet-status.success {
+    color: #27864e;
+    background: #effaf3;
+}
+
+.wallet-status.error {
+    color: #dc3545;
+    background: #fff0f1;
+}
+
+
+/* ================================
+   TIỀN MẶT
+================================ */
+
+.cash-payment-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cash-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9f6ed;
+    border-radius: 10px;
+    font-size: 18px;
+}
+
+.cash-payment-box strong {
+    font-size: 11px;
+}
+
+.cash-payment-box p {
+    margin: 4px 0 0;
+    color: #888;
+    font-size: 9px;
+}
+
+
+/* ================================
+   SẢN PHẨM
+================================ */
+
+.checkout-items {
+    display: grid;
+    gap: 9px;
+}
+
+.checkout-item {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border: 1px solid #e6eaf0;
+    border-radius: 10px;
+}
+
+.checkout-item img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f2f5f8;
+}
+
+.checkout-info {
+    min-width: 0;
+}
+
+.checkout-info h3 {
+    margin: 0 0 5px;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.product-meta {
+    color: #8a94a3;
+    font-size: 9px;
+}
+
+.price-box {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.price-box strong {
+    color: #1557b0;
+    font-size: 10px;
+}
+
+.qty-tag {
+    padding: 4px 7px;
+    border-radius: 20px;
+    background: #f1f4f8;
+    color: #697587;
+    font-size: 8px;
+}
+
+.checkout-price {
+    text-align: right;
+}
+
+.checkout-price strong {
+    font-size: 11px;
+}
+
+
+/* ================================
+   EMPTY
+================================ */
+
+.empty-cart {
+    padding: 30px;
+    text-align: center;
+    border: 1px dashed #cdd6e2;
+    border-radius: 11px;
+}
+
+.empty-icon {
+    font-size: 30px;
+}
+
+.empty-cart h3 {
+    margin: 8px 0 5px;
+    font-size: 13px;
+}
+
+.empty-cart p {
+    margin: 0;
+    color: #888;
+    font-size: 10px;
+}
+
+
+/* ================================
+   SUMMARY
+================================ */
+
+.summary-panel {
+    position: sticky;
+    top: 20px;
+    padding: 21px;
+    background: white;
+    border: 1px solid #e1e7ef;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(30, 60, 100, .06);
+}
+
+.summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e9ef;
+}
+
+.summary-header span {
+    color: #1557b0;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.summary-header h2 {
+    margin: 4px 0 0;
+    font-size: 17px;
+}
+
+.summary-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #edf4ff;
+    border-radius: 10px;
+}
+
+.summary-box {
+    display: grid;
+    gap: 13px;
+    padding: 18px 0;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    color: #7b8696;
+    font-size: 10px;
+}
+
+.summary-row strong {
+    color: #222;
+}
+
+.summary-divider {
+    height: 1px;
+    background: #e5e9ef;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.summary-total span {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.summary-total strong {
+    color: #1557b0;
+    font-size: 19px;
+}
+
+.summary-note {
+    display: flex;
+    gap: 9px;
+    padding: 11px;
+    border: 1px solid #dceafa;
+    border-radius: 9px;
+    background: #f7faff;
+}
+
+.note-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e3f5e9;
+    color: #27864e;
+    border-radius: 50%;
+    font-size: 10px;
+}
+
+.summary-note p {
+    margin: 0;
+    color: #687486;
+    font-size: 8px;
+    line-height: 1.6;
+}
+
+.secure-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+}
+
+.secure-info strong {
+    display: block;
+    color: #596579;
+    font-size: 9px;
+}
+
+.secure-info small {
+    color: #929baa;
+    font-size: 7px;
+}
+
+.action-row {
+    display: grid;
+    gap: 8px;
+}
+
+.checkout-button,
+.secondary-button {
+    width: 100%;
+    min-height: 43px;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.checkout-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 14px;
+    background: #1557b0;
+    color: #fff;
+}
+
+.checkout-button:hover {
+    background: #0d438b;
+}
+
+.checkout-button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.secondary-button {
+    background: #edf2f8;
+    color: #1557b0;
+}
+
+
+/* ================================
+   TOAST
+================================ */
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 25px;
+    z-index: 9999;
+    padding: 11px 18px;
+    border-radius: 30px;
+    background: rgba(20, 28, 43, .95);
+    color: #fff;
+    font-size: 10px;
+    opacity: 0;
+    transform: translate(-50%, 20px);
+    pointer-events: none;
+    transition: .25s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 900px) {
+
+    .checkout-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-panel {
+        position: static;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    .checkout-form {
+        grid-template-columns: 1fr;
+    }
+
+    .field.full {
+        grid-column: auto;
+    }
+
+    .checkout-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .progress-step div {
+        display: none;
+    }
+
+    .progress-line {
+        margin: 0 8px;
+    }
+
+    .qr-content {
+        flex-direction: column;
+    }
+
+    .checkout-item {
+        grid-template-columns: 60px 1fr;
+    }
+
+    .checkout-item img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .checkout-price {
+        grid-column: 2;
+        text-align: left;
+    }
 }

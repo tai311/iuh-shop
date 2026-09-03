@@ -564,811 +564,326 @@ document.addEventListener(
     }
 );
 
-/* =====================================================
-   IUH SHOP WALLET
-   LƯU TRỮ: localStorage
-===================================================== */
+/* =========================================================
+   IUH SHOP - PHẦN XỬ LÝ VÍ IUH
+   ---------------------------------------------------------
+   LƯU TRỮ:
+   - Số dư ví       -> Supabase: iuh_wallets
+   - Giao dịch      -> Supabase: wallet_transactions
+   - Nạp tiền       -> mô phỏng
+   - Rút tiền       -> mô phỏng
+   ========================================================= */
 
 
-/* =====================================================
-   LẤY USER HIỆN TẠI
-===================================================== */
+/* =========================================================
+   BIẾN VÍ
+   ========================================================= */
 
-function getCurrentWalletUser() {
+let currentWallet = null;
 
-    try {
 
-        return JSON.parse(
-            localStorage.getItem("currentUser")
-        );
-
-    } catch {
-
-        return null;
-
-    }
-
-}
-
-
-/* =====================================================
-   KEY RIÊNG CHO TỪNG TÀI KHOẢN
-===================================================== */
-
-function getWalletKey() {
-
-    const user =
-        getCurrentWalletUser();
-
-
-    /*
-        Không dùng chung ví giữa các tài khoản.
-    */
-
-    const identity =
-        user?.id ||
-        user?.userId ||
-        user?.email ||
-        user?.username ||
-        "guest";
-
-
-    return "iuhWallet_" +
-        String(identity)
-            .replace(
-                /[^a-zA-Z0-9_-]/g,
-                "_"
-            );
-
-}
-
-
-/* =====================================================
-   TẠO MÃ GIAO DỊCH
-===================================================== */
-
-function generateWalletTransactionId(
-    prefix = "IUH"
-) {
-
-    const time =
-        Date.now()
-            .toString()
-            .slice(-8);
-
-
-    const random =
-        Math.floor(
-            1000 +
-            Math.random() * 9000
-        );
-
-
-    return `${prefix}${time}${random}`;
-
-}
-
-
-/* =====================================================
-   WALLET DEFAULT
-===================================================== */
-
-function createDefaultWallet() {
-
-    return {
-
-        balance: 0,
-
-        pending: 0,
-
-        totalReceived: 0,
-
-        transactions: [],
-
-        updatedAt:
-            new Date().toISOString()
-
-    };
-
-}
-
-
-/* =====================================================
-   LẤY VÍ
-===================================================== */
-
-function getWallet() {
-
-    const key =
-        getWalletKey();
-
-
-    try {
-
-        const saved =
-            JSON.parse(
-                localStorage.getItem(key)
-            );
-
-
-        if (saved) {
-
-            return {
-
-                ...createDefaultWallet(),
-
-                ...saved
-
-            };
-
-        }
-
-    } catch {
-
-        console.warn(
-            "Không đọc được dữ liệu Ví IUH SHOP."
-        );
-
-    }
-
-
-    const wallet =
-        createDefaultWallet();
-
-
-    localStorage.setItem(
-        key,
-        JSON.stringify(wallet)
-    );
-
-
-    return wallet;
-
-}
-
-
-/* =====================================================
-   LƯU VÍ
-===================================================== */
-
-function saveWallet(wallet) {
-
-    wallet.updatedAt =
-        new Date().toISOString();
-
-
-    localStorage.setItem(
-        getWalletKey(),
-        JSON.stringify(wallet)
-    );
-
-}
-
-
-/* =====================================================
+/* =========================================================
    FORMAT TIỀN
-===================================================== */
+   ========================================================= */
 
-function formatWalletMoney(value) {
+function formatMoney(value) {
 
     return Number(value || 0)
-        .toLocaleString("vi-VN") +
-        "đ";
+        .toLocaleString("vi-VN") + "đ";
 
 }
 
 
-/* =====================================================
+/* =========================================================
    FORMAT NGÀY
-===================================================== */
+   ========================================================= */
 
-function formatTransactionDate(date) {
+function formatDate(value) {
 
-    const d =
-        new Date(date);
-
-
-    if (
-        isNaN(
-            d.getTime()
-        )
-    ) {
-
+    if (!value) {
         return "—";
-
     }
 
+    const date = new Date(value);
 
-    return d.toLocaleString(
+    if (isNaN(date.getTime())) {
+        return "—";
+    }
+
+    return date.toLocaleString(
         "vi-VN",
         {
-
             day: "2-digit",
-
             month: "2-digit",
-
             year: "numeric",
-
             hour: "2-digit",
-
             minute: "2-digit"
-
         }
     );
 
 }
 
 
-/* =====================================================
-   THÊM GIAO DỊCH
-===================================================== */
+/* =========================================================
+   TẠO / LẤY VÍ
+   ---------------------------------------------------------
+   RPC ensure_iuh_wallet sẽ:
+   - kiểm tra ví của user
+   - nếu chưa có thì tạo
+   - trả về thông tin ví
+   ========================================================= */
 
-function addWalletTransaction({
+async function loadWallet() {
 
-    type,
+    if (!currentUser) {
 
-    title,
+        currentWallet = null;
 
-    amount,
-
-    description,
-
-    bank = "",
-
-    account = ""
-
-}) {
-
-    const wallet =
-        getWallet();
+        return false;
+    }
 
 
-    wallet.transactions.unshift({
+    try {
 
-        id:
-            generateWalletTransactionId(),
-
-        type,
-
-        title,
-
-        amount:
-
-            Number(amount || 0),
-
-        description,
-
-        bank,
-
-        account,
-
-        createdAt:
-            new Date().toISOString()
-
-    });
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .rpc("ensure_iuh_wallet");
 
 
-    /*
-        Giữ lịch sử tối đa 100 giao dịch
-    */
+        if (error) {
 
-    wallet.transactions =
-        wallet.transactions.slice(
-            0,
-            100
+            console.error(
+                "Lỗi tải Ví IUH:",
+                error
+            );
+
+            alert(
+                "Không thể tải Ví IUH.\n\n" +
+                error.message
+            );
+
+            currentWallet = null;
+
+            return false;
+        }
+
+
+        /*
+         * RPC có thể trả về object hoặc
+         * mảng tùy cấu hình PostgreSQL.
+         */
+
+        if (Array.isArray(data)) {
+
+            currentWallet =
+                data.length > 0
+                    ? data[0]
+                    : null;
+
+        }
+        else {
+
+            currentWallet = data;
+
+        }
+
+
+        if (!currentWallet) {
+
+            console.error(
+                "Không nhận được dữ liệu ví."
+            );
+
+            return false;
+        }
+
+
+        return true;
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi loadWallet:",
+            error
         );
 
+        currentWallet = null;
 
-    saveWallet(wallet);
+        return false;
+    }
 
 }
 
 
-/* =====================================================
-   CẬP NHẬT GIAO DIỆN
-===================================================== */
+/* =========================================================
+   HIỂN THỊ SỐ DƯ VÍ
+   ========================================================= */
 
 function renderWallet() {
 
-    const wallet =
-        getWallet();
+    if (!currentWallet) {
+        return;
+    }
 
 
-    document.getElementById(
-        "walletBalance"
-    ).textContent =
-        formatWalletMoney(
-            wallet.balance
+    const balance =
+        Number(
+            currentWallet.balance || 0
         );
 
 
-    document.getElementById(
-        "pendingBalance"
-    ).textContent =
-        formatWalletMoney(
-            wallet.pending
+    const pending =
+        Number(
+            currentWallet.pending || 0
         );
 
 
-    document.getElementById(
-        "totalReceived"
-    ).textContent =
-        formatWalletMoney(
-            wallet.totalReceived
+    const totalReceived =
+        Number(
+            currentWallet.total_received || 0
         );
 
 
-    /*
-        Tính phí từ orders
-    */
+    /* -----------------------------------------------------
+       SỐ DƯ CHÍNH
+       ----------------------------------------------------- */
 
-    const feeData =
-        calculateOutstandingFees();
-
-
-    document.getElementById(
-        "outstandingFee"
-    ).textContent =
-        formatWalletMoney(
-            feeData.total
-        );
-
-
-    const status =
+    const balanceElement =
         document.getElementById(
-            "feeStatus"
+            "walletBalance"
         );
 
 
-    if (feeData.total > 0) {
+    if (balanceElement) {
 
-        status.textContent =
-            `${feeData.items.length} khoản cần thanh toán`;
-
-    }
-    else {
-
-        status.textContent =
-            "Không có khoản phí cần thanh toán";
+        balanceElement.textContent =
+            formatMoney(balance);
 
     }
 
 
-    renderTransactions();
+    /* -----------------------------------------------------
+       TIỀN ĐANG CHỜ
+       ----------------------------------------------------- */
 
-}
-
-
-/* =====================================================
-   LẤY ORDERS
-===================================================== */
-
-function getWalletOrders() {
-
-    try {
-
-        const orders =
-            JSON.parse(
-                localStorage.getItem("orders")
-            );
+    const pendingElement =
+        document.getElementById(
+            "pendingBalance"
+        );
 
 
-        return Array.isArray(orders)
-            ? orders
-            : [];
+    if (pendingElement) {
 
-    } catch {
-
-        return [];
+        pendingElement.textContent =
+            formatMoney(pending);
 
     }
 
-}
+
+    /* -----------------------------------------------------
+       TỔNG TIỀN ĐÃ NHẬN
+       ----------------------------------------------------- */
+
+    const receivedElement =
+        document.getElementById(
+            "totalReceived"
+        );
 
 
-/* =====================================================
-   KIỂM TRA ROLE
-===================================================== */
+    if (receivedElement) {
 
-function isWalletPrivileged() {
-
-    const user =
-        getCurrentWalletUser();
-
-
-    const role =
-        String(
-            user?.role ||
-            user?.userRole ||
-            user?.type ||
-            ""
-        )
-        .toLowerCase()
-        .trim();
-
-
-    return (
-
-        role === "admin" ||
-
-        role === "quản trị viên" ||
-
-        role === "quan tri vien" ||
-
-        role === "administrator"
-
-    );
-
-}
-
-
-/* =====================================================
-   LẤY GIÁ
-===================================================== */
-
-function getOrderPrice(order) {
-
-    return Number(
-
-        order.sellerPrice ||
-
-        order.productPrice ||
-
-        order.price ||
-
-        order.amount ||
-
-        0
-
-    );
-
-}
-
-
-/* =====================================================
-   COD
-===================================================== */
-
-function isWalletCOD(order) {
-
-    const method =
-        String(
-            order.paymentMethod ||
-            order.payment ||
-            ""
-        )
-        .toLowerCase();
-
-
-    return (
-
-        method.includes("cod") ||
-
-        method.includes("nhận hàng") ||
-
-        method.includes("nhan hang")
-
-    );
-
-}
-
-
-/* =====================================================
-   COMPLETED
-===================================================== */
-
-function isWalletCompleted(order) {
-
-    const status =
-        String(
-            order.status ||
-            order.orderStatus ||
-            ""
-        )
-        .toLowerCase()
-        .trim();
-
-
-    return (
-
-        status === "completed" ||
-
-        status === "hoàn thành" ||
-
-        status === "hoan thanh" ||
-
-        status === "delivered" ||
-
-        status === "đã giao" ||
-
-        status === "da giao"
-
-    );
-
-}
-
-
-/* =====================================================
-   PHÍ SÀN
-===================================================== */
-
-const WALLET_PLATFORM_FEE =
-    0.05;
-
-
-/* =====================================================
-   PHÍ CHẬM
-   0.1% / NGÀY
-===================================================== */
-
-const WALLET_DAILY_LATE_RATE =
-    0.001;
-
-
-const WALLET_DEADLINE_DAYS =
-    7;
-
-
-/* =====================================================
-   TÍNH NGÀY QUÁ HẠN
-===================================================== */
-
-function getWalletOverdueDays(dateValue) {
-
-    if (!dateValue) {
-
-        return 0;
+        receivedElement.textContent =
+            formatMoney(totalReceived);
 
     }
 
 
-    const completed =
-        new Date(dateValue);
+    /* -----------------------------------------------------
+       SỐ DƯ TRONG POPUP RÚT
+       ----------------------------------------------------- */
+
+    updateWithdrawBalance();
 
 
-    if (
-        isNaN(
-            completed.getTime()
-        )
-    ) {
+    /* -----------------------------------------------------
+       LỊCH SỬ
+       ----------------------------------------------------- */
 
-        return 0;
-
-    }
-
-
-    const deadline =
-        new Date(completed);
-
-
-    deadline.setDate(
-        deadline.getDate() +
-        WALLET_DEADLINE_DAYS
-    );
-
-
-    const now =
-        new Date();
-
-
-    if (now <= deadline) {
-
-        return 0;
-
-    }
-
-
-    return Math.floor(
-
-        (
-            now.getTime() -
-            deadline.getTime()
-        )
-        /
-        (1000 * 60 * 60 * 24)
-
-    );
+    loadTransactions();
 
 }
 
 
-/* =====================================================
-   TÍNH PHÍ SAU QUÁ HẠN
-===================================================== */
+/* =========================================================
+   CẬP NHẬT SỐ DƯ KHẢ DỤNG TRONG POPUP RÚT
+   ========================================================= */
 
-function getWalletFinalFee(
-    baseFee,
-    overdueDays
-) {
+function updateWithdrawBalance() {
 
-    if (
-        overdueDays <= 0
-    ) {
+    const element =
+        document.getElementById(
+            "withdrawAvailable"
+        );
 
-        return baseFee;
 
+    if (!element) {
+        return;
     }
 
 
-    return (
-
-        baseFee *
-        Math.pow(
-            1 + WALLET_DAILY_LATE_RATE,
-            overdueDays
-        )
-
-    );
+    element.textContent =
+        formatMoney(
+            currentWallet?.balance || 0
+        );
 
 }
 
 
-/* =====================================================
-   TÍNH CÔNG NỢ
-===================================================== */
-
-function calculateOutstandingFees() {
-
-    /*
-        Admin / quản trị viên:
-        luôn = 0
-    */
-
-    if (
-        isWalletPrivileged()
-    ) {
-
-        return {
-
-            total: 0,
-
-            items: []
-
-        };
-
-    }
-
-
-    const orders =
-        getWalletOrders();
-
-
-    const items = [];
-
-
-    orders.forEach(order => {
-
-
-        if (
-            !isWalletCompleted(order)
-        ) {
-
-            return;
-
-        }
-
-
-        if (
-            !isWalletCOD(order)
-        ) {
-
-            return;
-
-        }
-
-
-        if (
-            order.platformFeePaid === true ||
-            order.feePaid === true
-        ) {
-
-            return;
-
-        }
-
-
-        const baseFee =
-            getOrderPrice(order) *
-            WALLET_PLATFORM_FEE;
-
-
-        const completedDate =
-            order.completedAt ||
-            order.completedDate ||
-            order.updatedAt ||
-            order.createdAt;
-
-
-        const overdueDays =
-            getWalletOverdueDays(
-                completedDate
-            );
-
-
-        const finalFee =
-            getWalletFinalFee(
-                baseFee,
-                overdueDays
-            );
-
-
-        items.push({
-
-            id:
-                order.id ||
-                order.orderId,
-
-            product:
-                order.productName ||
-                order.name ||
-                "Đơn hàng",
-
-            baseFee,
-
-            finalFee,
-
-            overdueDays
-
-        });
-
-    });
-
-
-    return {
-
-        total:
-            items.reduce(
-                (sum, item) =>
-                    sum + item.finalFee,
-                0
-            ),
-
-        items
-
-    };
-
-}
-
-
-/* =====================================================
+/* =========================================================
    NẠP TIỀN
-===================================================== */
+   ---------------------------------------------------------
+   Đây là NẠP TIỀN MÔ PHỎNG.
 
-function openDepositModal() {
+   Không kết nối ngân hàng thật.
 
-    document.getElementById(
-        "depositAmount"
-    ).value = "";
+   Khi người dùng xác nhận:
+   - gọi RPC deposit_iuh_wallet
+   - cộng tiền vào database
+   - tạo lịch sử giao dịch
+   ========================================================= */
 
+async function confirmDeposit() {
 
-    document.getElementById(
-        "depositModal"
-    ).classList.add(
-        "active"
-    );
+    if (!currentUser) {
 
+        alert(
+            "Vui lòng đăng nhập trước."
+        );
 
-    document.body.style.overflow =
-        "hidden";
+        return;
+    }
 
-}
-
-
-function confirmDeposit() {
 
     const amount =
         Number(
             document.getElementById(
                 "depositAmount"
-            ).value
+            )?.value
         );
 
 
     const bank =
         document.getElementById(
             "depositBank"
-        ).value;
+        )?.value || "";
 
+
+    /* -----------------------------------------------------
+       KIỂM TRA SỐ TIỀN
+       ----------------------------------------------------- */
 
     if (
         !amount ||
@@ -1380,143 +895,180 @@ function confirmDeposit() {
         );
 
         return;
-
     }
 
 
-    const wallet =
-        getWallet();
+    if (!Number.isFinite(amount)) {
+
+        alert(
+            "Số tiền không hợp lệ."
+        );
+
+        return;
+    }
 
 
-    wallet.balance +=
-        amount;
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .rpc(
+                "deposit_iuh_wallet",
+                {
+                    p_amount: amount,
+                    p_bank: bank
+                }
+            );
 
 
-    /*
-        Nạp tiền không tính
-        vào doanh thu bán hàng.
-    */
+        if (error) {
 
-    wallet.transactions.unshift({
+            console.error(
+                "Lỗi nạp tiền:",
+                error
+            );
 
-        id:
-            generateWalletTransactionId(
-                "NAP"
-            ),
+            alert(
+                "Nạp tiền thất bại.\n\n" +
+                error.message
+            );
 
-        type:
-            "deposit",
-
-        title:
-            "Nạp tiền từ ngân hàng",
-
-        amount,
-
-        description:
-            `Nạp tiền từ ${bank}`,
-
-        bank,
-
-        createdAt:
-            new Date().toISOString()
-
-    });
+            return;
+        }
 
 
-    saveWallet(wallet);
+        /*
+         * RPC trả về số dư mới.
+         */
+
+        const newBalance =
+            Array.isArray(data)
+                ? data[0]
+                : data;
 
 
-    closeWalletModal(
-        "depositModal"
-    );
+        currentWallet.balance =
+            Number(
+                newBalance || 0
+            );
 
 
-    renderWallet();
+        /* -------------------------------------------------
+           ĐÓNG POPUP
+           ------------------------------------------------- */
 
-
-    alert(
-        "✓ Nạp tiền mô phỏng thành công!\n\n" +
-        `Số tiền: ${formatWalletMoney(amount)}`
-    );
-
-}
-
-
-/* =====================================================
-   RÚT TIỀN
-===================================================== */
-
-function openWithdrawModal() {
-
-    const wallet =
-        getWallet();
-
-
-    document.getElementById(
-        "withdrawAvailable"
-    ).textContent =
-        formatWalletMoney(
-            wallet.balance
+        closeWalletModal(
+            "depositModal"
         );
 
 
-    document.getElementById(
-        "withdrawAmount"
-    ).value = "";
+        /* -------------------------------------------------
+           CẬP NHẬT GIAO DIỆN
+           ------------------------------------------------- */
+
+        renderWallet();
 
 
-    document.getElementById(
-        "withdrawAccount"
-    ).value = "";
+        /* -------------------------------------------------
+           THÔNG BÁO
+           ------------------------------------------------- */
 
+        alert(
+            "✓ Nạp tiền mô phỏng thành công!\n\n" +
+            "Số tiền: " +
+            formatMoney(amount) +
+            "\n" +
+            "Ngân hàng: " +
+            (bank || "Không xác định")
+        );
 
-    document.getElementById(
-        "withdrawModal"
-    ).classList.add(
-        "active"
-    );
+    }
+    catch (error) {
 
+        console.error(
+            "Lỗi confirmDeposit:",
+            error
+        );
 
-    document.body.style.overflow =
-        "hidden";
+        alert(
+            "Không thể thực hiện giao dịch."
+        );
+
+    }
 
 }
 
 
-function confirmWithdraw() {
+/* =========================================================
+   RÚT TIỀN
+   ---------------------------------------------------------
+   Đây là RÚT TIỀN MÔ PHỎNG.
+
+   Không chuyển tiền thật về ngân hàng.
+
+   Khi xác nhận:
+   - kiểm tra số dư
+   - gọi RPC withdraw_iuh_wallet
+   - trừ tiền trong database
+   - lưu lịch sử giao dịch
+   ========================================================= */
+
+async function confirmWithdraw() {
+
+    if (!currentUser) {
+
+        alert(
+            "Vui lòng đăng nhập trước."
+        );
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       LẤY DỮ LIỆU FORM
+       ----------------------------------------------------- */
 
     const amount =
         Number(
             document.getElementById(
                 "withdrawAmount"
-            ).value
+            )?.value
         );
 
 
     const bank =
         document.getElementById(
             "withdrawBank"
-        ).value;
+        )?.value || "";
 
 
     const account =
         document.getElementById(
             "withdrawAccount"
-        ).value.trim();
+        )?.value
+            ?.trim() || "";
 
 
-    if (
-        !account
-    ) {
+    /* -----------------------------------------------------
+       KIỂM TRA TÀI KHOẢN NGÂN HÀNG
+       ----------------------------------------------------- */
+
+    if (!account) {
 
         alert(
             "Vui lòng nhập số tài khoản."
         );
 
         return;
-
     }
 
+
+    /* -----------------------------------------------------
+       KIỂM TRA SỐ TIỀN
+       ----------------------------------------------------- */
 
     if (
         !amount ||
@@ -1528,407 +1080,245 @@ function confirmWithdraw() {
         );
 
         return;
-
     }
 
 
-    const wallet =
-        getWallet();
+    if (!Number.isFinite(amount)) {
+
+        alert(
+            "Số tiền không hợp lệ."
+        );
+
+        return;
+    }
 
 
-    if (
-        amount > wallet.balance
-    ) {
+    /* -----------------------------------------------------
+       KIỂM TRA SỐ DƯ
+       ----------------------------------------------------- */
+
+    const balance =
+        Number(
+            currentWallet?.balance || 0
+        );
+
+
+    if (amount > balance) {
 
         alert(
             "Số dư khả dụng không đủ."
         );
 
         return;
-
     }
 
 
-    /*
-        Trừ tiền khỏi ví
-    */
+    try {
 
-    wallet.balance -=
-        amount;
-
-
-    /*
-        Ghi lịch sử
-    */
-
-    wallet.transactions.unshift({
-
-        id:
-            generateWalletTransactionId(
-                "RUT"
-            ),
-
-        type:
-            "withdraw",
-
-        title:
-            "Rút tiền về ngân hàng",
-
-        amount,
-
-        description:
-            `Rút tiền về ${bank}`,
-
-        bank,
-
-        account:
-            maskAccount(account),
-
-        createdAt:
-            new Date().toISOString()
-
-    });
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .rpc(
+                "withdraw_iuh_wallet",
+                {
+                    p_amount: amount,
+                    p_bank: bank,
+                    p_account: account
+                }
+            );
 
 
-    saveWallet(wallet);
+        if (error) {
+
+            console.error(
+                "Lỗi rút tiền:",
+                error
+            );
+
+            alert(
+                "Rút tiền thất bại.\n\n" +
+                error.message
+            );
+
+            return;
+        }
 
 
-    closeWalletModal(
-        "withdrawModal"
-    );
+        /*
+         * RPC trả về số dư mới.
+         */
+
+        const newBalance =
+            Array.isArray(data)
+                ? data[0]
+                : data;
 
 
-    renderWallet();
+        currentWallet.balance =
+            Number(
+                newBalance || 0
+            );
 
 
-    alert(
-        "✓ Yêu cầu rút tiền mô phỏng thành công!\n\n" +
-        `Số tiền: ${formatWalletMoney(amount)}\n` +
-        `Ngân hàng: ${bank}`
-    );
+        /* -------------------------------------------------
+           ĐÓNG POPUP
+           ------------------------------------------------- */
 
-}
-
-
-/* =====================================================
-   CHE SỐ TÀI KHOẢN
-===================================================== */
-
-function maskAccount(account) {
-
-    if (
-        account.length <= 4
-    ) {
-
-        return account;
-
-    }
-
-
-    return (
-        "*".repeat(
-            account.length - 4
-        ) +
-        account.slice(-4)
-    );
-
-}
-
-
-/* =====================================================
-   THANH TOÁN PHÍ SÀN
-===================================================== */
-
-function payFeeFromWallet(orderId) {
-
-    const feeData =
-        calculateOutstandingFees();
-
-
-    const item =
-        feeData.items.find(
-            fee =>
-                String(fee.id) ===
-                String(orderId)
+        closeWalletModal(
+            "withdrawModal"
         );
 
 
-    if (!item) {
+        /* -------------------------------------------------
+           CẬP NHẬT GIAO DIỆN
+           ------------------------------------------------- */
+
+        renderWallet();
+
+
+        /* -------------------------------------------------
+           THÔNG BÁO
+           ------------------------------------------------- */
 
         alert(
-            "Không tìm thấy khoản phí."
+            "✓ Rút tiền mô phỏng thành công!\n\n" +
+            "Số tiền: " +
+            formatMoney(amount) +
+            "\n" +
+            "Ngân hàng: " +
+            (bank || "Không xác định") +
+            "\n" +
+            "Số tài khoản: " +
+            account
         );
 
-        return;
-
     }
+    catch (error) {
 
-
-    const wallet =
-        getWallet();
-
-
-    /*
-        Kiểm tra số dư
-    */
-
-    if (
-        wallet.balance <
-        item.finalFee
-    ) {
+        console.error(
+            "Lỗi confirmWithdraw:",
+            error
+        );
 
         alert(
-            "Số dư Ví IUH SHOP không đủ để thanh toán khoản phí này."
+            "Không thể thực hiện giao dịch."
         );
 
-        return;
-
     }
-
-
-    /*
-        Trừ tiền ví
-    */
-
-    wallet.balance -=
-        item.finalFee;
-
-
-    /*
-        Lưu giao dịch
-    */
-
-    wallet.transactions.unshift({
-
-        id:
-            generateWalletTransactionId(
-                "PHI"
-            ),
-
-        type:
-            "fee",
-
-        title:
-            "Thanh toán phí sàn",
-
-        amount:
-            item.finalFee,
-
-        description:
-            item.product,
-
-        createdAt:
-            new Date().toISOString()
-
-    });
-
-
-    saveWallet(wallet);
-
-
-    /*
-        Cập nhật order
-    */
-
-    const orders =
-        getWalletOrders();
-
-
-    const index =
-        orders.findIndex(
-            order =>
-                String(
-                    order.id ||
-                    order.orderId
-                ) ===
-                String(orderId)
-        );
-
-
-    if (
-        index !== -1
-    ) {
-
-        orders[index].platformFeePaid =
-            true;
-
-        orders[index].feePaid =
-            true;
-
-        orders[index].feePaidAt =
-            new Date().toISOString();
-
-    }
-
-
-    localStorage.setItem(
-        "orders",
-        JSON.stringify(orders)
-    );
-
-
-    renderWallet();
-
-
-    alert(
-        "✓ Thanh toán phí sàn thành công!"
-    );
 
 }
 
 
-/* =====================================================
-   LỊCH SỬ
-===================================================== */
+/* =========================================================
+   MỞ POPUP NẠP TIỀN
+   ========================================================= */
 
-function renderTransactions() {
+function openDepositModal() {
 
-    const container =
+    const input =
         document.getElementById(
-            "transactionList"
+            "depositAmount"
         );
 
 
-    if (!container) {
+    if (input) {
 
-        return;
-
-    }
-
-
-    const wallet =
-        getWallet();
-
-
-    const transactions =
-        wallet.transactions || [];
-
-
-    if (
-        transactions.length === 0
-    ) {
-
-        container.innerHTML = `
-
-            <div class="empty-transaction">
-
-                Chưa có giao dịch nào.
-
-            </div>
-
-        `;
-
-        return;
+        input.value = "";
 
     }
 
 
-    container.innerHTML =
-        transactions
-            .map(transaction => {
-
-                const incoming =
-                    transaction.type ===
-                    "deposit" ||
-                    transaction.type ===
-                    "order";
+    const modal =
+        document.getElementById(
+            "depositModal"
+        );
 
 
-                const sign =
-                    incoming
-                    ? "+"
-                    : "-";
+    if (modal) {
+
+        modal.classList.add(
+            "active"
+        );
+
+    }
 
 
-                const icon =
-                    incoming
-                    ? "↓"
-                    : "↑";
-
-
-                return `
-
-                    <div
-                        class="transaction-item"
-                    >
-
-                        <div
-                            class="transaction-left"
-                        >
-
-                            <div
-                                class="
-                                    transaction-icon
-                                    ${incoming
-                                        ? "in"
-                                        : "out"}
-                                "
-                            >
-                                ${icon}
-                            </div>
-
-
-                            <div
-                                class="
-                                    transaction-info
-                                "
-                            >
-
-                                <strong>
-                                    ${transaction.title}
-                                </strong>
-
-                                <span>
-
-                                    ${
-                                        transaction.description ||
-                                        ""
-                                    }
-
-                                    ·
-
-                                    ${
-                                        formatTransactionDate(
-                                            transaction.createdAt
-                                        )
-                                    }
-
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <div
-                            class="
-                                transaction-amount
-                                ${incoming
-                                    ? "in"
-                                    : "out"}
-                            "
-                        >
-
-                            ${sign}
-                            ${formatWalletMoney(
-                                transaction.amount
-                            )}
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            })
-            .join("");
+    document.body.style.overflow =
+        "hidden";
 
 }
 
 
-/* =====================================================
-   ĐÓNG MODAL
-===================================================== */
+/* =========================================================
+   MỞ POPUP RÚT TIỀN
+   ========================================================= */
+
+function openWithdrawModal() {
+
+    if (!currentWallet) {
+
+        alert(
+            "Không thể tải thông tin ví."
+        );
+
+        return;
+    }
+
+
+    updateWithdrawBalance();
+
+
+    const amount =
+        document.getElementById(
+            "withdrawAmount"
+        );
+
+
+    const account =
+        document.getElementById(
+            "withdrawAccount"
+        );
+
+
+    if (amount) {
+
+        amount.value = "";
+
+    }
+
+
+    if (account) {
+
+        account.value = "";
+
+    }
+
+
+    const modal =
+        document.getElementById(
+            "withdrawModal"
+        );
+
+
+    if (modal) {
+
+        modal.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document.body.style.overflow =
+        "hidden";
+
+}
+
+
+/* =========================================================
+   ĐÓNG POPUP
+   ========================================================= */
 
 function closeWalletModal(
     modalId
@@ -1955,61 +1345,418 @@ function closeWalletModal(
 }
 
 
-/* =====================================================
-   TỰ CẬP NHẬT
-===================================================== */
+/* =========================================================
+   LỊCH SỬ GIAO DỊCH
+   ========================================================= */
 
-function startWalletRealtime() {
+async function loadTransactions() {
 
-    /*
-        Cập nhật mỗi 60 giây để
-        phát hiện phí quá hạn.
-    */
+    const container =
+        document.getElementById(
+            "transactionList"
+        );
+
+
+    if (
+        !container ||
+        !currentUser
+    ) {
+
+        return;
+    }
+
+
+    container.innerHTML = `
+        <div class="empty-transaction">
+            Đang tải giao dịch...
+        </div>
+    `;
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("wallet_transactions")
+            .select(
+                `
+                    id,
+                    type,
+                    title,
+                    amount,
+                    description,
+                    bank,
+                    account,
+                    created_at
+                `
+            )
+            .eq(
+                "user_id",
+                currentUser.id
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            )
+            .limit(100);
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi tải lịch sử:",
+                error
+            );
+
+            container.innerHTML = `
+                <div class="empty-transaction">
+                    Không thể tải lịch sử giao dịch.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        /* -------------------------------------------------
+           CHƯA CÓ GIAO DỊCH
+           ------------------------------------------------- */
+
+        if (
+            !data ||
+            data.length === 0
+        ) {
+
+            container.innerHTML = `
+                <div class="empty-transaction">
+                    Chưa có giao dịch nào.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        /* -------------------------------------------------
+           HIỂN THỊ GIAO DỊCH
+           ------------------------------------------------- */
+
+        container.innerHTML =
+            data
+                .map(
+                    function(transaction) {
+
+                        /*
+                         * deposit + sale
+                         * là tiền VÀO.
+                         *
+                         * withdraw + payment + fee
+                         * là tiền RA.
+                         */
+
+                        const incoming =
+                            transaction.type ===
+                                "deposit" ||
+                            transaction.type ===
+                                "sale";
+
+
+                        const sign =
+                            incoming
+                                ? "+"
+                                : "-";
+
+
+                        const icon =
+                            incoming
+                                ? "↓"
+                                : "↑";
+
+
+                        return `
+                            <div class="transaction-item">
+
+                                <div class="transaction-left">
+
+                                    <div class="
+                                        transaction-icon
+                                        ${incoming ? "in" : "out"}
+                                    ">
+                                        ${icon}
+                                    </div>
+
+
+                                    <div class="transaction-info">
+
+                                        <strong>
+                                            ${escapeHtml(
+                                                transaction.title ||
+                                                getTransactionTitle(
+                                                    transaction.type
+                                                )
+                                            )}
+                                        </strong>
+
+
+                                        <span>
+
+                                            ${escapeHtml(
+                                                transaction.description ||
+                                                ""
+                                            )}
+
+                                            ${
+                                                transaction.description
+                                                    ? " · "
+                                                    : ""
+                                            }
+
+                                            ${formatDate(
+                                                transaction.created_at
+                                            )}
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="
+                                    transaction-amount
+                                    ${incoming ? "in" : "out"}
+                                ">
+
+                                    ${sign}
+
+                                    ${formatMoney(
+                                        transaction.amount
+                                    )}
+
+                                </div>
+
+                            </div>
+                        `;
+
+                    }
+                )
+                .join("");
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi loadTransactions:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="empty-transaction">
+                Không thể tải lịch sử giao dịch.
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   TÊN GIAO DỊCH DỰ PHÒNG
+   ========================================================= */
+
+function getTransactionTitle(type) {
+
+    switch (type) {
+
+        case "deposit":
+            return "Nạp tiền";
+
+        case "withdraw":
+            return "Rút tiền";
+
+        case "payment":
+            return "Thanh toán";
+
+        case "fee":
+            return "Thanh toán phí";
+
+        case "sale":
+            return "Tiền bán hàng";
+
+        default:
+            return "Giao dịch";
+
+    }
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+   ---------------------------------------------------------
+   Tránh dữ liệu giao dịch chèn HTML/JS vào giao diện.
+   ========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   LÀM MỚI VÍ
+   ========================================================= */
+
+async function refreshWallet() {
+
+    if (!currentUser) {
+
+        return;
+    }
+
+
+    const success =
+        await loadWallet();
+
+
+    if (success) {
+
+        renderWallet();
+
+    }
+
+}
+
+
+/* =========================================================
+   ĐÓNG POPUP KHI CLICK BÊN NGOÀI
+   ---------------------------------------------------------
+   Không bắt buộc HTML phải có thêm code.
+   ========================================================= */
+
+function setupWalletModals() {
+
+    const depositModal =
+        document.getElementById(
+            "depositModal"
+        );
+
+
+    const withdrawModal =
+        document.getElementById(
+            "withdrawModal"
+        );
+
+
+    if (depositModal) {
+
+        depositModal.addEventListener(
+            "click",
+            function(event) {
+
+                if (
+                    event.target ===
+                    depositModal
+                ) {
+
+                    closeWalletModal(
+                        "depositModal"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (withdrawModal) {
+
+        withdrawModal.addEventListener(
+            "click",
+            function(event) {
+
+                if (
+                    event.target ===
+                    withdrawModal
+                ) {
+
+                    closeWalletModal(
+                        "withdrawModal"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   REALTIME / TỰ ĐỘNG LÀM MỚI
+   ---------------------------------------------------------
+   Kiểm tra lại số dư mỗi 60 giây.
+   ========================================================= */
+
+function startWalletRefresh() {
 
     setInterval(
-        function() {
+        async function() {
 
-            renderWallet();
+            if (
+                document.hidden
+            ) {
+
+                return;
+            }
+
+
+            await refreshWallet();
 
         },
-        60 * 1000
+        60000
     );
 
 
-    /*
-        Khi quay lại tab
-    */
-
     document.addEventListener(
         "visibilitychange",
-        function() {
+        async function() {
 
             if (
                 !document.hidden
             ) {
 
-                renderWallet();
-
-            }
-
-        }
-    );
-
-
-    /*
-        Nếu tab khác thay đổi localStorage
-    */
-
-    window.addEventListener(
-        "storage",
-        function(event) {
-
-            if (
-                event.key ===
-                getWalletKey()
-            ) {
-
-                renderWallet();
+                await refreshWallet();
 
             }
 
@@ -2019,17 +1766,143 @@ function startWalletRealtime() {
 }
 
 
-/* =====================================================
-   INIT
-===================================================== */
+/* =========================================================
+   KHỞI ĐỘNG PHẦN VÍ
+   ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
-    function() {
+    async function() {
 
-        renderWallet();
+        /*
+         * currentUser được lấy từ phần code
+         * phía trên của file.
+         *
+         * KHÔNG tạo lại header,
+         * KHÔNG tạo lại menu,
+         * KHÔNG tạo lại user.
+         */
 
-        startWalletRealtime();
+
+        if (!currentUser) {
+
+            console.warn(
+                "Ví IUH: chưa đăng nhập."
+            );
+
+            return;
+        }
+
+
+        /* -------------------------------------------------
+           TẢI VÍ
+           ------------------------------------------------- */
+
+        const success =
+            await loadWallet();
+
+
+        if (success) {
+
+            renderWallet();
+
+        }
+
+
+        /* -------------------------------------------------
+           SETUP POPUP
+           ------------------------------------------------- */
+
+        setupWalletModals();
+
+
+        /* -------------------------------------------------
+           TỰ ĐỘNG REFRESH
+           ------------------------------------------------- */
+
+        startWalletRefresh();
+
+    }
+);
+
+
+/* =========================================================
+   THEO DÕI ĐĂNG NHẬP / ĐĂNG XUẤT
+   ========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+    async function(event) {
+
+        /* -------------------------------------------------
+           ĐĂNG NHẬP
+           ------------------------------------------------- */
+
+        if (
+            event === "SIGNED_IN" ||
+            event === "TOKEN_REFRESHED"
+        ) {
+
+            /*
+             * Không gọi lại toàn bộ phần header.
+             * Chỉ cập nhật biến user nếu cần.
+             */
+
+            try {
+
+                const {
+                    data
+                } =
+                    await supabaseClient
+                        .auth
+                        .getSession();
+
+
+                currentUser =
+                    data?.session?.user ||
+                    currentUser;
+
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Lỗi cập nhật user cho ví:",
+                    error
+                );
+
+            }
+
+
+            if (currentUser) {
+
+                const success =
+                    await loadWallet();
+
+
+                if (success) {
+
+                    renderWallet();
+
+                }
+
+            }
+
+        }
+
+
+        /* -------------------------------------------------
+           ĐĂNG XUẤT
+           ------------------------------------------------- */
+
+        if (
+            event === "SIGNED_OUT"
+        ) {
+
+            currentUser = null;
+
+            currentWallet = null;
+
+        }
 
     }
 );

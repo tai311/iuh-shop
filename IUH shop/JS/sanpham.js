@@ -971,6 +971,422 @@ function bindProductEvents() {
 
 
 /* =====================================================
+   BÁO CÁO SẢN PHẨM
+===================================================== */
+
+let currentReportProduct = null;
+
+
+/* ==============================
+   MỞ MODAL BÁO CÁO
+============================== */
+
+function openReport(product) {
+
+    if (!product) {
+        return;
+    }
+
+    currentReportProduct = product;
+
+    const modal =
+        $("reportModal");
+
+    const productName =
+        $("reportProductName");
+
+    const form =
+        $("reportForm");
+
+    const reason =
+        $("reportReason");
+
+    const description =
+        $("reportDescription");
+
+
+    if (!modal || !productName || !form) {
+        console.error(
+            "Không tìm thấy giao diện báo cáo."
+        );
+
+        return;
+    }
+
+
+    /* Hiển thị tên sản phẩm */
+
+    productName.textContent =
+        product.name || "Sản phẩm";
+
+
+    /* Reset form */
+
+    form.reset();
+
+    if (reason) {
+        reason.value = "";
+    }
+
+    if (description) {
+        description.value = "";
+    }
+
+
+    /* Mở modal */
+
+    modal.hidden = false;
+
+    document.body.style.overflow = "hidden";
+
+}
+
+
+/* ==============================
+   ĐÓNG MODAL
+============================== */
+
+function closeReport() {
+
+    const modal =
+        $("reportModal");
+
+    if (modal) {
+        modal.hidden = true;
+    }
+
+    document.body.style.overflow = "";
+
+    currentReportProduct = null;
+
+}
+
+
+/* ==============================
+   GỬI BÁO CÁO
+============================== */
+
+async function submitReport(event) {
+
+    event.preventDefault();
+
+
+    if (!currentReportProduct) {
+
+        alert(
+            "Không xác định được sản phẩm."
+        );
+
+        return;
+    }
+
+
+    /* ==========================
+       KIỂM TRA ĐĂNG NHẬP
+    ========================== */
+
+    const {
+        data: {
+            user
+        },
+        error: userError
+    } =
+        await supabaseClient
+            .auth
+            .getUser();
+
+
+    if (userError || !user) {
+
+        alert(
+            "Bạn cần đăng nhập để báo cáo sản phẩm."
+        );
+
+        window.location.href =
+            "dangnhap.html";
+
+        return;
+    }
+
+
+    /* ==========================
+       LẤY DỮ LIỆU FORM
+    ========================== */
+
+    const reason =
+        $("reportReason")?.value?.trim();
+
+
+    const description =
+        $("reportDescription")?.value?.trim() ||
+        null;
+
+
+    if (!reason) {
+
+        alert(
+            "Vui lòng chọn lý do báo cáo."
+        );
+
+        return;
+    }
+
+
+    /* ==========================
+       KHÔNG CHO TỰ BÁO CÁO TIN
+       CỦA CHÍNH MÌNH
+    ========================== */
+
+    if (
+        String(currentReportProduct.seller_id) ===
+        String(user.id)
+    ) {
+
+        alert(
+            "Bạn không thể báo cáo sản phẩm của chính mình."
+        );
+
+        return;
+    }
+
+
+    /* ==========================
+       NÚT GỬI
+    ========================== */
+
+    const submitButton =
+        document.querySelector(
+            ".report-submit"
+        );
+
+
+    const oldText =
+        submitButton?.textContent ||
+        "Gửi báo cáo";
+
+
+    if (submitButton) {
+
+        submitButton.disabled = true;
+
+        submitButton.textContent =
+            "Đang gửi...";
+
+    }
+
+
+    try {
+
+        /* ======================
+           KIỂM TRA ĐÃ BÁO CÁO
+        ====================== */
+
+        const {
+            data: existingReport,
+            error: checkError
+        } =
+            await supabaseClient
+
+                .from("product_reports")
+
+                .select("id, status")
+
+                .eq(
+                    "product_id",
+                    currentReportProduct.id
+                )
+
+                .eq(
+                    "reporter_id",
+                    user.id
+                )
+
+                .eq(
+                    "status",
+                    "pending"
+                )
+
+                .maybeSingle();
+
+
+        if (checkError) {
+            throw checkError;
+        }
+
+
+        if (existingReport) {
+
+            alert(
+                "Bạn đã báo cáo sản phẩm này và báo cáo đang được xử lý."
+            );
+
+            closeReport();
+
+            return;
+        }
+
+
+        /* ======================
+           INSERT BÁO CÁO
+        ====================== */
+
+        const {
+            error
+        } =
+            await supabaseClient
+
+                .from("product_reports")
+
+                .insert({
+
+                    product_id:
+                        currentReportProduct.id,
+
+                    reporter_id:
+                        user.id,
+
+                    reason:
+                        reason,
+
+                    description:
+                        description,
+
+                    status:
+                        "pending"
+
+                });
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        /* ======================
+           THÀNH CÔNG
+        ====================== */
+
+        alert(
+            "Đã gửi báo cáo sản phẩm. Cảm ơn bạn đã góp phần xây dựng IUH SHOP."
+        );
+
+
+        closeReport();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi gửi báo cáo:",
+            error
+        );
+
+
+        alert(
+            "Không thể gửi báo cáo. Vui lòng thử lại."
+        );
+
+    }
+    finally {
+
+        if (submitButton) {
+
+            submitButton.disabled = false;
+
+            submitButton.textContent =
+                oldText;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   GẮN SỰ KIỆN MODAL BÁO CÁO
+===================================================== */
+
+function initReportModal() {
+
+    const modal =
+        $("reportModal");
+
+    const closeButton =
+        $("closeReportModal");
+
+    const cancelButton =
+        $("cancelReport");
+
+    const form =
+        $("reportForm");
+
+
+    /* Nút X */
+
+    closeButton?.addEventListener(
+        "click",
+        closeReport
+    );
+
+
+    /* Nút Hủy */
+
+    cancelButton?.addEventListener(
+        "click",
+        closeReport
+    );
+
+
+    /* Submit */
+
+    form?.addEventListener(
+        "submit",
+        submitReport
+    );
+
+
+    /* Click ra ngoài modal */
+
+    modal?.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target === modal
+            ) {
+
+                closeReport();
+
+            }
+
+        }
+    );
+
+
+    /* ESC để đóng */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape" &&
+                modal &&
+                !modal.hidden
+            ) {
+
+                closeReport();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
    SEARCH
 ===================================================== */
 
@@ -1084,12 +1500,57 @@ $("emptyClearButton")?.addEventListener(
 
 
 /* =====================================================
+   DROPDOWN TÀI KHOẢN
+===================================================== */
+
+function initAccountDropdown() {
+
+    const wrapper =
+        document.querySelector(".account-nav-wrapper");
+
+    const arrow =
+        document.getElementById("accountNavArrow");
+
+    const dropdown =
+        document.getElementById("accountShortcuts");
+
+    if (!wrapper || !arrow || !dropdown) {
+        return;
+    }
+
+    // Bấm mũi tên
+    arrow.addEventListener("click", function (event) {
+
+        event.stopPropagation();
+
+        wrapper.classList.toggle("open");
+
+    });
+
+    // Bấm bên ngoài thì đóng
+    document.addEventListener("click", function (event) {
+
+        if (!wrapper.contains(event.target)) {
+
+            wrapper.classList.remove("open");
+
+        }
+
+    });
+
+}
+
+/* =====================================================
    LOAD
 ===================================================== */
 
 document.addEventListener(
     "DOMContentLoaded",
     async () => {
+
+        initAccountDropdown();
+
+        initReportModal();
 
         await updateHeaderAccount();
 

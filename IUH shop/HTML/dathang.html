@@ -1,0 +1,1405 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ĐẶT HÀNG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FONT AWESOME -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/dathang.css">
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+                     
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+</a>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+
+
+    <main class="checkout-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="checkout-header">
+
+        <div class="page-title">
+
+            <span class="page-label">
+                IUH SHOP
+            </span>
+
+            <h1>
+                Đặt hàng
+            </h1>
+
+            <p>
+                Kiểm tra thông tin và hoàn tất đơn hàng của bạn
+            </p>
+
+        </div>
+
+
+        <a
+            href="giohang.html"
+            class="back-link"
+        >
+            ← Quay lại giỏ hàng
+        </a>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         TIẾN TRÌNH
+    ====================================================== -->
+
+    <div class="checkout-progress">
+
+
+        <div class="progress-step active">
+
+            <span>1</span>
+
+            <div>
+
+                <strong>
+                    Giỏ hàng
+                </strong>
+
+                <small>
+                    Chọn sản phẩm
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="progress-line active"></div>
+
+
+        <div class="progress-step active">
+
+            <span>2</span>
+
+            <div>
+
+                <strong>
+                    Đặt hàng
+                </strong>
+
+                <small>
+                    Thông tin
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="progress-line"></div>
+
+
+        <div class="progress-step">
+
+            <span>3</span>
+
+            <div>
+
+                <strong>
+                    Hoàn tất
+                </strong>
+
+                <small>
+                    Thành công
+                </small>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         LAYOUT
+    ====================================================== -->
+
+    <div class="checkout-shell">
+
+
+        <!-- =================================================
+             LEFT
+        ================================================== -->
+
+        <section class="checkout-main">
+
+
+            <!-- =================================================
+                 THÔNG TIN NGƯỜI NHẬN
+            ================================================== -->
+
+            <div class="checkout-card">
+
+
+                <div class="card-heading">
+
+                    <div class="heading-icon">
+                        👤
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Thông tin người nhận
+                        </h2>
+
+                        <p>
+                            Thông tin dùng để liên hệ và giao sản phẩm
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="checkout-form">
+
+
+                    <div class="field">
+
+                        <label for="recipientName">
+
+                            Họ và tên
+
+                            <span>*</span>
+
+                        </label>
+
+
+                        <input
+                            id="recipientName"
+                            type="text"
+                            placeholder="Nhập họ tên người nhận"
+                            autocomplete="name"
+                        >
+
+                    </div>
+
+
+
+                    <div class="field">
+
+                        <label for="recipientPhone">
+
+                            Số điện thoại
+
+                            <span>*</span>
+
+                        </label>
+
+
+                        <input
+                            id="recipientPhone"
+                            type="tel"
+                            placeholder="0909 123 456"
+                            autocomplete="tel"
+                        >
+
+                    </div>
+
+
+
+                    <div class="field full">
+
+                        <label for="recipientAddress">
+
+                            Địa chỉ nhận hàng
+
+                            <span>*</span>
+
+                        </label>
+
+
+                        <textarea
+                            id="recipientAddress"
+                            placeholder="Nhập địa chỉ nhận hàng..."
+                            autocomplete="street-address"
+                        ></textarea>
+
+                    </div>
+
+
+
+                    <div class="field full">
+
+                        <label for="orderNote">
+
+                            Ghi chú
+
+                        </label>
+
+
+                        <textarea
+                            id="orderNote"
+                            class="note-input"
+                            placeholder="Ghi chú thêm cho người bán nếu có..."
+                        ></textarea>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 VẬN CHUYỂN
+            ================================================== -->
+
+            <div class="checkout-card">
+
+
+                <div class="card-heading">
+
+                    <div class="heading-icon">
+                        🚚
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Phương thức nhận hàng
+                        </h2>
+
+                        <p>
+                            Chọn cách bạn muốn nhận sản phẩm
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="choice-group">
+
+
+                    <!-- GẶP TRỰC TIẾP -->
+
+                    <label class="option-box selected">
+
+                        <input
+                            type="radio"
+                            name="shippingMethod"
+                            value="meet"
+                            checked
+                        >
+
+
+                        <div class="option-radio"></div>
+
+
+                        <div class="option-content">
+
+                            <strong>
+                                Gặp trực tiếp người bán
+                            </strong>
+
+                            <small>
+                                Chủ động hẹn địa điểm và thời gian nhận hàng
+                            </small>
+
+                        </div>
+
+
+                        <b class="option-price free">
+                            Miễn phí
+                        </b>
+
+
+                    </label>
+
+
+
+                    <!-- TRUNG GIAN -->
+
+                    <label class="option-box">
+
+                        <input
+                            type="radio"
+                            name="shippingMethod"
+                            value="mid"
+                        >
+
+
+                        <div class="option-radio"></div>
+
+
+                        <div class="option-content">
+
+                            <strong>
+                                Qua trung gian
+                            </strong>
+
+                            <small>
+                                IUH SHOP hỗ trợ trung gian giao nhận
+                            </small>
+
+                        </div>
+
+
+                        <b class="option-price">
+                            5.000 ₫
+                        </b>
+
+
+                    </label>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 THANH TOÁN
+            ================================================== -->
+
+            <div class="checkout-card">
+
+
+                <div class="card-heading">
+
+                    <div class="heading-icon">
+                        💳
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Phương thức thanh toán
+                        </h2>
+
+                        <p>
+                            Chọn phương thức thanh toán phù hợp
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="choice-group">
+
+
+                    <!-- QR -->
+
+                    <label class="option-box selected">
+
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="qr"
+                            checked
+                        >
+
+
+                        <div class="option-radio"></div>
+
+
+                        <div class="option-content">
+
+                            <strong>
+                                Thanh toán qua QR Code
+                            </strong>
+
+                            <small>
+                                Quét mã QR để thanh toán nhanh chóng
+                            </small>
+
+                        </div>
+
+
+                        <span class="payment-badge">
+                            QR
+                        </span>
+
+
+                    </label>
+
+
+
+                    <!-- VÍ IUH -->
+
+                    <label class="option-box">
+
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="iuh_wallet"
+                        >
+
+
+                        <div class="option-radio"></div>
+
+
+                        <div class="option-content">
+
+                            <strong>
+                                Thanh toán bằng Ví IUH
+                            </strong>
+
+                            <small>
+                                Sử dụng số dư trong Ví IUH để thanh toán
+                            </small>
+
+                        </div>
+
+
+                        <span class="payment-badge wallet-badge">
+                            IUH
+                        </span>
+
+
+                    </label>
+
+
+
+                    <!-- TIỀN MẶT -->
+
+                    <label class="option-box">
+
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="cash"
+                        >
+
+
+                        <div class="option-radio"></div>
+
+
+                        <div class="option-content">
+
+                            <strong>
+                                Thanh toán tiền mặt
+                            </strong>
+
+                            <small>
+                                Thanh toán khi nhận sản phẩm
+                            </small>
+
+                        </div>
+
+
+                    </label>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     QR PAYMENT
+                ================================================== -->
+
+                <div
+                    id="qrPaymentBox"
+                    class="payment-detail-box"
+                >
+
+
+                    <div class="payment-detail-header">
+
+                        <div>
+
+                            <strong>
+                                Quét mã QR để thanh toán
+                            </strong>
+
+                            <p>
+                                Sử dụng ứng dụng ngân hàng để quét mã
+                            </p>
+
+                        </div>
+
+
+                        <span>
+                            🔒
+                        </span>
+
+                    </div>
+
+
+
+                    <div class="qr-content">
+
+
+                        <div class="qr-image-wrapper">
+
+                            <img
+                                id="qrCodeImage"
+                                src="..//Images/qrtt.png"
+                                alt="Mã QR thanh toán IUH SHOP"
+                            >
+
+                        </div>
+
+
+
+                        <div class="qr-instruction">
+
+
+                            <div>
+
+                                <span>1</span>
+
+                                <p>
+                                    Mở ứng dụng ngân hàng
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>2</span>
+
+                                <p>
+                                    Quét mã QR
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>3</span>
+
+                                <p>
+                                    Kiểm tra số tiền và thanh toán
+                                </p>
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <button
+                        type="button"
+                        id="confirmPaymentBtn"
+                        class="confirm-payment-button"
+                    >
+                        Tôi đã thanh toán
+                    </button>
+
+
+
+                    <div
+                        id="paymentVerificationStatus"
+                        class="payment-status"
+                    ></div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     VÍ IUH
+                ================================================== -->
+
+                <div
+                    id="walletPaymentBox"
+                    class="payment-detail-box wallet-payment-box hidden"
+                >
+
+
+                    <div class="wallet-header">
+
+                        <div class="wallet-symbol">
+                            💰
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+                                Ví IUH
+                            </strong>
+
+                            <p>
+                                Thanh toán trực tiếp bằng số dư ví
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="wallet-balance-box">
+
+
+                        <span>
+                            Số dư hiện tại
+                        </span>
+
+
+                        <strong
+                            id="walletBalance"
+                        >
+                            Đang tải...
+                        </strong>
+
+
+                    </div>
+
+
+
+                    <div class="wallet-after-payment">
+
+
+                        <div>
+
+                            <span>
+                                Tổng đơn hàng
+                            </span>
+
+                            <strong
+                                id="walletOrderTotal"
+                            >
+                                0 ₫
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Số dư sau thanh toán
+                            </span>
+
+                            <strong
+                                id="walletRemaining"
+                            >
+                                —
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div
+                        id="walletStatus"
+                        class="wallet-status"
+                    >
+                        Đang kiểm tra số dư Ví IUH...
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     CASH
+                ================================================== -->
+
+                <div
+                    id="cashPaymentBox"
+                    class="payment-detail-box cash-payment-box hidden"
+                >
+
+                    <div class="cash-icon">
+                        💵
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            Thanh toán tiền mặt
+                        </strong>
+
+                        <p>
+                            Bạn sẽ thanh toán trực tiếp khi nhận sản phẩm.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SẢN PHẨM
+            ================================================== -->
+
+            <div class="checkout-card">
+
+
+                <div class="card-heading product-heading">
+
+
+                    <div class="heading-icon">
+                        🛒
+                    </div>
+
+
+                    <div>
+
+                        <h2>
+                            Sản phẩm đặt mua
+                        </h2>
+
+                        <p>
+                            Kiểm tra sản phẩm và số lượng
+                        </p>
+
+                    </div>
+
+
+                    <span
+                        id="itemCount"
+                        class="item-count"
+                    >
+                        0 sản phẩm
+                    </span>
+
+
+                </div>
+
+
+
+                <div
+                    id="cartItems"
+                    class="checkout-items"
+                ></div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             SUMMARY
+        ================================================== -->
+
+        <aside class="summary-panel">
+
+
+            <div class="summary-header">
+
+
+                <div>
+
+                    <span>
+                        ĐƠN HÀNG
+                    </span>
+
+                    <h2>
+                        Tổng thanh toán
+                    </h2>
+
+                </div>
+
+
+                <div class="summary-icon">
+                    🧾
+                </div>
+
+
+            </div>
+
+
+
+            <div class="summary-box">
+
+
+                <div class="summary-row">
+
+                    <span>
+                        Tổng tiền hàng
+                    </span>
+
+                    <strong id="subtotal">
+                        0 ₫
+                    </strong>
+
+                </div>
+
+
+
+                <div class="summary-row">
+
+                    <span>
+                        Phí vận chuyển
+                    </span>
+
+                    <strong id="shippingFee">
+                        0 ₫
+                    </strong>
+
+                </div>
+
+
+
+                <div class="summary-row">
+
+                    <span>
+                        Giảm giá
+                    </span>
+
+                    <strong>
+                        0 ₫
+                    </strong>
+
+                </div>
+
+
+
+                <div class="summary-divider"></div>
+
+
+
+                <div class="summary-total">
+
+                    <span>
+                        Tổng thanh toán
+                    </span>
+
+                    <strong id="total">
+                        0 ₫
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="summary-note">
+
+                <div class="note-icon">
+                    ✓
+                </div>
+
+
+                <p>
+                    Sau khi xác nhận, hệ thống sẽ cập nhật số lượng
+                    sản phẩm trong kho. Nếu sản phẩm hết hàng,
+                    tin đăng sẽ tự động ẩn khỏi danh sách.
+                </p>
+
+
+            </div>
+
+
+
+            <div class="secure-info">
+
+                <span>
+                    🔒
+                </span>
+
+
+                <div>
+
+                    <strong>
+                        Thanh toán an toàn
+                    </strong>
+
+                    <small>
+                        Thông tin của bạn được bảo mật
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="action-row">
+
+
+                <button
+                    type="button"
+                    id="checkoutButton"
+                    class="checkout-button"
+                    disabled
+                >
+
+                    <span>
+                        Xác nhận đặt hàng
+                    </span>
+
+                    <span>
+                        →
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    id="continueShopping"
+                    class="secondary-button"
+                >
+                    ← Tiếp tục mua sắm
+                </button>
+
+
+            </div>
+
+
+        </aside>
+
+
+    </div>
+
+
+</main>
+
+<div
+    id="toast"
+    class="toast"
+    aria-live="polite"
+></div>
+
+
+     <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/dathang.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+</body>
+</html>

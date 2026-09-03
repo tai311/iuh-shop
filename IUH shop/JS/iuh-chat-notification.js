@@ -44,10 +44,14 @@
 
 
     const supabaseClient =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_PUBLISHABLE_KEY
-        );
+    window.IUH_SUPABASE ||
+    (
+        window.IUH_SUPABASE =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_PUBLISHABLE_KEY
+            )
+    );
 
 
     /* =========================================================
