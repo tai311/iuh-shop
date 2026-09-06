@@ -262,12 +262,6 @@ async function loadProducts() {
                 }
             );
 
-        products.sort((firstProduct, secondProduct) => {
-            const firstFeatured = Boolean(window.IUHServicePackage?.getBadge(firstProduct.seller_id));
-            const secondFeatured = Boolean(window.IUHServicePackage?.getBadge(secondProduct.seller_id));
-            return Number(secondFeatured) - Number(firstFeatured);
-        });
-
 
         /* =========================================
            5. HIỂN THỊ
@@ -593,9 +587,6 @@ function renderProductCard(product) {
     seller.role === "admin" ||
     seller.role === "moderator";
 
-    const serviceBadge =
-        window.IUHServicePackage?.getBadge(seller.user_id);
-
 
     return `
 
@@ -717,12 +708,6 @@ function renderProductCard(product) {
 <span class="seller-status">
 
     Người đăng
-
-    ${serviceBadge ? `
-        <span class="service-package-badge ${serviceBadge.className}">
-            ${esc(serviceBadge.label)}
-        </span>
-    ` : ""}
 
 </span>
 
