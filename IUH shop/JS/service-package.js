@@ -97,9 +97,7 @@
         async saveRemote(userId, value) {
             if (!window.supabase || !userId) return { error: new Error("Supabase chưa sẵn sàng") };
             const request = (async () => {
-                const { data: packageData, error: packageError } = await window.supabase
-                    .from("service_packages")
-                    .insert({
+                const packageValues = {
                         owner_id: userId,
                         plan_type: value.plan,
                         price: value.price,
@@ -108,10 +106,40 @@
                         status: "active",
                         starts_at: new Date().toISOString(),
                         expires_at: value.expiry
-                    })
-                    .select("id")
-                    .single();
-                return { packageData, packageError };
+                    };
+                    const { data: existingPackage, error: lookupError } = await window.supabase
+                        .from("service_packages")
+                        .select("id")
+                        .eq("owner_id", userId)
+                        .eq("status", "active")
+                        .maybeSingle();
+                    if (lookupError) return { packageData: null, packageError: lookupError };
+                    let packageData;
+                    if (existingPackage) {
+                        const { data: updatedPackage, error: updateError } = await window.supabase
+                            .from("service_packages")
+                            .update(packageValues)
+                            .eq("id", existingPackage.id)
+                            .select("id")
+                            .single();
+                        if (updateError) return { packageData: null, packageError: updateError };
+                        packageData = updatedPackage;
+                        const { error: removeMembersError } = await window.supabase
+                            .from("service_package_members")
+                            .delete()
+                            .eq("package_id", packageData.id)
+                            .eq("member_role", "member");
+                        if (removeMembersError) return { packageData: null, packageError: removeMembersError };
+                    } else {
+                        const { data: createdPackage, error: createError } = await window.supabase
+                            .from("service_packages")
+                            .insert(packageValues)
+                            .select("id")
+                            .single();
+                        if (createError) return { packageData: null, packageError: createError };
+                        packageData = createdPackage;
+                    }
+                    return { packageData, packageError: null };
             })();
             const timeout = new Promise((resolve) => window.setTimeout(() => resolve({ packageData: null, packageError: new Error("Supabase không phản hồi sau 10 giây") }), 10000));
             const { data: packageData, error: packageError } = await Promise.race([request, timeout]);
