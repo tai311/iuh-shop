@@ -82,6 +82,29 @@ select {
         min-width: max-content;
     }
 
+    .account-arrow-button {
+        width: 44px;
+        height: 54px;
+        flex: 0 0 44px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .account-shortcuts {
+        position: fixed;
+        top: 180px;
+        right: 12px;
+        width: min(250px, calc(100vw - 24px));
+        max-height: calc(100dvh - 196px);
+        overflow-y: auto;
+        z-index: 10001;
+    }
+
+    .account-shortcuts a {
+        min-height: 46px;
+        font-size: 13px;
+    }
+
     .page-content,
     .account-page,
     .products-page,

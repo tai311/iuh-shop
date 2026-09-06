@@ -998,6 +998,12 @@ document.addEventListener(
             return;
         }
 
+        if (accountArrow.dataset.accountNavBound === "true") {
+            return;
+        }
+
+        accountArrow.dataset.accountNavBound = "true";
+
 
         /* =========================
            BẤM MŨI TÊN

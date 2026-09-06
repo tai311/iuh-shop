@@ -417,7 +417,6 @@ async function updateHeaderAccount() {
         if (userAccount) {
             userAccount.style.display = "flex";
         }
-
     }
     catch (error) {
 
@@ -1519,6 +1518,12 @@ function initAccountDropdown() {
     if (!wrapper || !arrow || !dropdown) {
         return;
     }
+
+    if (arrow.dataset.accountNavBound === "true") {
+        return;
+    }
+
+    arrow.dataset.accountNavBound = "true";
 
     // Bấm mũi tên
     arrow.addEventListener("click", function (event) {
