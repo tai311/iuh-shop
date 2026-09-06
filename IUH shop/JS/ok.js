@@ -1102,6 +1102,8 @@ async function loadFeaturedProducts() {
                 userData || [];
         }
 
+        await window.IUHServicePackage?.loadForUsers(sellerIds);
+
 
         /* -----------------------------------------
            GHÉP SẢN PHẨM + NGƯỜI BÁN
@@ -1189,6 +1191,9 @@ function renderFeaturedCard(product) {
         isFeaturedSellerVerified(
             seller
         );
+
+    const serviceBadge =
+        window.IUHServicePackage?.getBadge(seller.user_id);
 
 
     const category =
@@ -1284,6 +1289,12 @@ function renderFeaturedCard(product) {
                             </span>
 
                             ${badgeHTML}
+
+                            ${serviceBadge ? `
+                                <span class="service-package-badge ${serviceBadge.className}">
+                                    ${serviceBadge.label}
+                                </span>
+                            ` : ""}
 
                         </div>
 
