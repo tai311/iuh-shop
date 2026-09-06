@@ -96,24 +96,31 @@
         },
         async saveRemote(userId, value) {
             if (!window.supabase || !userId) return { error: new Error("Supabase chưa sẵn sàng") };
-            const { data: packageData, error: packageError } = await window.supabase
-                .from("service_packages")
-                .insert({
-                    owner_id: userId,
-                    plan_type: value.plan,
-                    price: value.price,
-                    payment_method: value.paymentMethod,
-                    transaction_code: value.transaction,
-                    status: "active",
-                    starts_at: new Date().toISOString(),
-                    expires_at: value.expiry
-                })
-                .select("id")
-                .single();
+            const request = (async () => {
+                const { data: packageData, error: packageError } = await window.supabase
+                    .from("service_packages")
+                    .insert({
+                        owner_id: userId,
+                        plan_type: value.plan,
+                        price: value.price,
+                        payment_method: value.paymentMethod,
+                        transaction_code: value.transaction,
+                        status: "active",
+                        starts_at: new Date().toISOString(),
+                        expires_at: value.expiry
+                    })
+                    .select("id")
+                    .single();
+                return { packageData, packageError };
+            })();
+            const timeout = new Promise((resolve) => window.setTimeout(() => resolve({ packageData: null, packageError: new Error("Supabase không phản hồi sau 10 giây") }), 10000));
+            const { data: packageData, error: packageError } = await Promise.race([request, timeout]);
             if (packageError) return { error: packageError };
             const members = (value.members || []).filter((member) => member.user_id && member.user_id !== userId).map((member) => ({ package_id: packageData.id, user_id: member.user_id, member_role: "member" }));
             if (members.length) {
-                const { error: memberError } = await window.supabase.from("service_package_members").insert(members);
+                const memberRequest = window.supabase.from("service_package_members").insert(members);
+                const memberTimeout = new Promise((resolve) => window.setTimeout(() => resolve({ error: new Error("Không thể lưu thành viên sau 10 giây") }), 10000));
+                const { error: memberError } = await Promise.race([memberRequest, memberTimeout]);
                 if (memberError) return { error: memberError };
             }
             return { data: packageData };
