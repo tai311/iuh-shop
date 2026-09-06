@@ -847,9 +847,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const finishButton = document.getElementById("finishUpgradeButton");
     const message = document.getElementById("upgradePaymentMessage");
     const bankInfo = document.getElementById("upgradeBankInfo");
+    const groupManager = document.getElementById("servicePackageGroupManager");
+    const memberCount = document.getElementById("servicePackageMemberCount");
+    const memberEmail = document.getElementById("servicePackageMemberEmail");
+    const addMemberButton = document.getElementById("addServicePackageMemberButton");
+    const memberMessage = document.getElementById("servicePackageMemberMessage");
+    const memberList = document.getElementById("servicePackageMemberList");
+    const packageReminder = document.getElementById("servicePackageReminder");
     const plans = { personal: { name: "Gói Cá nhân", price: 19000 }, group: { name: "Gói Nhóm", price: 29000 } };
     let selectedPlan = "personal";
     let selectedMethod = "wallet";
+    let selectedGroupMembers = [];
 
     if (!modal || !openButton) return;
 
@@ -857,10 +865,42 @@ document.addEventListener("DOMContentLoaded", function () {
     function updatePlan() {
         const plan = plans[selectedPlan];
         document.querySelectorAll(".service-plan-card").forEach((card) => card.classList.toggle("selected", card.dataset.plan === selectedPlan));
+        groupManager.hidden = selectedPlan !== "group";
         document.getElementById("upgradeSelectedPlan").textContent = plan.name;
         document.getElementById("upgradeTotal").textContent = money(plan.price);
         document.getElementById("upgradeConfirmAmount").textContent = money(plan.price);
         message.textContent = "";
+    }
+    function renderGroupMembers() {
+        const total = selectedGroupMembers.length + 1;
+        memberCount.textContent = total + "/3";
+        memberList.innerHTML = selectedGroupMembers.map((member, index) => `
+            <div class="service-package-member">
+                <img class="service-package-member-avatar" src="${IUHServicePackage.escapeHTML(member.avatar_url || "../Images/default-avatar.svg")}" alt="">
+                <span class="service-package-member-info"><strong>${IUHServicePackage.escapeHTML(member.fullname || "Thành viên")}</strong><span>${IUHServicePackage.escapeHTML(member.email || "")}</span></span>
+                <button type="button" class="service-package-member-remove" data-member-index="${index}" aria-label="Xóa thành viên"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        `).join("");
+        memberList.querySelectorAll(".service-package-member-remove").forEach((button) => button.addEventListener("click", () => {
+            selectedGroupMembers.splice(Number(button.dataset.memberIndex), 1);
+            renderGroupMembers();
+        }));
+    }
+    async function addGroupMember() {
+        const email = memberEmail.value.trim().toLowerCase();
+        memberMessage.textContent = "";
+        if (!email || !email.includes("@")) { memberMessage.textContent = "Vui lòng nhập email hợp lệ."; return; }
+        if (selectedGroupMembers.length >= 2) { memberMessage.textContent = "Gói Nhóm chỉ hỗ trợ tối đa 3 tài khoản."; return; }
+        if (selectedGroupMembers.some((member) => member.email?.toLowerCase() === email)) { memberMessage.textContent = "Tài khoản này đã có trong nhóm."; return; }
+        if (typeof currentAuthUserId !== "undefined" && email === (window.currentUserEmail || "").toLowerCase()) { memberMessage.textContent = "Bạn đã là chủ gói của nhóm."; return; }
+        addMemberButton.disabled = true;
+        try {
+            const { data: member, error } = await supabaseClient.from("users").select("user_id, fullname, email, avatar_url").eq("email", email).maybeSingle();
+            if (error || !member) { memberMessage.textContent = "Không tìm thấy tài khoản IUH SHOP với email này."; return; }
+            if (member.user_id === currentAuthUserId) { memberMessage.textContent = "Bạn đã là chủ gói của nhóm."; return; }
+            selectedGroupMembers.push(member); memberEmail.value = ""; renderGroupMembers();
+        } catch (error) { memberMessage.textContent = "Không thể tìm thành viên lúc này."; }
+        finally { addMemberButton.disabled = false; }
     }
     function updateMethod() {
         document.querySelectorAll(".payment-method").forEach((method) => {
@@ -875,6 +915,18 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     function openModal() {
         formView.hidden = false; successView.hidden = true; message.textContent = ""; confirmButton.disabled = false;
+        const savedPackage = typeof currentAuthUserId !== "undefined" && IUHServicePackage.getPackage(currentAuthUserId);
+        selectedGroupMembers = savedPackage?.plan === "group" ? [...savedPackage.members] : [];
+        if (savedPackage) {
+            const packageName = plans[savedPackage.plan]?.name || "Gói dịch vụ";
+            const daysLeft = Math.max(0, Math.ceil((new Date(savedPackage.expiry) - new Date()) / 86400000));
+            packageReminder.hidden = false;
+            packageReminder.innerHTML = `<strong>Đang sử dụng ${packageName}</strong>Còn hiệu lực đến ${IUHServicePackage.formatExpiry(savedPackage.expiry)} (${daysLeft} ngày). Hệ thống sẽ nhắc bạn gia hạn khi gói sắp hết hạn.`;
+        } else {
+            packageReminder.hidden = true;
+            packageReminder.textContent = "";
+        }
+        renderGroupMembers();
         modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
     }
     function showSuccess() {
@@ -882,7 +934,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const transaction = "IUH" + Date.now().toString().slice(-8) + Math.floor(1000 + Math.random() * 9000);
         const expiry = new Date(); expiry.setDate(expiry.getDate() + 30);
         const expiryText = expiry.toLocaleDateString("vi-VN");
-        localStorage.setItem("iuhActiveServicePlan", JSON.stringify({ plan: selectedPlan, transaction, expiry: expiry.toISOString() }));
+        const groupMembers = selectedPlan === "group" ? selectedGroupMembers : [];
+        IUHServicePackage.save(currentAuthUserId, { plan: selectedPlan, transaction, expiry: expiry.toISOString(), members: groupMembers });
+        if (selectedPlan === "group") {
+            groupMembers.forEach((member) => IUHServicePackage.save(member.user_id, { plan: "group", transaction, expiry: expiry.toISOString(), members: [{ user_id: currentAuthUserId }, ...groupMembers] }));
+        }
         document.getElementById("upgradeSuccessText").textContent = "Bạn đã nâng cấp thành công " + plan.name + ". Quyền lợi đã sẵn sàng sử dụng.";
         document.getElementById("upgradeTransactionCode").textContent = transaction;
         document.getElementById("upgradeExpiryDate").textContent = expiryText;
@@ -894,6 +950,8 @@ document.addEventListener("DOMContentLoaded", function () {
     finishButton.addEventListener("click", closeModal);
     document.querySelectorAll(".service-plan-card").forEach((card) => card.addEventListener("click", () => { selectedPlan = card.dataset.plan; updatePlan(); }));
     document.querySelectorAll(".payment-method").forEach((method) => method.addEventListener("click", () => { selectedMethod = method.dataset.method; updateMethod(); }));
+    addMemberButton.addEventListener("click", addGroupMember);
+    memberEmail.addEventListener("keydown", (event) => { if (event.key === "Enter") addGroupMember(); });
     confirmButton.addEventListener("click", () => {
         if (typeof currentAuthUserId === "undefined" || !currentAuthUserId) { message.textContent = "Vui lòng đăng nhập để nâng cấp gói dịch vụ."; return; }
         confirmButton.disabled = true; confirmButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';

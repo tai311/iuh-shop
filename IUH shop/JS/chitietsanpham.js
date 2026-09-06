@@ -75,6 +75,7 @@ const productDescription = $("productDescription");
 const sellerName = $("sellerName");
 const sellerAvatar = $("sellerAvatar");
 const sellerVerifiedBadge = $("sellerVerifiedBadge");
+const sellerServiceBadge = $("sellerServiceBadge");
 const sellerProfileLink = $("sellerProfileLink");
 
 const backButton = $("backButton");
@@ -627,6 +628,18 @@ const fullname =
 
 if (sellerName) {
     sellerName.textContent = fullname;
+}
+
+const serviceBadge =
+    window.IUHServicePackage?.getBadge(seller.user_id);
+
+if (sellerServiceBadge) {
+    sellerServiceBadge.hidden = !serviceBadge;
+    if (serviceBadge) {
+        sellerServiceBadge.textContent = serviceBadge.label;
+        sellerServiceBadge.className =
+            `service-package-badge service-package-inline-badge ${serviceBadge.className}`;
+    }
 }
 
 

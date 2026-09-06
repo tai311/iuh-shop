@@ -1,0 +1,183 @@
+/* =========================================================
+   IUH SHOP - SERVICE PACKAGE BADGES AND STATUS
+========================================================= */
+
+.service-package-badge,
+.seller-featured-badge,
+.group-featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.service-package-badge::before,
+.seller-featured-badge::before,
+.group-featured-badge::before {
+    content: "★";
+    font-size: 10px;
+}
+
+.seller-featured-badge {
+    color: #8c6100;
+    background: #fff2bf;
+}
+
+.group-featured-badge {
+    color: #176b61;
+    background: #dff6ef;
+}
+
+.service-package-inline-badge {
+    display: inline-flex;
+    margin-left: 7px;
+    vertical-align: middle;
+}
+
+.service-package-reminder {
+    margin: 12px 0 0;
+    padding: 11px 13px;
+    border: 1px solid #f3d787;
+    border-radius: 8px;
+    color: #765900;
+    background: #fff9e6;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.service-package-reminder strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.service-package-member-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.service-package-member {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 10px;
+    border: 1px solid #e7ebf2;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.service-package-member-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.service-package-member-info {
+    display: grid;
+    flex: 1;
+    gap: 2px;
+    min-width: 0;
+}
+
+.service-package-member-info strong,
+.service-package-member-info span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.service-package-member-info strong {
+    color: #17233c;
+    font-size: 12px;
+}
+
+.service-package-member-info span {
+    color: #68738a;
+    font-size: 10px;
+}
+
+.service-package-member-remove {
+    border: 0;
+    color: #bd3c3c;
+    background: transparent;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.service-package-group-manager {
+    margin-top: 12px;
+    padding: 13px;
+    border: 1px solid #e4e9f2;
+    border-radius: 10px;
+    background: #f8faff;
+}
+
+.service-package-group-manager[hidden] {
+    display: none;
+}
+
+.service-package-group-manager > strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #17233c;
+    font-size: 12px;
+}
+
+.service-package-group-manager > p {
+    margin: 0;
+    color: #68738a;
+    font-size: 11px;
+}
+
+.service-package-member-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 11px;
+}
+
+.service-package-member-form input {
+    min-width: 0;
+    flex: 1;
+    padding: 9px 10px;
+    border: 1px solid #dce3ef;
+    border-radius: 7px;
+    outline: none;
+    font: 11px inherit;
+}
+
+.service-package-member-form input:focus {
+    border-color: #193f9e;
+}
+
+.service-package-member-form button {
+    padding: 0 12px;
+    border: 0;
+    border-radius: 7px;
+    color: #fff;
+    background: #193f9e;
+    font: 700 11px inherit;
+    cursor: pointer;
+}
+
+.service-package-member-message {
+    min-height: 15px;
+    margin: 7px 0 0;
+    color: #bd3c3c;
+    font-size: 10px;
+}
+
+@media (max-width: 540px) {
+    .service-package-member-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .service-package-member-form button {
+        min-height: 34px;
+    }
+}
