@@ -565,8 +565,9 @@
 
                     <!-- Nâng cấp -->
 
-                    <a
-                        href="goidichvu.html"
+                    <button
+                        type="button"
+                        id="openUpgradeModalButton"
                         class="account-menu-item"
                     >
 
@@ -600,7 +601,7 @@
                             ›
                         </span>
 
-                    </a>
+                    </button>
 
                     <!-- DASHBOARD NGƯỜI BÁN -->
 
@@ -1414,6 +1415,92 @@
 
     </div>
 
+</div>
+
+<!-- =================================
+     POPUP NÂNG CẤP GÓI DỊCH VỤ
+================================= -->
+
+<div
+    id="upgradeModal"
+    class="upgrade-modal"
+    aria-hidden="true"
+>
+    <div class="upgrade-modal-overlay" id="upgradeModalOverlay"></div>
+
+    <div
+        class="upgrade-modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="upgradeModalTitle"
+    >
+        <div class="upgrade-modal-header">
+            <div>
+                <span class="upgrade-eyebrow">IUH SHOP PLUS</span>
+                <h2 id="upgradeModalTitle">Nâng cấp gói dịch vụ</h2>
+                <p>Đưa tin đăng của bạn nổi bật hơn trong 30 ngày.</p>
+            </div>
+            <button type="button" id="closeUpgradeModalButton" class="upgrade-close" aria-label="Đóng">×</button>
+        </div>
+
+        <div id="upgradeFormView">
+            <div class="upgrade-step-heading">
+                <span>01</span>
+                <div><strong>Chọn gói phù hợp</strong><small>Thay đổi lựa chọn bất cứ lúc nào trước khi thanh toán.</small></div>
+            </div>
+
+            <div class="service-plan-grid">
+                <button type="button" class="service-plan-card selected" data-plan="personal">
+                    <span class="plan-icon"><i class="fa-solid fa-user"></i></span>
+                    <span class="plan-card-top"><strong>Gói Cá nhân</strong><b>19.000đ<small>/30 ngày</small></b></span>
+                    <span class="plan-users"><i class="fa-solid fa-circle-check"></i> 1 tài khoản</span>
+                    <span class="plan-description">Dành cho bạn tự quảng bá những tin đăng của mình.</span>
+                    <span class="plan-benefits"><span>✓ Đẩy tin nổi bật miễn phí</span><span>✓ Ưu tiên hiển thị sản phẩm</span><span>✓ Nhãn “Người bán nổi bật”</span><span>✓ Nhắc tin sắp hết hạn</span></span>
+                </button>
+
+                <button type="button" class="service-plan-card" data-plan="group">
+                    <span class="plan-badge">TIẾT KIỆM CHI PHÍ</span>
+                    <span class="plan-icon"><i class="fa-solid fa-users"></i></span>
+                    <span class="plan-card-top"><strong>Gói Nhóm</strong><b>29.000đ<small>/30 ngày</small></b></span>
+                    <span class="plan-users"><i class="fa-solid fa-circle-check"></i> Tối đa 3 tài khoản</span>
+                    <span class="plan-description">Chia sẻ chi phí cùng nhóm, mỗi thành viên dùng tài khoản riêng.</span>
+                    <span class="plan-benefits"><span>✓ Mỗi thành viên có lượt đẩy tin</span><span>✓ Ưu tiên tin của cả nhóm</span><span>✓ Nhãn thành viên nổi bật</span><span>✓ Nhắc tin sắp hết hạn</span></span>
+                </button>
+            </div>
+
+            <div class="upgrade-step-heading payment-heading">
+                <span>02</span>
+                <div><strong>Thông tin thanh toán</strong><small>Giao dịch được ghi nhận an toàn trên IUH SHOP.</small></div>
+            </div>
+
+            <div class="payment-methods" role="radiogroup" aria-label="Phương thức thanh toán">
+                <button type="button" class="payment-method selected" data-method="wallet"><i class="fa-solid fa-wallet"></i><span><strong>Ví IUH SHOP</strong><small>Số dư khả dụng</small></span><i class="fa-solid fa-circle-check method-check"></i></button>
+                <button type="button" class="payment-method" data-method="bank"><i class="fa-solid fa-building-columns"></i><span><strong>Chuyển khoản ngân hàng</strong><small>Quét mã QR sau khi xác nhận</small></span><i class="fa-regular fa-circle method-check"></i></button>
+            </div>
+
+            <div id="upgradeBankInfo" class="upgrade-bank-info" hidden>
+                <div><strong>IUH SHOP</strong><span>Ngân hàng Vietcombank · 0123 456 789</span><span>Nội dung: IUH <b id="upgradeTransferCode">SHOP</b></span></div>
+                <img src="../Images/qr.jpg" alt="Mã QR thanh toán gói dịch vụ">
+            </div>
+
+            <div class="upgrade-order-summary">
+                <div><span>Gói đang chọn</span><strong id="upgradeSelectedPlan">Gói Cá nhân</strong></div>
+                <div><span>Tổng thanh toán</span><strong id="upgradeTotal">19.000đ</strong></div>
+            </div>
+            <p id="upgradePaymentMessage" class="upgrade-payment-message" role="status"></p>
+            <button type="button" id="confirmUpgradeButton" class="upgrade-confirm-button"><i class="fa-solid fa-lock"></i> Xác nhận thanh toán <span id="upgradeConfirmAmount">19.000đ</span></button>
+            <p class="upgrade-secure-note"><i class="fa-solid fa-shield-halved"></i> Thông tin thanh toán được bảo mật bởi IUH SHOP</p>
+        </div>
+
+        <div id="upgradeSuccessView" class="upgrade-success-view" hidden>
+            <div class="upgrade-success-icon"><i class="fa-solid fa-check"></i></div>
+            <span class="upgrade-eyebrow">THANH TOÁN THÀNH CÔNG</span>
+            <h3>Gói dịch vụ đã được kích hoạt</h3>
+            <p id="upgradeSuccessText">Bạn đã nâng cấp thành công Gói Cá nhân.</p>
+            <div class="upgrade-success-details"><span>Mã giao dịch</span><strong id="upgradeTransactionCode">—</strong><span>Hiệu lực đến</span><strong id="upgradeExpiryDate">—</strong></div>
+            <button type="button" id="finishUpgradeButton" class="upgrade-confirm-button">Hoàn tất</button>
+        </div>
+    </div>
 </div>
 
     </main>

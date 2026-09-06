@@ -833,6 +833,77 @@ document.addEventListener(
 );
 
 /* =========================================
+   POPUP NÂNG CẤP GÓI DỊCH VỤ
+========================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("upgradeModal");
+    const openButton = document.getElementById("openUpgradeModalButton");
+    const closeButton = document.getElementById("closeUpgradeModalButton");
+    const overlay = document.getElementById("upgradeModalOverlay");
+    const formView = document.getElementById("upgradeFormView");
+    const successView = document.getElementById("upgradeSuccessView");
+    const confirmButton = document.getElementById("confirmUpgradeButton");
+    const finishButton = document.getElementById("finishUpgradeButton");
+    const message = document.getElementById("upgradePaymentMessage");
+    const bankInfo = document.getElementById("upgradeBankInfo");
+    const plans = { personal: { name: "Gói Cá nhân", price: 19000 }, group: { name: "Gói Nhóm", price: 29000 } };
+    let selectedPlan = "personal";
+    let selectedMethod = "wallet";
+
+    if (!modal || !openButton) return;
+
+    function money(value) { return new Intl.NumberFormat("vi-VN").format(value) + "đ"; }
+    function updatePlan() {
+        const plan = plans[selectedPlan];
+        document.querySelectorAll(".service-plan-card").forEach((card) => card.classList.toggle("selected", card.dataset.plan === selectedPlan));
+        document.getElementById("upgradeSelectedPlan").textContent = plan.name;
+        document.getElementById("upgradeTotal").textContent = money(plan.price);
+        document.getElementById("upgradeConfirmAmount").textContent = money(plan.price);
+        message.textContent = "";
+    }
+    function updateMethod() {
+        document.querySelectorAll(".payment-method").forEach((method) => {
+            const selected = method.dataset.method === selectedMethod;
+            method.classList.toggle("selected", selected);
+            method.querySelector(".method-check").className = selected ? "fa-solid fa-circle-check method-check" : "fa-regular fa-circle method-check";
+        });
+        bankInfo.hidden = selectedMethod !== "bank";
+    }
+    function closeModal() {
+        modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
+    }
+    function openModal() {
+        formView.hidden = false; successView.hidden = true; message.textContent = ""; confirmButton.disabled = false;
+        modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+    }
+    function showSuccess() {
+        const plan = plans[selectedPlan];
+        const transaction = "IUH" + Date.now().toString().slice(-8) + Math.floor(1000 + Math.random() * 9000);
+        const expiry = new Date(); expiry.setDate(expiry.getDate() + 30);
+        const expiryText = expiry.toLocaleDateString("vi-VN");
+        localStorage.setItem("iuhActiveServicePlan", JSON.stringify({ plan: selectedPlan, transaction, expiry: expiry.toISOString() }));
+        document.getElementById("upgradeSuccessText").textContent = "Bạn đã nâng cấp thành công " + plan.name + ". Quyền lợi đã sẵn sàng sử dụng.";
+        document.getElementById("upgradeTransactionCode").textContent = transaction;
+        document.getElementById("upgradeExpiryDate").textContent = expiryText;
+        formView.hidden = true; successView.hidden = false;
+    }
+    openButton.addEventListener("click", openModal);
+    closeButton.addEventListener("click", closeModal);
+    overlay.addEventListener("click", closeModal);
+    finishButton.addEventListener("click", closeModal);
+    document.querySelectorAll(".service-plan-card").forEach((card) => card.addEventListener("click", () => { selectedPlan = card.dataset.plan; updatePlan(); }));
+    document.querySelectorAll(".payment-method").forEach((method) => method.addEventListener("click", () => { selectedMethod = method.dataset.method; updateMethod(); }));
+    confirmButton.addEventListener("click", () => {
+        if (typeof currentAuthUserId === "undefined" || !currentAuthUserId) { message.textContent = "Vui lòng đăng nhập để nâng cấp gói dịch vụ."; return; }
+        confirmButton.disabled = true; confirmButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
+        window.setTimeout(() => { confirmButton.innerHTML = '<i class="fa-solid fa-lock"></i> Xác nhận thanh toán <span id="upgradeConfirmAmount">' + money(plans[selectedPlan].price) + "</span>"; showSuccess(); }, 650);
+    });
+    document.addEventListener("keydown", (event) => { if (event.key === "Escape" && modal.classList.contains("open")) closeModal(); });
+    updatePlan(); updateMethod();
+});
+
+/* =========================================
    DROPDOWN TÀI KHOẢN - 3 LỐI TẮT
 ========================================= */
 

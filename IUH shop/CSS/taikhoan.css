@@ -4376,3 +4376,66 @@ body.logged-out
 
     display: none;
 }
+
+/* =========================================
+    POPUP NÂNG CẤP GÓI DỊCH VỤ
+========================================= */
+.upgrade-modal { position: fixed; inset: 0; z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.upgrade-modal.open { display: flex; }
+.upgrade-modal-overlay { position: absolute; inset: 0; background: rgba(15, 29, 55, .65); backdrop-filter: blur(4px); }
+.upgrade-modal-content { position: relative; width: min(900px, 100%); max-height: 94vh; overflow-y: auto; padding: 30px; border-radius: 20px; background: #fff; box-shadow: 0 25px 80px rgba(10, 30, 70, .28); animation: upgradePopupIn .22s ease; }
+.upgrade-modal-header { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+.upgrade-eyebrow { color: #d59b00; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; }
+.upgrade-modal-header h2 { margin: 6px 0; color: #17233c; font-size: 25px; }
+.upgrade-modal-header p, .upgrade-step-heading small { color: #68738a; font-size: 13px; }
+.upgrade-close { width: 38px; height: 38px; border: 0; border-radius: 50%; color: #5e6a7f; background: #f2f5fa; font-size: 25px; cursor: pointer; }
+.upgrade-close:hover { color: #173f91; background: #e9eef7; }
+.upgrade-step-heading { display: flex; align-items: center; gap: 12px; margin: 20px 0 12px; }
+.upgrade-step-heading > span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: #fff; background: #193f9e; font-size: 11px; font-weight: 800; }
+.upgrade-step-heading div { display: grid; gap: 2px; }
+.upgrade-step-heading strong { color: #17233c; font-size: 15px; }
+.service-plan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.service-plan-card { position: relative; display: grid; gap: 10px; padding: 20px; border: 1.5px solid #e4e9f2; border-radius: 12px; color: #17233c; background: #fff; text-align: left; cursor: pointer; font-family: inherit; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.service-plan-card:hover { transform: translateY(-2px); border-color: #9db6e9; }
+.service-plan-card.selected { border-color: #193f9e; box-shadow: 0 0 0 3px rgba(25, 63, 158, .1); }
+.plan-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; color: #193f9e; background: #eef3ff; }
+.plan-card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.plan-card-top strong { font-size: 17px; }
+.plan-card-top b { color: #193f9e; font-size: 17px; white-space: nowrap; }
+.plan-card-top small { color: #68738a; font-size: 10px; font-weight: 500; }
+.plan-users { color: #193f9e; font-size: 12px; font-weight: 700; }
+.plan-description { min-height: 36px; color: #68738a; font-size: 12px; line-height: 1.5; }
+.plan-benefits { display: grid; gap: 6px; padding-top: 8px; border-top: 1px solid #edf0f5; color: #45516a; font-size: 11px; }
+.plan-badge { position: absolute; top: 14px; right: 14px; padding: 4px 7px; border-radius: 4px; color: #906a00; background: #fff4c9; font-size: 9px; font-weight: 800; }
+.payment-heading { margin-top: 25px; }
+.payment-methods { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.payment-method { display: flex; align-items: center; gap: 11px; padding: 13px; border: 1px solid #e4e9f2; border-radius: 10px; color: #193f9e; background: #fff; text-align: left; cursor: pointer; font-family: inherit; }
+.payment-method.selected { border-color: #193f9e; background: #f5f8ff; }
+.payment-method > span { display: grid; gap: 3px; flex: 1; }
+.payment-method strong { color: #17233c; font-size: 12px; }
+.payment-method small { color: #68738a; font-size: 10px; }
+.method-check { margin-left: auto; }
+.upgrade-bank-info { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 12px; padding: 13px; border-radius: 10px; color: #45516a; background: #f7f9fc; font-size: 11px; }
+.upgrade-bank-info[hidden] { display: none; }
+.upgrade-bank-info div { display: grid; gap: 5px; }
+.upgrade-bank-info img { width: 72px; height: 72px; object-fit: cover; border-radius: 5px; }
+.upgrade-order-summary { display: flex; justify-content: space-between; gap: 15px; margin-top: 18px; padding: 16px 0; border-top: 1px solid #edf0f5; border-bottom: 1px solid #edf0f5; }
+.upgrade-order-summary div { display: grid; gap: 5px; }
+.upgrade-order-summary span { color: #68738a; font-size: 11px; }
+.upgrade-order-summary strong { color: #17233c; font-size: 15px; }
+.upgrade-order-summary div:last-child { text-align: right; }
+.upgrade-order-summary div:last-child strong { color: #193f9e; font-size: 20px; }
+.upgrade-payment-message { min-height: 18px; margin: 10px 0 0; color: #d33b3b; font-size: 12px; }
+.upgrade-confirm-button { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 46px; margin-top: 8px; border: 0; border-radius: 8px; color: #fff; background: #193f9e; font: 700 13px inherit; cursor: pointer; }
+.upgrade-confirm-button:hover { background: #153586; }
+.upgrade-confirm-button:disabled { opacity: .65; cursor: wait; }
+.upgrade-secure-note { margin: 11px 0 0; color: #7b8699; text-align: center; font-size: 10px; }
+.upgrade-success-view { padding: 20px 30px 10px; text-align: center; }
+.upgrade-success-icon { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 15px; border-radius: 50%; color: #16845a; background: #e7f7ef; font-size: 28px; }
+.upgrade-success-view h3 { margin: 8px 0; color: #17233c; font-size: 22px; }
+.upgrade-success-view > p { color: #68738a; font-size: 13px; }
+.upgrade-success-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px; margin: 20px auto; padding: 15px; border-radius: 10px; background: #f7f9fc; text-align: left; font-size: 12px; }
+.upgrade-success-details span { color: #68738a; }
+.upgrade-success-details strong { color: #17233c; text-align: right; }
+@keyframes upgradePopupIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 640px) { .upgrade-modal-content { padding: 22px 17px; } .service-plan-grid, .payment-methods { grid-template-columns: 1fr; } .plan-description { min-height: 0; } .upgrade-modal-header h2 { font-size: 21px; } }
