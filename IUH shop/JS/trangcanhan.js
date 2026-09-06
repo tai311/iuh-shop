@@ -725,23 +725,6 @@ async function loadProfileUser(userId) {
         profile.fullname ||
         "Người dùng";
 
-    await window.IUHServicePackage?.loadForUsers([userId]);
-
-    const serviceBadge =
-        window.IUHServicePackage?.getBadge(userId);
-
-    const servicePackageBadge =
-        document.getElementById("servicePackageBadge");
-
-    if (servicePackageBadge) {
-        servicePackageBadge.hidden = !serviceBadge;
-        if (serviceBadge) {
-            servicePackageBadge.textContent = serviceBadge.label;
-            servicePackageBadge.className =
-                `service-package-badge service-package-inline-badge ${serviceBadge.className}`;
-        }
-    }
-
 
     /* =================================================
        AVATAR
@@ -1793,14 +1776,6 @@ async function loadProfileProducts(userId) {
             return;
         }
 
-        await window.IUHServicePackage?.loadForUsers([userId]);
-
-        products.sort((firstProduct, secondProduct) => {
-            const firstFeatured = Boolean(window.IUHServicePackage?.getBadge(firstProduct.seller_id));
-            const secondFeatured = Boolean(window.IUHServicePackage?.getBadge(secondProduct.seller_id));
-            return Number(secondFeatured) - Number(firstFeatured);
-        });
-
 
         /* =================================================
            CÓ TIN ĐĂNG
@@ -1948,9 +1923,6 @@ async function loadProfileProducts(userId) {
                         ? "Đang bán"
                         : "Tạm hết hàng";
 
-                const productServiceBadge =
-                    window.IUHServicePackage?.getBadge(userId);
-
 
                 /* -----------------------------------------
                    HTML CARD
@@ -1981,12 +1953,6 @@ async function loadProfileProducts(userId) {
                             )}
 
                         </span>
-
-                        ${productServiceBadge ? `
-                            <span class="service-package-badge ${productServiceBadge.className}">
-                                ${escapeProfileHTML(productServiceBadge.label)}
-                            </span>
-                        ` : ""}
 
 
                         <h3 class="profile-product-title">

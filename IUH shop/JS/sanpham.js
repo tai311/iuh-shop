@@ -229,8 +229,6 @@ async function loadProducts() {
                 userData || [];
         }
 
-        await window.IUHServicePackage?.loadForUsers(sellerIds);
-
 
         /* =========================================
            4. GHÉP users VÀO products
@@ -417,6 +415,7 @@ async function updateHeaderAccount() {
         if (userAccount) {
             userAccount.style.display = "flex";
         }
+
     }
     catch (error) {
 
@@ -560,6 +559,17 @@ function getFilteredProducts() {
 
 }
 
+const PLATFORM_FEE_RATE = 0.05;
+
+function getBuyerPrice(sellerPrice) {
+    const price = Number(sellerPrice) || 0;
+    return Math.round(price * (1 + PLATFORM_FEE_RATE));
+}
+
+function formatCurrency(value) {
+    return Number(value || 0).toLocaleString("vi-VN") + "đ";
+}
+
 
 /* =====================================================
    CARD SẢN PHẨM
@@ -636,20 +646,19 @@ function renderProductCard(product) {
 
                 <div class="product-meta">
 
-                    <span class="product-quantity">
+    <span class="product-quantity">
+        SL: ${Number(product.quantity)}
+    </span>
 
-                        SL: ${Number(product.quantity)}
+    <span class="product-category-text">
+        ${esc(product.category)}
+    </span>
 
-                    </span>
+</div>
 
-
-                    <span class="product-category-text">
-
-                        ${esc(product.category)}
-
-                    </span>
-
-                </div>
+<div class="product-price">
+    ${formatCurrency(getBuyerPrice(product.price))}
+</div>
 
 
                 <p class="product-description">
@@ -1518,12 +1527,6 @@ function initAccountDropdown() {
     if (!wrapper || !arrow || !dropdown) {
         return;
     }
-
-    if (arrow.dataset.accountNavBound === "true") {
-        return;
-    }
-
-    arrow.dataset.accountNavBound = "true";
 
     // Bấm mũi tên
     arrow.addEventListener("click", function (event) {

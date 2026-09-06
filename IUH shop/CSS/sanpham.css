@@ -2962,3 +2962,12 @@ body {
     display: none;
 }
 
+.product-price {
+    margin-bottom: 10px;
+
+    color: var(--product-blue);
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
