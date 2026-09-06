@@ -1,0 +1,327 @@
+/* =========================================================
+   IUH SHOP - MOBILE LAYOUT OVERRIDES
+========================================================= */
+
+*,
+*::before,
+*::after {
+    min-width: 0;
+}
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+img,
+svg,
+video {
+    max-width: 100%;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 600px) {
+    .site-header {
+        position: relative;
+    }
+
+    .top-bar-container,
+    .nav-container {
+        width: 100%;
+    }
+
+    .top-bar-container {
+        padding-inline: 14px;
+    }
+
+    .top-actions,
+    .account-area,
+    .guest-account,
+    .user-account-wrapper {
+        max-width: 100%;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .main-nav {
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .main-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-container {
+        min-width: max-content;
+    }
+
+    .brand {
+        margin-right: 12px;
+    }
+
+    .brand-logo {
+        width: 48px;
+    }
+
+    .brand-name {
+        font-size: 20px;
+    }
+
+    .navigation {
+        min-width: max-content;
+    }
+
+    .page-content,
+    .account-page,
+    .products-page,
+    .profile-page,
+    .manage-page,
+    .product-detail-page {
+        width: calc(100% - 28px);
+        max-width: none;
+        margin-inline: auto;
+    }
+
+    .account-profile {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 20px;
+        gap: 14px;
+    }
+
+    .profile-info {
+        width: 100%;
+    }
+
+    .auth-section {
+        grid-template-columns: 1fr;
+    }
+
+    .account-menu-item {
+        min-height: 68px;
+        padding: 12px 13px;
+        gap: 10px;
+    }
+
+    .menu-icon {
+        width: 37px;
+        height: 37px;
+    }
+
+    .menu-text strong {
+        font-size: 13px;
+    }
+
+    .menu-text span {
+        font-size: 10px;
+        line-height: 1.4;
+    }
+
+    .upgrade-modal {
+        align-items: flex-start;
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    .upgrade-modal-content {
+        width: 100%;
+        max-height: calc(100dvh - 20px);
+        padding: 19px 15px;
+        border-radius: 15px;
+    }
+
+    .upgrade-modal-header {
+        gap: 10px;
+        margin-bottom: 17px;
+    }
+
+    .upgrade-modal-header h2 {
+        font-size: 20px;
+        line-height: 1.25;
+    }
+
+    .upgrade-modal-header p {
+        max-width: 245px;
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    .upgrade-close {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 auto;
+    }
+
+    .upgrade-step-heading {
+        margin: 15px 0 10px;
+    }
+
+    .upgrade-step-heading small {
+        font-size: 10px;
+        line-height: 1.35;
+    }
+
+    .service-plan-grid,
+    .payment-methods {
+        grid-template-columns: 1fr;
+    }
+
+    .service-plan-card {
+        padding: 15px;
+        gap: 8px;
+    }
+
+    .plan-card-top {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .plan-card-top strong,
+    .plan-card-top b {
+        font-size: 15px;
+    }
+
+    .plan-description {
+        min-height: 0;
+        font-size: 11px;
+    }
+
+    .plan-benefits {
+        font-size: 10px;
+    }
+
+    .plan-badge {
+        top: 12px;
+        right: 12px;
+        max-width: 115px;
+        text-align: right;
+        white-space: normal;
+    }
+
+    .payment-method {
+        min-height: 56px;
+        padding: 11px;
+    }
+
+    .payment-method strong {
+        font-size: 11px;
+    }
+
+    .upgrade-bank-info {
+        align-items: flex-start;
+        font-size: 10px;
+    }
+
+    .upgrade-bank-info img {
+        width: 62px;
+        height: 62px;
+        flex: 0 0 auto;
+    }
+
+    .upgrade-order-summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .upgrade-order-summary div:last-child {
+        width: 100%;
+        text-align: left;
+    }
+
+    .upgrade-order-summary div:last-child strong {
+        font-size: 18px;
+    }
+
+    .service-package-member-form {
+        flex-direction: column;
+    }
+
+    .service-package-member-form button {
+        min-height: 38px;
+    }
+
+    .service-package-badge,
+    .seller-featured-badge,
+    .group-featured-badge {
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    .profile-card,
+    .product-card,
+    .product-detail-card,
+    .seller-card {
+        max-width: 100%;
+    }
+
+    .profile-products-grid,
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-tabs {
+        display: flex;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .profile-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .profile-tab {
+        flex: 0 0 auto;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 26px;
+    }
+
+    .footer-column {
+        min-width: 0;
+    }
+
+    .back-to-top {
+        right: 14px;
+        bottom: 14px;
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 380px) {
+    .top-actions {
+        gap: 8px;
+    }
+
+    .upgrade-modal {
+        padding: 6px;
+    }
+
+    .upgrade-modal-content {
+        max-height: calc(100dvh - 12px);
+        padding: 16px 12px;
+    }
+
+    .upgrade-modal-header h2 {
+        font-size: 18px;
+    }
+
+    .upgrade-modal-header p {
+        max-width: 210px;
+    }
+}
