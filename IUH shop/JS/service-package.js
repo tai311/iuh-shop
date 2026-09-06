@@ -5,6 +5,19 @@
 (function () {
     const STORAGE_KEY = "iuhServicePackages";
     const packageCache = new Map();
+    const SUPABASE_URL = "https://xecxofmogvqysejjpxvl.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
+
+    function getSupabaseClient() {
+        if (!window.__iuhServiceSupabaseClient) {
+            if (!window.supabase?.createClient) return null;
+            window.__iuhServiceSupabaseClient = window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_PUBLISHABLE_KEY
+            );
+        }
+        return window.__iuhServiceSupabaseClient;
+    }
 
     function readPackages() {
         try {
@@ -29,8 +42,9 @@
 
     async function loadForUsers(userIds) {
         const ids = [...new Set((userIds || []).filter(Boolean))];
-        if (!ids.length || !window.supabase) return;
-        const { data: membershipData, error: membershipError } = await window.supabase
+        const client = getSupabaseClient();
+        if (!ids.length || !client) return;
+        const { data: membershipData, error: membershipError } = await client
             .from("service_package_members")
             .select("user_id, package_id")
             .in("user_id", ids);
@@ -42,7 +56,7 @@
         ids.forEach((id) => packageCache.delete(id));
         ids.forEach((id) => packageCache.set(id, null));
         if (!packageIds.length) return;
-        const { data: packageData, error: packageError } = await window.supabase
+        const { data: packageData, error: packageError } = await client
             .from("service_packages")
             .select("id, plan_type, transaction_code, status, expires_at")
             .in("id", packageIds)
@@ -95,7 +109,8 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(packages));
         },
         async saveRemote(userId, value) {
-            if (!window.supabase || !userId) return { error: new Error("Supabase chưa sẵn sàng") };
+            const client = getSupabaseClient();
+            if (!client || !userId) return { error: new Error("Supabase chưa sẵn sàng") };
             const request = (async () => {
                 const packageValues = {
                         owner_id: userId,
@@ -107,7 +122,7 @@
                         starts_at: new Date().toISOString(),
                         expires_at: value.expiry
                     };
-                    const { data: existingPackage, error: lookupError } = await window.supabase
+                    const { data: existingPackage, error: lookupError } = await client
                         .from("service_packages")
                         .select("id")
                         .eq("owner_id", userId)
@@ -116,7 +131,7 @@
                     if (lookupError) return { packageData: null, packageError: lookupError };
                     let packageData;
                     if (existingPackage) {
-                        const { data: updatedPackage, error: updateError } = await window.supabase
+                        const { data: updatedPackage, error: updateError } = await client
                             .from("service_packages")
                             .update(packageValues)
                             .eq("id", existingPackage.id)
@@ -124,14 +139,14 @@
                             .single();
                         if (updateError) return { packageData: null, packageError: updateError };
                         packageData = updatedPackage;
-                        const { error: removeMembersError } = await window.supabase
+                        const { error: removeMembersError } = await client
                             .from("service_package_members")
                             .delete()
                             .eq("package_id", packageData.id)
                             .eq("member_role", "member");
                         if (removeMembersError) return { packageData: null, packageError: removeMembersError };
                     } else {
-                        const { data: createdPackage, error: createError } = await window.supabase
+                        const { data: createdPackage, error: createError } = await client
                             .from("service_packages")
                             .insert(packageValues)
                             .select("id")
@@ -146,7 +161,7 @@
             if (packageError) return { error: packageError };
             const members = (value.members || []).filter((member) => member.user_id && member.user_id !== userId).map((member) => ({ package_id: packageData.id, user_id: member.user_id, member_role: "member" }));
             if (members.length) {
-                const memberRequest = window.supabase.from("service_package_members").insert(members);
+                const memberRequest = client.from("service_package_members").insert(members);
                 const memberTimeout = new Promise((resolve) => window.setTimeout(() => resolve({ error: new Error("Không thể lưu thành viên sau 10 giây") }), 10000));
                 const { error: memberError } = await Promise.race([memberRequest, memberTimeout]);
                 if (memberError) return { error: memberError };
