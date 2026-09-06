@@ -725,6 +725,8 @@ async function loadProfileUser(userId) {
         profile.fullname ||
         "Người dùng";
 
+    await window.IUHServicePackage?.loadForUsers([userId]);
+
     const serviceBadge =
         window.IUHServicePackage?.getBadge(userId);
 

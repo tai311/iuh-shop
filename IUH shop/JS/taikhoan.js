@@ -935,7 +935,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const expiry = new Date(); expiry.setDate(expiry.getDate() + 30);
         const expiryText = expiry.toLocaleDateString("vi-VN");
         const groupMembers = selectedPlan === "group" ? selectedGroupMembers : [];
-        const packageValue = { plan: selectedPlan, price: plan.price, paymentMethod: selectedMethod, transaction, expiry: expiry.toISOString(), members: groupMembers };
+        const packageValue = { plan: selectedPlan, owner_id: currentAuthUserId, price: plan.price, paymentMethod: selectedMethod, transaction, expiry: expiry.toISOString(), members: groupMembers };
         const remoteResult = await IUHServicePackage.saveRemote(currentAuthUserId, packageValue);
         if (remoteResult.error) {
             message.textContent = "Chưa lưu được gói lên hệ thống. Hãy chạy file supabase/service_packages.sql trong Supabase rồi thử lại.";

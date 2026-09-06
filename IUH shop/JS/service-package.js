@@ -58,7 +58,7 @@
         if (!packageIds.length) return;
         const { data: packageData, error: packageError } = await client
             .from("service_packages")
-            .select("id, plan_type, transaction_code, status, expires_at")
+            .select("id, owner_id, plan_type, transaction_code, status, expires_at")
             .in("id", packageIds)
             .eq("status", "active")
             .gt("expires_at", new Date().toISOString());
@@ -74,6 +74,7 @@
                 .map((member) => ({ user_id: member.user_id }));
             packageCache.set(row.user_id, normalizePackage({
                 plan: currentPackage.plan_type,
+                owner_id: currentPackage.owner_id,
                 transaction: currentPackage.transaction_code,
                 expiry: currentPackage.expires_at,
                 members
@@ -84,7 +85,7 @@
     function getBadge(userId) {
         const servicePackage = getPackage(userId);
         if (!servicePackage) return null;
-        if (servicePackage.plan === "group" && servicePackage.members.some((member) => member.user_id === userId)) {
+        if (servicePackage.plan === "group" && servicePackage.owner_id !== userId) {
             return { label: "Thành viên nổi bật", className: "group-featured-badge" };
         }
         return { label: "Người bán nổi bật", className: "seller-featured-badge" };
