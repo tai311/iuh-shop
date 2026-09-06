@@ -229,6 +229,8 @@ async function loadProducts() {
                 userData || [];
         }
 
+        await window.IUHServicePackage?.loadForUsers(sellerIds);
+
 
         /* =========================================
            4. GHÉP users VÀO products

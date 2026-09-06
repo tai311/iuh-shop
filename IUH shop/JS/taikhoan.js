@@ -929,16 +929,21 @@ document.addEventListener("DOMContentLoaded", function () {
         renderGroupMembers();
         modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
     }
-    function showSuccess() {
+    async function showSuccess() {
         const plan = plans[selectedPlan];
         const transaction = "IUH" + Date.now().toString().slice(-8) + Math.floor(1000 + Math.random() * 9000);
         const expiry = new Date(); expiry.setDate(expiry.getDate() + 30);
         const expiryText = expiry.toLocaleDateString("vi-VN");
         const groupMembers = selectedPlan === "group" ? selectedGroupMembers : [];
-        IUHServicePackage.save(currentAuthUserId, { plan: selectedPlan, transaction, expiry: expiry.toISOString(), members: groupMembers });
-        if (selectedPlan === "group") {
-            groupMembers.forEach((member) => IUHServicePackage.save(member.user_id, { plan: "group", transaction, expiry: expiry.toISOString(), members: [{ user_id: currentAuthUserId }, ...groupMembers] }));
+        const packageValue = { plan: selectedPlan, price: plan.price, paymentMethod: selectedMethod, transaction, expiry: expiry.toISOString(), members: groupMembers };
+        const remoteResult = await IUHServicePackage.saveRemote(currentAuthUserId, packageValue);
+        if (remoteResult.error) {
+            message.textContent = "Chưa lưu được gói lên hệ thống. Hãy chạy file supabase/service_packages.sql trong Supabase rồi thử lại.";
+            confirmButton.disabled = false;
+            return;
         }
+        IUHServicePackage.save(currentAuthUserId, packageValue);
+        groupMembers.forEach((member) => IUHServicePackage.save(member.user_id, { ...packageValue, members: [{ user_id: currentAuthUserId }, ...groupMembers] }));
         document.getElementById("upgradeSuccessText").textContent = "Bạn đã nâng cấp thành công " + plan.name + ". Quyền lợi đã sẵn sàng sử dụng.";
         document.getElementById("upgradeTransactionCode").textContent = transaction;
         document.getElementById("upgradeExpiryDate").textContent = expiryText;
@@ -955,7 +960,7 @@ document.addEventListener("DOMContentLoaded", function () {
     confirmButton.addEventListener("click", () => {
         if (typeof currentAuthUserId === "undefined" || !currentAuthUserId) { message.textContent = "Vui lòng đăng nhập để nâng cấp gói dịch vụ."; return; }
         confirmButton.disabled = true; confirmButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
-        window.setTimeout(() => { confirmButton.innerHTML = '<i class="fa-solid fa-lock"></i> Xác nhận thanh toán <span id="upgradeConfirmAmount">' + money(plans[selectedPlan].price) + "</span>"; showSuccess(); }, 650);
+        window.setTimeout(async () => { confirmButton.innerHTML = '<i class="fa-solid fa-lock"></i> Xác nhận thanh toán <span id="upgradeConfirmAmount">' + money(plans[selectedPlan].price) + "</span>"; await showSuccess(); }, 650);
     });
     document.addEventListener("keydown", (event) => { if (event.key === "Escape" && modal.classList.contains("open")) closeModal(); });
     updatePlan(); updateMethod();

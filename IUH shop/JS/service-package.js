@@ -4,6 +4,7 @@
 
 (function () {
     const STORAGE_KEY = "iuhServicePackages";
+    const packageCache = new Map();
 
     function readPackages() {
         try {
@@ -22,7 +23,48 @@
 
     function getPackage(userId) {
         if (!userId) return null;
+        if (packageCache.has(userId)) return packageCache.get(userId);
         return normalizePackage(readPackages()[userId]);
+    }
+
+    async function loadForUsers(userIds) {
+        const ids = [...new Set((userIds || []).filter(Boolean))];
+        if (!ids.length || !window.supabase) return;
+        const { data: membershipData, error: membershipError } = await window.supabase
+            .from("service_package_members")
+            .select("user_id, package_id")
+            .in("user_id", ids);
+        if (membershipError) {
+            console.warn("Không thể tải thành viên gói từ Supabase:", membershipError.message);
+            return;
+        }
+        const packageIds = [...new Set((membershipData || []).map((row) => row.package_id).filter(Boolean))];
+        ids.forEach((id) => packageCache.delete(id));
+        ids.forEach((id) => packageCache.set(id, null));
+        if (!packageIds.length) return;
+        const { data: packageData, error: packageError } = await window.supabase
+            .from("service_packages")
+            .select("id, plan_type, transaction_code, status, expires_at")
+            .in("id", packageIds)
+            .eq("status", "active")
+            .gt("expires_at", new Date().toISOString());
+        if (packageError) {
+            console.warn("Không thể tải gói dịch vụ từ Supabase:", packageError.message);
+            return;
+        }
+        (membershipData || []).forEach((row) => {
+            const currentPackage = (packageData || []).find((item) => item.id === row.package_id);
+            if (!currentPackage) return;
+            const members = (membershipData || [])
+                .filter((member) => member.package_id === currentPackage.id)
+                .map((member) => ({ user_id: member.user_id }));
+            packageCache.set(row.user_id, normalizePackage({
+                plan: currentPackage.plan_type,
+                transaction: currentPackage.transaction_code,
+                expiry: currentPackage.expires_at,
+                members
+            }));
+        });
     }
 
     function getBadge(userId) {
@@ -40,17 +82,44 @@
 
     window.IUHServicePackage = {
         getPackage,
+        loadForUsers,
         getBadge,
         escapeHTML,
         formatExpiry(expiry) {
             return new Date(expiry).toLocaleDateString("vi-VN");
         },
         save(userId, value) {
+            packageCache.set(userId, normalizePackage(value));
             const packages = readPackages();
             packages[userId] = value;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(packages));
         },
+        async saveRemote(userId, value) {
+            if (!window.supabase || !userId) return { error: new Error("Supabase chưa sẵn sàng") };
+            const { data: packageData, error: packageError } = await window.supabase
+                .from("service_packages")
+                .insert({
+                    owner_id: userId,
+                    plan_type: value.plan,
+                    price: value.price,
+                    payment_method: value.paymentMethod,
+                    transaction_code: value.transaction,
+                    status: "active",
+                    starts_at: new Date().toISOString(),
+                    expires_at: value.expiry
+                })
+                .select("id")
+                .single();
+            if (packageError) return { error: packageError };
+            const members = (value.members || []).filter((member) => member.user_id && member.user_id !== userId).map((member) => ({ package_id: packageData.id, user_id: member.user_id, member_role: "member" }));
+            if (members.length) {
+                const { error: memberError } = await window.supabase.from("service_package_members").insert(members);
+                if (memberError) return { error: memberError };
+            }
+            return { data: packageData };
+        },
         remove(userId) {
+            packageCache.delete(userId);
             const packages = readPackages();
             delete packages[userId];
             localStorage.setItem(STORAGE_KEY, JSON.stringify(packages));

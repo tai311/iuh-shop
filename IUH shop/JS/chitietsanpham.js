@@ -615,6 +615,8 @@ async function loadSeller(sellerId) {
 
 currentSeller = seller;
 
+    await window.IUHServicePackage?.loadForUsers([seller.user_id]);
+
 
 /* =================================================
    TÊN NGƯỜI ĐĂNG
