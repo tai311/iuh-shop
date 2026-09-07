@@ -957,11 +957,256 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".payment-method").forEach((method) => method.addEventListener("click", () => { selectedMethod = method.dataset.method; updateMethod(); }));
     addMemberButton.addEventListener("click", addGroupMember);
     memberEmail.addEventListener("keydown", (event) => { if (event.key === "Enter") addGroupMember(); });
-    confirmButton.addEventListener("click", () => {
-        if (typeof currentAuthUserId === "undefined" || !currentAuthUserId) { message.textContent = "Vui lòng đăng nhập để nâng cấp gói dịch vụ."; return; }
-        confirmButton.disabled = true; confirmButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
-        window.setTimeout(async () => { confirmButton.innerHTML = '<i class="fa-solid fa-lock"></i> Xác nhận thanh toán <span id="upgradeConfirmAmount">' + money(plans[selectedPlan].price) + "</span>"; await showSuccess(); }, 650);
-    });
+    confirmButton.addEventListener("click", async () => {
+
+    if (
+        typeof currentAuthUserId === "undefined" ||
+        !currentAuthUserId
+    ) {
+        message.textContent =
+            "Vui lòng đăng nhập để nâng cấp gói dịch vụ.";
+        return;
+    }
+
+    const plan = plans[selectedPlan];
+
+    confirmButton.disabled = true;
+
+    confirmButton.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
+
+    try {
+
+        /* ==========================================
+           TẠO MÃ GIAO DỊCH
+        ========================================== */
+
+        const transaction =
+            "IUH" +
+            Date.now().toString().slice(-8) +
+            Math.floor(
+                1000 + Math.random() * 9000
+            );
+
+
+        /* ==========================================
+           THANH TOÁN VÍ IUH
+        ========================================== */
+
+        if (selectedMethod === "wallet") {
+
+            const { data, error } =
+                await supabaseClient
+                    .rpc(
+                        "pay_service_package",
+                        {
+                            p_plan_type:
+                                selectedPlan,
+
+                            p_price:
+                                plan.price,
+
+                            p_transaction_code:
+                                transaction
+                        }
+                    );
+
+            if (error) {
+                throw error;
+            }
+
+            if (!data?.success) {
+                throw new Error(
+                    data?.message ||
+                    "Thanh toán gói thất bại."
+                );
+            }
+        }
+
+
+        /* ==========================================
+           QR MÔ PHỎNG
+        ========================================== */
+
+        if (selectedMethod === "qr") {
+
+            /*
+             * QR hiện tại là mô phỏng.
+             * Sau khi người dùng xác nhận QR,
+             * ghi nhận doanh thu cho Admin.
+             */
+
+            const { data, error } =
+                await supabaseClient
+                    .rpc(
+                        "pay_service_package",
+                        {
+                            p_plan_type:
+                                selectedPlan,
+
+                            p_price:
+                                plan.price,
+
+                            p_transaction_code:
+                                transaction
+                        }
+                    );
+
+            if (error) {
+                throw error;
+            }
+
+            if (!data?.success) {
+                throw new Error(
+                    data?.message ||
+                    "Thanh toán QR thất bại."
+                );
+            }
+        }
+
+
+        /* ==========================================
+           LƯU GÓI
+        ========================================== */
+
+        const expiry = new Date();
+
+        expiry.setDate(
+            expiry.getDate() + 30
+        );
+
+        const groupMembers =
+            selectedPlan === "group"
+                ? selectedGroupMembers
+                : [];
+
+
+        const packageValue = {
+
+            plan:
+                selectedPlan,
+
+            owner_id:
+                currentAuthUserId,
+
+            price:
+                plan.price,
+
+            paymentMethod:
+                selectedMethod,
+
+            transaction:
+                transaction,
+
+            expiry:
+                expiry.toISOString(),
+
+            members:
+                groupMembers
+        };
+
+
+        const remoteResult =
+            await IUHServicePackage.saveRemote(
+                currentAuthUserId,
+                packageValue
+            );
+
+
+        if (remoteResult.error) {
+            throw new Error(
+                remoteResult.error.message ||
+                "Không thể lưu gói dịch vụ."
+            );
+        }
+
+
+        /* Lưu local */
+
+        IUHServicePackage.save(
+            currentAuthUserId,
+            packageValue
+        );
+
+
+        /* Lưu thành viên nhóm */
+
+        groupMembers.forEach(member => {
+
+            IUHServicePackage.save(
+                member.user_id,
+                {
+                    ...packageValue,
+
+                    members: [
+                        {
+                            user_id:
+                                currentAuthUserId
+                        },
+                        ...groupMembers
+                    ]
+                }
+            );
+
+        });
+
+
+        /* ==========================================
+           HIỂN THỊ THÀNH CÔNG
+        ========================================== */
+
+        document
+            .getElementById(
+                "upgradeSuccessText"
+            )
+            .textContent =
+                "Bạn đã nâng cấp thành công " +
+                plan.name +
+                ". Quyền lợi đã sẵn sàng sử dụng.";
+
+
+        document
+            .getElementById(
+                "upgradeTransactionCode"
+            )
+            .textContent =
+                transaction;
+
+
+        document
+            .getElementById(
+                "upgradeExpiryDate"
+            )
+            .textContent =
+                expiry.toLocaleDateString(
+                    "vi-VN"
+                );
+
+
+        formView.hidden = true;
+        successView.hidden = false;
+
+
+    } catch (error) {
+
+        console.error(
+            "Service package payment error:",
+            error
+        );
+
+        message.textContent =
+            error.message ||
+            "Không thể thanh toán gói dịch vụ.";
+
+        confirmButton.disabled = false;
+
+        confirmButton.innerHTML =
+            '<i class="fa-solid fa-lock"></i> Xác nhận thanh toán <span id="upgradeConfirmAmount">' +
+            money(plan.price) +
+            "</span>";
+    }
+
+});
     document.addEventListener("keydown", (event) => { if (event.key === "Escape" && modal.classList.contains("open")) closeModal(); });
     updatePlan(); updateMethod();
 });
