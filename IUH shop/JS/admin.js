@@ -4665,70 +4665,110 @@ async function loadPackages() {
         </div>
     `;
 
-
     try {
 
-        /*
-         * Lấy tất cả membership.
-         * Dùng select("*") để không phụ thuộc
-         * vào việc bảng có thêm cột hay không.
-         */
+        /* =====================================================
+           1. LẤY MEMBERSHIP
+        ===================================================== */
 
         const {
             data: memberships,
             error: membershipError
-        } =
-            await supabaseClient
-                .from("service_package_members")
-                .select("*");
-
+        } = await supabaseClient
+            .from("service_package_members")
+            .select(`
+                id,
+                package_id,
+                user_id,
+                member_role,
+                joined_at
+            `);
 
         if (membershipError) {
             throw membershipError;
         }
 
 
-        servicePackages =
-            memberships || [];
+        /* =====================================================
+           2. LẤY THÔNG TIN GÓI
+        ===================================================== */
+
+        const packageIds = [
+            ...new Set(
+                (memberships || [])
+                    .map(item => item.package_id)
+                    .filter(Boolean)
+            )
+        ];
+
+        let packageMap = new Map();
+
+        if (packageIds.length) {
+
+            const {
+                data: packageData,
+                error: packageError
+            } = await supabaseClient
+                .from("service_packages")
+                .select(`
+                    id,
+                    owner_id,
+                    plan_type,
+                    price,
+                    payment_method,
+                    transaction_code,
+                    status,
+                    starts_at,
+                    expires_at,
+                    created_at
+                `)
+                .in("id", packageIds);
+
+            if (packageError) {
+                throw packageError;
+            }
+
+            packageMap = new Map(
+                (packageData || []).map(pkg => [
+                    String(pkg.id),
+                    pkg
+                ])
+            );
+        }
 
 
-        /*
-         * Lấy thông tin người dùng
-         */
+        /* =====================================================
+           3. LẤY USER
+        ===================================================== */
 
         const userIds = [
             ...new Set(
-                servicePackages
+                (memberships || [])
                     .map(item => item.user_id)
                     .filter(Boolean)
             )
         ];
 
-
         let userMap = new Map();
-
 
         if (userIds.length) {
 
             const {
                 data: userData,
                 error: userError
-            } =
-                await supabaseClient
-                    .from("users")
-                    .select(
-                        "user_id,fullname,email,avatar_url"
-                    )
-                    .in(
-                        "user_id",
-                        userIds
-                    );
-
+            } = await supabaseClient
+                .from("users")
+                .select(`
+                    user_id,
+                    fullname,
+                    email,
+                    avatar_url
+                `)
+                .in("user_id", userIds);
 
             if (userError) {
                 throw userError;
             }
-
 
             userMap = new Map(
                 (userData || []).map(user => [
@@ -4739,20 +4779,35 @@ async function loadPackages() {
         }
 
 
-        /*
-         * Gắn thông tin user vào membership
-         */
+        /* =====================================================
+           4. GHÉP DỮ LIỆU
+        ===================================================== */
 
-        servicePackages =
-            servicePackages.map(item => ({
+        servicePackages = (memberships || []).map(item => {
+
+            const pkg =
+                packageMap.get(
+                    String(item.package_id)
+                ) || null;
+
+            const user =
+                userMap.get(
+                    String(item.user_id)
+                ) || null;
+
+            return {
                 ...item,
 
-                user:
-                    userMap.get(
-                        String(item.user_id)
-                    ) || null
-            }));
+                package: pkg,
+                user: user
+            };
 
+        });
+
+
+        /* =====================================================
+           5. CẬP NHẬT GIAO DIỆN
+        ===================================================== */
 
         updatePackageOverview();
 
@@ -4767,10 +4822,8 @@ async function loadPackages() {
             error
         );
 
-
         list.innerHTML = `
             <div class="error-box">
-
                 Không thể tải danh sách
                 gói dịch vụ.
 
@@ -4779,10 +4832,8 @@ async function loadPackages() {
                 ${escapeHTML(
                     error.message || ""
                 )}
-
             </div>
         `;
-
     }
 }
 
@@ -4793,16 +4844,53 @@ async function loadPackages() {
 
 function getServicePackage(packageId) {
 
-    return (
-        SERVICE_PACKAGES[
-            Number(packageId)
-        ] || {
-            name: `Gói #${packageId}`,
-            price: 0,
-            duration: 30,
-            type: "unknown"
-        }
+    const item = servicePackages.find(
+        item =>
+            String(item.package_id) ===
+            String(packageId)
     );
+
+    if (item?.package) {
+
+        const pkg = item.package;
+
+        return {
+            name:
+                pkg.plan_type === "personal"
+                    ? "Gói Cá nhân"
+                    : pkg.plan_type === "group"
+                        ? "Gói Nhóm"
+                        : "Gói dịch vụ",
+
+            price:
+                Number(pkg.price || 0),
+
+            duration: 30,
+
+            type:
+                pkg.plan_type || "unknown",
+
+            status:
+                pkg.status || "unknown",
+
+            starts_at:
+                pkg.starts_at || null,
+
+            expires_at:
+                pkg.expires_at || null
+        };
+    }
+
+
+    return {
+        name: "Gói dịch vụ",
+        price: 0,
+        duration: 30,
+        type: "unknown",
+        status: "unknown",
+        starts_at: null,
+        expires_at: null
+    };
 }
 
 
@@ -4812,23 +4900,25 @@ function getServicePackage(packageId) {
 
 function getPackageStartDate(item) {
 
-    const fields = [
-        "started_at",
-        "start_at",
-        "start_date",
-        "activated_at",
-        "created_at"
-    ];
+    if (item?.package?.starts_at) {
+        const date =
+            new Date(
+                item.package.starts_at
+            );
 
-
-    for (const field of fields) {
-
-        if (item[field]) {
-            return new Date(item[field]);
+        if (!isNaN(date.getTime())) {
+            return date;
         }
-
     }
 
+    if (item?.joined_at) {
+        const date =
+            new Date(item.joined_at);
+
+        if (!isNaN(date.getTime())) {
+            return date;
+        }
+    }
 
     return null;
 }
@@ -4840,61 +4930,17 @@ function getPackageStartDate(item) {
 
 function getPackageExpireDate(item) {
 
-    const fields = [
-        "expires_at",
-        "expired_at",
-        "end_at",
-        "end_date",
-        "expiry_date"
-    ];
+    if (item?.package?.expires_at) {
 
-
-    for (const field of fields) {
-
-        if (item[field]) {
-
-            const date =
-                new Date(item[field]);
-
-            if (!isNaN(date.getTime())) {
-                return date;
-            }
-
-        }
-
-    }
-
-
-    /*
-     * Nếu database chưa lưu ngày hết hạn,
-     * tính 30 ngày từ ngày bắt đầu.
-     */
-
-    const start =
-        getPackageStartDate(item);
-
-
-    if (start) {
-
-        const packageInfo =
-            getServicePackage(
-                item.package_id
+        const date =
+            new Date(
+                item.package.expires_at
             );
 
-
-        const expire =
-            new Date(start);
-
-
-        expire.setDate(
-            expire.getDate() +
-            packageInfo.duration
-        );
-
-
-        return expire;
+        if (!isNaN(date.getTime())) {
+            return date;
+        }
     }
-
 
     return null;
 }
