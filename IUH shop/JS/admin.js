@@ -1,6 +1,6 @@
-/* =========================================
-   SUPABASE
-========================================= */
+/* =========================================================
+   IUH SHOP ADMIN
+========================================================= */
 
 const SUPABASE_URL =
     "https://xecxofmogvqysejjpxvl.supabase.co";
@@ -14,512 +14,370 @@ const supabaseClient =
         SUPABASE_PUBLISHABLE_KEY
     );
 
+
 const DEFAULT_AVATAR =
     "../Images/default-avatar.svg";
 
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentAdmin = null;
+
 let users = [];
-let currentFilter = "all";
-
 let products = [];
-let currentProductFilter = "all";
+let orders = [];
+let forumPosts = [];
+let financeTransactions = [];
 
-/* =========================================
-   DASHBOARD ADMIN - DATABASE
-========================================= */
+let userFilter = "all";
+let productFilter = "all";
+let orderFilter = "all";
+let forumFilter = "all";
 
-let adminStats = {
-    totalUsers: 0,
-    totalProducts: 0,
-    totalOrders: 0,
-    pendingOrders: 0
-};
+let selectedUser = null;
+let selectedOrder = null;
 
 
-/* =========================================
-   FORMAT TIỀN
-========================================= */
+/* =========================================================
+   HELPERS
+========================================================= */
 
-function formatAdminCurrency(value) {
-    return new Intl.NumberFormat("vi-VN").format(
-        Number(value) || 0
-    ) + "đ";
+function $(id) {
+    return document.getElementById(id);
 }
 
 
-/* =========================================
-   TẢI THỐNG KÊ DASHBOARD
-========================================= */
+function escapeHTML(value) {
 
-async function loadAdminDashboardStats() {
-
-    try {
-
-        /* ==============================
-           TỔNG NGƯỜI DÙNG
-        ============================== */
-
-        const {
-            count: userCount,
-            error: userError
-        } = await supabaseClient
-            .from("users")
-            .select("*", {
-                count: "exact",
-                head: true
-            });
-
-        if (userError) {
-            throw userError;
-        }
-
-
-        /* ==============================
-           TỔNG SẢN PHẨM
-        ============================== */
-
-        const {
-            count: productCount,
-            error: productError
-        } = await supabaseClient
-            .from("products")
-            .select("*", {
-                count: "exact",
-                head: true
-            });
-
-        if (productError) {
-            throw productError;
-        }
-
-
-        /* ==============================
-           TỔNG ĐƠN HÀNG
-        ============================== */
-
-        const {
-            count: orderCount,
-            error: orderError
-        } = await supabaseClient
-            .from("orders")
-            .select("*", {
-                count: "exact",
-                head: true
-            });
-
-        if (orderError) {
-            throw orderError;
-        }
-
-
-        /* ==============================
-           ĐƠN CHỜ XỬ LÝ
-           
-           pending + confirmed
-        ============================== */
-
-        const {
-            count: pendingCount,
-            error: pendingError
-        } = await supabaseClient
-            .from("orders")
-            .select("*", {
-                count: "exact",
-                head: true
-            })
-            .in("status", [
-                "pending",
-                "confirmed"
-            ]);
-
-        if (pendingError) {
-            throw pendingError;
-        }
-
-
-        adminStats.totalUsers =
-            userCount || 0;
-
-        adminStats.totalProducts =
-            productCount || 0;
-
-        adminStats.totalOrders =
-            orderCount || 0;
-
-        adminStats.pendingOrders =
-            pendingCount || 0;
-
-
-        updateAdminDashboardStats();
-
-    }
-    catch (error) {
-
-        console.error(
-            "Lỗi tải thống kê Admin:",
-            error
-        );
-
-        updateAdminDashboardStats(true);
-    }
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 
-/* =========================================
-   HIỂN THỊ THỐNG KÊ
-========================================= */
+function formatMoney(value) {
 
-function updateAdminDashboardStats(
-    hasError = false
-) {
-
-    const totalUsers =
-        document.getElementById(
-            "totalUsers"
-        );
-
-    const totalProducts =
-        document.getElementById(
-            "totalProducts"
-        );
-
-    const totalOrders =
-        document.getElementById(
-            "totalOrders"
-        );
-
-    const pendingItems =
-        document.getElementById(
-            "pendingItems"
-        );
-
-
-    if (hasError) {
-
-        if (totalUsers) {
-            totalUsers.textContent = "!";
-        }
-
-        if (totalProducts) {
-            totalProducts.textContent = "!";
-        }
-
-        if (totalOrders) {
-            totalOrders.textContent = "!";
-        }
-
-        if (pendingItems) {
-            pendingItems.textContent = "!";
-        }
-
-        return;
-    }
-
-
-    if (totalUsers) {
-        totalUsers.textContent =
-            adminStats.totalUsers;
-    }
-
-    if (totalProducts) {
-        totalProducts.textContent =
-            adminStats.totalProducts;
-    }
-
-    if (totalOrders) {
-        totalOrders.textContent =
-            adminStats.totalOrders;
-    }
-
-    if (pendingItems) {
-        pendingItems.textContent =
-            adminStats.pendingOrders;
-    }
+    return (
+        Number(value || 0)
+            .toLocaleString("vi-VN")
+        + "đ"
+    );
 }
 
 
-/* =========================================
-   REALTIME ADMIN
-========================================= */
+function formatDate(value) {
 
-function setupAdminRealtime() {
+    if (!value) {
+        return "-";
+    }
 
-    /* ==============================
-       USERS
-    ============================== */
+    const date =
+        new Date(value);
 
-    supabaseClient
-        .channel("admin-users-realtime")
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "users"
-            },
-            async function () {
+    if (Number.isNaN(date.getTime())) {
+        return "-";
+    }
 
-                await loadAdminDashboardStats();
-
-                /*
-                   Nếu đang mở quản lý user
-                   thì tải lại danh sách
-                */
-                const verificationSection =
-                    document.getElementById(
-                        "verificationSection"
-                    );
-
-                if (
-                    verificationSection &&
-                    verificationSection.classList.contains("show")
-                ) {
-                    await loadUsers();
-                }
-            }
-        )
-        .subscribe();
-
-
-    /* ==============================
-       PRODUCTS
-    ============================== */
-
-    supabaseClient
-        .channel("admin-products-realtime")
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "products"
-            },
-            async function () {
-
-                await loadAdminDashboardStats();
-
-                /*
-                   Nếu đang mở quản lý sản phẩm
-                   thì tải lại danh sách
-                */
-                const productsSection =
-                    document.getElementById(
-                        "productsSection"
-                    );
-
-                if (
-                    productsSection &&
-                    productsSection.classList.contains("show")
-                ) {
-                    await loadProducts();
-                }
-            }
-        )
-        .subscribe();
-
-
-    /* ==============================
-       ORDERS
-    ============================== */
-
-    supabaseClient
-        .channel("admin-orders-realtime")
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "orders"
-            },
-            async function () {
-
-                console.log(
-                    "Admin: orders thay đổi"
-                );
-
-                await loadAdminDashboardStats();
-
-                /*
-                   Nếu sau này có khu vực
-                   quản lý đơn hàng thì
-                   có thể reload tại đây.
-                */
-                if (
-                    typeof loadAdminOrders ===
-                    "function"
-                ) {
-                    await loadAdminOrders();
-                }
-            }
-        )
-        .subscribe();
-
-
-    /* ==============================
-       WALLET ADMIN
-    ============================== */
-
-    supabaseClient
-        .channel("admin-wallet-realtime")
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "iuh_wallets"
-            },
-            async function () {
-
-                if (
-                    typeof loadAdminWallet ===
-                    "function"
-                ) {
-                    await loadAdminWallet();
-                }
-            }
-        )
-        .subscribe();
-
-
-    /* ==============================
-       WALLET TRANSACTIONS
-    ============================== */
-
-    supabaseClient
-        .channel("admin-wallet-transactions-realtime")
-        .on(
-            "postgres_changes",
-            {
-                event: "INSERT",
-                schema: "public",
-                table: "wallet_transactions"
-            },
-            async function () {
-
-                if (
-                    typeof loadAdminWallet ===
-                    "function"
-                ) {
-                    await loadAdminWallet();
-                }
-
-                if (
-                    typeof loadAdminWalletHistory ===
-                    "function"
-                ) {
-                    await loadAdminWalletHistory();
-                }
-            }
-        )
-        .subscribe();
+    return date.toLocaleString(
+        "vi-VN"
+    );
 }
 
 
-/* =========================================
-   KHỞI TẠO DASHBOARD
-========================================= */
+function isBoostActive(product) {
 
-async function initAdminDashboard() {
+    if (
+        product?.is_boosted !== true
+    ) {
+        return false;
+    }
 
-    /*
-       Tải số liệu ngay khi mở trang
-    */
-    await loadAdminDashboardStats();
+    if (!product.boost_expires_at) {
+        return false;
+    }
 
-    /*
-       Bật realtime
-    */
-    setupAdminRealtime();
+    return (
+        new Date(
+            product.boost_expires_at
+        ).getTime()
+        > Date.now()
+    );
 }
 
 
-/* =========================================
-   KIỂM TRA ADMIN
-========================================= */
+function roleText(role) {
+
+    if (role === "admin") {
+        return "Admin";
+    }
+
+    if (role === "moderator") {
+        return "Quản trị viên";
+    }
+
+    return "Sinh viên";
+}
+
+
+function orderStatusText(status) {
+
+    return {
+
+        pending: "Chờ xử lý",
+
+        confirmed: "Đã xác nhận",
+
+        shipping: "Đang giao",
+
+        delivered: "Đã giao",
+
+        completed: "Hoàn thành",
+
+        cancelled: "Đã hủy"
+
+    }[status] || status || "Không xác định";
+}
+
+
+function paymentText(method) {
+
+    return {
+
+        qr: "QR",
+
+        iuh_wallet: "IUH Wallet",
+
+        cod: "COD"
+
+    }[method] || method || "Không xác định";
+}
+
+
+/* =========================================================
+   ADMIN CHECK
+========================================================= */
 
 async function checkAdmin() {
 
-    const {
-        data: { user },
-        error: authError
-    } = await supabaseClient.auth.getUser();
+    console.log("========== CHECK ADMIN ==========");
 
-    if (authError || !user) {
-        window.location.href = "trangchu.html";
-        return null;
-    }
+    try {
 
-    const {
-        data: profile,
-        error: profileError
-    } = await supabaseClient
-        .from("users")
-        .select("fullname, role")
-        .eq("user_id", user.id)
-        .maybeSingle();
+        const {
+            data: {
+                user
+            },
+            error: authError
+        } =
+            await supabaseClient.auth.getUser();
 
-    if (profileError) {
 
-        console.error(
-            "Lỗi lấy profile:",
+        console.log(
+            "Auth user:",
+            user
+        );
+
+
+        /* =========================================
+           CHƯA ĐĂNG NHẬP
+        ========================================= */
+
+        if (
+            authError ||
+            !user
+        ) {
+
+            console.error(
+                "Không có phiên đăng nhập:",
+                authError
+            );
+
+            alert(
+                "Phiên đăng nhập không tồn tại. Vui lòng đăng nhập lại."
+            );
+
+            return null;
+        }
+
+
+        /* =========================================
+           LẤY PROFILE ADMIN
+        ========================================= */
+
+        const {
+            data: profile,
+            error: profileError
+        } =
+            await supabaseClient
+                .from("users")
+                .select("*")
+                .eq(
+                    "user_id",
+                    user.id
+                )
+                .maybeSingle();
+
+
+        console.log(
+            "User ID:",
+            user.id
+        );
+
+        console.log(
+            "Profile:",
+            profile
+        );
+
+        console.log(
+            "Profile error:",
             profileError
         );
 
+
+        /* =========================================
+           LỖI DATABASE / RLS
+        ========================================= */
+
+        if (profileError) {
+
+            console.error(
+                "Lỗi lấy profile:",
+                profileError
+            );
+
+            alert(
+                "Không lấy được thông tin quyền Admin.\n\n" +
+                profileError.message
+            );
+
+            return null;
+        }
+
+
+        /* =========================================
+           KHÔNG TÌM THẤY USER
+        ========================================= */
+
+        if (!profile) {
+
+            console.error(
+                "Không tìm thấy dòng users với user_id:",
+                user.id
+            );
+
+            alert(
+                "Tài khoản đăng nhập chưa có thông tin trong bảng users."
+            );
+
+            return null;
+        }
+
+
+        /* =========================================
+           KIỂM TRA ROLE
+        ========================================= */
+
+        const role =
+            String(
+                profile.role || ""
+            )
+            .trim()
+            .toLowerCase();
+
+
+        console.log(
+            "ROLE THỰC TẾ:",
+            profile.role
+        );
+
+
+        if (
+            role !== "admin"
+        ) {
+
+            alert(
+                "Tài khoản này chưa có quyền Admin.\n\n" +
+                "Role hiện tại: " +
+                (
+                    profile.role ||
+                    "NULL"
+                )
+            );
+
+            return null;
+        }
+
+
+        /* =========================================
+           XÁC NHẬN ADMIN
+        ========================================= */
+
+        console.log(
+            "✅ ADMIN ACCESS GRANTED"
+        );
+
+
+        const adminName =
+            document.getElementById(
+                "adminName"
+            );
+
+
+        if (adminName) {
+
+            adminName.textContent =
+                profile.fullname ||
+                "Admin";
+
+        }
+
+
+        return {
+            ...user,
+            profile
+        };
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "CHECK ADMIN ERROR:",
+            error
+        );
+
         alert(
-            "Không thể kiểm tra quyền Admin."
+            "Có lỗi khi kiểm tra quyền Admin:\n\n" +
+            error.message
         );
 
         return null;
     }
-
-    if (
-        !profile ||
-        profile.role !== "admin"
-    ) {
-
-        alert(
-            "Bạn không có quyền truy cập trang quản trị."
-        );
-
-        window.location.href =
-            "trangchu.html";
-
-        return null;
-    }
-
-    const adminName =
-        document.getElementById(
-            "adminName"
-        );
-
-    if (adminName) {
-
-        adminName.textContent =
-            profile.fullname ||
-            "Admin";
-    }
-
-    return user;
 }
 
 
-/* =========================================
-   ĐĂNG XUẤT
-========================================= */
+/* =========================================================
+   LOGOUT
+========================================================= */
 
-function setupLogout() {
-
-    const logoutButton =
-        document.getElementById(
-            "adminLogout"
-        );
-
-    if (!logoutButton) {
-        return;
-    }
-
-    logoutButton.addEventListener(
+$("adminLogout")
+    ?.addEventListener(
         "click",
         async function () {
+
+            const confirmed =
+                confirm(
+                    "Bạn có chắc muốn đăng xuất?"
+                );
+
+            if (!confirmed) {
+                return;
+            }
 
             const {
                 error
@@ -529,11 +387,6 @@ function setupLogout() {
                     .signOut();
 
             if (error) {
-
-                console.error(
-                    "Lỗi đăng xuất:",
-                    error
-                );
 
                 alert(
                     "Đăng xuất thất bại."
@@ -546,147 +399,124 @@ function setupLogout() {
                 "trangchu.html";
         }
     );
-}
-
-/* =========================================
-   QUẢN LÝ TIN ĐĂNG
-========================================= */
-
-function setupProductManagement() {
-
-    const manageProducts =
-        document.getElementById(
-            "manageProducts"
-        );
-
-    const productsSection =
-        document.getElementById(
-            "productsSection"
-        );
-
-    const closeProducts =
-        document.getElementById(
-            "closeProducts"
-        );
 
 
-    if (
-        !manageProducts ||
-        !productsSection
-    ) {
-        return;
-    }
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+const pageTitles = {
+
+    dashboard:
+        "Tổng quan",
+
+    users:
+        "Người dùng",
+
+    products:
+        "Tin đăng",
+
+    orders:
+        "Đơn hàng",
+
+    forum:
+        "Diễn đàn",
+
+    finance:
+        "Tài chính"
+
+};
 
 
-    /* =====================================
-       MỞ QUẢN LÝ TIN
-    ===================================== */
+function openPage(page) {
 
-    manageProducts.addEventListener(
-        "click",
-        async function () {
+    document
+        .querySelectorAll(".admin-page")
+        .forEach(
+            section => {
 
-            productsSection.classList.add(
-                "show"
-            );
-
-            productsSection.setAttribute(
-                "aria-hidden",
-                "false"
-            );
-
-
-            productsSection.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-
-
-            await loadProducts();
-
-        }
-    );
-
-
-    /* =====================================
-       ĐÓNG
-    ===================================== */
-
-    if (closeProducts) {
-
-        closeProducts.addEventListener(
-            "click",
-            function () {
-
-                productsSection.classList.remove(
-                    "show"
+                section.classList.toggle(
+                    "active",
+                    section.id ===
+                    `page-${page}`
                 );
-
-                productsSection.setAttribute(
-                    "aria-hidden",
-                    "true"
-                );
-
-
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                });
 
             }
         );
 
-    }
 
+    document
+        .querySelectorAll(".admin-nav-item[data-page]")
+        .forEach(
+            button => {
 
-    setupProductFilters();
+                button.classList.toggle(
+                    "active",
+                    button.dataset.page === page
+                );
 
-}
-
-
-/* =========================================
-   TÌM KIẾM + LỌC TIN
-========================================= */
-
-function setupProductFilters() {
-
-    const buttons =
-        document.querySelectorAll(
-            ".product-filter-button"
+            }
         );
 
 
-    buttons.forEach(
-        function (button) {
+    $("pageTitle").textContent =
+        pageTitles[page] ||
+        "Tổng quan";
+
+
+    if (page === "dashboard") {
+        loadDashboard();
+    }
+
+    if (page === "users") {
+        loadUsers();
+    }
+
+    if (page === "products") {
+        loadProducts();
+    }
+
+    if (page === "orders") {
+        loadOrders();
+    }
+
+    if (page === "forum") {
+        loadForumPosts();
+    }
+
+    if (page === "finance") {
+        loadFinance();
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+document
+    .querySelectorAll(
+        "[data-page]"
+    )
+    .forEach(
+        button => {
 
             button.addEventListener(
                 "click",
                 function () {
 
-                    buttons.forEach(
-                        function (item) {
+                    if (
+                        button.classList.contains(
+                            "disabled"
+                        )
+                    ) {
+                        return;
+                    }
 
-                            item.classList.remove(
-                                "active"
-                            );
-
-                        }
+                    openPage(
+                        button.dataset.page
                     );
-
-
-                    button.classList.add(
-                        "active"
-                    );
-
-
-                    currentProductFilter =
-                        button.dataset.productFilter ||
-                        "all";
-
-
-                    renderProducts();
-
-                    updateProductSummary();
 
                 }
             );
@@ -695,49 +525,1637 @@ function setupProductFilters() {
     );
 
 
-    const searchInput =
-        document.getElementById(
-            "productsSearch"
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+async function loadDashboard() {
+
+    try {
+
+        const [
+            userResult,
+            productResult,
+            orderResult,
+            boostedResult,
+            forumResult,
+            revenueResult
+        ] =
+        await Promise.all([
+
+            supabaseClient
+                .from("users")
+                .select(
+                    "user_id",
+                    {
+                        count: "exact",
+                        head: true
+                    }
+                ),
+
+            supabaseClient
+                .from("products")
+                .select(
+                    "id,status",
+                    {
+                        count: "exact",
+                        head: false
+                    }
+                ),
+
+            supabaseClient
+    .from("orders")
+    .select(
+        "id,status,created_at"
+    ),
+
+            supabaseClient
+                .from("products")
+                .select(
+                    "id,is_boosted,boost_expires_at"
+                ),
+
+            supabaseClient
+                .from("forum_posts")
+                .select(
+                    "id",
+                    {
+                        count: "exact",
+                        head: true
+                    }
+                ),
+
+            loadAdminRevenue()
+
+        ]);
+
+
+        const totalUsers =
+            userResult.count || 0;
+
+
+        const allProducts =
+            productResult.data || [];
+
+
+        const activeProducts =
+            allProducts.filter(
+                item =>
+                    item.status ===
+                    "active"
+            ).length;
+
+
+        const allOrders =
+            orderResult.data || [];
+
+
+        const pendingOrders =
+            allOrders.filter(
+                item =>
+                    [
+                        "pending",
+                        "confirmed",
+                        "shipping"
+                    ].includes(
+                        item.status
+                    )
+            ).length;
+
+
+        const boostedProducts =
+            (boostedResult.data || [])
+                .filter(
+                    isBoostActive
+                )
+                .length;
+
+
+        const revenue =
+            revenueResult;
+
+
+        $("statUsers").textContent =
+            totalUsers.toLocaleString(
+                "vi-VN"
+            );
+
+        $("statProducts").textContent =
+            activeProducts.toLocaleString(
+                "vi-VN"
+            );
+
+        $("statOrders").textContent =
+            allOrders.length.toLocaleString(
+                "vi-VN"
+            );
+
+        $("statPending").textContent =
+            pendingOrders.toLocaleString(
+                "vi-VN"
+            );
+
+
+        $("activityUsers").textContent =
+            totalUsers;
+
+        $("activityProducts").textContent =
+            activeProducts;
+
+        $("activityBoosted").textContent =
+            boostedProducts;
+
+        $("activityPosts").textContent =
+            forumResult.count || 0;
+
+
+        $("dashboardRevenue").textContent =
+            formatMoney(
+                revenue.total
+            );
+
+        $("revenuePlatform").textContent =
+            formatMoney(
+                revenue.platform
+            );
+
+        $("revenueBoost").textContent =
+            formatMoney(
+                revenue.boost
+            );
+
+        $("financeTotal").textContent =
+            formatMoney(
+                revenue.total
+            );
+
+        renderAdminCharts(
+    revenue.transactions || [],
+    allOrders || []
+);
+
+renderRecentTransactions(
+    revenue.transactions || []
+);
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
         );
 
+    }
+}
 
-    if (searchInput) {
 
-        searchInput.addEventListener(
-            "input",
-            function () {
+/* =========================================================
+   REVENUE
+========================================================= */
 
-                renderProducts();
+async function loadAdminRevenue() {
 
-                updateProductSummary();
+    try {
+
+        const {
+            data: admins,
+            error: adminError
+        } =
+            await supabaseClient
+                .from("users")
+                .select("user_id")
+                .eq(
+                    "role",
+                    "admin"
+                )
+                .limit(1);
+
+
+        if (adminError) {
+            throw adminError;
+        }
+
+
+        if (!admins?.length) {
+
+            return {
+                total: 0,
+                platform: 0,
+                boost: 0,
+                transactions: []
+            };
+
+        }
+
+
+        const {
+            data: wallet,
+            error: walletError
+        } =
+            await supabaseClient
+                .from("iuh_wallets")
+                .select("id")
+                .eq(
+                    "user_id",
+                    admins[0].user_id
+                )
+                .maybeSingle();
+
+
+        if (walletError) {
+            throw walletError;
+        }
+
+
+        if (!wallet) {
+
+            return {
+                total: 0,
+                platform: 0,
+                boost: 0,
+                transactions: []
+            };
+
+        }
+
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("wallet_transactions")
+                .select(`
+                    id,
+                    type,
+                    title,
+                    amount,
+                    description,
+                    created_at
+                `)
+                .eq(
+                    "wallet_id",
+                    wallet.id
+                )
+                .eq(
+                    "type",
+                    "fee"
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        const transactions =
+            data || [];
+
+
+        let platform = 0;
+        let boost = 0;
+
+
+        transactions.forEach(
+            transaction => {
+
+                const text =
+                    (
+                        transaction.title ||
+                        ""
+                    ).toLowerCase()
+                    + " "
+                    +
+                    (
+                        transaction.description ||
+                        ""
+                    ).toLowerCase();
+
+
+                if (
+                    text.includes("đẩy tin") ||
+                    text.includes("boost") ||
+                    text.includes("nổi bật")
+                ) {
+
+                    boost +=
+                        Number(
+                            transaction.amount
+                        ) || 0;
+
+                }
+
+                else {
+
+                    platform +=
+                        Number(
+                            transaction.amount
+                        ) || 0;
+
+                }
 
             }
         );
 
+
+        return {
+
+            total:
+                platform + boost,
+
+            platform,
+
+            boost,
+
+            transactions
+
+        };
+
     }
+
+    catch (error) {
+
+        console.error(
+            "Revenue error:",
+            error
+        );
+
+        return {
+            total: 0,
+            platform: 0,
+            boost: 0,
+            transactions: []
+        };
+    }
+}
+
+let revenueChartInstance = null;
+let ordersChartInstance = null;
+
+
+/* =========================
+   CHART - THEO THÁNG
+========================= */
+
+function getMonthKey(date) {
+    const d = new Date(date);
+
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+
+function formatMonthLabel(monthKey) {
+    const [year, month] = monthKey.split("-");
+
+    return `${month}/${year}`;
+}
+
+
+/* Lấy toàn bộ các tháng từ giao dịch đầu tiên đến hiện tại */
+function getAllMonths(items) {
+
+    const now = new Date();
+
+    let firstDate = now;
+
+    if (items && items.length > 0) {
+
+        const dates = items
+            .map(item => new Date(item.created_at))
+            .filter(date => !isNaN(date.getTime()));
+
+        if (dates.length > 0) {
+            firstDate = new Date(
+                Math.min(...dates.map(date => date.getTime()))
+            );
+        }
+    }
+
+    firstDate = new Date(
+        firstDate.getFullYear(),
+        firstDate.getMonth(),
+        1
+    );
+
+    const lastDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1
+    );
+
+    const months = [];
+
+    let current = new Date(firstDate);
+
+    while (current <= lastDate) {
+
+        const key =
+            `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}`;
+
+        months.push(key);
+
+        current.setMonth(current.getMonth() + 1);
+    }
+
+    return months;
+}
+
+
+/* =========================
+   BIỂU ĐỒ DOANH THU
+========================= */
+
+function renderRevenueChart(transactions) {
+
+    const canvas = $("revenueChart");
+
+    if (!canvas) return;
+
+    transactions = transactions || [];
+
+    const months = getAllMonths(transactions);
+
+    const revenueByMonth = months.map(monthKey => {
+
+        return transactions
+            .filter(transaction => {
+
+                return getMonthKey(transaction.created_at) === monthKey;
+
+            })
+            .reduce((total, transaction) => {
+
+                return total + Number(transaction.amount || 0);
+
+            }, 0);
+
+    });
+
+
+    /* Tổng doanh thu TOÀN BỘ */
+    const totalRevenue = transactions.reduce(
+        (total, transaction) =>
+            total + Number(transaction.amount || 0),
+        0
+    );
+
+
+    if ($("chartRevenueTotal")) {
+
+        $("chartRevenueTotal").textContent =
+            formatMoney(totalRevenue);
+
+    }
+
+
+    if (revenueChartInstance) {
+        revenueChartInstance.destroy();
+    }
+
+
+    const ctx = canvas.getContext("2d");
+
+
+    revenueChartInstance = new Chart(ctx, {
+
+        type: "line",
+
+        data: {
+
+            labels: months.map(formatMonthLabel),
+
+            datasets: [{
+
+                label: "Doanh thu",
+
+                data: revenueByMonth,
+
+                borderWidth: 3,
+
+                tension: 0.35,
+
+                fill: true,
+
+                pointRadius: 4,
+
+                pointHoverRadius: 6
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            interaction: {
+                intersect: false,
+                mode: "index"
+            },
+
+            plugins: {
+
+                legend: {
+                    display: false
+                },
+
+                tooltip: {
+
+                    callbacks: {
+
+                        label: function(context) {
+
+                            return " " +
+                                formatMoney(context.raw);
+
+                        }
+
+                    }
+
+                }
+
+            },
+
+            scales: {
+
+                x: {
+
+                    ticks: {
+                        maxRotation: 0
+                    }
+
+                },
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+
+                        callback: function(value) {
+
+                            return Number(value)
+                                .toLocaleString("vi-VN") + "đ";
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+}
+
+
+/* =========================
+   BIỂU ĐỒ ĐƠN HÀNG
+========================= */
+
+function renderOrdersChart(allOrders) {
+
+    const canvas = $("ordersChart");
+
+    if (!canvas) return;
+
+    allOrders = allOrders || [];
+
+    const months = getAllMonths(allOrders);
+
+
+    const ordersByMonth = months.map(monthKey => {
+
+        return allOrders.filter(order => {
+
+            return getMonthKey(order.created_at) === monthKey;
+
+        }).length;
+
+    });
+
+
+    /* Tổng đơn từ trước tới nay */
+    const totalOrders = allOrders.length;
+
+
+    if ($("chartOrdersTotal")) {
+
+        $("chartOrdersTotal").textContent =
+            totalOrders.toLocaleString("vi-VN");
+
+    }
+
+
+    if (ordersChartInstance) {
+        ordersChartInstance.destroy();
+    }
+
+
+    const ctx = canvas.getContext("2d");
+
+
+    ordersChartInstance = new Chart(ctx, {
+
+        type: "bar",
+
+        data: {
+
+            labels: months.map(formatMonthLabel),
+
+            datasets: [{
+
+                label: "Đơn hàng",
+
+                data: ordersByMonth,
+
+                borderRadius: 8,
+
+                borderWidth: 0
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+                    display: false
+                }
+
+            },
+
+            scales: {
+
+                x: {
+
+                    ticks: {
+                        maxRotation: 0
+                    }
+
+                },
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+                        precision: 0
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+}
+
+
+/* =========================
+   RENDER CẢ 2 BIỂU ĐỒ
+========================= */
+
+function renderAdminCharts(transactions, allOrders) {
+
+    renderRevenueChart(transactions || []);
+
+    renderOrdersChart(allOrders || []);
 
 }
 
 
-/* =========================================
-   TẢI TIN ĐĂNG
-========================================= */
+/* =========================
+   GIAO DỊCH PHÁT SINH
+========================= */
 
-async function loadProducts() {
+function renderRecentTransactions(transactions) {
+
+    const container = $("dashboardTransactions");
+
+    if (!container) return;
+
+    transactions = transactions || [];
+
+
+    /* Mới nhất trước */
+    const sortedTransactions = [...transactions]
+        .sort((a, b) => {
+
+            return new Date(b.created_at) -
+                   new Date(a.created_at);
+
+        });
+
+
+    if (sortedTransactions.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty-transaction">
+                Chưa có giao dịch phát sinh
+            </div>
+        `;
+
+        return;
+    }
+
+
+    /* Hiển thị 10 giao dịch gần nhất */
+    container.innerHTML = sortedTransactions
+        .slice(0, 10)
+        .map(transaction => {
+
+            const date = new Date(transaction.created_at);
+
+            const dateText = date.toLocaleString("vi-VN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+
+            const amount = Number(transaction.amount || 0);
+
+
+            const description =
+                transaction.description ||
+                transaction.title ||
+                "Giao dịch hệ thống";
+
+
+            let typeText = "Phí sàn";
+            let icon = "💰";
+
+
+            const content =
+                `${transaction.title || ""} ${description}`
+                    .toLowerCase();
+
+
+            if (
+                content.includes("đẩy tin") ||
+                content.includes("boost") ||
+                content.includes("nổi bật")
+            ) {
+
+                typeText = "Đẩy tin";
+                icon = "🔥";
+
+            }
+
+
+            return `
+
+                <div class="dashboard-transaction-item">
+
+                    <div class="transaction-icon">
+                        ${icon}
+                    </div>
+
+                    <div class="transaction-info">
+
+                        <strong>
+                            ${typeText}
+                        </strong>
+
+                        <span>
+                            ${description}
+                        </span>
+
+                        <small>
+                            ${dateText}
+                        </small>
+
+                    </div>
+
+                    <div class="transaction-amount">
+                        +${formatMoney(amount)}
+                    </div>
+
+                </div>
+
+            `;
+
+        })
+        .join("");
+}
+
+
+/* =========================================================
+   USERS
+========================================================= */
+
+async function loadUsers() {
 
     const list =
-        document.getElementById(
-            "productsList"
+        $("usersList");
+
+
+    list.innerHTML = `
+        <div class="loading-box">
+            Đang tải người dùng...
+        </div>
+    `;
+
+
+    try {
+
+        /*
+         * Dùng select("*") để không bị giới hạn
+         * khi bảng users có thêm MSSV, khoa, ngành...
+         */
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("users")
+                .select("*")
+                .order(
+                    "fullname",
+                    {
+                        ascending: true
+                    }
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        users =
+            data || [];
+
+
+        renderUsers();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Load users:",
+            error
         );
 
+        list.innerHTML = `
+            <div class="error-box">
+                Không thể tải danh sách người dùng.
+                <br><br>
+                ${escapeHTML(
+                    error.message
+                )}
+            </div>
+        `;
+    }
+}
 
-    if (!list) {
+
+function getFilteredUsers() {
+
+    const keyword =
+        (
+            $("userSearch")?.value ||
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    return users.filter(
+        user => {
+
+            const verified =
+                user.student_verified === true;
+
+
+            const filterMatch =
+                userFilter === "all" ||
+
+                (
+                    userFilter === "verified" &&
+                    verified
+                ) ||
+
+                (
+                    userFilter === "unverified" &&
+                    !verified
+                );
+
+
+            const searchable =
+                [
+                    user.fullname,
+                    user.email,
+
+                    user.student_id,
+                    user.student_code,
+                    user.mssv,
+
+                    user.faculty,
+                    user.department,
+                    user.major,
+                    user.class,
+                    user.class_code
+
+                ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+
+            return (
+                filterMatch &&
+                (
+                    !keyword ||
+                    searchable.includes(keyword)
+                )
+            );
+
+        }
+    );
+}
+
+
+function renderUsers() {
+
+    const list =
+        $("usersList");
+
+
+    const filtered =
+        getFilteredUsers();
+
+
+    $("userSummary").textContent =
+        `${filtered.length} người dùng đang hiển thị · ` +
+        `${users.filter(
+            u => u.student_verified === true
+        ).length} tài khoản đã xác thực`;
+
+
+    if (!filtered.length) {
+
+        list.innerHTML = `
+            <div class="empty-box">
+                Không tìm thấy người dùng phù hợp.
+            </div>
+        `;
+
         return;
     }
 
 
     list.innerHTML = `
-        <div class="products-loading">
+
+        <div class="user-table-head">
+
+            <span>NGƯỜI DÙNG</span>
+            <span>VAI TRÒ</span>
+            <span>XÁC THỰC</span>
+            <span></span>
+
+        </div>
+
+        ${
+            filtered
+                .map(
+                    createUserRow
+                )
+                .join("")
+        }
+
+    `;
+}
+
+
+function createUserRow(user) {
+
+    const verified =
+        user.student_verified === true;
+
+
+    const badge =
+        verified ||
+        user.role === "admin" ||
+        user.role === "moderator"
+
+            ? "✓"
+
+            : "";
+
+
+    let action = `
+        <button
+            class="small-button view"
+            type="button"
+            data-user-view="${escapeHTML(
+                user.user_id
+            )}"
+        >
+            Xem
+        </button>
+    `;
+
+
+    if (
+        user.role === "user"
+    ) {
+
+        action += verified
+
+            ?
+
+            `
+                <button
+                    class="small-button revoke"
+                    type="button"
+                    data-user-verify="false"
+                    data-user-id="${escapeHTML(
+                        user.user_id
+                    )}"
+                >
+                    Thu hồi
+                </button>
+            `
+
+            :
+
+            `
+                <button
+                    class="small-button grant"
+                    type="button"
+                    data-user-verify="true"
+                    data-user-id="${escapeHTML(
+                        user.user_id
+                    )}"
+                >
+                    Cấp ✓
+                </button>
+            `;
+    }
+
+
+    return `
+
+        <div class="user-row">
+
+            <div class="user-info">
+
+                <img
+                    class="user-avatar"
+                    src="${escapeHTML(
+                        user.avatar_url ||
+                        DEFAULT_AVATAR
+                    )}"
+                    alt="Avatar"
+                    onerror="this.src='${DEFAULT_AVATAR}'"
+                >
+
+                <div class="user-name">
+
+                    <strong>
+
+                        ${escapeHTML(
+                            user.fullname ||
+                            "Chưa cập nhật"
+                        )}
+
+                        ${
+                            badge
+                                ? `
+                                    <span class="verify-ok">
+                                        ✓
+                                    </span>
+                                `
+                                : ""
+                        }
+
+                    </strong>
+
+                    <span>
+                        ${escapeHTML(
+                            user.email ||
+                            "Chưa có email"
+                        )}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="user-role">
+                ${roleText(
+                    user.role
+                )}
+            </div>
+
+
+            <div
+                class="user-verify ${
+                    verified
+                        ? "verify-ok"
+                        : "verify-no"
+                }"
+            >
+                ${
+                    verified
+                        ? "Đã xác thực"
+                        : "Chưa xác thực"
+                }
+            </div>
+
+
+            <div class="user-actions">
+                ${action}
+            </div>
+
+        </div>
+
+    `;
+}
+
+
+/* =========================================================
+   USER EVENTS
+========================================================= */
+
+document.addEventListener(
+    "click",
+    async function(event) {
+
+        const viewButton =
+            event.target.closest(
+                "[data-user-view]"
+            );
+
+
+        if (viewButton) {
+
+            const userId =
+                viewButton.dataset.userView;
+
+            openUserDetail(
+                userId
+            );
+
+            return;
+        }
+
+
+        const verifyButton =
+            event.target.closest(
+                "[data-user-verify]"
+            );
+
+
+        if (verifyButton) {
+
+            const userId =
+                verifyButton.dataset.userId;
+
+            const verified =
+                verifyButton.dataset.userVerify ===
+                "true";
+
+
+            await setUserVerification(
+                userId,
+                verified
+            );
+
+        }
+
+    }
+);
+
+
+async function setUserVerification(
+    userId,
+    verified
+) {
+
+    const message =
+        verified
+
+            ? "Cấp tích xác thực cho tài khoản này?"
+
+            : "Thu hồi tích xác thực của tài khoản này?";
+
+
+    if (!confirm(message)) {
+        return;
+    }
+
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .rpc(
+                    "admin_set_student_verified",
+                    {
+                        target_user_id:
+                            userId,
+
+                        verified:
+                            verified
+                    }
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        alert(
+            verified
+                ? "Đã cấp tích xác thực."
+                : "Đã thu hồi tích xác thực."
+        );
+
+
+        await loadUsers();
+        await loadDashboard();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+        alert(
+            error.message ||
+            "Không thể cập nhật xác thực."
+        );
+    }
+}
+
+
+/* =========================================================
+   USER DETAIL
+========================================================= */
+
+function getUserField(
+    user,
+    keys
+) {
+
+    for (
+        const key of keys
+    ) {
+
+        if (
+            user[key] !== undefined &&
+            user[key] !== null &&
+            String(user[key]).trim() !== ""
+        ) {
+
+            return user[key];
+
+        }
+
+    }
+
+    return null;
+}
+
+
+function getUserDetailFields(user) {
+
+    const fields = [];
+
+
+    function add(
+        label,
+        keys,
+        full = false
+    ) {
+
+        const value =
+            getUserField(
+                user,
+                keys
+            );
+
+
+        if (
+            value !== null
+        ) {
+
+            fields.push({
+                label,
+                value,
+                full
+            });
+
+        }
+
+    }
+
+
+    /*
+     * Các tên cột phổ biến.
+     * Nếu database của bạn dùng tên nào
+     * trong số này thì Admin sẽ tự hiển thị.
+     */
+
+    add(
+        "Mã số sinh viên",
+        [
+            "student_id",
+            "student_code",
+            "mssv",
+            "student_number"
+        ]
+    );
+
+
+    add(
+        "Khoa",
+        [
+            "faculty",
+            "department",
+            "faculty_name"
+        ]
+    );
+
+
+    add(
+        "Ngành",
+        [
+            "major",
+            "major_name",
+            "program",
+            "program_name"
+        ]
+    );
+
+
+    add(
+        "Lớp",
+        [
+            "class_code",
+            "class_name",
+            "class"
+        ]
+    );
+
+
+    add(
+        "Email",
+        [
+            "email"
+        ]
+    );
+
+
+    add(
+        "Số điện thoại",
+        [
+            "phone",
+            "phone_number"
+        ]
+    );
+
+
+    add(
+        "Vai trò",
+        [
+            "role"
+        ]
+    );
+
+
+    add(
+        "Trạng thái xác thực",
+        [
+            "verification_status"
+        ]
+    );
+
+
+    add(
+        "Phương thức xác thực",
+        [
+            "verification_method"
+        ]
+    );
+
+
+    add(
+        "Ngày xác thực",
+        [
+            "verified_at"
+        ]
+    );
+
+
+    add(
+        "Ngày tạo tài khoản",
+        [
+            "created_at"
+        ]
+    );
+
+
+    return fields;
+}
+
+
+function openUserDetail(
+    userId
+) {
+
+    const user =
+        users.find(
+            item =>
+                String(item.user_id) ===
+                String(userId)
+        );
+
+
+    if (!user) {
+        return;
+    }
+
+
+    selectedUser =
+        user;
+
+
+    $("detailAvatar").src =
+        user.avatar_url ||
+        DEFAULT_AVATAR;
+
+
+    $("detailName").textContent =
+        user.fullname ||
+        "Chưa cập nhật";
+
+
+    $("detailEmail").textContent =
+        user.email ||
+        "Chưa có email";
+
+
+    const verified =
+        user.student_verified === true;
+
+
+    $("detailStatus").innerHTML =
+
+        verified
+
+            ?
+
+            `
+                <span class="status-pill status-active">
+                    ✓ Đã xác thực sinh viên
+                </span>
+            `
+
+            :
+
+            `
+                <span class="status-pill status-hidden">
+                    Chưa xác thực sinh viên
+                </span>
+            `;
+
+
+    const fields =
+        getUserDetailFields(
+            user
+        );
+
+
+    $("userDetailGrid").innerHTML =
+        fields.length
+
+            ?
+
+            fields.map(
+                field => `
+                    <div class="detail-item ${
+                        field.full
+                            ? "full"
+                            : ""
+                    }">
+
+                        <span>
+                            ${escapeHTML(
+                                field.label
+                            )}
+                        </span>
+
+                        <strong>
+                            ${escapeHTML(
+                                field.value
+                            )}
+                        </strong>
+
+                    </div>
+                `
+            ).join("")
+
+            :
+
+            `
+                <div class="detail-item full">
+                    <span>Thông tin sinh viên</span>
+                    <strong>
+                        Chưa có thông tin MSSV/khoa/ngành
+                        trong dữ liệu tài khoản.
+                    </strong>
+                </div>
+            `;
+
+
+    const button =
+        $("detailVerificationButton");
+
+
+    if (
+        user.role === "user"
+    ) {
+
+        button.style.display =
+            "inline-flex";
+
+        button.textContent =
+            verified
+                ? "Thu hồi xác thực"
+                : "Cấp xác thực";
+
+        button.dataset.userId =
+            user.user_id;
+
+        button.dataset.verified =
+            verified
+                ? "false"
+                : "true";
+
+        button.className =
+            verified
+                ? "secondary-button"
+                : "primary-button";
+
+    }
+
+    else {
+
+        button.style.display =
+            "none";
+    }
+
+
+    $("userModal").hidden =
+        false;
+}
+
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+async function loadProducts() {
+
+    const list =
+        $("productsList");
+
+
+    list.innerHTML = `
+        <div class="loading-box">
             Đang tải tin đăng...
         </div>
     `;
@@ -745,10 +2163,7 @@ async function loadProducts() {
 
     try {
 
-        const {
-            data: productData,
-            error: productError
-        } =
+        let result =
             await supabaseClient
                 .from("products")
                 .select(`
@@ -756,10 +2171,15 @@ async function loadProducts() {
                     seller_id,
                     name,
                     category,
+                    quantity,
                     price,
+                    description,
                     image_urls,
                     status,
-                    created_at
+                    created_at,
+                    is_boosted,
+                    boost_started_at,
+                    boost_expires_at
                 `)
                 .order(
                     "created_at",
@@ -769,85 +2189,90 @@ async function loadProducts() {
                 );
 
 
-        if (productError) {
-            throw productError;
+        /*
+         * Nếu database chưa có cột boost,
+         * vẫn cho Admin xem tin bình thường.
+         */
+
+        if (result.error) {
+
+            result =
+                await supabaseClient
+                    .from("products")
+                    .select(`
+                        id,
+                        seller_id,
+                        name,
+                        category,
+                        quantity,
+                        price,
+                        description,
+                        image_urls,
+                        status,
+                        created_at
+                    `)
+                    .order(
+                        "created_at",
+                        {
+                            ascending: false
+                        }
+                    );
+
+        }
+
+
+        if (result.error) {
+            throw result.error;
         }
 
 
         products =
-            productData || [];
+            result.data || [];
 
 
         await attachProductSellers();
 
 
-        updateTotalProducts();
-
         renderProducts();
-
-        updateProductSummary();
 
     }
 
     catch (error) {
 
         console.error(
-            "Lỗi tải tin đăng:",
+            "Products error:",
             error
         );
 
-
         list.innerHTML = `
-
-            <div class="products-error">
-
-                Không thể tải danh sách tin đăng.
-
+            <div class="error-box">
+                Không thể tải tin đăng.
                 <br><br>
-
-                ${escapeHtml(
-                    error.message || ""
+                ${escapeHTML(
+                    error.message
                 )}
-
             </div>
-
         `;
-
     }
-
 }
 
 
-/* =========================================
-   LẤY THÔNG TIN NGƯỜI BÁN
-========================================= */
-
 async function attachProductSellers() {
 
-    const sellerIds = [
-        ...new Set(
-            products
-                .map(
-                    product =>
-                        product.seller_id
-                )
-                .filter(Boolean)
-        )
-    ];
+    const sellerIds =
+        [
+            ...new Set(
+                products
+                    .map(
+                        item =>
+                            item.seller_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
 
 
-    if (
-        sellerIds.length === 0
-    ) {
-
-        products =
-            products.map(
-                product => ({
-                    ...product,
-                    seller: null
-                })
-            );
-
+    if (!sellerIds.length) {
         return;
     }
 
@@ -862,9 +2287,7 @@ async function attachProductSellers() {
                 user_id,
                 fullname,
                 email,
-                avatar_url,
-                role,
-                student_verified
+                avatar_url
             `)
             .in(
                 "user_id",
@@ -877,7 +2300,7 @@ async function attachProductSellers() {
     }
 
 
-    const sellerMap =
+    const map =
         new Map(
             (data || []).map(
                 user => [
@@ -893,143 +2316,156 @@ async function attachProductSellers() {
     products =
         products.map(
             product => ({
-
                 ...product,
 
                 seller:
-                    sellerMap.get(
+                    map.get(
                         String(
                             product.seller_id
                         )
                     ) || null
-
             })
         );
-
 }
 
 
-/* =========================================
-   LỌC TIN
-========================================= */
-
 function getFilteredProducts() {
-
-    const searchInput =
-        document.getElementById(
-            "productsSearch"
-        );
-
 
     const keyword =
         (
-            searchInput?.value ||
+            $("productSearch")?.value ||
             ""
         )
-            .trim()
-            .toLowerCase();
+        .trim()
+        .toLowerCase();
 
 
     return products.filter(
-        function (product) {
+        product => {
 
             const status =
                 product.status ||
                 "active";
 
 
-            const filterMatch =
-                currentProductFilter ===
-                    "all" ||
-
-                status ===
-                    currentProductFilter;
-
-
-            const productName =
-                (
-                    product.name ||
-                    ""
-                )
-                    .toLowerCase();
-
-
-            const sellerName =
-                (
-                    product.seller?.fullname ||
-                    ""
-                )
-                    .toLowerCase();
-
-
-            const sellerEmail =
-                (
-                    product.seller?.email ||
-                    ""
-                )
-                    .toLowerCase();
-
-
-            const searchMatch =
-                !keyword ||
-
-                productName.includes(
-                    keyword
-                ) ||
-
-                sellerName.includes(
-                    keyword
-                ) ||
-
-                sellerEmail.includes(
-                    keyword
+            const boosted =
+                isBoostActive(
+                    product
                 );
+
+
+            let filterMatch =
+                productFilter ===
+                "all";
+
+
+            if (
+                productFilter ===
+                "active"
+            ) {
+                filterMatch =
+                    status === "active";
+            }
+
+
+            if (
+                productFilter ===
+                "hidden"
+            ) {
+                filterMatch =
+                    status === "hidden";
+            }
+
+
+            if (
+                productFilter ===
+                "boosted"
+            ) {
+                filterMatch =
+                    boosted;
+            }
+
+
+            const text =
+                [
+                    product.name,
+                    product.category,
+                    product.seller?.fullname,
+                    product.seller?.email
+                ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
 
 
             return (
                 filterMatch &&
-                searchMatch
+                (
+                    !keyword ||
+                    text.includes(keyword)
+                )
             );
 
         }
     );
-
 }
 
 
-/* =========================================
-   HIỂN THỊ TIN
-========================================= */
+function getProductImage(
+    imageUrls
+) {
+
+    if (
+        Array.isArray(imageUrls) &&
+        imageUrls.length
+    ) {
+
+        return imageUrls[0];
+
+    }
+
+
+    if (
+        typeof imageUrls === "string" &&
+        imageUrls.trim()
+    ) {
+
+        return imageUrls;
+
+    }
+
+
+    return "";
+}
+
 
 function renderProducts() {
 
     const list =
-        document.getElementById(
-            "productsList"
-        );
-
-
-    if (!list) {
-        return;
-    }
+        $("productsList");
 
 
     const filtered =
         getFilteredProducts();
 
 
-    if (
-        filtered.length === 0
-    ) {
+    const boostedCount =
+        products.filter(
+            isBoostActive
+        ).length;
+
+
+    $("productSummary").textContent =
+        `${filtered.length} tin đang hiển thị · ` +
+        `${boostedCount} tin nổi bật đang hoạt động`;
+
+
+    if (!filtered.length) {
 
         list.innerHTML = `
-
-            <div class="products-empty">
-
+            <div class="empty-box">
                 Không tìm thấy tin đăng phù hợp.
-
             </div>
-
         `;
 
         return;
@@ -1042,20 +2478,24 @@ function renderProducts() {
                 createProductCard
             )
             .join("");
-
 }
 
-
-/* =========================================
-   CARD TIN ĐĂNG
-========================================= */
 
 function createProductCard(
     product
 ) {
 
-    const seller =
-        product.seller || {};
+    const active =
+        (
+            product.status ||
+            "active"
+        ) === "active";
+
+
+    const boosted =
+        isBoostActive(
+            product
+        );
 
 
     const image =
@@ -1064,104 +2504,155 @@ function createProductCard(
         );
 
 
-    const status =
-        product.status ||
-        "active";
-
-
-    const isActive =
-        status === "active";
-
-
-    const price =
-        Number.isFinite(
-            Number(
-                product.price
-            )
-        )
-
-            ?
-
-            new Intl.NumberFormat(
-                "vi-VN"
-            ).format(
-                Number(
-                    product.price
-                )
-            ) + "đ"
-
-            :
-
-            "Liên hệ";
-
-
-    const createdAt =
-        product.created_at
-
-            ?
-
-            new Date(
-                product.created_at
-            ).toLocaleDateString(
-                "vi-VN"
-            )
-
-            :
-
-            "";
-
-
     return `
 
-        <article
-            class="product-admin-card"
-        >
+        <article class="product-admin-card">
 
-            <img
-                class="product-admin-image"
+            <div class="product-image">
 
-                src="${escapeAttribute(
+                ${
                     image
-                )}"
 
-                alt="Ảnh sản phẩm"
+                        ?
 
-                onerror="
-                    this.src='../Images/default-product.png'
-                "
-            >
+                        `
+                            <img
+                                src="${escapeHTML(
+                                    image
+                                )}"
+                                alt="${escapeHTML(
+                                    product.name ||
+                                    "Sản phẩm"
+                                )}"
+                            >
+                        `
+
+                        :
+
+                        `
+                            <div
+                                style="
+                                    width:100%;
+                                    height:100%;
+                                    display:flex;
+                                    align-items:center;
+                                    justify-content:center;
+                                    font-size:40px;
+                                "
+                            >
+                                📦
+                            </div>
+                        `
+                }
 
 
-            <div
-                class="product-admin-info"
-            >
+                ${
+                    boosted
 
-                <div
-                    class="product-admin-title-row"
-                >
+                        ?
 
-                    <strong
-                        class="product-admin-name"
-                    >
+                        `
+                            <span class="product-featured">
+                                🔥 NỔI BẬT
+                            </span>
+                        `
 
-                        ${escapeHtml(
-                            product.name ||
-                            "Tin đăng không tên"
+                        : ""
+                }
+
+
+                ${
+                    !active
+
+                        ?
+
+                        `
+                            <span class="product-hidden">
+                                ĐANG ẨN
+                            </span>
+                        `
+
+                        : ""
+                }
+
+            </div>
+
+
+            <div class="product-body">
+
+                <div class="product-title">
+                    ${escapeHTML(
+                        product.name ||
+                        "Không có tên"
+                    )}
+                </div>
+
+
+                <div class="product-price">
+                    ${formatMoney(
+                        Number(
+                            product.price
+                        ) || 0
+                    )}
+                </div>
+
+
+                <div class="product-meta">
+
+                    <span>
+                        Người bán:
+                        ${escapeHTML(
+                            product.seller?.fullname ||
+                            "Không xác định"
                         )}
+                    </span>
 
-                    </strong>
+                    <span>
+                        Danh mục:
+                        ${escapeHTML(
+                            product.category ||
+                            "Chưa phân loại"
+                        )}
+                    </span>
+
+                    <span>
+                        Số lượng:
+                        ${escapeHTML(
+                            product.quantity ??
+                            "0"
+                        )}
+                    </span>
+
+                    ${
+                        boosted
+
+                            ?
+
+                            `
+                                <span>
+                                    Hết nổi bật:
+                                    ${formatDate(
+                                        product.boost_expires_at
+                                    )}
+                                </span>
+                            `
+
+                            : ""
+                    }
+
+                </div>
 
 
-                    <span
-                        class="product-admin-status ${
-                            isActive
-                                ? "is-active"
-                                : "is-hidden"
-                        }"
-                    >
+                <div class="product-status-line">
+
+                    <span class="status-pill ${
+                        active
+                            ? "status-active"
+                            : "status-hidden"
+                    }">
 
                         ${
-                            isActive
+                            active
                                 ? "Đang hiển thị"
                                 : "Đang ẩn"
                         }
@@ -1171,441 +2662,62 @@ function createProductCard(
                 </div>
 
 
-                <span
-                    class="product-admin-meta"
-                >
+                <div class="product-actions">
 
-                    Người bán:
+                    <button
+                        class="toggle"
+                        type="button"
+                        data-product-action="${
+                            active
+                                ? "hide"
+                                : "show"
+                        }"
+                        data-product-id="${escapeHTML(
+                            product.id
+                        )}"
+                    >
 
-                    ${escapeHtml(
-                        seller.fullname ||
-                        "Không xác định"
-                    )}
+                        ${
+                            active
+                                ? "Ẩn tin"
+                                : "Hiện tin"
+                        }
 
-                </span>
-
-
-                <span
-                    class="product-admin-meta"
-                >
-
-                    ${escapeHtml(
-                        product.category ||
-                        "Chưa phân loại"
-                    )}
-
-                    · ${price}
-
-                    ${
-                        createdAt
-                            ? `· ${createdAt}`
-                            : ""
-                    }
-
-                </span>
-
-            </div>
+                    </button>
 
 
-            <div
-                class="product-admin-actions"
-            >
+                    <button
+                        class="delete"
+                        type="button"
+                        data-product-action="delete"
+                        data-product-id="${escapeHTML(
+                            product.id
+                        )}"
+                    >
+                        Xóa
+                    </button>
 
-                <button
-                    type="button"
-
-                    class="product-admin-action ${
-                        isActive
-                            ? "hide"
-                            : "show"
-                    }"
-
-                    data-product-action="${
-                        isActive
-                            ? "hide"
-                            : "show"
-                    }"
-
-                    data-product-id="${escapeAttribute(
-                        product.id
-                    )}"
-                >
-
-                    ${
-                        isActive
-                            ? "Ẩn tin"
-                            : "Hiện tin"
-                    }
-
-                </button>
-
-
-                <button
-                    type="button"
-
-                    class="product-admin-action delete"
-
-                    data-product-action="delete"
-
-                    data-product-id="${escapeAttribute(
-                        product.id
-                    )}"
-                >
-
-                    Xóa
-
-                </button>
+                </div>
 
             </div>
 
         </article>
 
     `;
-
 }
 
 
-/* =========================================
-   LẤY ẢNH SẢN PHẨM
-========================================= */
-
-function getProductImage(
-    value
-) {
-
-    if (
-        Array.isArray(value) &&
-        value.length > 0
-    ) {
-
-        return value[0];
-
-    }
-
-
-    if (
-        typeof value ===
-        "string"
-    ) {
-
-        const trimmed =
-            value.trim();
-
-
-        if (!trimmed) {
-
-            return "../Images/default-product.png";
-
-        }
-
-
-        try {
-
-            const parsed =
-                JSON.parse(
-                    trimmed
-                );
-
-
-            if (
-                Array.isArray(parsed) &&
-                parsed.length > 0
-            ) {
-
-                return parsed[0];
-
-            }
-
-        }
-
-        catch (error) {
-
-            return trimmed;
-
-        }
-
-    }
-
-
-    return "../Images/default-product.png";
-
-}
-
-
-/* =========================================
-   CẬP NHẬT TỔNG SẢN PHẨM
-========================================= */
-
-function updateTotalProducts() {
-
-    const totalProducts =
-        document.getElementById(
-            "totalProducts"
-        );
-
-
-    if (totalProducts) {
-
-        totalProducts.textContent =
-            products.length;
-
-    }
-
-}
-
-
-/* =========================================
-   THỐNG KÊ TIN
-========================================= */
-
-function updateProductSummary() {
-
-    const summary =
-        document.getElementById(
-            "productsSummary"
-        );
-
-
-    if (!summary) {
-        return;
-    }
-
-
-    const active =
-        products.filter(
-            product =>
-                (
-                    product.status ||
-                    "active"
-                ) === "active"
-        ).length;
-
-
-    const hidden =
-        products.filter(
-            product =>
-                product.status ===
-                "hidden"
-        ).length;
-
-
-    summary.textContent =
-
-        `Có ${products.length} tin đăng · ` +
-
-        `${active} đang hiển thị · ` +
-
-        `${hidden} đang ẩn · ` +
-
-        `Đang hiển thị ${
-            getFilteredProducts().length
-        }`;
-
-}
-
-
-/* =========================================
-   ẨN / HIỆN TIN
-========================================= */
-
-async function changeProductStatus(
-    productId,
-    newStatus
-) {
-
-    const product =
-        products.find(
-            item =>
-                String(item.id) ===
-                String(productId)
-        );
-
-
-    if (!product) {
-        return;
-    }
-
-
-    const message =
-        newStatus === "hidden"
-
-            ?
-
-            `Bạn có chắc muốn ẩn tin "${
-                product.name ||
-                "này"
-            }" không?`
-
-            :
-
-            `Bạn có muốn hiện lại tin "${
-                product.name ||
-                "này"
-            }" không?`;
-
-
-    if (
-        !confirm(message)
-    ) {
-        return;
-    }
-
-
-    try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from("products")
-                .update({
-                    status:
-                        newStatus
-                })
-                .eq(
-                    "id",
-                    product.id
-                );
-
-
-    if (error) {
-        throw error;
-    }
-
-
-    product.status =
-        newStatus;
-
-
-    renderProducts();
-
-    updateProductSummary();
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Lỗi cập nhật trạng thái tin:",
-            error
-        );
-
-
-        alert(
-            error.message ||
-            "Không thể cập nhật trạng thái tin."
-        );
-
-    }
-
-}
-
-
-/* =========================================
-   XÓA TIN
-========================================= */
-
-async function deleteProduct(
-    productId
-) {
-
-    const product =
-        products.find(
-            item =>
-                String(item.id) ===
-                String(productId)
-        );
-
-
-    if (!product) {
-        return;
-    }
-
-
-    const confirmed =
-        confirm(
-            `Bạn có chắc muốn XÓA tin "${
-                product.name ||
-                "này"
-            }" không?\n\n` +
-            `Hành động này không thể hoàn tác.`
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from("products")
-                .delete()
-                .eq(
-                    "id",
-                    product.id
-                );
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        products =
-            products.filter(
-                item =>
-                    String(item.id) !==
-                    String(product.id)
-            );
-
-
-        updateTotalProducts();
-
-        renderProducts();
-
-        updateProductSummary();
-
-
-        alert(
-            "Đã xóa tin đăng."
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Lỗi xóa tin đăng:",
-            error
-        );
-
-
-        alert(
-            error.message ||
-            "Không thể xóa tin đăng."
-        );
-
-    }
-
-}
-
-
-/* =========================================
-   XỬ LÝ NÚT ẨN / HIỆN / XÓA
-========================================= */
+/* =========================================================
+   PRODUCT ACTION
+========================================================= */
 
 document.addEventListener(
     "click",
-    async function (event) {
+    async function(event) {
 
         const button =
             event.target.closest(
-                ".product-admin-action"
+                "[data-product-action]"
             );
 
 
@@ -1622,12 +2734,50 @@ document.addEventListener(
             button.dataset.productAction;
 
 
+        const product =
+            products.find(
+                item =>
+                    String(item.id) ===
+                    String(productId)
+            );
+
+
+        if (!product) {
+            return;
+        }
+
+
         if (
-            !productId ||
-            !action
+            action === "delete"
         ) {
 
-            return;
+            if (
+                !confirm(
+                    `Xóa tin "${product.name}"?\n\nHành động này không thể hoàn tác.`
+                )
+            ) {
+                return;
+            }
+
+        }
+
+        else {
+
+            const newStatus =
+                action === "hide"
+                    ? "hidden"
+                    : "active";
+
+
+            if (
+                !confirm(
+                    newStatus === "hidden"
+                        ? `Ẩn tin "${product.name}"?`
+                        : `Hiện lại tin "${product.name}"?`
+                )
+            ) {
+                return;
+            }
 
         }
 
@@ -1639,36 +2789,84 @@ document.addEventListener(
         try {
 
             if (
-                action === "hide"
-            ) {
-
-                await changeProductStatus(
-                    productId,
-                    "hidden"
-                );
-
-            }
-
-            else if (
-                action === "show"
-            ) {
-
-                await changeProductStatus(
-                    productId,
-                    "active"
-                );
-
-            }
-
-            else if (
                 action === "delete"
             ) {
 
-                await deleteProduct(
-                    productId
-                );
+                const {
+                    error
+                } =
+                    await supabaseClient
+                        .from("products")
+                        .delete()
+                        .eq(
+                            "id",
+                            productId
+                        );
+
+
+                if (error) {
+                    throw error;
+                }
+
+
+                products =
+                    products.filter(
+                        item =>
+                            String(item.id) !==
+                            String(productId)
+                    );
 
             }
+
+            else {
+
+                const newStatus =
+                    action === "hide"
+                        ? "hidden"
+                        : "active";
+
+
+                const {
+                    error
+                } =
+                    await supabaseClient
+                        .from("products")
+                        .update({
+                            status:
+                                newStatus
+                        })
+                        .eq(
+                            "id",
+                            productId
+                        );
+
+
+                if (error) {
+                    throw error;
+                }
+
+
+                product.status =
+                    newStatus;
+
+            }
+
+
+            renderProducts();
+            await loadDashboard();
+
+        }
+
+        catch (error) {
+
+            console.error(
+                error
+            );
+
+            alert(
+                error.message ||
+                "Không thể cập nhật tin đăng."
+            );
 
         }
 
@@ -1682,133 +2880,19 @@ document.addEventListener(
     }
 );
 
-/* =========================================
-   QUẢN LÝ ĐƠN HÀNG ADMIN
-========================================= */
 
-let adminOrders = [];
-let currentOrderFilter = "all";
+/* =========================================================
+   ORDERS
+========================================================= */
 
-
-/* =========================================
-   MỞ / ĐÓNG QUẢN LÝ ĐƠN HÀNG
-========================================= */
-
-function setupOrderManagement() {
-
-    const manageOrders =
-        document.getElementById(
-            "manageOrders"
-        );
-
-    const ordersSection =
-        document.getElementById(
-            "ordersSection"
-        );
-
-    const closeOrders =
-        document.getElementById(
-            "closeOrders"
-        );
-
-
-    if (
-        !manageOrders ||
-        !ordersSection
-    ) {
-        console.error(
-            "Không tìm thấy khu vực quản lý đơn hàng."
-        );
-
-        return;
-    }
-
-
-    /* ==============================
-       MỞ
-    ============================== */
-
-    manageOrders.addEventListener(
-        "click",
-        async function () {
-
-            ordersSection.classList.add(
-                "show"
-            );
-
-            ordersSection.setAttribute(
-                "aria-hidden",
-                "false"
-            );
-
-
-            ordersSection.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-
-
-            await loadAdminOrders();
-
-        }
-    );
-
-
-    /* ==============================
-       ĐÓNG
-    ============================== */
-
-    if (closeOrders) {
-
-        closeOrders.addEventListener(
-            "click",
-            function () {
-
-                ordersSection.classList.remove(
-                    "show"
-                );
-
-                ordersSection.setAttribute(
-                    "aria-hidden",
-                    "true"
-                );
-
-
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                });
-
-            }
-        );
-
-    }
-
-
-    setupOrderFilters();
-
-}
-
-
-/* =========================================
-   TẢI ĐƠN HÀNG TỪ DATABASE
-========================================= */
-
-async function loadAdminOrders() {
+async function loadOrders() {
 
     const list =
-        document.getElementById(
-            "ordersList"
-        );
-
-
-    if (!list) {
-        return;
-    }
+        $("ordersList");
 
 
     list.innerHTML = `
-        <div class="products-loading">
+        <div class="loading-box">
             Đang tải đơn hàng...
         </div>
     `;
@@ -1819,33 +2903,32 @@ async function loadAdminOrders() {
         const {
             data,
             error
-        } = await supabaseClient
-
-            .from("orders")
-
-            .select(`
-                id,
-                order_code,
-                buyer_id,
-                recipient_name,
-                recipient_phone,
-                recipient_address,
-                shipping_method,
-                shipping_fee,
-                payment_method,
-                subtotal,
-                total_amount,
-                status,
-                created_at,
-                updated_at
-            `)
-
-            .order(
-                "created_at",
-                {
-                    ascending: false
-                }
-            );
+        } =
+            await supabaseClient
+                .from("orders")
+                .select(`
+                    id,
+                    order_code,
+                    buyer_id,
+                    recipient_name,
+                    recipient_phone,
+                    recipient_address,
+                    note,
+                    shipping_method,
+                    shipping_fee,
+                    payment_method,
+                    subtotal,
+                    total_amount,
+                    status,
+                    created_at,
+                    updated_at
+                `)
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
 
 
         if (error) {
@@ -1853,66 +2936,54 @@ async function loadAdminOrders() {
         }
 
 
-        adminOrders =
+        orders =
             data || [];
 
 
         await attachOrderBuyers();
+        await attachOrderItems();
 
-        renderAdminOrders();
 
-        updateAdminOrderSummary();
+        renderOrders();
 
     }
 
     catch (error) {
 
         console.error(
-            "Lỗi tải đơn hàng Admin:",
+            "Orders error:",
             error
         );
 
-
         list.innerHTML = `
-            <div class="products-error">
-
-                Không thể tải danh sách đơn hàng.
-
+            <div class="error-box">
+                Không thể tải đơn hàng.
                 <br><br>
-
-                ${escapeHtml(
-                    error.message || ""
+                ${escapeHTML(
+                    error.message
                 )}
-
             </div>
         `;
-
     }
-
 }
 
 
-/* =========================================
-   LẤY THÔNG TIN NGƯỜI MUA
-========================================= */
-
 async function attachOrderBuyers() {
 
-    const buyerIds = [
-        ...new Set(
-            adminOrders
-                .map(
-                    order =>
-                        order.buyer_id
-                )
-                .filter(Boolean)
-        )
-    ];
+    const ids =
+        [
+            ...new Set(
+                orders
+                    .map(
+                        order =>
+                            order.buyer_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
 
 
-    if (
-        buyerIds.length === 0
-    ) {
+    if (!ids.length) {
         return;
     }
 
@@ -1922,19 +2993,11 @@ async function attachOrderBuyers() {
         error
     } =
         await supabaseClient
-
             .from("users")
-
-            .select(`
-                user_id,
-                fullname,
-                email,
-                avatar_url
-            `)
-
+            .select("*")
             .in(
                 "user_id",
-                buyerIds
+                ids
             );
 
 
@@ -1943,7 +3006,7 @@ async function attachOrderBuyers() {
     }
 
 
-    const buyerMap =
+    const map =
         new Map(
             (data || []).map(
                 user => [
@@ -1956,221 +3019,347 @@ async function attachOrderBuyers() {
         );
 
 
-    adminOrders =
-        adminOrders.map(
+    orders =
+        orders.map(
             order => ({
-
                 ...order,
 
                 buyer:
-                    buyerMap.get(
+                    map.get(
                         String(
                             order.buyer_id
                         )
                     ) || null
-
             })
         );
-
 }
 
 
-/* =========================================
-   FILTER ĐƠN HÀNG
-========================================= */
+async function attachOrderItems() {
 
-function setupOrderFilters() {
-
-    const buttons =
-        document.querySelectorAll(
-            "[data-order-filter]"
+    const orderIds =
+        orders.map(
+            order =>
+                order.id
         );
 
 
-    buttons.forEach(
-        function (button) {
-
-            button.addEventListener(
-                "click",
-                function () {
-
-                    buttons.forEach(
-                        function (item) {
-
-                            item.classList.remove(
-                                "active"
-                            );
-
-                        }
-                    );
-
-
-                    button.classList.add(
-                        "active"
-                    );
-
-
-                    currentOrderFilter =
-                        button.dataset.orderFilter ||
-                        "all";
-
-
-                    renderAdminOrders();
-
-                    updateAdminOrderSummary();
-
-                }
-            );
-
-        }
-    );
-
-
-    const searchInput =
-        document.getElementById(
-            "ordersSearch"
-        );
-
-
-    if (searchInput) {
-
-        searchInput.addEventListener(
-            "input",
-            function () {
-
-                renderAdminOrders();
-
-                updateAdminOrderSummary();
-
-            }
-        );
-
-    }
-
-}
-
-
-/* =========================================
-   LỌC ĐƠN
-========================================= */
-
-function getFilteredAdminOrders() {
-
-    const searchInput =
-        document.getElementById(
-            "ordersSearch"
-        );
-
-
-    const keyword =
-        (
-            searchInput?.value ||
-            ""
-        )
-            .trim()
-            .toLowerCase();
-
-
-    return adminOrders.filter(
-        function (order) {
-
-            const status =
-                order.status ||
-                "pending";
-
-
-            let filterMatch = true;
-
-
-            if (
-                currentOrderFilter !==
-                "all"
-            ) {
-
-                filterMatch =
-                    status ===
-                    currentOrderFilter;
-
-            }
-
-
-            const orderCode =
-                String(
-                    order.order_code ||
-                    ""
-                ).toLowerCase();
-
-
-            const buyerName =
-                String(
-                    order.buyer?.fullname ||
-                    order.recipient_name ||
-                    ""
-                ).toLowerCase();
-
-
-            const buyerEmail =
-                String(
-                    order.buyer?.email ||
-                    ""
-                ).toLowerCase();
-
-
-            const searchMatch =
-                !keyword ||
-
-                orderCode.includes(
-                    keyword
-                ) ||
-
-                buyerName.includes(
-                    keyword
-                ) ||
-
-                buyerEmail.includes(
-                    keyword
-                );
-
-
-            return (
-                filterMatch &&
-                searchMatch
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================
-   HIỂN THỊ ĐƠN
-========================================= */
-
-function renderAdminOrders() {
-
-    const list =
-        document.getElementById(
-            "ordersList"
-        );
-
-
-    if (!list) {
+    if (!orderIds.length) {
         return;
     }
 
 
+    const {
+        data: items,
+        error
+    } =
+        await supabaseClient
+            .from("order_items")
+            .select(`
+                id,
+                order_id,
+                product_id,
+                seller_id,
+                product_name,
+                product_image,
+                price,
+                quantity,
+                subtotal
+            `)
+            .in(
+                "order_id",
+                orderIds
+            );
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    const productIds =
+        [
+            ...new Set(
+                (items || [])
+                    .map(
+                        item =>
+                            item.product_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+    let productMap =
+        new Map();
+
+
+    if (productIds.length) {
+
+        /*
+         * Có boost columns
+         */
+
+        let result =
+            await supabaseClient
+                .from("products")
+                .select(`
+                    id,
+                    is_boosted,
+                    boost_started_at,
+                    boost_expires_at
+                `)
+                .in(
+                    "id",
+                    productIds
+                );
+
+
+        /*
+         * Fallback nếu DB chưa có boost columns.
+         */
+
+        if (result.error) {
+
+            result =
+                await supabaseClient
+                    .from("products")
+                    .select("id")
+                    .in(
+                        "id",
+                        productIds
+                    );
+
+        }
+
+
+        if (
+            !result.error
+        ) {
+
+            productMap =
+                new Map(
+                    (result.data || [])
+                        .map(
+                            product => [
+                                String(
+                                    product.id
+                                ),
+                                product
+                            ]
+                        )
+                );
+
+        }
+
+    }
+
+
+    const enrichedItems =
+        (items || []).map(
+            item => {
+
+                const product =
+                    productMap.get(
+                        String(
+                            item.product_id
+                        )
+                    );
+
+
+                let boosted =
+                    false;
+
+
+                /*
+                 * Kiểm tra tin nổi bật tại thời điểm
+                 * đơn hàng được tạo.
+                 */
+
+                if (
+                    product?.boost_started_at &&
+                    product?.boost_expires_at
+                ) {
+
+                    const order =
+                        orders.find(
+                            itemOrder =>
+                                String(
+                                    itemOrder.id
+                                ) ===
+                                String(
+                                    item.order_id
+                                )
+                        );
+
+
+                    if (order) {
+
+                        const time =
+                            new Date(
+                                order.created_at
+                            ).getTime();
+
+
+                        boosted =
+                            time >=
+                                new Date(
+                                    product.boost_started_at
+                                ).getTime()
+
+                            &&
+
+                            time <=
+                                new Date(
+                                    product.boost_expires_at
+                                ).getTime();
+
+                    }
+
+                }
+
+                else {
+
+                    boosted =
+                        product?.is_boosted === true;
+
+                }
+
+
+                return {
+                    ...item,
+                    product,
+                    boosted
+                };
+
+            }
+        );
+
+
+    orders =
+        orders.map(
+            order => ({
+
+                ...order,
+
+                items:
+                    enrichedItems.filter(
+                        item =>
+                            String(
+                                item.order_id
+                            ) ===
+                            String(
+                                order.id
+                            )
+                    )
+
+            })
+        );
+}
+
+
+function getFilteredOrders() {
+
+    const keyword =
+        (
+            $("orderSearch")?.value ||
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    return orders.filter(
+        order => {
+
+            let filterMatch =
+                orderFilter === "all";
+
+
+            if (
+                orderFilter !== "all"
+            ) {
+
+                if (
+                    orderFilter === "pending"
+                ) {
+
+                    filterMatch =
+                        [
+                            "pending",
+                            "confirmed"
+                        ].includes(
+                            order.status
+                        );
+
+                }
+
+                else {
+
+                    filterMatch =
+                        order.status ===
+                        orderFilter;
+
+                }
+
+            }
+
+
+            const text =
+                [
+                    order.order_code,
+                    order.buyer?.fullname,
+                    order.buyer?.email,
+                    order.recipient_name
+                ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+
+            return (
+                filterMatch &&
+                (
+                    !keyword ||
+                    text.includes(keyword)
+                )
+            );
+
+        }
+    );
+}
+
+
+function renderOrders() {
+
+    const list =
+        $("ordersList");
+
+
     const filtered =
-        getFilteredAdminOrders();
+        getFilteredOrders();
 
 
-    if (
-        filtered.length === 0
-    ) {
+    const boostedOrders =
+        filtered.filter(
+            order =>
+                order.items?.some(
+                    item =>
+                        item.boosted
+                )
+        ).length;
+
+
+    $("orderSummary").textContent =
+        `${filtered.length} đơn hàng · ` +
+        `${boostedOrders} đơn có sản phẩm nổi bật`;
+
+
+    if (!filtered.length) {
 
         list.innerHTML = `
-            <div class="products-empty">
-                Không tìm thấy đơn hàng phù hợp.
+            <div class="empty-box">
+                Không tìm thấy đơn hàng.
             </div>
         `;
 
@@ -2181,337 +3370,221 @@ function renderAdminOrders() {
     list.innerHTML =
         filtered
             .map(
-                createAdminOrderCard
+                createOrderCard
             )
             .join("");
-
 }
 
 
-/* =========================================
-   CARD ĐƠN HÀNG
-========================================= */
-
-function createAdminOrderCard(
+function createOrderCard(
     order
 ) {
 
-    const status =
-        order.status ||
-        "pending";
-
-
-    const statusText = {
-
-        pending:
-            "Chờ xử lý",
-
-        confirmed:
-            "Đã xác nhận",
-
-        shipping:
-            "Đang giao",
-
-        delivered:
-            "Đã giao",
-
-        completed:
-            "Hoàn thành",
-
-        cancelled:
-            "Đã hủy"
-
-    }[status] || status;
-
-
-    const statusClass = {
-
-        pending:
-            "is-hidden",
-
-        confirmed:
-            "is-active",
-
-        shipping:
-            "is-active",
-
-        delivered:
-            "is-active",
-
-        completed:
-            "is-active",
-
-        cancelled:
-            "is-hidden"
-
-    }[status] || "";
-
-
-    const total =
-        Number(
-            order.total_amount
-        ) || 0;
-
-
-    const createdAt =
-        order.created_at
-            ? new Date(
-                order.created_at
-            ).toLocaleString(
-                "vi-VN"
-            )
-            : "";
-
-
-    const paymentText = {
-
-        qr:
-            "QR",
-
-        iuh_wallet:
-            "IUH Wallet",
-
-        cod:
-            "COD"
-
-    }[
-        order.payment_method
-    ] ||
-        order.payment_method ||
-        "Không xác định";
+    const boostedItems =
+        (order.items || [])
+            .filter(
+                item =>
+                    item.boosted
+            );
 
 
     return `
 
-        <article
-            class="product-admin-card"
-        >
+        <article class="order-card">
 
-            <div
-                class="product-admin-info"
-            >
+            <div>
 
-                <div
-                    class="product-admin-title-row"
-                >
-
-                    <strong
-                        class="product-admin-name"
-                    >
-                        Đơn ${
-                            escapeHtml(
-                                order.order_code ||
-                                "#" + order.id
-                            )
-                        }
-                    </strong>
-
-
-                    <span
-                        class="product-admin-status ${statusClass}"
-                    >
-                        ${escapeHtml(
-                            statusText
-                        )}
-                    </span>
-
+                <div class="order-code">
+                    Đơn ${
+                        escapeHTML(
+                            order.order_code ||
+                            "#" + order.id
+                        )
+                    }
                 </div>
 
 
-                <span
-                    class="product-admin-meta"
-                >
+                <div class="order-buyer">
+
                     Người mua:
-                    ${escapeHtml(
+                    ${escapeHTML(
                         order.buyer?.fullname ||
                         order.recipient_name ||
                         "Không xác định"
                     )}
-                </span>
+
+                </div>
 
 
-                <span
-                    class="product-admin-meta"
-                >
-                    Thanh toán:
-                    ${escapeHtml(
-                        paymentText
+                <div class="order-meta">
+
+                    ${escapeHTML(
+                        formatDate(
+                            order.created_at
+                        )
                     )}
-                    · Tổng:
-                    ${formatAdminCurrency(
-                        total
+
+                    ·
+
+                    ${escapeHTML(
+                        paymentText(
+                            order.payment_method
+                        )
                     )}
-                </span>
+
+                </div>
 
 
-                <span
-                    class="product-admin-meta"
-                >
-                    ${
-                        createdAt
-                            ? escapeHtml(
-                                createdAt
-                            )
-                            : ""
-                    }
-                </span>
+                ${
+                    boostedItems.length
+
+                        ?
+
+                        `
+                            <span class="boost-order-badge">
+                                🔥 ${boostedItems.length}
+                                sản phẩm nổi bật
+                            </span>
+                        `
+
+                        : ""
+                }
 
             </div>
 
 
-            <div
-                class="product-admin-actions"
-            >
+            <div>
 
-                <select
-                    class="admin-order-status"
-                    data-order-id="${
-                        escapeAttribute(
-                            order.id
+                <span class="order-status ${
+                    order.status || "pending"
+                }">
+
+                    ${escapeHTML(
+                        orderStatusText(
+                            order.status
                         )
-                    }"
-                >
+                    )}
 
-                    <option
-                        value="pending"
-                        ${
-                            status === "pending"
-                                ? "selected"
-                                : ""
-                        }
+                </span>
+
+
+                <div class="order-meta">
+
+                    ${(
+                        order.items ||
+                        []
+                    ).length}
+
+                    sản phẩm
+
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div class="order-total">
+                    ${formatMoney(
+                        order.total_amount
+                    )}
+                </div>
+
+
+                <div class="order-buttons">
+
+                    <button
+                        class="order-view"
+                        type="button"
+                        data-order-view="${escapeHTML(
+                            order.id
+                        )}"
                     >
-                        Chờ xử lý
-                    </option>
+                        Chi tiết
+                    </button>
 
-                    <option
-                        value="confirmed"
-                        ${
-                            status === "confirmed"
-                                ? "selected"
-                                : ""
-                        }
+
+                    <select
+                        class="order-status-select"
+                        data-order-status-id="${escapeHTML(
+                            order.id
+                        )}"
                     >
-                        Đã xác nhận
-                    </option>
 
-                    <option
-                        value="shipping"
                         ${
-                            status === "shipping"
-                                ? "selected"
-                                : ""
+                            [
+                                "pending",
+                                "confirmed",
+                                "shipping",
+                                "delivered",
+                                "completed",
+                                "cancelled"
+                            ]
+                            .map(
+                                status => `
+                                    <option
+                                        value="${status}"
+                                        ${
+                                            order.status ===
+                                            status
+                                                ? "selected"
+                                                : ""
+                                        }
+                                    >
+                                        ${orderStatusText(
+                                            status
+                                        )}
+                                    </option>
+                                `
+                            )
+                            .join("")
                         }
-                    >
-                        Đang giao
-                    </option>
 
-                    <option
-                        value="delivered"
-                        ${
-                            status === "delivered"
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        Đã giao
-                    </option>
+                    </select>
 
-                    <option
-                        value="completed"
-                        ${
-                            status === "completed"
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        Hoàn thành
-                    </option>
-
-                    <option
-                        value="cancelled"
-                        ${
-                            status === "cancelled"
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        Đã hủy
-                    </option>
-
-                </select>
+                </div>
 
             </div>
 
         </article>
 
     `;
-
 }
 
 
-/* =========================================
-   THỐNG KÊ ĐƠN
-========================================= */
+/* =========================================================
+   ORDER EVENTS
+========================================================= */
 
-function updateAdminOrderSummary() {
+document.addEventListener(
+    "click",
+    function(event) {
 
-    const summary =
-        document.getElementById(
-            "ordersSummary"
+        const button =
+            event.target.closest(
+                "[data-order-view]"
+            );
+
+
+        if (!button) {
+            return;
+        }
+
+
+        openOrderDetail(
+            button.dataset.orderView
         );
-
-
-    if (!summary) {
-        return;
     }
+);
 
-
-    const pending =
-        adminOrders.filter(
-            order =>
-                order.status ===
-                    "pending" ||
-                order.status ===
-                    "confirmed"
-        ).length;
-
-
-    const shipping =
-        adminOrders.filter(
-            order =>
-                order.status ===
-                "shipping"
-        ).length;
-
-
-    const completed =
-        adminOrders.filter(
-            order =>
-                order.status ===
-                "completed"
-        ).length;
-
-
-    summary.textContent =
-        `Có ${adminOrders.length} đơn hàng · ` +
-        `${pending} chờ xử lý · ` +
-        `${shipping} đang giao · ` +
-        `${completed} hoàn thành`;
-
-}
-
-
-/* =========================================
-   ĐỔI TRẠNG THÁI ĐƠN
-========================================= */
 
 document.addEventListener(
     "change",
-    async function (event) {
+    async function(event) {
 
         const select =
             event.target.closest(
-                ".admin-order-status"
+                "[data-order-status-id]"
             );
 
 
@@ -2521,21 +3594,17 @@ document.addEventListener(
 
 
         const orderId =
-            select.dataset.orderId;
+            select.dataset.orderStatusId;
 
 
         const newStatus =
             select.value;
 
 
-        if (!orderId) {
-            return;
-        }
-
-
         try {
 
-            select.disabled = true;
+            select.disabled =
+                true;
 
 
             const {
@@ -2561,28 +3630,23 @@ document.addEventListener(
             }
 
 
-            await loadAdminOrders();
-
-            await loadAdminDashboardStats();
-
+            await loadOrders();
+            await loadDashboard();
 
         }
 
         catch (error) {
 
             console.error(
-                "Lỗi cập nhật trạng thái đơn:",
                 error
             );
 
-
             alert(
                 error.message ||
-                "Không thể cập nhật trạng thái đơn hàng."
+                "Không thể cập nhật trạng thái đơn."
             );
 
-
-            await loadAdminOrders();
+            await loadOrders();
 
         }
 
@@ -2590,153 +3654,289 @@ document.addEventListener(
 
             select.disabled =
                 false;
-
         }
 
     }
 );
 
 
-/* =========================================
-   MỞ / ĐÓNG QUẢN LÝ NGƯỜI DÙNG
-========================================= */
+/* =========================================================
+   ORDER DETAIL
+========================================================= */
 
-function setupUserManagement() {
+function openOrderDetail(
+    orderId
+) {
 
-    const manageUsers =
-        document.getElementById(
-            "manageUsers"
-        );
-
-    const verificationSection =
-        document.getElementById(
-            "verificationSection"
-        );
-
-    const closeVerification =
-        document.getElementById(
-            "closeVerification"
+    const order =
+        orders.find(
+            item =>
+                String(item.id) ===
+                String(orderId)
         );
 
 
-    /* Không tìm thấy nút */
-
-    if (!manageUsers) {
-
-        console.error(
-            "Không tìm thấy #manageUsers"
-        );
-
+    if (!order) {
         return;
     }
 
 
-    /* Không tìm thấy khu vực xác thực */
+    selectedOrder =
+        order;
 
-    if (!verificationSection) {
 
-        console.error(
-            "Không tìm thấy #verificationSection"
+    $("orderDetailCode").textContent =
+        order.order_code ||
+        "#" + order.id;
+
+
+    $("orderDetailDate").textContent =
+        formatDate(
+            order.created_at
         );
 
-        return;
-    }
+
+    $("orderDetailInfo").innerHTML = `
+
+        <div class="order-info-item">
+
+            <span>Người mua</span>
+
+            <strong>
+                ${escapeHTML(
+                    order.buyer?.fullname ||
+                    order.recipient_name ||
+                    "-"
+                )}
+            </strong>
+
+        </div>
 
 
-    /* =====================================
-       BẤM QUẢN LÝ NGƯỜI DÙNG
-    ===================================== */
+        <div class="order-info-item">
 
-    manageUsers.addEventListener(
-        "click",
-        async function () {
+            <span>Email</span>
 
-            /*
-               Hiện phần xác thực
-            */
+            <strong>
+                ${escapeHTML(
+                    order.buyer?.email ||
+                    "-"
+                )}
+            </strong>
 
-            verificationSection.classList.add(
-                "show"
-            );
-
-            verificationSection.setAttribute(
-                "aria-hidden",
-                "false"
-            );
+        </div>
 
 
-            /*
-               Cuộn xuống phần xác thực
-            */
+        <div class="order-info-item">
 
-            verificationSection.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
+            <span>Số điện thoại</span>
 
+            <strong>
+                ${escapeHTML(
+                    order.recipient_phone ||
+                    "-"
+                )}
+            </strong>
 
-            /*
-               Tải danh sách tài khoản
-            */
-
-            await loadUsers();
-        }
-    );
+        </div>
 
 
-    /* =====================================
-       BẤM ĐÓNG
-    ===================================== */
+        <div class="order-info-item">
 
-    if (closeVerification) {
+            <span>Thanh toán</span>
 
-        closeVerification.addEventListener(
-            "click",
-            function () {
+            <strong>
+                ${escapeHTML(
+                    paymentText(
+                        order.payment_method
+                    )
+                )}
+            </strong>
 
-                verificationSection.classList.remove(
-                    "show"
-                );
-
-                verificationSection.setAttribute(
-                    "aria-hidden",
-                    "true"
-                );
+        </div>
 
 
-                /*
-                   Cuộn về đầu trang
-                */
+        <div class="order-info-item">
 
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                });
-            }
+            <span>Giao hàng</span>
+
+            <strong>
+                ${escapeHTML(
+                    order.shipping_method ||
+                    "-"
+                )}
+            </strong>
+
+        </div>
+
+
+        <div class="order-info-item">
+
+            <span>Trạng thái</span>
+
+            <strong>
+                ${escapeHTML(
+                    orderStatusText(
+                        order.status
+                    )
+                )}
+            </strong>
+
+        </div>
+
+
+        <div class="order-info-item"
+             style="grid-column:1/-1">
+
+            <span>Địa chỉ nhận</span>
+
+            <strong>
+                ${escapeHTML(
+                    order.recipient_address ||
+                    "-"
+                )}
+            </strong>
+
+        </div>
+
+    `;
+
+
+    const items =
+        order.items || [];
+
+
+    $("orderDetailItems").innerHTML =
+        items.length
+
+            ?
+
+            items.map(
+                item => `
+
+                    <div class="order-item">
+
+                        ${
+                            item.product_image
+
+                                ?
+
+                                `
+                                    <img
+                                        src="${escapeHTML(
+                                            item.product_image
+                                        )}"
+                                        alt=""
+                                    >
+                                `
+
+                                :
+
+                                `
+                                    <div
+                                        style="
+                                            width:46px;
+                                            height:46px;
+                                            display:flex;
+                                            align-items:center;
+                                            justify-content:center;
+                                            background:#f1f4f8;
+                                            border-radius:7px;
+                                            font-size:20px;
+                                        "
+                                    >
+                                        📦
+                                    </div>
+                                `
+                        }
+
+
+                        <div class="order-item-info">
+
+                            <strong>
+                                ${escapeHTML(
+                                    item.product_name ||
+                                    "Sản phẩm"
+                                )}
+                            </strong>
+
+
+                            <span>
+                                SL:
+                                ${escapeHTML(
+                                    item.quantity
+                                )}
+
+                                ·
+
+                                Đơn giá:
+                                ${formatMoney(
+                                    item.price
+                                )}
+                            </span>
+
+
+                            ${
+                                item.boosted
+
+                                    ?
+
+                                    `
+                                        <span class="order-boost">
+                                            🔥 TIN NỔI BẬT
+                                        </span>
+                                    `
+
+                                    : ""
+                            }
+
+                        </div>
+
+
+                        <div class="order-item-price">
+                            ${formatMoney(
+                                item.subtotal
+                            )}
+                        </div>
+
+                    </div>
+
+                `
+            ).join("")
+
+            :
+
+            `
+                <div class="empty-box">
+                    Đơn hàng chưa có sản phẩm.
+                </div>
+            `;
+
+
+    $("orderDetailTotal").textContent =
+        formatMoney(
+            order.total_amount
         );
-    }
+
+
+    $("orderModal").hidden =
+        false;
 }
 
 
-/* =========================================
-   TẢI DANH SÁCH TÀI KHOẢN
-========================================= */
+/* =========================================================
+   FORUM
+========================================================= */
 
-async function loadUsers() {
+async function loadForumPosts() {
 
-    const verificationList =
-        document.getElementById(
-            "verificationList"
-        );
-
-    if (!verificationList) {
-        return;
-    }
+    const list =
+        $("forumList");
 
 
-    verificationList.innerHTML = `
-        <div class="verification-loading">
-            Đang tải tài khoản...
+    list.innerHTML = `
+        <div class="loading-box">
+            Đang tải bài viết...
         </div>
     `;
 
@@ -2748,611 +3948,319 @@ async function loadUsers() {
             error
         } =
             await supabaseClient
-                .from("users")
+                .from("forum_posts")
                 .select(`
-                    user_id,
-                    fullname,
-                    email,
-                    avatar_url,
-                    role,
-                    student_verified,
-                    verification_status,
-                    verification_method,
-                    verified_at
+                    id,
+                    author_id,
+                    content,
+                    post_type,
+                    created_at,
+                    moderation_status
                 `)
                 .order(
-                    "fullname",
+                    "created_at",
                     {
-                        ascending: true
+                        ascending: false
                     }
                 );
 
 
         if (error) {
+
+            /*
+             * Báo rõ nếu Admin chưa thêm
+             * moderation_status.
+             */
+
+            if (
+                String(
+                    error.message
+                ).includes(
+                    "moderation_status"
+                )
+            ) {
+
+                throw new Error(
+                    "Bảng forum_posts chưa có cột moderation_status. Hãy chạy SQL mình đưa ở phía trên."
+                );
+
+            }
+
             throw error;
         }
 
 
-        users =
+        forumPosts =
             data || [];
 
 
-        /*
-           Cập nhật tổng số người dùng
-        */
-
-        updateTotalUsers();
+        await attachForumAuthors();
 
 
-        /*
-           Hiển thị danh sách
-        */
-
-        renderUsers();
-
-
-        /*
-           Cập nhật thống kê xác thực
-        */
-
-        updateSummary();
+        renderForumPosts();
 
     }
 
     catch (error) {
 
         console.error(
-            "Lỗi tải danh sách tài khoản:",
+            "Forum error:",
             error
         );
 
-
-        verificationList.innerHTML = `
-
-            <div class="verification-error">
-
-                Không thể tải danh sách tài khoản.
-
-                <br><br>
-
-                ${escapeHtml(
-                    error.message || ""
+        list.innerHTML = `
+            <div class="error-box">
+                ${escapeHTML(
+                    error.message
                 )}
-
             </div>
-
         `;
     }
 }
 
 
-/* =========================================
-   CẬP NHẬT TỔNG USER
-========================================= */
+async function attachForumAuthors() {
 
-function updateTotalUsers() {
+    const ids =
+        [
+            ...new Set(
+                forumPosts
+                    .map(
+                        post =>
+                            post.author_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
 
-    const totalUsers =
-        document.getElementById(
-            "totalUsers"
-        );
 
-    if (totalUsers) {
-
-        totalUsers.textContent =
-            users.length;
+    if (!ids.length) {
+        return;
     }
-}
 
 
-/* =========================================
-   FILTER + SEARCH
-========================================= */
-
-function setupFilters() {
-
-    const filterButtons =
-        document.querySelectorAll(
-            ".filter-button"
-        );
-
-
-    /*
-       Bộ lọc
-    */
-
-    filterButtons.forEach(
-        function (button) {
-
-            button.addEventListener(
-                "click",
-                function () {
-
-                    filterButtons.forEach(
-                        function (item) {
-
-                            item.classList.remove(
-                                "active"
-                            );
-                        }
-                    );
-
-
-                    button.classList.add(
-                        "active"
-                    );
-
-
-                    currentFilter =
-                        button.dataset.filter ||
-                        "all";
-
-
-                    renderUsers();
-
-                    updateSummary();
-                }
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("users")
+            .select(`
+                user_id,
+                fullname,
+                avatar_url
+            `)
+            .in(
+                "user_id",
+                ids
             );
-        }
-    );
 
 
-    /*
-       Tìm kiếm
-    */
-
-    const searchInput =
-        document.getElementById(
-            "verificationSearch"
-        );
-
-
-    if (searchInput) {
-
-        searchInput.addEventListener(
-            "input",
-            function () {
-
-                renderUsers();
-
-                updateSummary();
-            }
-        );
+    if (error) {
+        throw error;
     }
+
+
+    const map =
+        new Map(
+            (data || []).map(
+                user => [
+                    String(
+                        user.user_id
+                    ),
+                    user
+                ]
+            )
+        );
+
+
+    forumPosts =
+        forumPosts.map(
+            post => ({
+                ...post,
+
+                author:
+                    map.get(
+                        String(
+                            post.author_id
+                        )
+                    ) || null
+            })
+        );
 }
 
 
-/* =========================================
-   LỌC USER
-========================================= */
-
-function getFilteredUsers() {
-
-    const searchInput =
-        document.getElementById(
-            "verificationSearch"
-        );
-
+function getFilteredForumPosts() {
 
     const keyword =
         (
-            searchInput?.value ||
+            $("forumSearch")?.value ||
             ""
         )
-            .trim()
-            .toLowerCase();
+        .trim()
+        .toLowerCase();
 
 
-    return users.filter(
-        function (user) {
+    return forumPosts.filter(
+        post => {
 
-            const verified =
-                user.student_verified === true;
+            const status =
+                post.moderation_status ||
+                "active";
 
-
-            /*
-               Kiểm tra bộ lọc
-            */
 
             const filterMatch =
-
-                currentFilter === "all"
-
-                ||
-
-                (
-                    currentFilter === "verified" &&
-                    verified
-                )
-
-                ||
-
-                (
-                    currentFilter === "unverified" &&
-                    !verified
-                );
+                forumFilter === "all" ||
+                status === forumFilter;
 
 
-            /*
-               Tên
-            */
-
-            const name =
-                (
-                    user.fullname ||
-                    ""
-                )
-                    .toLowerCase();
-
-
-            /*
-               Email
-            */
-
-            const email =
-                (
-                    user.email ||
-                    ""
-                )
-                    .toLowerCase();
-
-
-            /*
-               Kiểm tra từ khóa
-            */
-
-            const searchMatch =
-
-                !keyword
-
-                ||
-
-                name.includes(
-                    keyword
-                )
-
-                ||
-
-                email.includes(
-                    keyword
-                );
+            const text =
+                [
+                    post.content,
+                    post.author?.fullname
+                ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
 
 
             return (
                 filterMatch &&
-                searchMatch
+                (
+                    !keyword ||
+                    text.includes(keyword)
+                )
             );
         }
     );
 }
 
 
-/* =========================================
-   HIỂN THỊ USER
-========================================= */
+function renderForumPosts() {
 
-function renderUsers() {
-
-    const verificationList =
-        document.getElementById(
-            "verificationList"
-        );
+    const list =
+        $("forumList");
 
 
-    if (!verificationList) {
-        return;
-    }
+    const filtered =
+        getFilteredForumPosts();
 
 
-    const filteredUsers =
-        getFilteredUsers();
+    $("forumSummary").textContent =
+        `${filtered.length} bài viết đang hiển thị`;
 
 
-    /*
-       Không có tài khoản
-    */
+    if (!filtered.length) {
 
-    if (
-        filteredUsers.length === 0
-    ) {
-
-        verificationList.innerHTML = `
-
-            <div class="verification-empty">
-
-                Không tìm thấy tài khoản phù hợp.
-
+        list.innerHTML = `
+            <div class="empty-box">
+                Không có bài viết phù hợp.
             </div>
-
         `;
 
         return;
     }
 
 
-    /*
-       Tạo danh sách card
-    */
-
-    verificationList.innerHTML =
-        filteredUsers
+    list.innerHTML =
+        filtered
             .map(
-                createUserCard
+                createForumCard
             )
             .join("");
 }
 
 
-/* =========================================
-   TẠO CARD USER
-========================================= */
-
-function createUserCard(
-    user
+function createForumCard(
+    post
 ) {
 
-    const verified =
-        user.student_verified === true;
+    const hidden =
+        post.moderation_status ===
+        "hidden";
 
-
-    const role =
-        user.role ||
-        "user";
-
-
-    /* =====================================
-       CHỨC DANH
-    ===================================== */
-
-    let roleText =
-        "Sinh viên";
-
-
-    if (
-        role === "admin"
-    ) {
-
-        roleText =
-            "Admin";
-
-    }
-
-    else if (
-        role === "moderator"
-    ) {
-
-        roleText =
-            "Quản trị viên";
-    }
-
-
-    /* =====================================
-       TRẠNG THÁI
-    ===================================== */
-
-    let stateText =
-        "Chưa có tích xác thực";
-
-
-    if (verified) {
-
-        if (
-            user.verification_method ===
-            "admin_grant"
-        ) {
-
-            stateText =
-                "Được Admin cấp tích";
-
-        }
-
-        else {
-
-            stateText =
-                "Đã xác thực sinh viên";
-        }
-    }
-
-
-    /* =====================================
-       NÚT
-    ===================================== */
-
-    let action = "";
-
-
-    /*
-       Admin và Quản trị viên:
-
-       - Mặc định có tích
-       - Không cần cấp
-       - Không hiện nút thu hồi
-    */
-
-    if (
-        role === "admin" ||
-        role === "moderator"
-    ) {
-
-        action = `
-
-            <span
-                class="verification-state is-verified"
-            >
-                Quyền hệ thống
-            </span>
-
-        `;
-
-    }
-
-
-    /*
-       Sinh viên đã có tích
-    */
-
-    else if (verified) {
-
-        action = `
-
-            <button
-                type="button"
-                class="verification-action revoke"
-                data-action="revoke"
-                data-user-id="${escapeAttribute(
-                    user.user_id
-                )}"
-            >
-
-                Thu hồi tích
-
-            </button>
-
-        `;
-
-    }
-
-
-    /*
-       Sinh viên chưa có tích
-    */
-
-    else {
-
-        action = `
-
-            <button
-                type="button"
-                class="verification-action grant"
-                data-action="grant"
-                data-user-id="${escapeAttribute(
-                    user.user_id
-                )}"
-            >
-
-                Cấp tích ✓
-
-            </button>
-
-        `;
-    }
-
-
-    /* =====================================
-       TÍCH XANH
-    ===================================== */
-
-    const badge =
-
-        verified ||
-
-        role === "admin" ||
-
-        role === "moderator"
-
-            ?
-
-            `
-
-                <span
-                    class="student-verified-badge"
-                    title="Đã xác thực"
-                >
-
-                    ✓
-
-                </span>
-
-            `
-
-            :
-
-            "";
-
-
-    /* =====================================
-       CARD
-    ===================================== */
 
     return `
 
-        <article
-            class="verification-card"
-        >
+        <article class="forum-card">
 
-            <img
-                class="verification-avatar"
-                src="${escapeAttribute(
-                    user.avatar_url ||
-                    DEFAULT_AVATAR
-                )}"
-                alt="Avatar"
-                onerror="this.src='${DEFAULT_AVATAR}'"
-            >
+            <div class="forum-card-head">
 
+                <div>
 
-            <div
-                class="verification-user"
-            >
+                    <div class="forum-author">
 
-                <div
-                    class="verification-name"
-                >
-
-                    <strong>
-
-                        ${escapeHtml(
-                            user.fullname ||
-                            "Chưa cập nhật tên"
+                        ${escapeHTML(
+                            post.author?.fullname ||
+                            "Người dùng IUH"
                         )}
 
-                    </strong>
+                    </div>
 
+                    <div class="forum-date">
 
-                    ${badge}
+                        ${formatDate(
+                            post.created_at
+                        )}
+
+                    </div>
 
                 </div>
 
 
-                <span
-                    class="verification-email"
-                >
+                <span class="status-pill ${
+                    hidden
+                        ? "status-hidden"
+                        : "status-active"
+                }">
 
-                    ${escapeHtml(
-                        user.email ||
-                        ""
-                    )}
-
-                </span>
-
-
-                <span
-                    class="verification-role"
-                >
-
-                    ${roleText}
-
-                </span>
-
-
-                <span
-                    class="verification-state ${
-                        verified
-                            ? "is-verified"
-                            : ""
-                    }"
-                >
-
-                    ${stateText}
+                    ${
+                        hidden
+                            ? "Đang ẩn"
+                            : "Đang hiển thị"
+                    }
 
                 </span>
 
             </div>
 
 
-            <div>
+            <div class="forum-content">
 
-                ${action}
+                ${escapeHTML(
+                    post.content ||
+                    ""
+                )}
+
+            </div>
+
+
+            <div class="forum-actions">
+
+                <button
+                    class="${
+                        hidden
+                            ? "forum-show"
+                            : "forum-hide"
+                    }"
+                    type="button"
+                    data-forum-action="${
+                        hidden
+                            ? "show"
+                            : "hide"
+                    }"
+                    data-forum-id="${escapeHTML(
+                        post.id
+                    )}"
+                >
+
+                    ${
+                        hidden
+                            ? "Hiện bài"
+                            : "Ẩn bài"
+                    }
+
+                </button>
 
             </div>
 
@@ -3362,17 +4270,13 @@ function createUserCard(
 }
 
 
-/* =========================================
-   CẤP / THU HỒI TÍCH
-========================================= */
-
 document.addEventListener(
     "click",
-    async function (event) {
+    async function(event) {
 
         const button =
             event.target.closest(
-                ".verification-action"
+                "[data-forum-action]"
             );
 
 
@@ -3381,60 +4285,56 @@ document.addEventListener(
         }
 
 
-        const userId =
-            button.dataset.userId;
+        const post =
+            forumPosts.find(
+                item =>
+                    String(item.id) ===
+                    String(
+                        button.dataset.forumId
+                    )
+            );
 
 
-        const verified =
-            button.dataset.action ===
-            "grant";
-
-
-        if (!userId) {
+        if (!post) {
             return;
         }
 
 
-        const message =
+        const action =
+            button.dataset.forumAction;
 
-            verified
 
-                ?
-
-                "Bạn có chắc muốn cấp tích cho tài khoản này không?"
-
-                :
-
-                "Bạn có chắc muốn thu hồi tích của tài khoản này không?";
+        const newStatus =
+            action === "hide"
+                ? "hidden"
+                : "active";
 
 
         if (
-            !confirm(message)
+            !confirm(
+                newStatus === "hidden"
+                    ? "Ẩn bài viết này?"
+                    : "Hiện lại bài viết này?"
+            )
         ) {
             return;
         }
 
 
-        button.disabled =
-            true;
-
-
         try {
 
             const {
-                data,
                 error
             } =
                 await supabaseClient
-                    .rpc(
-                        "admin_set_student_verified",
-                        {
-                            target_user_id:
-                                userId,
-
-                            verified:
-                                verified
-                        }
+                    .from("forum_posts")
+                    .update({
+                        moderation_status:
+                            newStatus
+                    })
+                    .eq(
+                        "id",
+                        post.id
                     );
 
 
@@ -3443,226 +4343,581 @@ document.addEventListener(
             }
 
 
-            if (
-                !data ||
-                data.success !== true
-            ) {
-
-                throw new Error(
-                    "Máy chủ không trả về kết quả hợp lệ."
-                );
-            }
-
-
-            alert(
-
-                verified
-
-                    ?
-
-                    "Đã cấp tích xác thực."
-
-                    :
-
-                    "Đã thu hồi tích xác thực."
-
-            );
-
-
-            /*
-               Tải lại danh sách
-            */
-
-            await loadUsers();
+            await loadForumPosts();
+            await loadDashboard();
 
         }
 
         catch (error) {
 
             console.error(
-                "Lỗi cập nhật tích:",
                 error
             );
 
-
             alert(
                 error.message ||
-                "Không thể cập nhật trạng thái xác thực."
+                "Không thể cập nhật bài viết."
             );
-
-
-            button.disabled =
-                false;
         }
     }
 );
 
 
-/* =========================================
-   THỐNG KÊ XÁC THỰC
-========================================= */
+/* =========================================================
+   FINANCE
+========================================================= */
 
-function updateSummary() {
+async function loadFinance() {
 
-    const summary =
-        document.getElementById(
-            "verificationSummary"
+    const list =
+        $("financeList");
+
+
+    list.innerHTML = `
+        <div class="loading-box">
+            Đang tải giao dịch...
+        </div>
+    `;
+
+
+    const revenue =
+        await loadAdminRevenue();
+
+
+    financeTransactions =
+        revenue.transactions || [];
+
+
+    $("financeTotal").textContent =
+        formatMoney(
+            revenue.total
         );
 
 
-    if (!summary) {
+    if (!financeTransactions.length) {
+
+        list.innerHTML = `
+            <div class="empty-box">
+                Chưa có giao dịch phí.
+            </div>
+        `;
+
         return;
     }
 
 
-    /*
-       Chỉ tính tài khoản sinh viên
-    */
+    list.innerHTML =
+        financeTransactions
+            .map(
+                transaction => {
 
-    const students =
-        users.filter(
-            function (user) {
-
-                return (
-                    user.role ===
-                    "user"
-                );
-            }
-        );
+                    const text =
+                        (
+                            transaction.title ||
+                            ""
+                        ).toLowerCase();
 
 
-    /*
-       Sinh viên đã có tích
-    */
-
-    const verified =
-        students.filter(
-            function (user) {
-
-                return (
-                    user.student_verified ===
-                    true
-                );
-            }
-        ).length;
+                    let type =
+                        "Phí sàn";
 
 
-    /*
-       Số tài khoản đang hiển thị
-    */
+                    if (
+                        text.includes(
+                            "đẩy tin"
+                        ) ||
+                        text.includes(
+                            "nổi bật"
+                        )
+                    ) {
 
-    const visible =
-        getFilteredUsers().length;
+                        type =
+                            "Phí đẩy tin";
+                    }
 
 
-    summary.textContent =
+                    return `
 
-        `Có ${students.length} tài khoản sinh viên · ` +
+                        <div class="finance-row">
 
-        `${verified} đã có tích · ` +
+                            <span>
+                                ${formatDate(
+                                    transaction.created_at
+                                )}
+                            </span>
 
-        `${students.length - verified} chưa có tích · ` +
 
-        `Đang hiển thị ${visible}`;
+                            <span>
+                                ${escapeHTML(
+                                    transaction.title ||
+                                    transaction.description ||
+                                    "-"
+                                )}
+                            </span>
+
+
+                            <span>
+                                ${type}
+                            </span>
+
+
+                            <span class="amount">
+                                +${formatMoney(
+                                    transaction.amount
+                                )}
+                            </span>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
 }
 
 
-/* =========================================
-   ESCAPE HTML
-========================================= */
+/* =========================================================
+   FILTER EVENTS
+========================================================= */
 
-function escapeHtml(
-    value
-) {
+document
+    .querySelectorAll(
+        ".user-filter"
+    )
+    .forEach(
+        button => {
 
-    return String(value)
+            button.addEventListener(
+                "click",
+                function() {
 
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
-}
+                    document
+                        .querySelectorAll(
+                            ".user-filter"
+                        )
+                        .forEach(
+                            item =>
+                                item.classList.remove(
+                                    "active"
+                                )
+                        );
 
 
-function escapeAttribute(
-    value
-) {
+                    button.classList.add(
+                        "active"
+                    );
 
-    return escapeHtml(
-        value
+
+                    userFilter =
+                        button.dataset.userFilter;
+
+
+                    renderUsers();
+                }
+            );
+
+        }
     );
+
+
+$("userSearch")
+    ?.addEventListener(
+        "input",
+        renderUsers
+    );
+
+
+document
+    .querySelectorAll(
+        ".product-filter"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    document
+                        .querySelectorAll(
+                            ".product-filter"
+                        )
+                        .forEach(
+                            item =>
+                                item.classList.remove(
+                                    "active"
+                                )
+                        );
+
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    productFilter =
+                        button.dataset.productFilter;
+
+
+                    renderProducts();
+                }
+            );
+
+        }
+    );
+
+
+$("productSearch")
+    ?.addEventListener(
+        "input",
+        renderProducts
+    );
+
+
+document
+    .querySelectorAll(
+        ".order-filter"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    document
+                        .querySelectorAll(
+                            ".order-filter"
+                        )
+                        .forEach(
+                            item =>
+                                item.classList.remove(
+                                    "active"
+                                )
+                        );
+
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    orderFilter =
+                        button.dataset.orderFilter;
+
+
+                    renderOrders();
+                }
+            );
+
+        }
+    );
+
+
+$("orderSearch")
+    ?.addEventListener(
+        "input",
+        renderOrders
+    );
+
+
+document
+    .querySelectorAll(
+        ".forum-filter"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    document
+                        .querySelectorAll(
+                            ".forum-filter"
+                        )
+                        .forEach(
+                            item =>
+                                item.classList.remove(
+                                    "active"
+                                )
+                        );
+
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    forumFilter =
+                        button.dataset.forumFilter;
+
+
+                    renderForumPosts();
+                }
+            );
+
+        }
+    );
+
+
+$("forumSearch")
+    ?.addEventListener(
+        "input",
+        renderForumPosts
+    );
+
+
+/* =========================================================
+   MODAL EVENTS
+========================================================= */
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const close =
+            event.target.closest(
+                "[data-close-modal]"
+            );
+
+
+        if (!close) {
+            return;
+        }
+
+
+        const modalId =
+            close.dataset.closeModal;
+
+
+        if ($(modalId)) {
+            $(modalId).hidden =
+                true;
+        }
+    }
+);
+
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target.classList.contains(
+                "modal-overlay"
+            )
+        ) {
+
+            event.target.hidden =
+                true;
+        }
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key !== "Escape"
+        ) {
+            return;
+        }
+
+
+        document
+            .querySelectorAll(
+                ".modal-overlay"
+            )
+            .forEach(
+                modal =>
+                    modal.hidden = true
+            );
+    }
+);
+
+
+/* =========================================================
+   DETAIL USER VERIFICATION
+========================================================= */
+
+$("detailVerificationButton")
+    ?.addEventListener(
+        "click",
+        async function() {
+
+            if (!selectedUser) {
+                return;
+            }
+
+
+            const verified =
+                this.dataset.verified ===
+                "true";
+
+
+            await setUserVerification(
+                selectedUser.user_id,
+                verified
+            );
+
+
+            $("userModal").hidden =
+                true;
+        }
+    );
+
+
+/* =========================================================
+   REALTIME
+========================================================= */
+
+function setupRealtime() {
+
+    supabaseClient
+        .channel(
+            "admin-dashboard-realtime"
+        )
+
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "users"
+            },
+            async function() {
+
+                if (
+                    $("page-users")
+                        .classList
+                        .contains("active")
+                ) {
+
+                    await loadUsers();
+
+                }
+
+                await loadDashboard();
+
+            }
+        )
+
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "products"
+            },
+            async function() {
+
+                if (
+                    $("page-products")
+                        .classList
+                        .contains("active")
+                ) {
+
+                    await loadProducts();
+
+                }
+
+                await loadDashboard();
+
+            }
+        )
+
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "orders"
+            },
+            async function() {
+
+                if (
+                    $("page-orders")
+                        .classList
+                        .contains("active")
+                ) {
+
+                    await loadOrders();
+
+                }
+
+                await loadDashboard();
+
+            }
+        )
+
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "wallet_transactions"
+            },
+            async function() {
+
+                await loadDashboard();
+
+                if (
+                    $("page-finance")
+                        .classList
+                        .contains("active")
+                ) {
+
+                    await loadFinance();
+
+                }
+
+            }
+        )
+
+        .subscribe();
+
 }
 
 
-/* =========================================
-   KHỞI ĐỘNG
-========================================= */
+/* =========================================================
+   INIT
+========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     async function () {
 
         console.log(
-            "IUH SHOP ADMIN JS đã chạy."
+            "🚀 IUH SHOP ADMIN START"
         );
 
 
-        /*
-           Kiểm tra tài khoản Admin
-        */
-
-        const user =
+        const admin =
             await checkAdmin();
 
 
-        if (!user) {
+        if (!admin) {
+
+            console.error(
+                "❌ ADMIN CHECK FAILED"
+            );
+
             return;
         }
 
-        await initAdminDashboard();
+
+        console.log(
+            "✅ ADMIN PAGE READY"
+        );
 
 
-        /*
-           Khởi tạo các chức năng
-        */
+        await loadDashboard();
 
-        setupLogout();
+        setupRealtime();
 
-setupProductManagement();
-
-setupOrderManagement();
-
-setupUserManagement();
-
-setupFilters();
-
-
-        /*
-           KHÔNG tải danh sách xác thực
-           ngay khi mở trang.
-
-           Chỉ tải khi Admin bấm:
-           "Quản lý người dùng".
-        */
     }
 );

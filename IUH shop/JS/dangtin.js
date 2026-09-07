@@ -37,6 +37,9 @@ const PLATFORM_FEE_RATE = 0.05;
 
 const TERMS_VERSION = "1.0";
 
+const BOOST_FEE = 3000;
+const BOOST_DURATION_HOURS = 24;
+
 
 /* =========================================================
    BIẾN TOÀN CỤC
@@ -1301,6 +1304,533 @@ async function uploadImages(
 
 }
 
+/* =========================================================
+   ĐẨY TIN NỔI BẬT
+   ========================================================= */
+
+let boostEnabled = false;
+let boostPaymentMethod = null;
+let boostPaymentCompleted = false;
+
+const boostProductEl = document.getElementById("boostProduct");
+
+const boostPaymentModal = document.getElementById("boostPaymentModal");
+const boostPaymentBackdrop = document.getElementById("boostPaymentBackdrop");
+const closeBoostPayment = document.getElementById("closeBoostPayment");
+
+const boostWalletPayment =
+    document.getElementById("boostWalletPayment");
+
+const boostWalletBalance =
+    document.getElementById("boostWalletBalance");
+
+const payBoostWallet =
+    document.getElementById("payBoostWallet");
+
+const boostQrPayment =
+    document.getElementById("boostQrPayment");
+
+const confirmBoostQr =
+    document.getElementById("confirmBoostQr");
+
+/* NÚT CHỌN PHƯƠNG THỨC */
+const boostPaymentMethodButtons =
+    document.querySelectorAll(
+        ".boost-method"
+    );
+
+const boostPaymentStatus = document.getElementById("boostPaymentStatus");
+
+
+/* =========================================================
+   FORMAT TIỀN
+   ========================================================= */
+
+function formatBoostCurrency(value) {
+    return Number(value || 0).toLocaleString("vi-VN") + "đ";
+}
+
+
+/* =========================================================
+   KIỂM TRA CHỌN ĐẨY TIN
+   ========================================================= */
+
+if (boostProductEl) {
+    boostProductEl.addEventListener("change", function () {
+        boostEnabled = this.checked;
+
+        console.log("Đẩy tin:", boostEnabled ? "BẬT" : "TẮT");
+    });
+}
+
+
+/* =========================================================
+   MỞ MODAL THANH TOÁN
+   ========================================================= */
+
+function openBoostPaymentModal() {
+    if (!boostPaymentModal) {
+        console.error("Không tìm thấy boostPaymentModal");
+        return;
+    }
+
+    boostPaymentMethod = null;
+    boostPaymentCompleted = false;
+
+    if (boostPaymentStatus) {
+        boostPaymentStatus.textContent = "";
+        boostPaymentStatus.className = "boost-payment-status";
+    }
+
+    /* Mặc định chọn Ví IUH */
+boostPaymentMethod = "iuh_wallet";
+
+boostPaymentMethodButtons.forEach(function (button) {
+
+    if (button.dataset.paymentMethod === "wallet") {
+        button.classList.add("active");
+    } else {
+        button.classList.remove("active");
+    }
+
+});
+
+/*
+ * Hiện Ví
+ */
+if (boostWalletPayment) {
+    boostWalletPayment.hidden = false;
+}
+
+/*
+ * Ẩn QR
+ */
+if (boostQrPayment) {
+    boostQrPayment.hidden = true;
+}
+
+    boostPaymentModal.classList.add("show");
+    document.body.classList.add("modal-open");
+
+    loadBoostWalletBalance();
+}
+
+
+/* =========================================================
+   ĐÓNG MODAL
+   ========================================================= */
+
+function closeBoostPaymentModal() {
+    if (!boostPaymentModal) return;
+
+    boostPaymentModal.classList.remove("show");
+    document.body.classList.remove("modal-open");
+}
+
+if (closeBoostPayment) {
+    closeBoostPayment.addEventListener("click", function () {
+        closeBoostPaymentModal();
+    });
+}
+
+if (boostPaymentBackdrop) {
+    boostPaymentBackdrop.addEventListener("click", function () {
+        closeBoostPaymentModal();
+    });
+}
+
+
+/* =========================================================
+   ESC ĐỂ ĐÓNG
+   ========================================================= */
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && boostPaymentModal?.classList.contains("show")) {
+        closeBoostPaymentModal();
+    }
+});
+
+
+/* =========================================================
+   LẤY SỐ DƯ VÍ IUH
+   ========================================================= */
+
+async function loadBoostWalletBalance() {
+    if (!boostWalletBalance) return;
+
+    boostWalletBalance.textContent = "Đang kiểm tra...";
+
+    try {
+        if (!currentUser) {
+            boostWalletBalance.textContent = "Chưa đăng nhập";
+            return;
+        }
+
+        const { data, error } = await supabaseClient
+            .from("iuh_wallets")
+            .select("balance")
+            .eq("user_id", currentUser.id)
+            .maybeSingle();
+
+        if (error) {
+            console.error("Lỗi lấy số dư ví:", error);
+            boostWalletBalance.textContent = "Không thể kiểm tra";
+            return;
+        }
+
+        const balance = Number(data?.balance || 0);
+
+        boostWalletBalance.textContent =
+            `Số dư: ${formatBoostCurrency(balance)}`;
+
+    } catch (error) {
+        console.error(error);
+        boostWalletBalance.textContent = "Không thể kiểm tra";
+    }
+}
+
+
+/* =========================================================
+   CHỌN PHƯƠNG THỨC THANH TOÁN
+========================================================= */
+
+if (boostPaymentMethodButtons.length > 0) {
+
+    boostPaymentMethodButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const method =
+                button.dataset.paymentMethod;
+
+            /*
+             * Xóa trạng thái active của tất cả nút
+             */
+            boostPaymentMethodButtons.forEach(function (item) {
+                item.classList.remove("active");
+            });
+
+            /*
+             * Active nút vừa chọn
+             */
+            button.classList.add("active");
+
+
+            /* =========================================
+               VÍ IUH
+            ========================================= */
+
+            if (method === "wallet") {
+
+                boostPaymentMethod = "iuh_wallet";
+
+                /*
+                 * Hiện Ví
+                 */
+                if (boostWalletPayment) {
+                    boostWalletPayment.hidden = false;
+                }
+
+                /*
+                 * Ẩn QR
+                 */
+                if (boostQrPayment) {
+                    boostQrPayment.hidden = true;
+                }
+
+                if (boostPaymentStatus) {
+
+                    boostPaymentStatus.textContent =
+                        "Thanh toán 3.000đ bằng Ví IUH.";
+
+                    boostPaymentStatus.className =
+                        "boost-payment-status";
+                }
+
+                /*
+                 * Kiểm tra số dư
+                 */
+                loadBoostWalletBalance();
+
+                return;
+            }
+
+
+            /* =========================================
+               QR
+            ========================================= */
+
+            if (method === "qr") {
+
+                boostPaymentMethod =
+                    "qr_simulated";
+
+                /*
+                 * Ẩn Ví
+                 */
+                if (boostWalletPayment) {
+                    boostWalletPayment.hidden = true;
+                }
+
+                /*
+                 * HIỆN QR
+                 */
+                if (boostQrPayment) {
+                    boostQrPayment.hidden = false;
+                }
+
+                if (boostPaymentStatus) {
+
+                    boostPaymentStatus.textContent =
+                        "Quét mã QR để thanh toán 3.000đ.";
+
+                    boostPaymentStatus.className =
+                        "boost-payment-status";
+                }
+
+                return;
+            }
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+   THANH TOÁN BẰNG VÍ IUH
+   ========================================================= */
+
+if (payBoostWallet) {
+    payBoostWallet.addEventListener("click", async function () {
+
+        if (!currentUser) {
+            showToast("Vui lòng đăng nhập trước khi thanh toán.");
+            return;
+        }
+
+        payBoostWallet.disabled = true;
+        payBoostWallet.textContent = "Đang thanh toán...";
+
+        if (boostPaymentStatus) {
+            boostPaymentStatus.textContent =
+                "Đang xử lý thanh toán...";
+            boostPaymentStatus.className =
+                "boost-payment-status loading";
+        }
+
+        try {
+
+            const { data, error } = await supabaseClient
+                .rpc("pay_boost_fee");
+
+            if (error) {
+                console.error("Lỗi thanh toán đẩy tin:", error);
+
+                throw new Error(
+                    error.message || "Không thể thanh toán phí đẩy tin."
+                );
+            }
+
+            if (!data || data.success !== true) {
+                throw new Error(
+                    data?.message || "Thanh toán không thành công."
+                );
+            }
+
+            boostPaymentMethod = "iuh_wallet";
+            boostPaymentCompleted = true;
+
+            if (boostPaymentStatus) {
+                boostPaymentStatus.textContent =
+                    `Thanh toán ${formatBoostCurrency(BOOST_FEE)} thành công.`;
+
+                boostPaymentStatus.className =
+                    "boost-payment-status success";
+            }
+
+            showToast("Thanh toán phí đẩy tin thành công!");
+
+            setTimeout(async function () {
+                closeBoostPaymentModal();
+
+                await submitProductForReal();
+
+            }, 700);
+
+        } catch (error) {
+
+            console.error(error);
+
+            if (boostPaymentStatus) {
+                boostPaymentStatus.textContent =
+                    error.message || "Thanh toán thất bại.";
+
+                boostPaymentStatus.className =
+                    "boost-payment-status error";
+            }
+
+            showToast(
+                error.message || "Thanh toán thất bại."
+            );
+
+        } finally {
+
+            payBoostWallet.disabled = false;
+            payBoostWallet.textContent =
+                `Thanh toán ${formatBoostCurrency(BOOST_FEE)}`;
+        }
+    });
+}
+
+
+/* =========================================================
+   CHỌN THANH TOÁN QR
+   ========================================================= */
+
+if (boostQrPayment) {
+    boostQrPayment.addEventListener("click", function () {
+
+        boostPaymentMethod = "qr_simulated";
+
+        boostQrPayment.classList.add("active");
+
+        if (boostWalletPayment) {
+            boostWalletPayment.classList.remove("active");
+        }
+
+        if (boostPaymentStatus) {
+            boostPaymentStatus.textContent =
+                "Thanh toán QR mô phỏng. Sau khi chuyển khoản, bấm xác nhận.";
+            
+            boostPaymentStatus.className =
+                "boost-payment-status";
+        }
+    });
+}
+
+
+/* =========================================================
+   XÁC NHẬN THANH TOÁN QR MÔ PHỎNG
+   ========================================================= */
+
+if (confirmBoostQr) {
+    confirmBoostQr.addEventListener("click", async function () {
+
+        if (!currentUser) {
+            showToast("Vui lòng đăng nhập trước.");
+            return;
+        }
+
+        confirmBoostQr.disabled = true;
+        confirmBoostQr.textContent = "Đang xác nhận...";
+
+        try {
+
+    // QR là thanh toán mô phỏng
+    // Không trừ tiền trong Ví IUH
+
+    const { data, error } = await supabaseClient
+        .rpc("record_boost_qr_payment");
+
+    if (error) {
+        console.error("Lỗi ghi nhận thanh toán QR:", error);
+
+        throw new Error(
+            error.message || "Không thể xác nhận thanh toán QR."
+        );
+    }
+
+    if (!data || data.success !== true) {
+        throw new Error(
+            data?.message || "Thanh toán QR không thành công."
+        );
+    }
+
+    boostPaymentMethod = "qr_simulated";
+    boostPaymentCompleted = true;
+
+    if (boostPaymentStatus) {
+        boostPaymentStatus.textContent =
+            "Thanh toán QR đã được xác nhận.";
+
+        boostPaymentStatus.className =
+            "boost-payment-status success";
+    }
+
+    showToast("Thanh toán phí đẩy tin thành công!");
+
+    setTimeout(async function () {
+        closeBoostPaymentModal();
+
+        await submitProductForReal();
+
+    }, 700);
+
+} catch (error) {
+
+    console.error(error);
+
+    if (boostPaymentStatus) {
+        boostPaymentStatus.textContent =
+            error.message ||
+            "Không thể xác nhận thanh toán.";
+
+        boostPaymentStatus.className =
+            "boost-payment-status error";
+    }
+
+    showToast(
+        error.message ||
+        "Không thể xác nhận thanh toán."
+    );
+
+} finally {
+
+    confirmBoostQr.disabled = false;
+
+    confirmBoostQr.textContent =
+        "Tôi đã thanh toán";
+}
+    });
+}
+
+
+/* =========================================================
+   XỬ LÝ THANH TOÁN ĐẨY TIN
+   ========================================================= */
+
+async function processBoostPayment() {
+
+    /*
+     * Không chọn đẩy tin
+     * → đăng sản phẩm bình thường.
+     */
+    if (!boostEnabled) {
+        boostPaymentCompleted = false;
+        boostPaymentMethod = null;
+
+        await submitProductForReal();
+        return;
+    }
+
+    /*
+     * Đã thanh toán rồi
+     * → không thanh toán lại.
+     */
+    if (boostPaymentCompleted) {
+        await submitProductForReal();
+        return;
+    }
+
+    /*
+     * Chọn đẩy tin
+     * → mở modal thanh toán.
+     */
+    openBoostPaymentModal();
+}
+
 
 /* =========================================================
    TẠO SẢN PHẨM
@@ -1454,6 +1984,15 @@ async function createProduct() {
     /* -----------------------------------------
        LƯU SẢN PHẨM
     ----------------------------------------- */
+    const boostStartedAt = boostPaymentCompleted
+    ? new Date()
+    : null;
+
+const boostExpiresAt = boostPaymentCompleted
+    ? new Date(
+        Date.now() + BOOST_DURATION_HOURS * 60 * 60 * 1000
+      )
+    : null;
 
     const {
         data: product,
@@ -1462,35 +2001,20 @@ async function createProduct() {
         await supabaseClient
             .from("products")
             .insert({
+            seller_id: currentUser.id,
+            name,
+            category,
+            quantity,
+            price,
+            description: productDescription,
+            image_urls: imageUrls,
+            status: "active",
 
-                seller_id:
-                    currentUser.id,
-
-                name:
-                    name,
-
-                category:
-                    category,
-
-                quantity:
-                    quantity,
-
-                /*
-                 * price = giá người bán đặt
-                 */
-                price:
-                    price,
-
-                description:
-                    productDescription,
-
-                image_urls:
-                    imageUrls,
-
-                status:
-                    "active"
-
-            })
+            // Đẩy tin
+            is_boosted: boostPaymentCompleted,
+            boost_started_at: boostStartedAt,
+            boost_expires_at: boostExpiresAt
+        })
             .select("id")
             .single();
 
@@ -2209,26 +2733,17 @@ function openFinalConfirmation() {
 ========================================================= */
 
 if (finalConfirmPost) {
+    finalConfirmPost.addEventListener("click", async function () {
 
-    finalConfirmPost.addEventListener(
-        "click",
-        async function () {
+        closeModal(confirmModal);
 
-            /*
-             * Chỉ tại đây mới thực sự
-             * upload ảnh + insert products.
-             */
+        /*
+         * Kiểm tra người dùng có chọn
+         * ĐẨY TIN NỔI BẬT hay không.
+         */
+        await processBoostPayment();
 
-            closeModal(
-                confirmModal
-            );
-
-
-            await submitProductForReal();
-
-        }
-    );
-
+    });
 }
 
 

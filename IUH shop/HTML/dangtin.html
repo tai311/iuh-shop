@@ -534,6 +534,77 @@
 
         </section>
 
+        <!-- =====================================================
+     ĐẨY TIN NỔI BẬT
+===================================================== -->
+
+<section class="form-card boost-card">
+
+    <div class="card-title">
+        <div class="title-number">
+            03
+        </div>
+
+        <div>
+            <h2>
+                Đẩy tin nổi bật
+            </h2>
+
+            <p>
+                Tăng khả năng sản phẩm được người mua nhìn thấy.
+            </p>
+        </div>
+    </div>
+
+    <label class="boost-option">
+
+        <input
+            type="checkbox"
+            id="boostProduct"
+        >
+
+        <span class="boost-checkbox"></span>
+
+        <div class="boost-content">
+
+            <div class="boost-title-row">
+
+                <strong>
+                    🔥 Đẩy tin nổi bật
+                </strong>
+
+                <span class="boost-price">
+                    3.000đ
+                </span>
+
+            </div>
+
+            <p>
+                Tin được ưu tiên hiển thị trong 24 giờ
+                và có nhãn “Nổi bật”.
+            </p>
+
+            <div class="boost-benefits">
+
+                <span>✓ Ưu tiên hiển thị</span>
+                <span>✓ Nổi bật 24 giờ</span>
+                <span>✓ Có nhãn 🔥</span>
+
+            </div>
+
+        </div>
+
+    </label>
+
+    <div
+        class="boost-note"
+        id="boostNote"
+    >
+        Bạn có thể bỏ qua nếu không muốn đẩy tin.
+    </div>
+
+</section>
+
 
         <!-- HÌNH ẢNH -->
 
@@ -928,6 +999,172 @@
             </button>
 
         </div>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     POPUP 3 - THANH TOÁN ĐẨY TIN
+===================================================== -->
+
+<div
+    class="boost-payment-modal"
+    id="boostPaymentModal"
+    aria-hidden="true"
+>
+
+    <div
+        class="boost-payment-backdrop"
+        id="boostPaymentBackdrop"
+    ></div>
+
+    <div
+        class="boost-payment-dialog"
+        role="dialog"
+        aria-modal="true"
+    >
+
+        <button
+            type="button"
+            class="boost-payment-close"
+            id="closeBoostPayment"
+        >
+            ×
+        </button>
+
+        <span class="modal-label">
+            THANH TOÁN DỊCH VỤ
+        </span>
+
+        <h2>
+            Đẩy tin nổi bật
+        </h2>
+
+        <p class="boost-payment-description">
+            Tin của bạn sẽ được ưu tiên hiển thị
+            trong 24 giờ.
+        </p>
+
+        <div class="boost-payment-total">
+
+            <span>
+                Phí đẩy tin
+            </span>
+
+            <strong>
+                3.000đ
+            </strong>
+
+        </div>
+
+        <div class="boost-payment-methods">
+
+            <button
+                type="button"
+                class="boost-method active"
+                data-payment-method="wallet"
+            >
+                <span class="boost-method-icon">
+                    💰
+                </span>
+
+                <span>
+                    <strong>Ví IUH</strong>
+                    <small>
+                        Thanh toán từ số dư ví
+                    </small>
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="boost-method"
+                data-payment-method="qr"
+            >
+                <span class="boost-method-icon">
+                    ▦
+                </span>
+
+                <span>
+                    <strong>Quét QR</strong>
+                    <small>
+                        Thanh toán mô phỏng
+                    </small>
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- VÍ IUH -->
+
+        <div
+            class="boost-wallet-payment"
+            id="boostWalletPayment"
+        >
+
+            <div class="wallet-balance-box">
+
+                <span>
+                    Số dư ví IUH
+                </span>
+
+                <strong id="boostWalletBalance">
+                    Đang kiểm tra...
+                </strong>
+
+            </div>
+
+            <button
+                type="button"
+                class="boost-pay-button"
+                id="payBoostWallet"
+            >
+                Thanh toán 3.000đ
+            </button>
+
+        </div>
+
+
+        <!-- QR -->
+
+        <div
+            class="boost-qr-payment"
+            id="boostQrPayment"
+            hidden
+        >
+
+            <div class="fake-qr">
+
+                <div class="fake-qr-pattern">
+                    QR
+                </div>
+
+            </div>
+
+            <p>
+                Quét mã QR để thanh toán 3.000đ
+            </p>
+
+            <button
+                type="button"
+                class="boost-pay-button"
+                id="confirmBoostQr"
+            >
+                Tôi đã thanh toán
+            </button>
+
+        </div>
+
+
+        <p
+            class="boost-payment-status"
+            id="boostPaymentStatus"
+        ></p>
 
     </div>
 

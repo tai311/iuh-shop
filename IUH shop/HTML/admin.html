@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Quản trị - IUH SHOP</title>
+    <title>Admin Dashboard - IUH SHOP</title>
 
     <link
         rel="preconnect"
@@ -30,714 +30,1297 @@
 
     <link
         rel="stylesheet"
-        href="../CSS/admin.css?v=20260818"
+        href="../CSS/admin.css?v=20260907"
     >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
 
 </head>
 
 
 <body>
 
-    <!-- =========================================
-         HEADER ADMIN
-    ========================================== -->
+<div class="admin-app">
 
-    <header class="admin-header">
 
-        <div class="admin-header-left">
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
 
-            <a
-                href="trangchu.html"
-                class="admin-brand"
+    <aside class="admin-sidebar">
+
+        <div class="sidebar-brand">
+
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH SHOP"
             >
 
-                <img
-                    src="../Images/logo-trang.png"
-                    alt="IUH SHOP"
-                >
-
-                <div>
-
-                    <strong>IUH SHOP</strong>
-
-                    <span>
-                        Trang quản trị
-                    </span>
-
-                </div>
-
-            </a>
+            <div>
+                <strong>IUH SHOP</strong>
+                <span>ADMIN</span>
+            </div>
 
         </div>
 
 
-        <div class="admin-header-right">
+        <div class="sidebar-section-title">
+            QUẢN TRỊ
+        </div>
 
-            <span
-                id="adminName"
-                class="admin-name"
+
+        <nav class="admin-nav">
+
+            <button
+                class="admin-nav-item active"
+                data-page="dashboard"
+                type="button"
             >
-                Admin
-            </span>
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </button>
+
+
+            <button
+                class="admin-nav-item"
+                data-page="users"
+                type="button"
+            >
+                <span class="nav-icon">👥</span>
+                <span>Người dùng</span>
+            </button>
+
+
+            <button
+                class="admin-nav-item"
+                data-page="products"
+                type="button"
+            >
+                <span class="nav-icon">📦</span>
+                <span>Tin đăng</span>
+            </button>
+
+
+            <button
+                class="admin-nav-item"
+                data-page="orders"
+                type="button"
+            >
+                <span class="nav-icon">🛒</span>
+                <span>Đơn hàng</span>
+            </button>
+
+
+            <button
+                class="admin-nav-item"
+                data-page="forum"
+                type="button"
+            >
+                <span class="nav-icon">💬</span>
+                <span>Diễn đàn</span>
+            </button>
+
+
+            <button
+                class="admin-nav-item"
+                data-page="finance"
+                type="button"
+            >
+                <span class="nav-icon">💰</span>
+                <span>Tài chính</span>
+            </button>
+
+
+            <button
+                class="admin-nav-item disabled"
+                type="button"
+                title="Tính năng đang phát triển"
+            >
+                <span class="nav-icon">📦</span>
+                <span>Ký gửi</span>
+                <small>Sắp có</small>
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a
+                href="trangchu.html"
+                class="back-home"
+            >
+                ← Về trang chính
+            </a>
 
             <button
                 id="adminLogout"
-                class="logout-btn"
                 type="button"
+                class="logout-button"
             >
                 Đăng xuất
             </button>
 
         </div>
 
-    </header>
+    </aside>
 
 
 
-    <!-- =========================================
-         NỘI DUNG
-    ========================================== -->
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
 
-    <main class="admin-container">
+    <main class="admin-main">
 
-        <!-- Tiêu đề -->
 
-        <section class="admin-welcome">
+        <!-- TOPBAR -->
+
+        <header class="admin-topbar">
 
             <div>
 
-                <span class="admin-label">
-                    ADMINISTRATOR
+                <span class="topbar-label">
+                    ADMINISTRATION
                 </span>
 
-                <h1>
-                    Bảng điều khiển
+                <h1 id="pageTitle">
+                    Tổng quan
                 </h1>
 
-                <p>
-                    Quản lý và theo dõi hoạt động
-                    của IUH SHOP.
-                </p>
-
             </div>
 
-        </section>
 
+            <div class="admin-profile">
 
-
-        <!-- =====================================
-             THỐNG KÊ
-        ====================================== -->
-
-        <section class="admin-stats">
-
-            <div class="admin-stat-card">
-
-                <div class="admin-stat-icon">
-                    👥
+                <div class="admin-profile-avatar">
+                    A
                 </div>
 
                 <div>
 
-                    <span>
-                        Người dùng
-                    </span>
-
-                    <strong id="totalUsers">
-                        --
+                    <strong id="adminName">
+                        Admin
                     </strong>
+
+                    <span>
+                        Quản trị viên
+                    </span>
 
                 </div>
 
             </div>
 
+        </header>
 
-            <div class="admin-stat-card">
 
-                <div class="admin-stat-icon">
-                    📦
-                </div>
+
+        <!-- =================================================
+             DASHBOARD
+        ================================================== -->
+
+        <section
+            class="admin-page active"
+            id="page-dashboard"
+        >
+
+            <div class="welcome-panel">
 
                 <div>
 
-                    <span>
-                        Sản phẩm
+                    <span class="eyebrow">
+                        IUH SHOP
                     </span>
 
-                    <strong id="totalProducts">
-                        --
-                    </strong>
+                    <h2>
+                        Xin chào, Admin 👋
+                    </h2>
 
+                    <p>
+                        Quản lý người dùng, tin đăng,
+                        đơn hàng và hoạt động của hệ thống
+                        tại một nơi.
+                    </p>
+
+                </div>
+
+                <div class="welcome-decoration">
+                    ◈
                 </div>
 
             </div>
 
 
-            <div class="admin-stat-card">
 
-                <div class="admin-stat-icon">
-                    🛒
-                </div>
+            <!-- KPI -->
 
-                <div>
+            <div class="kpi-grid">
 
-                    <span>
-                        Đơn hàng
-                    </span>
+                <div class="kpi-card">
 
-                    <strong id="totalOrders">
-                        --
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div class="admin-stat-card">
-
-                <div class="admin-stat-icon">
-                    ⚠
-                </div>
-
-                <div>
-
-                    <span>
-                        Chờ xử lý
-                    </span>
-
-                    <strong id="pendingItems">
-                        --
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =====================================
-             CHỨC NĂNG QUẢN TRỊ
-        ====================================== -->
-
-        <section class="admin-section">
-
-            <div class="section-heading">
-
-                <h2>
-                    Quản lý hệ thống
-                </h2>
-
-                <p>
-                    Các chức năng quản trị IUH SHOP
-                </p>
-
-            </div>
-
-
-            <div class="admin-menu-grid">
-
-
-                <!-- Người dùng -->
-
-                <button
-                    type="button"
-                    class="admin-menu-card"
-                    id="manageUsers"
-                >
-
-                    <div class="menu-icon">
+                    <div class="kpi-icon blue">
                         👥
                     </div>
 
                     <div>
-
-                        <h3>
-                            Quản lý người dùng
-                        </h3>
-
-                        <p>
-                            Xem và quản lý tài khoản
-                            sinh viên.
-                        </p>
-
+                        <span>Người dùng</span>
+                        <strong id="statUsers">0</strong>
+                        <small>Tài khoản hệ thống</small>
                     </div>
 
-                    <span class="menu-arrow">
-                        →
-                    </span>
-
-                </button>
+                </div>
 
 
-            
+                <div class="kpi-card">
 
-                <!-- Sản phẩm -->
-
-                <button
-                    type="button"
-                    class="admin-menu-card"
-                    id="manageProducts"
-                >
-
-                    <div class="menu-icon">
+                    <div class="kpi-icon purple">
                         📦
                     </div>
 
                     <div>
-
-                        <h3>
-                            Quản lý sản phẩm
-                        </h3>
-
-                        <p>
-                            Kiểm tra và quản lý
-                            sản phẩm được đăng bán.
-                        </p>
-
+                        <span>Tin đăng</span>
+                        <strong id="statProducts">0</strong>
+                        <small>Tin đang hoạt động</small>
                     </div>
 
-                    <span class="menu-arrow">
-                        →
-                    </span>
-
-                </button>
+                </div>
 
 
+                <div class="kpi-card">
 
-                <!-- Danh mục -->
-
-                <button
-                    type="button"
-                    class="admin-menu-card"
-                    id="manageCategories"
-                >
-
-                    <div class="menu-icon">
-                        🏷
-                    </div>
-
-                    <div>
-
-                        <h3>
-                            Quản lý danh mục
-                        </h3>
-
-                        <p>
-                            Quản lý các danh mục
-                            sản phẩm.
-                        </p>
-
-                    </div>
-
-                    <span class="menu-arrow">
-                        →
-                    </span>
-
-                </button>
-
-
-
-                <!-- Đơn hàng -->
-
-                <button
-                    type="button"
-                    class="admin-menu-card"
-                    id="manageOrders"
-                >
-
-                    <div class="menu-icon">
+                    <div class="kpi-icon orange">
                         🛒
                     </div>
 
                     <div>
+                        <span>Đơn hàng</span>
+                        <strong id="statOrders">0</strong>
+                        <small>Tổng đơn hàng</small>
+                    </div>
 
-                        <h3>
-                            Quản lý đơn hàng
-                        </h3>
+                </div>
 
-                        <p>
-                            Theo dõi và xử lý
-                            các đơn hàng.
-                        </p>
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon red">
+                        ⏳
+                    </div>
+
+                    <div>
+                        <span>Chờ xử lý</span>
+                        <strong id="statPending">0</strong>
+                        <small>Cần Admin theo dõi</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DASHBOARD GRID -->
+
+            <div class="dashboard-grid">
+
+
+                <div class="dashboard-card large">
+
+                    <div class="card-heading">
+
+                        <div>
+
+                            <span class="eyebrow">
+                                PLATFORM
+                            </span>
+
+                            <h3>
+                                Hoạt động hệ thống
+                            </h3>
+
+                        </div>
 
                     </div>
 
-                    <span class="menu-arrow">
-                        →
-                    </span>
 
-                </button>
+                    <div class="activity-list">
 
+                        <div class="activity-row">
+
+                            <div class="activity-icon">
+                                👥
+                            </div>
+
+                            <div>
+                                <strong>Người dùng</strong>
+                                <span>Tổng tài khoản</span>
+                            </div>
+
+                            <b id="activityUsers">0</b>
+
+                        </div>
+
+
+                        <div class="activity-row">
+
+                            <div class="activity-icon">
+                                📦
+                            </div>
+
+                            <div>
+                                <strong>Tin đang bán</strong>
+                                <span>Sản phẩm đang hiển thị</span>
+                            </div>
+
+                            <b id="activityProducts">0</b>
+
+                        </div>
+
+
+                        <div class="activity-row">
+
+                            <div class="activity-icon">
+                                🔥
+                            </div>
+
+                            <div>
+                                <strong>Tin nổi bật</strong>
+                                <span>Đang được đẩy trong 24 giờ</span>
+                            </div>
+
+                            <b id="activityBoosted">0</b>
+
+                        </div>
+
+
+                        <div class="activity-row">
+
+                            <div class="activity-icon">
+                                💬
+                            </div>
+
+                            <div>
+                                <strong>Bài diễn đàn</strong>
+                                <span>Nội dung cộng đồng</span>
+                            </div>
+
+                            <b id="activityPosts">0</b>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="dashboard-card">
+
+                    <div class="card-heading">
+
+                        <div>
+
+                            <span class="eyebrow">
+                                REVENUE
+                            </span>
+
+                            <h3>
+                                Doanh thu nền tảng
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="revenue-big"
+                         id="dashboardRevenue">
+                        0đ
+                    </div>
+
+
+                    <p class="muted">
+                        Tổng các khoản phí đã ghi nhận
+                        vào ví Admin.
+                    </p>
+
+
+                    <div class="revenue-items">
+
+                        <div>
+                            <span>Phí sàn</span>
+                            <strong id="revenuePlatform">
+                                0đ
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Phí đẩy tin</span>
+                            <strong id="revenueBoost">
+                                0đ
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
-        </section>
 
-        <!-- =====================================
-     QUẢN LÝ TIN ĐĂNG
-====================================== -->
+            <!-- QUICK ACTION -->
 
-<section
-    class="products-section"
-    id="productsSection"
-    aria-hidden="true"
->
+            <div class="quick-actions">
 
-    <div class="products-heading">
+                <button
+                    data-page="users"
+                    type="button"
+                >
+                    <span>👥</span>
+                    <div>
+                        <strong>Quản lý người dùng</strong>
+                        <small>Xem hồ sơ và xác thực sinh viên</small>
+                    </div>
+                    <b>→</b>
+                </button>
 
-        <div>
 
-            <span class="admin-label">
-                TIN ĐĂNG
-            </span>
+                <button
+                    data-page="products"
+                    type="button"
+                >
+                    <span>📦</span>
+                    <div>
+                        <strong>Quản lý tin đăng</strong>
+                        <small>Ẩn, hiện, xóa và kiểm tra tin nổi bật</small>
+                    </div>
+                    <b>→</b>
+                </button>
 
-            <h2>
-                Quản lý tin đăng
-            </h2>
 
-            <p>
-                Admin có thể ẩn, hiện hoặc xóa
-                tin đăng của sinh viên.
-            </p>
+                <button
+                    data-page="orders"
+                    type="button"
+                >
+                    <span>🛒</span>
+                    <div>
+                        <strong>Quản lý đơn hàng</strong>
+                        <small>Xem chi tiết và trạng thái đơn</small>
+                    </div>
+                    <b>→</b>
+                </button>
+
+
+                <button
+                    data-page="forum"
+                    type="button"
+                >
+                    <span>💬</span>
+                    <div>
+                        <strong>Kiểm duyệt diễn đàn</strong>
+                        <small>Ẩn hoặc hiện bài viết cộng đồng</small>
+                    </div>
+                    <b>→</b>
+                </button>
+
+            </div>
+
+            <!-- =================================================
+     BIỂU ĐỒ DASHBOARD
+================================================== -->
+
+<section class="admin-chart-grid">
+
+    <!-- DOANH THU -->
+    <div class="admin-chart-card">
+
+        <div class="admin-chart-header">
+
+            <div>
+                <span class="admin-chart-label">
+                    DOANH THU
+                </span>
+
+                <h3>
+                    Doanh thu nền tảng
+                </h3>
+
+                <p>
+                    Phí sàn và phí đẩy tin
+                </p>
+            </div>
+
+            <strong id="chartRevenueTotal">
+                0đ
+            </strong>
 
         </div>
 
-
-        <button
-            type="button"
-            class="products-close"
-            id="closeProducts"
-        >
-            Đóng
-        </button>
-
-    </div>
-
-
-    <!-- THANH TÌM KIẾM + LỌC -->
-
-    <div class="products-toolbar">
-
-        <div class="products-search">
-
-            <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-            >
-
-                <circle
-                    cx="11"
-                    cy="11"
-                    r="7"
-                ></circle>
-
-                <path
-                    d="M16 16l5 5"
-                ></path>
-
-            </svg>
-
-
-            <input
-                type="search"
-                id="productsSearch"
-                placeholder="Tìm tên sản phẩm hoặc người bán..."
-            >
-
-        </div>
-
-
-        <div class="products-filter">
-
-            <button
-                type="button"
-                class="product-filter-button active"
-                data-product-filter="all"
-            >
-                Tất cả
-            </button>
-
-
-            <button
-                type="button"
-                class="product-filter-button"
-                data-product-filter="active"
-            >
-                Đang hiển thị
-            </button>
-
-
-            <button
-                type="button"
-                class="product-filter-button"
-                data-product-filter="hidden"
-            >
-                Đang ẩn
-            </button>
-
+        <div class="admin-chart-box">
+            <canvas id="revenueChart"></canvas>
         </div>
 
     </div>
 
 
-    <!-- THỐNG KÊ -->
+    <!-- ĐƠN HÀNG -->
+    <div class="admin-chart-card">
 
-    <div
-        class="products-summary"
-        id="productsSummary"
-    >
-        Chưa tải danh sách tin đăng.
-    </div>
+        <div class="admin-chart-header">
 
+            <div>
+                <span class="admin-chart-label">
+                    ĐƠN HÀNG
+                </span>
 
-    <!-- DANH SÁCH -->
+                <h3>
+                    Đơn hàng theo ngày
+                </h3>
 
-    <div
-        class="products-list"
-        id="productsList"
-    >
+                <p>
+                    Số lượng đơn phát sinh
+                </p>
+            </div>
 
-        <div class="products-loading">
+            <strong id="chartOrdersTotal">
+                0
+            </strong>
 
-            Bấm “Quản lý sản phẩm”
-            để tải danh sách tin đăng.
+        </div>
 
+        <div class="admin-chart-box">
+            <canvas id="ordersChart"></canvas>
         </div>
 
     </div>
 
 </section>
 
-        <!-- =====================================
-             QUẢN LÝ XÁC THỰC SINH VIÊN
-        ====================================== -->
+<section class="admin-transactions-card">
+
+    <div class="admin-transactions-header">
+
+        <div>
+            <span class="admin-chart-label">TÀI CHÍNH</span>
+
+            <h3>Giao dịch phát sinh</h3>
+
+            <p>
+                Các giao dịch doanh thu của nền tảng
+            </p>
+        </div>
+
+        <div class="transaction-total-label">
+            Toàn bộ giao dịch
+        </div>
+
+    </div>
+
+
+    <div id="dashboardTransactions"
+         class="dashboard-transactions">
+
+        <div class="empty-transaction">
+            Đang tải giao dịch...
+        </div>
+
+    </div>
+
+</section>
+
+        </section>
+
+
+
+        <!-- =================================================
+             USERS
+        ================================================== -->
 
         <section
-            class="verification-section"
-            id="verificationSection"
-            aria-hidden="true"
+            class="admin-page"
+            id="page-users"
         >
 
-            <div class="verification-heading">
+            <div class="page-header">
 
                 <div>
-                    <span class="admin-label">XÁC THỰC</span>
+
+                    <span class="eyebrow">
+                        USERS
+                    </span>
 
                     <h2>
-                        Quản lý tích xác thực sinh viên
+                        Quản lý người dùng
                     </h2>
 
                     <p>
-                        Admin có thể cấp hoặc thu hồi tích xác thực
-                        cho tài khoản sinh viên.
+                        Xem thông tin tài khoản và quản lý
+                        xác thực sinh viên.
                     </p>
-                </div>
 
-                <button
-                    type="button"
-                    class="verification-close"
-                    id="closeVerification"
-                >
-                    Đóng
-                </button>
+                </div>
 
             </div>
 
-            <div class="verification-toolbar">
 
-                <div class="verification-search">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <circle cx="11" cy="11" r="7"></circle>
-                        <path d="M16 16l5 5"></path>
-                    </svg>
+            <div class="toolbar">
+
+                <div class="search-box">
+
+                    <span>⌕</span>
 
                     <input
+                        id="userSearch"
                         type="search"
-                        id="verificationSearch"
-                        placeholder="Tìm tên hoặc email sinh viên..."
+                        placeholder="Tìm tên, email, MSSV..."
                     >
+
                 </div>
 
-                <div class="verification-filter">
-                    <button type="button" class="filter-button active" data-filter="all">
+
+                <div class="filter-tabs">
+
+                    <button
+                        class="user-filter active"
+                        data-user-filter="all"
+                        type="button"
+                    >
                         Tất cả
                     </button>
-                    <button type="button" class="filter-button" data-filter="unverified">
-                        Chưa có tích
+
+                    <button
+                        class="user-filter"
+                        data-user-filter="verified"
+                        type="button"
+                    >
+                        Đã xác thực
                     </button>
-                    <button type="button" class="filter-button" data-filter="verified">
-                        Đã có tích
+
+                    <button
+                        class="user-filter"
+                        data-user-filter="unverified"
+                        type="button"
+                    >
+                        Chưa xác thực
                     </button>
+
                 </div>
 
             </div>
 
-            <div class="verification-summary" id="verificationSummary">
-                Chưa tải danh sách.
+
+            <div
+                class="result-summary"
+                id="userSummary"
+            >
+                Đang tải...
             </div>
 
-            <div class="verification-list" id="verificationList">
-                <div class="verification-loading">
-                    Bấm “Quản lý người dùng” để tải danh sách tài khoản.
+
+            <div
+                class="user-table-wrap"
+                id="usersList"
+            >
+
+                <div class="loading-box">
+                    Đang tải người dùng...
                 </div>
+
             </div>
 
         </section>
 
-        <!-- =====================================
-     QUẢN LÝ ĐƠN HÀNG
-====================================== -->
 
-<section
-    class="products-section"
-    id="ordersSection"
-    aria-hidden="true"
+
+        <!-- =================================================
+             PRODUCTS
+        ================================================== -->
+
+        <section
+            class="admin-page"
+            id="page-products"
+        >
+
+            <div class="page-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        LISTINGS
+                    </span>
+
+                    <h2>
+                        Quản lý tin đăng
+                    </h2>
+
+                    <p>
+                        Kiểm soát sản phẩm và tin nổi bật
+                        trên IUH SHOP.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="toolbar">
+
+                <div class="search-box">
+
+                    <span>⌕</span>
+
+                    <input
+                        id="productSearch"
+                        type="search"
+                        placeholder="Tìm sản phẩm hoặc người bán..."
+                    >
+
+                </div>
+
+
+                <div class="filter-tabs">
+
+                    <button
+                        class="product-filter active"
+                        data-product-filter="all"
+                        type="button"
+                    >
+                        Tất cả
+                    </button>
+
+                    <button
+                        class="product-filter"
+                        data-product-filter="active"
+                        type="button"
+                    >
+                        Đang hiển thị
+                    </button>
+
+                    <button
+                        class="product-filter"
+                        data-product-filter="hidden"
+                        type="button"
+                    >
+                        Đang ẩn
+                    </button>
+
+                    <button
+                        class="product-filter"
+                        data-product-filter="boosted"
+                        type="button"
+                    >
+                        🔥 Nổi bật
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="result-summary"
+                id="productSummary"
+            >
+                Đang tải...
+            </div>
+
+
+            <div
+                class="listing-grid"
+                id="productsList"
+            >
+
+                <div class="loading-box">
+                    Đang tải tin đăng...
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             ORDERS
+        ================================================== -->
+
+        <section
+            class="admin-page"
+            id="page-orders"
+        >
+
+            <div class="page-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        ORDERS
+                    </span>
+
+                    <h2>
+                        Quản lý đơn hàng
+                    </h2>
+
+                    <p>
+                        Theo dõi người mua, sản phẩm,
+                        thanh toán và tin nổi bật.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="toolbar">
+
+                <div class="search-box">
+
+                    <span>⌕</span>
+
+                    <input
+                        id="orderSearch"
+                        type="search"
+                        placeholder="Tìm mã đơn, người mua..."
+                    >
+
+                </div>
+
+
+                <div class="filter-tabs">
+
+                    <button
+                        class="order-filter active"
+                        data-order-filter="all"
+                        type="button"
+                    >
+                        Tất cả
+                    </button>
+
+                    <button
+                        class="order-filter"
+                        data-order-filter="pending"
+                        type="button"
+                    >
+                        Chờ xử lý
+                    </button>
+
+                    <button
+                        class="order-filter"
+                        data-order-filter="shipping"
+                        type="button"
+                    >
+                        Đang giao
+                    </button>
+
+                    <button
+                        class="order-filter"
+                        data-order-filter="completed"
+                        type="button"
+                    >
+                        Hoàn thành
+                    </button>
+
+                    <button
+                        class="order-filter"
+                        data-order-filter="cancelled"
+                        type="button"
+                    >
+                        Đã hủy
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="result-summary"
+                id="orderSummary"
+            >
+                Đang tải...
+            </div>
+
+
+            <div
+                class="orders-list"
+                id="ordersList"
+            >
+
+                <div class="loading-box">
+                    Đang tải đơn hàng...
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             FORUM
+        ================================================== -->
+
+        <section
+            class="admin-page"
+            id="page-forum"
+        >
+
+            <div class="page-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        COMMUNITY
+                    </span>
+
+                    <h2>
+                        Kiểm duyệt diễn đàn
+                    </h2>
+
+                    <p>
+                        Quản lý nội dung được đăng
+                        trong cộng đồng IUH SHOP.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="toolbar">
+
+                <div class="search-box">
+
+                    <span>⌕</span>
+
+                    <input
+                        id="forumSearch"
+                        type="search"
+                        placeholder="Tìm nội dung bài viết..."
+                    >
+
+                </div>
+
+
+                <div class="filter-tabs">
+
+                    <button
+                        class="forum-filter active"
+                        data-forum-filter="all"
+                        type="button"
+                    >
+                        Tất cả
+                    </button>
+
+                    <button
+                        class="forum-filter"
+                        data-forum-filter="active"
+                        type="button"
+                    >
+                        Đang hiển thị
+                    </button>
+
+                    <button
+                        class="forum-filter"
+                        data-forum-filter="hidden"
+                        type="button"
+                    >
+                        Đang ẩn
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="result-summary"
+                id="forumSummary"
+            >
+                Đang tải...
+            </div>
+
+
+            <div
+                class="forum-list"
+                id="forumList"
+            >
+
+                <div class="loading-box">
+                    Đang tải bài viết...
+                </div>
+
+            </div>
+
+        
+
+        </section>
+
+
+
+        <!-- =================================================
+             FINANCE
+        ================================================== -->
+
+        <section
+            class="admin-page"
+            id="page-finance"
+        >
+
+            <div class="page-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        FINANCE
+                    </span>
+
+                    <h2>
+                        Tài chính
+                    </h2>
+
+                    <p>
+                        Theo dõi các khoản thu của hệ thống.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="finance-summary">
+
+                <div class="finance-total">
+
+                    <span>
+                        Tổng doanh thu nền tảng
+                    </span>
+
+                    <strong id="financeTotal">
+                        0đ
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="finance-table-wrap">
+
+                <div class="finance-table-head">
+                    <span>Thời gian</span>
+                    <span>Nội dung</span>
+                    <span>Loại phí</span>
+                    <span>Số tiền</span>
+                </div>
+
+
+                <div
+                    id="financeList"
+                    class="finance-list"
+                >
+
+                    <div class="loading-box">
+                        Đang tải giao dịch...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     USER DETAIL MODAL
+========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="userModal"
+    hidden
 >
 
-    <div class="products-heading">
+    <div
+        class="modal-card user-modal"
+        role="dialog"
+        aria-modal="true"
+    >
 
-        <div>
+        <button
+            class="modal-close"
+            data-close-modal="userModal"
+            type="button"
+        >
+            ×
+        </button>
 
-            <span class="admin-label">
-                ĐƠN HÀNG
+
+        <div class="user-detail-header">
+
+            <img
+                id="detailAvatar"
+                src="../Images/default-avatar.svg"
+                alt="Avatar"
+            >
+
+            <div>
+
+                <span class="eyebrow">
+                    USER PROFILE
+                </span>
+
+                <h2 id="detailName">
+                    Người dùng
+                </h2>
+
+                <p id="detailEmail">
+                    -
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="detail-status"
+            id="detailStatus"
+        ></div>
+
+
+        <div
+            class="detail-grid"
+            id="userDetailGrid"
+        ></div>
+
+
+        <div class="modal-actions">
+
+            <button
+                id="detailVerificationButton"
+                type="button"
+                class="primary-button"
+            >
+                Cấp xác thực
+            </button>
+
+            <button
+                class="secondary-button"
+                data-close-modal="userModal"
+                type="button"
+            >
+                Đóng
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     ORDER DETAIL MODAL
+========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="orderModal"
+    hidden
+>
+
+    <div
+        class="modal-card order-modal"
+        role="dialog"
+        aria-modal="true"
+    >
+
+        <button
+            class="modal-close"
+            data-close-modal="orderModal"
+            type="button"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-heading">
+
+            <span class="eyebrow">
+                ORDER DETAIL
             </span>
 
-            <h2>
-                Quản lý đơn hàng
+            <h2 id="orderDetailCode">
+                Đơn hàng
             </h2>
 
-            <p>
-                Theo dõi và xử lý các đơn hàng
-                của IUH SHOP.
+            <p id="orderDetailDate">
+                -
             </p>
 
         </div>
 
-        <button
-            type="button"
-            class="products-close"
-            id="closeOrders"
-        >
-            Đóng
-        </button>
 
-    </div>
+        <div
+            class="order-detail-info"
+            id="orderDetailInfo"
+        ></div>
 
 
-    <!-- THANH TÌM KIẾM + LỌC -->
+        <h3 class="modal-subtitle">
+            Sản phẩm trong đơn
+        </h3>
 
-    <div class="products-toolbar">
 
-        <div class="products-search">
+        <div
+            class="order-items"
+            id="orderDetailItems"
+        ></div>
 
-            <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-            >
-                <circle
-                    cx="11"
-                    cy="11"
-                    r="7"
-                ></circle>
 
-                <path
-                    d="M16 16l5 5"
-                ></path>
+        <div class="order-total-box">
 
-            </svg>
+            <span>
+                Tổng đơn hàng
+            </span>
 
-            <input
-                type="search"
-                id="ordersSearch"
-                placeholder="Tìm mã đơn hoặc người mua..."
-            >
+            <strong id="orderDetailTotal">
+                0đ
+            </strong>
 
         </div>
 
 
-        <div class="products-filter">
+        <div class="modal-actions">
 
             <button
+                class="secondary-button"
+                data-close-modal="orderModal"
                 type="button"
-                class="product-filter-button active"
-                data-order-filter="all"
             >
-                Tất cả
-            </button>
-
-            <button
-                type="button"
-                class="product-filter-button"
-                data-order-filter="pending"
-            >
-                Chờ xử lý
-            </button>
-
-            <button
-                type="button"
-                class="product-filter-button"
-                data-order-filter="shipping"
-            >
-                Đang giao
-            </button>
-
-            <button
-                type="button"
-                class="product-filter-button"
-                data-order-filter="completed"
-            >
-                Hoàn thành
+                Đóng
             </button>
 
         </div>
 
     </div>
 
-
-    <!-- THỐNG KÊ -->
-
-    <div
-        class="products-summary"
-        id="ordersSummary"
-    >
-        Chưa tải danh sách đơn hàng.
-    </div>
+</div>
 
 
-    <!-- DANH SÁCH ĐƠN -->
-
-    <div
-        class="products-list"
-        id="ordersList"
-    >
-
-        <div class="products-loading">
-            Bấm “Quản lý đơn hàng”
-            để tải danh sách.
-        </div>
-
-    </div>
-
-</section>
-
-    </main>
-
-
-
-    <!-- =========================================
-         SUPABASE
-    ========================================== -->
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
-
-    <script
-        src="../JS/admin.js"
-    ></script>
+<script src="../JS/admin.js?v=20260907"></script>
 
 </body>
 

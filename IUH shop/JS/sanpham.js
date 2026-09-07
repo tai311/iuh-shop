@@ -115,17 +115,20 @@ async function loadProducts() {
             .from("products")
 
             .select(`
-                id,
-                seller_id,
-                name,
-                category,
-                quantity,
-                price,
-                description,
-                image_urls,
-                status,
-                created_at
-            `)
+    id,
+    seller_id,
+    name,
+    category,
+    quantity,
+    price,
+    description,
+    image_urls,
+    status,
+    created_at,
+    is_boosted,
+    boost_started_at,
+    boost_expires_at
+`)
 
             .eq(
                 "status",
@@ -507,52 +510,68 @@ function getFilteredProducts() {
 
     result.sort((a, b) => {
 
-        if (state.sort === "newest") {
+    /* ==============================
+       TIN NỔI BẬT LÊN TRƯỚC
+    ============================== */
 
-            return new Date(b.created_at)
-                - new Date(a.created_at);
+    const aBoosted = isBoostActive(a);
+    const bBoosted = isBoostActive(b);
 
-        }
-
-
-        if (state.sort === "oldest") {
-
-            return new Date(a.created_at)
-                - new Date(b.created_at);
-
-        }
+    if (aBoosted !== bBoosted) {
+        return Number(bBoosted) - Number(aBoosted);
+    }
 
 
-        if (state.sort === "nameAZ") {
+    /* ==============================
+       SẮP XẾP BÌNH THƯỜNG
+    ============================== */
 
-            return (a.name || "")
-                .localeCompare(
-                    b.name || "",
-                    "vi"
-                );
+    if (state.sort === "newest") {
 
-        }
+        return new Date(b.created_at)
+            - new Date(a.created_at);
 
-
-        if (state.sort === "quantityHigh") {
-
-            return Number(b.quantity)
-                - Number(a.quantity);
-
-        }
+    }
 
 
-        if (state.sort === "quantityLow") {
+    if (state.sort === "oldest") {
 
-            return Number(a.quantity)
-                - Number(b.quantity);
+        return new Date(a.created_at)
+            - new Date(b.created_at);
 
-        }
+    }
 
 
-        return 0;
+    if (state.sort === "nameAZ") {
 
-    });
+        return (a.name || "")
+            .localeCompare(
+                b.name || "",
+                "vi"
+            );
+
+    }
+
+
+    if (state.sort === "quantityHigh") {
+
+        return Number(b.quantity)
+            - Number(a.quantity);
+
+    }
+
+
+    if (state.sort === "quantityLow") {
+
+        return Number(a.quantity)
+            - Number(b.quantity);
+
+    }
+
+
+    return 0;
+
+});
 
 
     return result;
@@ -570,6 +589,17 @@ function formatCurrency(value) {
     return Number(value || 0).toLocaleString("vi-VN") + "đ";
 }
 
+function isBoostActive(product) {
+    if (product.is_boosted !== true) {
+        return false;
+    }
+
+    if (!product.boost_expires_at) {
+        return false;
+    }
+
+    return new Date(product.boost_expires_at).getTime() > Date.now();
+}
 
 /* =====================================================
    CARD SẢN PHẨM
@@ -607,28 +637,35 @@ function renderProductCard(product) {
         >
 
             <div
-                class="product-image-wrap"
-                data-detail-id="${product.id}"
-            >
+    class="product-image-wrap"
+    data-detail-id="${product.id}"
+>
 
-                <img
-                    class="product-image"
-                    src="${esc(firstImage)}"
-                    alt="${esc(product.name)}"
-                    loading="lazy"
-                    onerror="
-                        this.src='../Images/default-product.png'
-                    "
-                >
-
-
-                <span class="product-category-badge">
-
-                    ${esc(product.category)}
-
+    ${
+        isBoostActive(product)
+            ? `
+                <span class="product-featured-badge">
+                    🔥 NỔI BẬT
                 </span>
+              `
+            : ""
+    }
 
-            </div>
+    <img
+        class="product-image"
+        src="${esc(firstImage)}"
+        alt="${esc(product.name)}"
+        loading="lazy"
+        onerror="
+            this.src='../Images/default-product.png'
+        "
+    >
+
+    <span class="product-category-badge">
+        ${esc(product.category)}
+    </span>
+
+</div>
 
 
             <div class="product-card-body">

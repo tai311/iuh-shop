@@ -1011,21 +1011,19 @@ async function loadForumPosts() {
 
 
     const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from(
-                "forum_posts"
-            )
-            .select("*")
-            .order(
-                "created_at",
-                {
-                    ascending:
-                        false
-                }
-            );
+    data,
+    error
+} =
+    await supabaseClient
+        .from("forum_posts")
+        .select("*")
+        .eq("moderation_status", "active")
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
+        );
 
 
     if (error) {

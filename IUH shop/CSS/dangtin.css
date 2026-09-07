@@ -3396,3 +3396,480 @@ body {
 
     display: none;
 }
+
+/* =========================================================
+   ĐẨY TIN NỔI BẬT
+========================================================= */
+
+.boost-card {
+    position: relative;
+}
+
+.boost-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    padding: 18px;
+
+    border: 1px solid #dfe5f0;
+    border-radius: 10px;
+
+    background: #fafbfe;
+
+    cursor: pointer;
+
+    transition:
+        border-color .2s ease,
+        background .2s ease,
+        box-shadow .2s ease;
+}
+
+.boost-option:hover {
+    border-color: var(--blue);
+    background: #f8faff;
+}
+
+.boost-option:has(input:checked) {
+    border-color: var(--blue);
+    background: var(--blue-soft);
+
+    box-shadow:
+        0 5px 18px rgba(25, 63, 158, .08);
+}
+
+.boost-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.boost-checkbox {
+    width: 22px;
+    height: 22px;
+
+    flex-shrink: 0;
+
+    margin-top: 2px;
+
+    border: 2px solid #cbd4e3;
+    border-radius: 5px;
+
+    background: #fff;
+
+    position: relative;
+}
+
+.boost-option input:checked + .boost-checkbox {
+    border-color: var(--blue);
+    background: var(--blue);
+}
+
+.boost-option input:checked + .boost-checkbox::after {
+    content: "✓";
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    color: #fff;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.boost-content {
+    flex: 1;
+}
+
+.boost-title-row {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+.boost-title-row strong {
+    color: var(--text);
+
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.boost-price {
+    color: var(--blue);
+
+    font-size: 16px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+.boost-content p {
+    margin: 6px 0 10px;
+
+    color: var(--gray);
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.boost-benefits {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+.boost-benefits span {
+    padding: 5px 8px;
+
+    border-radius: 5px;
+
+    background: #fff;
+
+    color: var(--gray);
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.boost-note {
+    margin-top: 8px;
+
+    color: var(--light-gray);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   POPUP THANH TOÁN
+========================================================= */
+
+.boost-payment-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 99999;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.boost-payment-modal.show {
+    display: flex;
+}
+
+.boost-payment-backdrop {
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(15, 29, 55, .55);
+}
+
+.boost-payment-dialog {
+    position: relative;
+
+    width: min(470px, 100%);
+
+    padding: 28px;
+
+    border-radius: 14px;
+
+    background: #fff;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, .2);
+}
+
+.boost-payment-close {
+    position: absolute;
+
+    top: 14px;
+    right: 16px;
+
+    width: 32px;
+    height: 32px;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: #f1f4f8;
+
+    color: var(--gray);
+
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+.boost-payment-dialog h2 {
+    margin: 7px 0 5px;
+
+    font-size: 22px;
+}
+
+.boost-payment-description {
+    margin: 0 0 18px;
+
+    color: var(--gray);
+
+    font-size: 12px;
+
+    line-height: 1.6;
+}
+
+.boost-payment-total {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 14px 16px;
+
+    margin-bottom: 16px;
+
+    border-radius: 9px;
+
+    background: var(--blue-soft);
+}
+
+.boost-payment-total span {
+    color: var(--gray);
+
+    font-size: 12px;
+}
+
+.boost-payment-total strong {
+    color: var(--blue);
+
+    font-size: 20px;
+}
+
+
+/* PAYMENT METHOD */
+
+.boost-payment-methods {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 16px;
+}
+
+.boost-method {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 12px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    background: #fff;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.boost-method.active {
+    border-color: var(--blue);
+
+    background: var(--blue-soft);
+}
+
+.boost-method-icon {
+    font-size: 21px;
+}
+
+.boost-method strong {
+    display: block;
+
+    color: var(--text);
+
+    font-size: 12px;
+}
+
+.boost-method small {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--gray);
+
+    font-size: 9px;
+}
+
+
+/* WALLET */
+
+.wallet-balance-box {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 13px 15px;
+
+    margin-bottom: 10px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 8px;
+}
+
+.wallet-balance-box span {
+    color: var(--gray);
+
+    font-size: 11px;
+}
+
+.wallet-balance-box strong {
+    color: var(--text);
+
+    font-size: 15px;
+}
+
+
+/* QR */
+
+.boost-qr-payment {
+    text-align: center;
+}
+
+.fake-qr {
+    width: 180px;
+    height: 180px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 12px;
+
+    border: 8px solid #fff;
+
+    outline: 1px solid var(--border);
+
+    background:
+        repeating-linear-gradient(
+            45deg,
+            #17233c 0,
+            #17233c 4px,
+            #fff 4px,
+            #fff 8px
+        );
+}
+
+.fake-qr-pattern {
+    width: 70px;
+    height: 70px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #fff;
+
+    color: var(--text);
+
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.boost-qr-payment p {
+    margin-bottom: 12px;
+
+    color: var(--gray);
+
+    font-size: 11px;
+}
+
+
+/* BUTTON */
+
+.boost-pay-button {
+    width: 100%;
+
+    min-height: 44px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background: var(--blue);
+
+    color: #fff;
+
+    font-family: inherit;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.boost-pay-button:hover {
+    background: var(--blue-dark);
+}
+
+.boost-payment-status {
+    margin-top: 12px;
+
+    text-align: center;
+
+    font-size: 11px;
+
+    color: var(--green);
+}
+
+
+/* =========================================================
+   CHỮ TO HƠN MỘT XÍU
+========================================================= */
+
+.form-group label {
+    font-size: 13px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    font-size: 14px;
+}
+
+.field-note {
+    font-size: 11px;
+}
+
+.card-title h2 {
+    font-size: 18px;
+}
+
+.card-title p {
+    font-size: 12px;
+}
+
+.post-heading p {
+    font-size: 14px;
+}

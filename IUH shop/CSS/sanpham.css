@@ -2971,3 +2971,27 @@ body {
     line-height: 1.2;
 }
 
+.product-image-wrap {
+    position: relative;
+}
+
+.product-featured-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    left: auto;
+    z-index: 10;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 7px 14px;
+    background: #e53935;
+    color: #fff;
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+}
