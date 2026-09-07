@@ -31,6 +31,9 @@ let orders = [];
 let forumPosts = [];
 let financeTransactions = [];
 
+let servicePackages = [];
+let packageFilter = "all";
+
 let userFilter = "all";
 let productFilter = "all";
 let orderFilter = "all";
@@ -423,7 +426,8 @@ const pageTitles = {
         "Diễn đàn",
 
     finance:
-        "Tài chính"
+        "Tài chính",
+    packages: "Gói dịch vụ"
 
 };
 
@@ -487,6 +491,10 @@ function openPage(page) {
     if (page === "finance") {
         loadFinance();
     }
+
+    if (page === "packages") {
+    loadPackages();
+}
 
     window.scrollTo({
         top: 0,
@@ -684,6 +692,11 @@ async function loadDashboard() {
                 revenue.boost
             );
 
+        $("revenuePackage").textContent =
+    formatMoney(
+        revenue.package
+    );
+
         $("financeTotal").textContent =
             formatMoney(
                 revenue.total
@@ -726,10 +739,7 @@ async function loadAdminRevenue() {
             await supabaseClient
                 .from("users")
                 .select("user_id")
-                .eq(
-                    "role",
-                    "admin"
-                )
+                .eq("role", "admin")
                 .limit(1);
 
 
@@ -744,6 +754,7 @@ async function loadAdminRevenue() {
                 total: 0,
                 platform: 0,
                 boost: 0,
+                package: 0,
                 transactions: []
             };
 
@@ -775,6 +786,7 @@ async function loadAdminRevenue() {
                 total: 0,
                 platform: 0,
                 boost: 0,
+                package: 0,
                 transactions: []
             };
 
@@ -822,6 +834,7 @@ async function loadAdminRevenue() {
 
         let platform = 0;
         let boost = 0;
+        let packageRevenue = 0;
 
 
         transactions.forEach(
@@ -832,7 +845,8 @@ async function loadAdminRevenue() {
                         transaction.title ||
                         ""
                     ).toLowerCase()
-                    + " "
+                    +
+                    " "
                     +
                     (
                         transaction.description ||
@@ -840,25 +854,53 @@ async function loadAdminRevenue() {
                     ).toLowerCase();
 
 
+                const amount =
+                    Number(
+                        transaction.amount || 0
+                    );
+
+
+                /*
+                 * GÓI DỊCH VỤ
+                 */
+
                 if (
+                    text.includes("gói dịch vụ") ||
+                    text.includes("gói cá nhân") ||
+                    text.includes("gói nhóm") ||
+                    (
+                        text.includes("gói") &&
+                        !text.includes("đẩy tin")
+                    )
+                ) {
+
+                    packageRevenue += amount;
+
+                }
+
+
+                /*
+                 * ĐẨY TIN
+                 */
+
+                else if (
                     text.includes("đẩy tin") ||
                     text.includes("boost") ||
                     text.includes("nổi bật")
                 ) {
 
-                    boost +=
-                        Number(
-                            transaction.amount
-                        ) || 0;
+                    boost += amount;
 
                 }
 
+
+                /*
+                 * PHÍ SÀN
+                 */
+
                 else {
 
-                    platform +=
-                        Number(
-                            transaction.amount
-                        ) || 0;
+                    platform += amount;
 
                 }
 
@@ -869,17 +911,23 @@ async function loadAdminRevenue() {
         return {
 
             total:
-                platform + boost,
+                platform +
+                boost +
+                packageRevenue,
 
             platform,
 
             boost,
+
+            package:
+                packageRevenue,
 
             transactions
 
         };
 
     }
+
 
     catch (error) {
 
@@ -888,39 +936,52 @@ async function loadAdminRevenue() {
             error
         );
 
+
         return {
+
             total: 0,
+
             platform: 0,
+
             boost: 0,
+
+            package: 0,
+
             transactions: []
+
         };
+
     }
+
 }
 
 let revenueChartInstance = null;
 let ordersChartInstance = null;
 
 
-/* =========================
-   CHART - THEO THÁNG
-========================= */
+/* =========================================================
+   BIỂU ĐỒ DOANH THU - THEO NGÀY
+   - Hiển thị doanh thu từng ngày
+   - Ngày mới nhất ở bên phải
+   - Có thể kéo ngang để xem ngày cũ
+========================================================= */
 
-function getMonthKey(date) {
+function getDayKey(date) {
     const d = new Date(date);
 
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 
-function formatMonthLabel(monthKey) {
-    const [year, month] = monthKey.split("-");
+function formatDayLabel(dayKey) {
+    const [year, month, day] = dayKey.split("-");
 
-    return `${month}/${year}`;
+    return `${day}/${month}`;
 }
 
 
-/* Lấy toàn bộ các tháng từ giao dịch đầu tiên đến hiện tại */
-function getAllMonths(items) {
+/* Lấy toàn bộ ngày từ giao dịch đầu tiên → hôm nay */
+function getAllDays(items) {
 
     const now = new Date();
 
@@ -933,45 +994,57 @@ function getAllMonths(items) {
             .filter(date => !isNaN(date.getTime()));
 
         if (dates.length > 0) {
+
             firstDate = new Date(
-                Math.min(...dates.map(date => date.getTime()))
+                Math.min(
+                    ...dates.map(
+                        date => date.getTime()
+                    )
+                )
             );
+
         }
+
     }
 
-    firstDate = new Date(
+
+    const start = new Date(
         firstDate.getFullYear(),
         firstDate.getMonth(),
-        1
+        firstDate.getDate()
     );
 
-    const lastDate = new Date(
+
+    const end = new Date(
         now.getFullYear(),
         now.getMonth(),
-        1
+        now.getDate()
     );
 
-    const months = [];
 
-    let current = new Date(firstDate);
+    const days = [];
 
-    while (current <= lastDate) {
+    let current = new Date(start);
 
-        const key =
-            `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}`;
 
-        months.push(key);
+    while (current <= end) {
 
-        current.setMonth(current.getMonth() + 1);
+        days.push(getDayKey(current));
+
+        current.setDate(
+            current.getDate() + 1
+        );
+
     }
 
-    return months;
+
+    return days;
 }
 
 
-/* =========================
-   BIỂU ĐỒ DOANH THU
-========================= */
+/* =========================================================
+   RENDER DOANH THU THEO NGÀY
+========================================================= */
 
 function renderRevenueChart(transactions) {
 
@@ -979,133 +1052,289 @@ function renderRevenueChart(transactions) {
 
     if (!canvas) return;
 
+
     transactions = transactions || [];
 
-    const months = getAllMonths(transactions);
 
-    const revenueByMonth = months.map(monthKey => {
-
-        return transactions
-            .filter(transaction => {
-
-                return getMonthKey(transaction.created_at) === monthKey;
-
-            })
-            .reduce((total, transaction) => {
-
-                return total + Number(transaction.amount || 0);
-
-            }, 0);
-
-    });
-
-
-    /* Tổng doanh thu TOÀN BỘ */
-    const totalRevenue = transactions.reduce(
-        (total, transaction) =>
-            total + Number(transaction.amount || 0),
-        0
+    /* Lấy danh sách ngày */
+    const days = getAllDays(
+        transactions
     );
+
+
+    /* Gom doanh thu theo ngày */
+    const revenueByDay = days.map(
+        dayKey => {
+
+            return transactions
+                .filter(
+                    transaction =>
+                        getDayKey(
+                            transaction.created_at
+                        ) === dayKey
+                )
+                .reduce(
+                    (total, transaction) => {
+
+                        return total +
+                            Number(
+                                transaction.amount || 0
+                            );
+
+                    },
+                    0
+                );
+
+        }
+    );
+
+
+    /* Tổng doanh thu */
+    const totalRevenue =
+        transactions.reduce(
+            (total, transaction) => {
+
+                return total +
+                    Number(
+                        transaction.amount || 0
+                    );
+
+            },
+            0
+        );
 
 
     if ($("chartRevenueTotal")) {
 
         $("chartRevenueTotal").textContent =
-            formatMoney(totalRevenue);
+            formatMoney(
+                totalRevenue
+            );
 
     }
 
 
+    /* Hủy chart cũ */
     if (revenueChartInstance) {
+
         revenueChartInstance.destroy();
+
+        revenueChartInstance = null;
+
     }
 
 
-    const ctx = canvas.getContext("2d");
+    const chartBox =
+        canvas.parentElement;
 
 
-    revenueChartInstance = new Chart(ctx, {
+    if (!chartBox) return;
 
-        type: "line",
 
-        data: {
+    /* =====================================================
+       TÍNH CHIỀU RỘNG BIỂU ĐỒ
 
-            labels: months.map(formatMonthLabel),
+       Mỗi ngày = 60px
+       Có nhiều ngày thì biểu đồ dài ra
+       → kéo ngang xem ngày cũ
+    ===================================================== */
 
-            datasets: [{
+    const chartWidth =
+        Math.max(
+            days.length * 60,
+            chartBox.clientWidth || 700
+        );
 
-                label: "Doanh thu",
 
-                data: revenueByMonth,
+    /* Cho phép kéo ngang */
+    chartBox.style.overflowX =
+        "auto";
 
-                borderWidth: 3,
+    chartBox.style.overflowY =
+        "hidden";
 
-                tension: 0.35,
 
-                fill: true,
+    /* Canvas có chiều rộng thật */
+    canvas.style.setProperty(
+        "width",
+        chartWidth + "px",
+        "important"
+    );
 
-                pointRadius: 4,
+    canvas.style.setProperty(
+        "height",
+        "280px",
+        "important"
+    );
 
-                pointHoverRadius: 6
 
-            }]
+    canvas.width =
+        chartWidth;
 
-        },
+    canvas.height =
+        280;
 
-        options: {
 
-            responsive: true,
+    const ctx =
+        canvas.getContext("2d");
 
-            maintainAspectRatio: false,
 
-            interaction: {
-                intersect: false,
-                mode: "index"
-            },
+    revenueChartInstance =
+        new Chart(
+            ctx,
+            {
 
-            plugins: {
+                type: "line",
 
-                legend: {
-                    display: false
-                },
+                data: {
 
-                tooltip: {
+                    labels:
+                        days.map(
+                            formatDayLabel
+                        ),
 
-                    callbacks: {
+                    datasets: [
 
-                        label: function(context) {
+                        {
 
-                            return " " +
-                                formatMoney(context.raw);
+                            label:
+                                "Doanh thu",
+
+                            data:
+                                revenueByDay,
+
+                            borderWidth:
+                                3,
+
+                            tension:
+                                0.35,
+
+                            fill:
+                                true,
+
+                            pointRadius:
+                                4,
+
+                            pointHoverRadius:
+                                6
 
                         }
 
-                    }
-
-                }
-
-            },
-
-            scales: {
-
-                x: {
-
-                    ticks: {
-                        maxRotation: 0
-                    }
+                    ]
 
                 },
 
-                y: {
 
-                    beginAtZero: true,
+                options: {
 
-                    ticks: {
+                    responsive:
+                        false,
 
-                        callback: function(value) {
+                    maintainAspectRatio:
+                        false,
 
-                            return Number(value)
-                                .toLocaleString("vi-VN") + "đ";
+
+                    interaction: {
+
+                        intersect:
+                            false,
+
+                        mode:
+                            "index"
+
+                    },
+
+
+                    plugins: {
+
+                        legend: {
+
+                            display:
+                                false
+
+                        },
+
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                title:
+                                    function(context) {
+
+                                        const index =
+                                            context[0]
+                                                .dataIndex;
+
+                                        const date =
+                                            days[index];
+
+                                        const [
+                                            year,
+                                            month,
+                                            day
+                                        ] =
+                                            date.split("-");
+
+                                        return `${day}/${month}/${year}`;
+
+                                    },
+
+
+                                label:
+                                    function(context) {
+
+                                        return " " +
+                                            formatMoney(
+                                                context.raw
+                                            );
+
+                                    }
+
+                            }
+
+                        }
+
+                    },
+
+
+                    scales: {
+
+                        x: {
+
+                            ticks: {
+
+                                maxRotation:
+                                    0,
+
+                                autoSkip:
+                                    true,
+
+                                maxTicksLimit:
+                                    20
+
+                            }
+
+                        },
+
+
+                        y: {
+
+                            beginAtZero:
+                                true,
+
+                            ticks: {
+
+                                callback:
+                                    function(value) {
+
+                                        return formatMoney(
+                                            value
+                                        );
+
+                                    }
+
+                            }
 
                         }
 
@@ -1114,10 +1343,26 @@ function renderRevenueChart(transactions) {
                 }
 
             }
+        );
+
+
+    /* =====================================================
+       TỰ ĐỘNG ĐỨNG Ở NGÀY MỚI NHẤT
+
+       Ngày cũ vẫn nằm bên trái,
+       người dùng kéo thanh ngang để xem.
+    ===================================================== */
+
+    requestAnimationFrame(
+        () => {
+
+            chartBox.scrollLeft =
+                chartBox.scrollWidth -
+                chartBox.clientWidth;
 
         }
+    );
 
-    });
 }
 
 
@@ -1125,108 +1370,127 @@ function renderRevenueChart(transactions) {
    BIỂU ĐỒ ĐƠN HÀNG
 ========================= */
 
+/* =========================
+   BIỂU ĐỒ ĐƠN HÀNG THEO NGÀY
+========================= */
+
 function renderOrdersChart(allOrders) {
-
     const canvas = $("ordersChart");
-
     if (!canvas) return;
 
     allOrders = allOrders || [];
 
-    const months = getAllMonths(allOrders);
-
-
-    const ordersByMonth = months.map(monthKey => {
-
-        return allOrders.filter(order => {
-
-            return getMonthKey(order.created_at) === monthKey;
-
-        }).length;
-
+    /* Lấy các ngày có đơn */
+    const validOrders = allOrders.filter(order => {
+        return order.created_at && !isNaN(new Date(order.created_at).getTime());
     });
 
+    const days = [];
 
-    /* Tổng đơn từ trước tới nay */
-    const totalOrders = allOrders.length;
+    validOrders.forEach(order => {
+        const date = new Date(order.created_at);
 
+        const dayKey =
+            `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+        if (!days.includes(dayKey)) {
+            days.push(dayKey);
+        }
+    });
+
+    /* Nếu có đơn thì sắp xếp ngày từ cũ → mới */
+    days.sort();
+
+    /* Đếm số đơn từng ngày */
+    const ordersByDay = days.map(dayKey => {
+        return validOrders.filter(order => {
+            const date = new Date(order.created_at);
+
+            const orderDay =
+                `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+            return orderDay === dayKey;
+        }).length;
+    });
+
+    /* Tổng số đơn */
+    const totalOrders = validOrders.length;
 
     if ($("chartOrdersTotal")) {
-
         $("chartOrdersTotal").textContent =
             totalOrders.toLocaleString("vi-VN");
-
     }
 
-
+    /* Xóa chart cũ */
     if (ordersChartInstance) {
         ordersChartInstance.destroy();
     }
 
-
     const ctx = canvas.getContext("2d");
 
-
     ordersChartInstance = new Chart(ctx, {
-
         type: "bar",
 
         data: {
-
-            labels: months.map(formatMonthLabel),
+            labels: days.map(dayKey => {
+                const [year, month, day] = dayKey.split("-");
+                return `${day}/${month}`;
+            }),
 
             datasets: [{
-
                 label: "Đơn hàng",
-
-                data: ordersByMonth,
-
+                data: ordersByDay,
+                borderWidth: 0,
                 borderRadius: 8,
-
-                borderWidth: 0
-
+                maxBarThickness: 45
             }]
-
         },
 
         options: {
-
             responsive: true,
-
             maintainAspectRatio: false,
 
             plugins: {
-
                 legend: {
                     display: false
-                }
+                },
 
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            const index = context[0].dataIndex;
+                            const [year, month, day] =
+                                days[index].split("-");
+
+                            return `${day}/${month}/${year}`;
+                        },
+
+                        label: function(context) {
+                            return ` ${context.raw} đơn`;
+                        }
+                    }
+                }
             },
 
             scales: {
-
                 x: {
-
                     ticks: {
-                        maxRotation: 0
+                        maxRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 15
                     }
-
                 },
 
                 y: {
-
                     beginAtZero: true,
 
                     ticks: {
-                        precision: 0
+                        precision: 0,
+                        stepSize: 1
                     }
-
                 }
-
             }
-
         }
-
     });
 }
 
@@ -4362,6 +4626,762 @@ document.addEventListener(
     }
 );
 
+/* =========================================================
+   QUẢN LÝ GÓI DỊCH VỤ
+========================================================= */
+
+const SERVICE_PACKAGES = {
+    1: {
+        name: "Gói Cá nhân",
+        price: 19000,
+        duration: 30,
+        type: "personal"
+    },
+
+    2: {
+        name: "Gói Nhóm",
+        price: 29000,
+        duration: 30,
+        type: "group"
+    }
+};
+
+
+/* =========================================================
+   TẢI GÓI DỊCH VỤ
+========================================================= */
+
+async function loadPackages() {
+
+    const list = $("packagesList");
+
+    if (!list) {
+        return;
+    }
+
+    list.innerHTML = `
+        <div class="loading-box">
+            Đang tải gói dịch vụ...
+        </div>
+    `;
+
+
+    try {
+
+        /*
+         * Lấy tất cả membership.
+         * Dùng select("*") để không phụ thuộc
+         * vào việc bảng có thêm cột hay không.
+         */
+
+        const {
+            data: memberships,
+            error: membershipError
+        } =
+            await supabaseClient
+                .from("service_package_members")
+                .select("*");
+
+
+        if (membershipError) {
+            throw membershipError;
+        }
+
+
+        servicePackages =
+            memberships || [];
+
+
+        /*
+         * Lấy thông tin người dùng
+         */
+
+        const userIds = [
+            ...new Set(
+                servicePackages
+                    .map(item => item.user_id)
+                    .filter(Boolean)
+            )
+        ];
+
+
+        let userMap = new Map();
+
+
+        if (userIds.length) {
+
+            const {
+                data: userData,
+                error: userError
+            } =
+                await supabaseClient
+                    .from("users")
+                    .select(
+                        "user_id,fullname,email,avatar_url"
+                    )
+                    .in(
+                        "user_id",
+                        userIds
+                    );
+
+
+            if (userError) {
+                throw userError;
+            }
+
+
+            userMap = new Map(
+                (userData || []).map(user => [
+                    String(user.user_id),
+                    user
+                ])
+            );
+        }
+
+
+        /*
+         * Gắn thông tin user vào membership
+         */
+
+        servicePackages =
+            servicePackages.map(item => ({
+                ...item,
+
+                user:
+                    userMap.get(
+                        String(item.user_id)
+                    ) || null
+            }));
+
+
+        updatePackageOverview();
+
+        renderPackages();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Packages error:",
+            error
+        );
+
+
+        list.innerHTML = `
+            <div class="error-box">
+
+                Không thể tải danh sách
+                gói dịch vụ.
+
+                <br><br>
+
+                ${escapeHTML(
+                    error.message || ""
+                )}
+
+            </div>
+        `;
+
+    }
+}
+
+
+/* =========================================================
+   LẤY THÔNG TIN GÓI
+========================================================= */
+
+function getServicePackage(packageId) {
+
+    return (
+        SERVICE_PACKAGES[
+            Number(packageId)
+        ] || {
+            name: `Gói #${packageId}`,
+            price: 0,
+            duration: 30,
+            type: "unknown"
+        }
+    );
+}
+
+
+/* =========================================================
+   LẤY NGÀY BẮT ĐẦU
+========================================================= */
+
+function getPackageStartDate(item) {
+
+    const fields = [
+        "started_at",
+        "start_at",
+        "start_date",
+        "activated_at",
+        "created_at"
+    ];
+
+
+    for (const field of fields) {
+
+        if (item[field]) {
+            return new Date(item[field]);
+        }
+
+    }
+
+
+    return null;
+}
+
+
+/* =========================================================
+   LẤY NGÀY HẾT HẠN
+========================================================= */
+
+function getPackageExpireDate(item) {
+
+    const fields = [
+        "expires_at",
+        "expired_at",
+        "end_at",
+        "end_date",
+        "expiry_date"
+    ];
+
+
+    for (const field of fields) {
+
+        if (item[field]) {
+
+            const date =
+                new Date(item[field]);
+
+            if (!isNaN(date.getTime())) {
+                return date;
+            }
+
+        }
+
+    }
+
+
+    /*
+     * Nếu database chưa lưu ngày hết hạn,
+     * tính 30 ngày từ ngày bắt đầu.
+     */
+
+    const start =
+        getPackageStartDate(item);
+
+
+    if (start) {
+
+        const packageInfo =
+            getServicePackage(
+                item.package_id
+            );
+
+
+        const expire =
+            new Date(start);
+
+
+        expire.setDate(
+            expire.getDate() +
+            packageInfo.duration
+        );
+
+
+        return expire;
+    }
+
+
+    return null;
+}
+
+
+/* =========================================================
+   TRẠNG THÁI GÓI
+========================================================= */
+
+function getPackageStatus(item) {
+
+    const expire =
+        getPackageExpireDate(item);
+
+
+    if (!expire) {
+        return "unknown";
+    }
+
+
+    return expire.getTime() > Date.now()
+        ? "active"
+        : "expired";
+}
+
+
+/* =========================================================
+   LỌC GÓI
+========================================================= */
+
+function getFilteredPackages() {
+
+    const keyword =
+        (
+            $("packageSearch")?.value ||
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    return servicePackages.filter(item => {
+
+        const info =
+            getServicePackage(
+                item.package_id
+            );
+
+
+        const status =
+            getPackageStatus(item);
+
+
+        const user =
+            item.user || {};
+
+
+        const searchable = [
+
+            user.fullname,
+
+            user.email,
+
+            info.name
+
+        ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+
+        const searchMatch =
+            !keyword ||
+            searchable.includes(keyword);
+
+
+        let filterMatch = true;
+
+
+        if (
+            packageFilter === "personal"
+        ) {
+
+            filterMatch =
+                info.type === "personal";
+
+        }
+
+
+        if (
+            packageFilter === "group"
+        ) {
+
+            filterMatch =
+                info.type === "group";
+
+        }
+
+
+        if (
+            packageFilter === "active"
+        ) {
+
+            filterMatch =
+                status === "active";
+
+        }
+
+
+        if (
+            packageFilter === "expired"
+        ) {
+
+            filterMatch =
+                status === "expired";
+
+        }
+
+
+        return (
+            searchMatch &&
+            filterMatch
+        );
+
+    });
+}
+
+
+/* =========================================================
+   THỐNG KÊ GÓI
+========================================================= */
+
+function updatePackageOverview() {
+
+    const total =
+        servicePackages.length;
+
+
+    const personal =
+        servicePackages.filter(item =>
+            getServicePackage(
+                item.package_id
+            ).type === "personal"
+        ).length;
+
+
+    const group =
+        servicePackages.filter(item =>
+            getServicePackage(
+                item.package_id
+            ).type === "group"
+        ).length;
+
+
+    /*
+     * Doanh thu gói lấy từ giao dịch
+     * wallet Admin, không lấy membership
+     * để tránh tính sai doanh thu.
+     */
+
+    let packageRevenue = 0;
+
+
+    financeTransactions.forEach(
+        transaction => {
+
+            const text =
+                (
+                    transaction.title ||
+                    ""
+                ).toLowerCase()
+                +
+                " "
+                +
+                (
+                    transaction.description ||
+                    ""
+                ).toLowerCase();
+
+
+            if (
+                text.includes("gói") ||
+                text.includes("dịch vụ")
+            ) {
+
+                packageRevenue +=
+                    Number(
+                        transaction.amount || 0
+                    );
+
+            }
+
+        }
+    );
+
+
+    if ($("packageTotal")) {
+        $("packageTotal").textContent =
+            total.toLocaleString("vi-VN");
+    }
+
+
+    if ($("packagePersonal")) {
+        $("packagePersonal").textContent =
+            personal.toLocaleString("vi-VN");
+    }
+
+
+    if ($("packageGroup")) {
+        $("packageGroup").textContent =
+            group.toLocaleString("vi-VN");
+    }
+
+
+    if ($("packageRevenue")) {
+        $("packageRevenue").textContent =
+            formatMoney(
+                packageRevenue
+            );
+    }
+
+}
+
+
+/* =========================================================
+   HIỂN THỊ GÓI
+========================================================= */
+
+function renderPackages() {
+
+    const list =
+        $("packagesList");
+
+
+    if (!list) {
+        return;
+    }
+
+
+    const filtered =
+        getFilteredPackages();
+
+
+    if ($("packageSummary")) {
+
+        $("packageSummary").textContent =
+            `${filtered.length} gói đang hiển thị · ` +
+            `${servicePackages.length} lượt đăng ký`;
+
+    }
+
+
+    if (!filtered.length) {
+
+        list.innerHTML = `
+            <div class="empty-box">
+                Không tìm thấy gói dịch vụ phù hợp.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    list.innerHTML = `
+
+        <div class="package-table-head">
+
+            <span>NGƯỜI DÙNG</span>
+
+            <span>GÓI</span>
+
+            <span>THỜI HẠN</span>
+
+            <span>TRẠNG THÁI</span>
+
+            <span>GIÁ</span>
+
+        </div>
+
+
+        ${
+            filtered
+                .map(
+                    createPackageRow
+                )
+                .join("")
+        }
+
+    `;
+}
+
+
+/* =========================================================
+   CARD GÓI
+========================================================= */
+
+function createPackageRow(item) {
+
+    const info =
+        getServicePackage(
+            item.package_id
+        );
+
+
+    const user =
+        item.user || {};
+
+
+    const start =
+        getPackageStartDate(item);
+
+
+    const expire =
+        getPackageExpireDate(item);
+
+
+    const status =
+        getPackageStatus(item);
+
+
+    const statusText =
+        status === "active"
+            ? "Đang hoạt động"
+            : status === "expired"
+                ? "Hết hạn"
+                : "Chưa xác định";
+
+
+    const statusClass =
+        status === "active"
+            ? "package-status-active"
+            : "package-status-expired";
+
+
+    return `
+
+        <div class="package-row">
+
+            <div class="package-user">
+
+                <img
+                    src="${escapeHTML(
+                        user.avatar_url ||
+                        DEFAULT_AVATAR
+                    )}"
+                    alt="Avatar"
+                    onerror="
+                        this.src='${DEFAULT_AVATAR}'
+                    "
+                >
+
+                <div>
+
+                    <strong>
+                        ${escapeHTML(
+                            user.fullname ||
+                            "Chưa cập nhật"
+                        )}
+                    </strong>
+
+                    <span>
+                        ${escapeHTML(
+                            user.email ||
+                            "Chưa có email"
+                        )}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="package-name">
+
+                <strong>
+                    ${escapeHTML(
+                        info.name
+                    )}
+                </strong>
+
+                <span>
+                    ${info.duration} ngày
+                </span>
+
+            </div>
+
+
+            <div class="package-dates">
+
+                <span>
+                    Bắt đầu:
+                    ${
+                        start
+                            ? start.toLocaleDateString(
+                                "vi-VN"
+                            )
+                            : "-"
+                    }
+                </span>
+
+                <span>
+                    Hết hạn:
+                    ${
+                        expire
+                            ? expire.toLocaleDateString(
+                                "vi-VN"
+                            )
+                            : "-"
+                    }
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <span
+                    class="${statusClass}"
+                >
+                    ${statusText}
+                </span>
+
+            </div>
+
+
+            <div class="package-price">
+
+                ${formatMoney(
+                    info.price
+                )}
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+/* =========================================================
+   PACKAGE EVENTS
+========================================================= */
+
+document
+    .querySelectorAll(
+        ".package-filter"
+    )
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                document
+                    .querySelectorAll(
+                        ".package-filter"
+                    )
+                    .forEach(item =>
+                        item.classList.remove(
+                            "active"
+                        )
+                    );
+
+
+                button.classList.add(
+                    "active"
+                );
+
+
+                packageFilter =
+                    button.dataset.packageFilter;
+
+
+                renderPackages();
+
+            }
+        );
+
+    });
+
+
+$("packageSearch")
+    ?.addEventListener(
+        "input",
+        renderPackages
+    );
+
 
 /* =========================================================
    FINANCE
@@ -4418,22 +5438,26 @@ async function loadFinance() {
                         ).toLowerCase();
 
 
-                    let type =
-                        "Phí sàn";
+                    let type = "Phí sàn";
 
+if (
+    text.includes("gói dịch vụ") ||
+    text.includes("gói cá nhân") ||
+    text.includes("gói nhóm") ||
+    (
+        text.includes("gói") &&
+        !text.includes("đẩy tin")
+    )
+) {
+    type = "Gói dịch vụ";
+}
 
-                    if (
-                        text.includes(
-                            "đẩy tin"
-                        ) ||
-                        text.includes(
-                            "nổi bật"
-                        )
-                    ) {
-
-                        type =
-                            "Phí đẩy tin";
-                    }
+else if (
+    text.includes("đẩy tin") ||
+    text.includes("nổi bật")
+) {
+    type = "Phí đẩy tin";
+}
 
 
                     return `

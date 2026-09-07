@@ -136,6 +136,16 @@
 
 
             <button
+    class="admin-nav-item"
+    data-page="packages"
+    type="button"
+>
+    <span class="nav-icon">💳</span>
+    <span>Gói dịch vụ</span>
+</button>
+
+
+            <button
                 class="admin-nav-item disabled"
                 type="button"
                 title="Tính năng đang phát triển"
@@ -465,6 +475,13 @@
                             </strong>
                         </div>
 
+                        <div>
+    <span>Gói dịch vụ</span>
+    <strong id="revenuePackage">
+        0đ
+    </strong>
+</div>
+
                     </div>
 
                 </div>
@@ -526,6 +543,25 @@
                     </div>
                     <b>→</b>
                 </button>
+
+                <button
+    data-page="packages"
+    type="button"
+>
+    <span>💳</span>
+
+    <div>
+        <strong>
+            Quản lý gói dịch vụ
+        </strong>
+
+        <small>
+            Theo dõi người đăng ký và thời hạn gói
+        </small>
+    </div>
+
+    <b>→</b>
+</button>
 
             </div>
 
@@ -1133,6 +1169,178 @@
             </div>
 
         </section>
+
+        <!-- =================================================
+     SERVICE PACKAGES
+================================================== -->
+
+<section
+    class="admin-page"
+    id="page-packages"
+>
+
+    <div class="page-header">
+
+        <div>
+            <span class="eyebrow">
+                SERVICE
+            </span>
+
+            <h2>
+                Quản lý gói dịch vụ
+            </h2>
+
+            <p>
+                Theo dõi các gói dịch vụ, người đăng ký,
+                thời hạn và doanh thu từ gói.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- TỔNG QUAN GÓI -->
+
+    <div class="package-overview">
+
+        <div class="package-overview-card">
+
+            <span>
+                Tổng lượt đăng ký
+            </span>
+
+            <strong id="packageTotal">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="package-overview-card">
+
+            <span>
+                Gói Cá nhân
+            </span>
+
+            <strong id="packagePersonal">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="package-overview-card">
+
+            <span>
+                Gói Nhóm
+            </span>
+
+            <strong id="packageGroup">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="package-overview-card">
+
+            <span>
+                Doanh thu gói
+            </span>
+
+            <strong id="packageRevenue">
+                0đ
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- TÌM KIẾM -->
+
+    <div class="toolbar">
+
+        <div class="search-box">
+
+            <span>⌕</span>
+
+            <input
+                id="packageSearch"
+                type="search"
+                placeholder="Tìm tên hoặc email người dùng..."
+            >
+
+        </div>
+
+
+        <div class="filter-tabs">
+
+            <button
+                class="package-filter active"
+                data-package-filter="all"
+                type="button"
+            >
+                Tất cả
+            </button>
+
+            <button
+                class="package-filter"
+                data-package-filter="personal"
+                type="button"
+            >
+                Cá nhân
+            </button>
+
+            <button
+                class="package-filter"
+                data-package-filter="group"
+                type="button"
+            >
+                Nhóm
+            </button>
+
+            <button
+                class="package-filter"
+                data-package-filter="active"
+                type="button"
+            >
+                Đang hoạt động
+            </button>
+
+            <button
+                class="package-filter"
+                data-package-filter="expired"
+                type="button"
+            >
+                Hết hạn
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="result-summary"
+        id="packageSummary"
+    >
+        Đang tải...
+    </div>
+
+
+    <div
+        class="package-list"
+        id="packagesList"
+    >
+
+        <div class="loading-box">
+            Đang tải gói dịch vụ...
+        </div>
+
+    </div>
+
+</section>
 
 
     </main>
