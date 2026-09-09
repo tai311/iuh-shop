@@ -2908,3 +2908,421 @@ body {
     }
 
 }
+
+
+/* =========================================================
+   QUẢN LÝ KÝ GỬI
+========================================================= */
+
+.consignment-admin-overview {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.consignment-admin-stat {
+    padding: 19px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+}
+
+.consignment-admin-stat span {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.consignment-admin-stat strong {
+    display: block;
+    margin-top: 7px;
+    color: var(--blue);
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.consignment-admin-stat.pending strong {
+    color: #a47709;
+}
+
+.consignment-admin-stat.selling strong {
+    color: #2458bd;
+}
+
+.consignment-admin-stat.sold strong {
+    color: var(--green);
+}
+
+.consignment-admin-stat.payout strong {
+    color: var(--red);
+}
+
+
+/* LIST */
+
+.consignment-admin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.consignment-admin-row {
+    display: grid;
+    grid-template-columns:
+        1.5fr
+        1.6fr
+        .9fr
+        .8fr
+        .9fr
+        1.3fr;
+
+    align-items: center;
+    gap: 16px;
+
+    padding: 17px 19px;
+
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+
+    box-shadow:
+        0 5px 18px
+        rgba(20,48,105,.04);
+}
+
+
+.consignment-admin-row:hover {
+    border-color: #cad7ef;
+}
+
+
+.consignment-admin-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.consignment-admin-avatar {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background: #edf3ff;
+    color: var(--blue);
+
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.consignment-admin-user div {
+    min-width: 0;
+}
+
+.consignment-admin-user strong {
+    display: block;
+    color: var(--text);
+    font-size: 11px;
+}
+
+.consignment-admin-user span {
+    display: block;
+    margin-top: 3px;
+
+    color: var(--muted);
+    font-size: 9px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.consignment-admin-product strong {
+    display: block;
+
+    color: var(--blue);
+    font-size: 12px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.consignment-admin-product span {
+    display: block;
+    margin-top: 4px;
+
+    color: var(--muted);
+    font-size: 9px;
+}
+
+
+.consignment-admin-price {
+    color: var(--blue);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+
+.consignment-admin-date {
+    color: var(--muted);
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+
+.consignment-admin-status {
+    display: inline-flex;
+    width: fit-content;
+
+    padding: 6px 9px;
+    border-radius: 999px;
+
+    font-size: 8px;
+    font-weight: 800;
+}
+
+
+.consignment-status-pending {
+    background: #fff8df;
+    color: #9a6a0a;
+}
+
+.consignment-status-approved {
+    background: #eef4ff;
+    color: var(--blue);
+}
+
+.consignment-status-selling {
+    background: #edf3ff;
+    color: #2458bd;
+}
+
+.consignment-status-sold {
+    background: #eaf8ef;
+    color: #21834b;
+}
+
+.consignment-status-completed {
+    background: #e5f8ef;
+    color: #11764d;
+}
+
+.consignment-status-rejected,
+.consignment-status-cancelled {
+    background: #fff0f0;
+    color: #c33d3d;
+}
+
+
+.consignment-admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.consignment-admin-actions button {
+    min-height: 30px;
+    padding: 0 9px;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+    font-size: 8px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.consignment-view-btn {
+    border: 1px solid #d6dfef;
+    background: var(--blue-light);
+    color: var(--blue);
+}
+
+.consignment-approve-btn {
+    border: 1px solid #cde5d9;
+    background: #effaf4;
+    color: var(--green);
+}
+
+.consignment-reject-btn {
+    border: 1px solid #efd2d2;
+    background: #fff4f4;
+    color: var(--red);
+}
+
+.consignment-selling-btn {
+    border: 1px solid #d6dfef;
+    background: #f2f6ff;
+    color: var(--blue);
+}
+
+.consignment-sold-btn {
+    border: 1px solid #cde5d9;
+    background: #effaf4;
+    color: var(--green);
+}
+
+.consignment-pay-btn {
+    border: none;
+    background: var(--blue);
+    color: #fff;
+}
+
+.consignment-pay-btn:hover {
+    background: var(--blue-2);
+}
+
+
+/* DETAIL */
+
+.consignment-modal {
+    width: min(760px, 100%);
+}
+
+
+.consignment-detail-status {
+    margin-top: 18px;
+}
+
+
+.consignment-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+
+.consignment-detail-item {
+    padding: 13px;
+
+    border: 1px solid #edf0f5;
+    border-radius: 10px;
+
+    background: #f8faff;
+}
+
+
+.consignment-detail-item span {
+    display: block;
+
+    color: var(--muted);
+    font-size: 9px;
+}
+
+
+.consignment-detail-item strong {
+    display: block;
+    margin-top: 5px;
+
+    color: var(--text);
+    font-size: 12px;
+}
+
+
+.consignment-admin-note-box {
+    margin-top: 15px;
+    padding: 14px;
+
+    border-radius: 10px;
+
+    background: #fff9e8;
+    color: #76590d;
+
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+
+.consignment-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-top: 18px;
+}
+
+.consignment-modal-actions button {
+    min-height: 38px;
+    padding: 0 14px;
+
+    border-radius: 8px;
+
+    border: 0;
+
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+
+    .consignment-admin-overview {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .consignment-admin-row {
+        grid-template-columns:
+            1.4fr
+            1.5fr
+            1fr
+            1fr;
+
+    }
+
+    .consignment-admin-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .consignment-admin-overview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .consignment-admin-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .consignment-admin-actions {
+        grid-column: auto;
+    }
+
+    .consignment-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 450px) {
+
+    .consignment-admin-overview {
+        grid-template-columns: 1fr;
+    }
+
+}

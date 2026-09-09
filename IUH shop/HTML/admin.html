@@ -146,14 +146,13 @@
 
 
             <button
-                class="admin-nav-item disabled"
-                type="button"
-                title="Tính năng đang phát triển"
-            >
-                <span class="nav-icon">📦</span>
-                <span>Ký gửi</span>
-                <small>Sắp có</small>
-            </button>
+    class="admin-nav-item"
+    data-page="consignment"
+    type="button"
+>
+    <span class="nav-icon">📦</span>
+    <span>Ký gửi</span>
+</button>
 
         </nav>
 
@@ -482,6 +481,11 @@
     </strong>
 </div>
 
+<div class="revenue-row">
+    <span>Phí ký gửi</span>
+    <strong id="consignmentFeeRevenue">0đ</strong>
+</div>
+
                     </div>
 
                 </div>
@@ -557,6 +561,25 @@
 
         <small>
             Theo dõi người đăng ký và thời hạn gói
+        </small>
+    </div>
+
+    <b>→</b>
+</button>
+
+<button
+    data-page="consignment"
+    type="button"
+>
+    <span>🤝</span>
+
+    <div>
+        <strong>
+            Quản lý ký gửi
+        </strong>
+
+        <small>
+            Duyệt yêu cầu và thanh toán người gửi
         </small>
     </div>
 
@@ -1171,6 +1194,170 @@
         </section>
 
         <!-- =================================================
+     CONSIGNMENT
+================================================== -->
+
+<section
+    class="admin-page"
+    id="page-consignment"
+>
+
+    <div class="page-header">
+
+        <div>
+            <span class="eyebrow">
+                CONSIGNMENT
+            </span>
+
+            <h2>
+                Quản lý ký gửi
+            </h2>
+
+            <p>
+                Tiếp nhận, duyệt, quản lý sản phẩm ký gửi
+                và thanh toán cho người gửi.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- TỔNG QUAN -->
+
+    <div class="consignment-admin-overview">
+
+        <div class="consignment-admin-stat">
+            <span>Tổng yêu cầu</span>
+            <strong id="consignmentTotal">0</strong>
+        </div>
+
+        <div class="consignment-admin-stat pending">
+            <span>Chờ duyệt</span>
+            <strong id="consignmentPending">0</strong>
+        </div>
+
+        <div class="consignment-admin-stat selling">
+            <span>Đang bán</span>
+            <strong id="consignmentSelling">0</strong>
+        </div>
+
+        <div class="consignment-admin-stat sold">
+            <span>Đã bán</span>
+            <strong id="consignmentSold">0</strong>
+        </div>
+
+        <div class="consignment-admin-stat payout">
+            <span>Chờ thanh toán</span>
+            <strong id="consignmentPayout">0</strong>
+        </div>
+
+    </div>
+
+
+    <!-- TOOLBAR -->
+
+    <div class="toolbar">
+
+        <div class="search-box">
+
+            <span>⌕</span>
+
+            <input
+                id="consignmentSearch"
+                type="search"
+                placeholder="Tìm sản phẩm, người gửi, email..."
+            >
+
+        </div>
+
+
+        <div class="filter-tabs">
+
+            <button
+                class="consignment-filter active"
+                data-consignment-filter="all"
+                type="button"
+            >
+                Tất cả
+            </button>
+
+            <button
+                class="consignment-filter"
+                data-consignment-filter="pending"
+                type="button"
+            >
+                Chờ duyệt
+            </button>
+
+            <button
+                class="consignment-filter"
+                data-consignment-filter="approved"
+                type="button"
+            >
+                Đã duyệt
+            </button>
+
+            <button
+                class="consignment-filter"
+                data-consignment-filter="selling"
+                type="button"
+            >
+                Đang bán
+            </button>
+
+            <button
+                class="consignment-filter"
+                data-consignment-filter="sold"
+                type="button"
+            >
+                Đã bán
+            </button>
+
+            <button
+                class="consignment-filter"
+                data-consignment-filter="completed"
+                type="button"
+            >
+                Hoàn tất
+            </button>
+
+            <button
+                class="consignment-filter"
+                data-consignment-filter="rejected"
+                type="button"
+            >
+                Từ chối
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="result-summary"
+        id="consignmentSummary"
+    >
+        Đang tải...
+    </div>
+
+
+    <!-- DANH SÁCH -->
+
+    <div
+        class="consignment-admin-list"
+        id="consignmentList"
+    >
+
+        <div class="loading-box">
+            Đang tải yêu cầu ký gửi...
+        </div>
+
+    </div>
+
+</section>
+
+        <!-- =================================================
      SERVICE PACKAGES
 ================================================== -->
 
@@ -1437,7 +1624,75 @@
 
 </div>
 
+<!-- =========================================================
+     CONSIGNMENT DETAIL MODAL
+========================================================= -->
 
+<div
+    class="modal-overlay"
+    id="consignmentModal"
+    hidden
+>
+
+    <div
+        class="modal-card consignment-modal"
+        role="dialog"
+        aria-modal="true"
+    >
+
+        <button
+            class="modal-close"
+            data-close-modal="consignmentModal"
+            type="button"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-heading">
+
+            <span class="eyebrow">
+                CONSIGNMENT DETAIL
+            </span>
+
+            <h2 id="consignmentDetailName">
+                Sản phẩm ký gửi
+            </h2>
+
+            <p id="consignmentDetailDate">
+                -
+            </p>
+
+        </div>
+
+
+        <div
+            class="consignment-detail-status"
+            id="consignmentDetailStatus"
+        ></div>
+
+
+        <div
+            class="consignment-detail-grid"
+            id="consignmentDetailGrid"
+        ></div>
+
+
+        <div
+            class="consignment-admin-note-box"
+            id="consignmentNoteBox"
+        >
+        </div>
+
+
+        <div
+            class="consignment-modal-actions"
+            id="consignmentModalActions"
+        ></div>
+
+    </div>
+
+</div>
 
 <!-- =========================================================
      ORDER DETAIL MODAL

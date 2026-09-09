@@ -42,6 +42,10 @@ let forumFilter = "all";
 let selectedUser = null;
 let selectedOrder = null;
 
+let consignments = [];
+let consignmentFilter = "all";
+let selectedConsignment = null;
+
 
 /* =========================================================
    HELPERS
@@ -427,7 +431,8 @@ const pageTitles = {
 
     finance:
         "Tài chính",
-    packages: "Gói dịch vụ"
+    packages: "Gói dịch vụ",
+    consignment: "Ký gửi",
 
 };
 
@@ -697,6 +702,11 @@ async function loadDashboard() {
         revenue.package
     );
 
+    $("revenueConsignment").textContent =
+    formatMoney(
+        revenue.consignment
+    );
+
         $("financeTotal").textContent =
             formatMoney(
                 revenue.total
@@ -835,96 +845,116 @@ async function loadAdminRevenue() {
         let platform = 0;
         let boost = 0;
         let packageRevenue = 0;
+        let consignment = 0;
 
 
         transactions.forEach(
-            transaction => {
+    transaction => {
 
-                const text =
-                    (
-                        transaction.title ||
-                        ""
-                    ).toLowerCase()
-                    +
-                    " "
-                    +
-                    (
-                        transaction.description ||
-                        ""
-                    ).toLowerCase();
-
-
-                const amount =
-                    Number(
-                        transaction.amount || 0
-                    );
+        const text =
+            (
+                transaction.title ||
+                ""
+            ).toLowerCase()
+            +
+            " "
+            +
+            (
+                transaction.description ||
+                ""
+            ).toLowerCase();
 
 
-                /*
-                 * GÓI DỊCH VỤ
-                 */
-
-                if (
-                    text.includes("gói dịch vụ") ||
-                    text.includes("gói cá nhân") ||
-                    text.includes("gói nhóm") ||
-                    (
-                        text.includes("gói") &&
-                        !text.includes("đẩy tin")
-                    )
-                ) {
-
-                    packageRevenue += amount;
-
-                }
+        const amount =
+            Number(
+                transaction.amount || 0
+            );
 
 
-                /*
-                 * ĐẨY TIN
-                 */
+        /*
+         * PHÍ KÝ GỬI
+         */
 
-                else if (
-                    text.includes("đẩy tin") ||
-                    text.includes("boost") ||
-                    text.includes("nổi bật")
-                ) {
+        if (
+            text.includes("phí ký gửi") ||
+            text.includes("ký gửi") ||
+            text.includes("ky gui") ||
+            text.includes("consignment")
+        ) {
 
-                    boost += amount;
+            consignment += amount;
 
-                }
-
-
-                /*
-                 * PHÍ SÀN
-                 */
-
-                else {
-
-                    platform += amount;
-
-                }
-
-            }
-        );
+        }
 
 
-        return {
+        /*
+         * GÓI DỊCH VỤ
+         */
 
-            total:
-                platform +
-                boost +
-                packageRevenue,
+        else if (
+            text.includes("gói dịch vụ") ||
+            text.includes("gói cá nhân") ||
+            text.includes("gói nhóm") ||
+            (
+                text.includes("gói") &&
+                !text.includes("đẩy tin")
+            )
+        ) {
 
-            platform,
+            packageRevenue += amount;
 
-            boost,
+        }
 
-            package:
-                packageRevenue,
 
-            transactions
+        /*
+         * ĐẨY TIN
+         */
 
-        };
+        else if (
+            text.includes("đẩy tin") ||
+            text.includes("boost") ||
+            text.includes("nổi bật")
+        ) {
+
+            boost += amount;
+
+        }
+
+
+        /*
+         * PHÍ SÀN
+         */
+
+        else {
+
+            platform += amount;
+
+        }
+
+    }
+);
+
+
+       return {
+
+    total:
+        platform +
+        boost +
+        packageRevenue +
+        consignment,
+
+    platform,
+
+    boost,
+
+    package:
+        packageRevenue,
+
+    consignment,
+
+    transactions
+
+};
 
     }
 
