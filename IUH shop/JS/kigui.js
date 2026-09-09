@@ -876,17 +876,46 @@ async function submitConsignment(event) {
     try {
 
         // --------------------------------
-        // LƯU THÔNG TIN ẢNH
-        // --------------------------------
+// UPLOAD ẢNH LÊN SUPABASE STORAGE
+// --------------------------------
 
-        /*
-         * Giai đoạn đầu lưu tên file.
-         * Sau này có thể kết nối Supabase Storage
-         * để upload ảnh thật.
-         */
+const imageUrls = [];
 
-        const imageNames =
-            files.map(file => file.name);
+for (let i = 0; i < files.length; i++) {
+
+    const file = files[i];
+
+    const fileExt =
+        file.name.split(".").pop();
+
+    const fileName =
+        `${user.id}/${Date.now()}_${i}.${fileExt}`;
+
+    const {
+        error: uploadError
+    } = await supabaseClient
+        .storage
+        .from("consignment-images")
+        .upload(fileName, file, {
+            cacheControl: "3600",
+            upsert: false
+        });
+
+    if (uploadError) {
+        throw uploadError;
+    }
+
+    const {
+        data: publicUrlData
+    } = supabaseClient
+        .storage
+        .from("consignment-images")
+        .getPublicUrl(fileName);
+
+    imageUrls.push(
+        publicUrlData.publicUrl
+    );
+}
 
 
         // --------------------------------
@@ -927,7 +956,7 @@ async function submitConsignment(event) {
                     deliveryMethod,
 
                 image_names:
-                    imageNames,
+                     imageUrls,
 
                 status:
                     "pending"

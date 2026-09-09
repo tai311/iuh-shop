@@ -2748,22 +2748,6 @@ body {
     color: #193f9e;
 }
 
-.consignment-history-card {
-    display: flex;
-    align-items: center;
-
-    gap: 16px;
-
-    padding: 17px 18px;
-
-    background: #fff;
-
-    border: 1px solid #e5e9f1;
-    border-radius: 14px;
-
-    transition: .2s ease;
-}
-
 .consignment-history-card:hover {
     border-color: #cbd6eb;
 
@@ -2847,25 +2831,214 @@ body {
     font-size: 14px;
 }
 
-.history-status {
-    min-width: 95px;
+/* =========================================================
+   CARD YÊU CẦU KÝ GỬI
+   ========================================================= */
 
-    text-align: center;
+.consignment-history-card {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 55px minmax(0, 1fr) 150px 130px;
+    align-items: center;
+    gap: 18px;
+
+    padding: 18px 20px;
+
+    background: #ffffff;
+    border: 1px solid #e5e9f1;
+    border-radius: 14px;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
 }
 
-.history-status-badge {
+.consignment-history-card:hover {
+    border-color: #cbd6eb;
+    box-shadow: 0 6px 20px rgba(23,35,60,.07);
+    transform: translateY(-1px);
+}
+
+
+/* ICON SẢN PHẨM */
+
+.history-product-icon {
+    width: 55px;
+    height: 55px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #edf3ff;
+    color: #193f9e;
+
+    font-size: 20px;
+}
+
+
+/* THÔNG TIN SẢN PHẨM */
+
+.history-product-info {
+    min-width: 0;
+}
+
+.history-product-info h3 {
+    margin: 0 0 6px;
+
+    color: #17233c;
+
+    font-size: 15px;
+    font-weight: 800;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-product-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 6px 10px;
+
+    color: #7b8495;
+
+    font-size: 11px;
+}
+
+.history-product-meta span {
+    display: inline-flex;
+    align-items: center;
+}
+
+.history-price {
+    margin-top: 8px;
+
+    color: #193f9e;
+
+    font-size: 15px;
+    font-weight: 800;
+}
+
+
+/* TRẠNG THÁI */
+
+.history-card-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+
+    min-width: 0;
+}
+
+.consignment-status {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    padding: 6px 10px;
+    gap: 6px;
+
+    padding: 7px 11px;
 
     border-radius: 20px;
 
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
 
     white-space: nowrap;
+}
+
+.history-card-status small {
+    color: #8a93a3;
+
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+
+/* CÁC TRẠNG THÁI */
+
+.status-pending {
+    color: #966d00;
+    background: #fff4c8;
+}
+
+.status-approved,
+.status-selling {
+    color: #185a9d;
+    background: #e7f1ff;
+}
+
+.status-sold,
+.status-completed {
+    color: #23734d;
+    background: #e5f7ed;
+}
+
+.status-rejected,
+.status-cancelled {
+    color: #a43d3d;
+    background: #fdeaea;
+}
+
+.status-unknown {
+    color: #68738a;
+    background: #eef1f5;
+}
+
+
+/* NÚT XEM CHI TIẾT */
+
+.history-card-action {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.history-card-action button {
+    height: 38px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 0 14px;
+
+    border: 1px solid #d8e0ed;
+    border-radius: 9px;
+
+    background: #ffffff;
+    color: #193f9e;
+
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+}
+
+.history-card-action button:hover {
+    background: #193f9e;
+    border-color: #193f9e;
+    color: #ffffff;
+}
+
+.history-card-action button i {
+    font-size: 9px;
 }
 
 .status-pending {
@@ -2965,35 +3138,24 @@ body {
 
 @media (max-width: 900px) {
 
-    .consignment-container {
-        width: calc(100% - 30px);
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .history-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
     .consignment-history-card {
-        flex-wrap: wrap;
+        grid-template-columns: 55px minmax(0, 1fr);
+        gap: 14px;
     }
 
-    .history-product-info {
-        flex: 1;
+    .history-card-status {
+        grid-column: 1 / -1;
+
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
     }
 
-    .history-price {
-        margin-left: 71px;
-
-        text-align: left;
+    .history-card-action {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
     }
 
-    .history-status {
-        text-align: left;
-    }
 }
 
 /* =========================================================
@@ -3165,6 +3327,42 @@ body {
     .history-status {
         text-align: left;
     }
+
+    .consignment-history-card {
+    grid-template-columns: 45px minmax(0, 1fr);
+    gap: 10px;
+    padding: 14px;
+}
+
+.history-product-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 17px;
+}
+
+.history-product-info h3 {
+    font-size: 13px;
+}
+
+.history-price {
+    font-size: 13px;
+}
+
+.history-card-status {
+    grid-column: 1 / -1;
+
+    align-items: flex-start;
+}
+
+.history-card-action {
+    grid-column: 1 / -1;
+
+    justify-content: stretch;
+}
+
+.history-card-action button {
+    width: 100%;
+}
 }
 
 /* =========================================================
@@ -3256,4 +3454,337 @@ body {
 
 .history-empty .empty-create-btn {
     margin-top: 2px;
+}
+
+/* =========================================================
+   MODAL CHI TIẾT YÊU CẦU KÝ GỬI
+   ========================================================= */
+
+.consignment-modal {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    box-sizing: border-box;
+
+    z-index: 999999;
+}
+
+.consignment-modal-overlay {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(15, 27, 52, 0.58);
+    backdrop-filter: blur(3px);
+}
+
+.consignment-modal-box {
+    position: relative;
+
+    width: min(650px, 100%);
+    max-height: calc(100vh - 40px);
+
+    overflow-y: auto;
+
+    padding: 28px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border: 1px solid #e3e8f1;
+    border-radius: 18px;
+
+    box-shadow:
+        0 20px 60px rgba(17, 35, 70, 0.22);
+
+    animation: consignmentModalIn .2s ease;
+}
+
+@keyframes consignmentModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* NÚT X */
+
+.consignment-modal-close {
+    position: absolute;
+
+    top: 16px;
+    right: 16px;
+
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f1f4f8;
+    color: #667085;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+.consignment-modal-close:hover {
+    background: #193f9e;
+    color: #ffffff;
+}
+
+
+/* LABEL */
+
+.modal-label {
+    display: inline-block;
+
+    margin-bottom: 7px;
+
+    color: #193f9e;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 1.2px;
+}
+
+.consignment-modal-box h2 {
+    margin: 0 45px 18px 0;
+
+    color: #17233c;
+
+    font-size: 23px;
+    font-weight: 800;
+
+    line-height: 1.35;
+}
+
+
+/* STATUS */
+
+.modal-status {
+    margin-bottom: 22px;
+}
+
+.modal-status .consignment-status {
+    display: inline-flex;
+}
+
+
+/* THÔNG TIN */
+
+.modal-info-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 1px;
+
+    margin-bottom: 22px;
+
+    overflow: hidden;
+
+    background: #e5e9f1;
+
+    border: 1px solid #e5e9f1;
+    border-radius: 12px;
+}
+
+.modal-info-grid > div {
+    padding: 15px;
+
+    background: #ffffff;
+}
+
+.modal-info-grid > div span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #8a93a3;
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.modal-info-grid > div strong {
+    display: block;
+
+    color: #26324a;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.modal-info-grid > div strong.receive {
+    color: #193f9e;
+}
+
+
+/* MÔ TẢ */
+
+.modal-description {
+    padding: 17px;
+
+    margin-bottom: 16px;
+
+    background: #f7f9fc;
+
+    border: 1px solid #e6eaf1;
+    border-radius: 12px;
+}
+
+.modal-description > span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #193f9e;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .8px;
+}
+
+.modal-description p {
+    margin: 0;
+
+    color: #59657a;
+
+    font-size: 12px;
+    line-height: 1.7;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+
+/* PHẢN HỒI ADMIN */
+
+.admin-note {
+    padding: 16px;
+
+    margin-bottom: 18px;
+
+    background: #fff9df;
+
+    border: 1px solid #f0df9b;
+    border-radius: 12px;
+}
+
+.admin-note > span {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #8a6200;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .7px;
+}
+
+.admin-note p {
+    margin: 0;
+
+    color: #6e6135;
+
+    font-size: 12px;
+    line-height: 1.6;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+
+/* NÚT ĐÓNG */
+
+.modal-close-btn {
+    width: 100%;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #193f9e;
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+.modal-close-btn:hover {
+    background: #153586;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .consignment-modal {
+        padding: 12px;
+    }
+
+    .consignment-modal-box {
+        max-height: calc(100vh - 24px);
+
+        padding: 20px 16px;
+
+        border-radius: 15px;
+    }
+
+    .consignment-modal-box h2 {
+        font-size: 19px;
+
+        margin-right: 35px;
+    }
+
+    .modal-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-info-grid > div {
+        padding: 12px;
+    }
+
+    .modal-close-btn {
+        height: 42px;
+    }
 }

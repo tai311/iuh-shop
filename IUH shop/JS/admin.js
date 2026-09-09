@@ -497,8 +497,22 @@ function openPage(page) {
         loadFinance();
     }
 
-    if (page === "packages") {
-    loadPackages();
+    if (page === "consignment") {
+
+    const section =
+        document.getElementById(
+            "page-consignment"
+        );
+
+    if (section) {
+
+        section.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        loadConsignments();
+    }
 }
 
     window.scrollTo({
@@ -702,10 +716,15 @@ async function loadDashboard() {
         revenue.package
     );
 
-    $("revenueConsignment").textContent =
-    formatMoney(
-        revenue.consignment
-    );
+    const revenueConsignment =
+    $("revenueConsignment");
+
+if (revenueConsignment) {
+    revenueConsignment.textContent =
+        formatMoney(
+            revenue.consignment
+        );
+}
 
         $("financeTotal").textContent =
             formatMoney(
@@ -848,95 +867,56 @@ async function loadAdminRevenue() {
         let consignment = 0;
 
 
-        transactions.forEach(
-    transaction => {
+       transactions.forEach(transaction => {
 
-        const text =
-            (
-                transaction.title ||
-                ""
-            ).toLowerCase()
-            +
-            " "
-            +
-            (
-                transaction.description ||
-                ""
-            ).toLowerCase();
+    const text =
+        String(transaction.title || "").toLowerCase() +
+        " " +
+        String(transaction.description || "").toLowerCase();
 
+    const amount = Number(transaction.amount || 0);
 
-        const amount =
-            Number(
-                transaction.amount || 0
-            );
-
-
-        /*
-         * PHÍ KÝ GỬI
-         */
-
-        if (
-            text.includes("phí ký gửi") ||
-            text.includes("ký gửi") ||
-            text.includes("ky gui") ||
-            text.includes("consignment")
-        ) {
-
-            consignment += amount;
-
-        }
-
-
-        /*
-         * GÓI DỊCH VỤ
-         */
-
-        else if (
-            text.includes("gói dịch vụ") ||
-            text.includes("gói cá nhân") ||
-            text.includes("gói nhóm") ||
-            (
-                text.includes("gói") &&
-                !text.includes("đẩy tin")
-            )
-        ) {
-
-            packageRevenue += amount;
-
-        }
-
-
-        /*
-         * ĐẨY TIN
-         */
-
-        else if (
-            text.includes("đẩy tin") ||
-            text.includes("boost") ||
-            text.includes("nổi bật")
-        ) {
-
-            boost += amount;
-
-        }
-
-
-        /*
-         * PHÍ SÀN
-         */
-
-        else {
-
-            platform += amount;
-
-        }
-
+    // PHÍ KÝ GỬI
+    if (
+        text.includes("phí ký gửi") ||
+        text.includes("ký gửi") ||
+        text.includes("ky gui") ||
+        text.includes("consignment")
+    ) {
+        consignment += amount;
     }
-);
+
+    // GÓI DỊCH VỤ
+    else if (
+        text.includes("gói dịch vụ") ||
+        text.includes("gói cá nhân") ||
+        text.includes("gói nhóm") ||
+        (
+            text.includes("gói") &&
+            !text.includes("đẩy tin")
+        )
+    ) {
+        packageRevenue += amount;
+    }
+
+    // ĐẨY TIN
+    else if (
+        text.includes("đẩy tin") ||
+        text.includes("boost") ||
+        text.includes("nổi bật")
+    ) {
+        boost += amount;
+    }
+
+    // PHÍ SÀN
+    else {
+        platform += amount;
+    }
+
+});
 
 
        return {
-
     total:
         platform +
         boost +
@@ -944,18 +924,11 @@ async function loadAdminRevenue() {
         consignment,
 
     platform,
-
     boost,
-
-    package:
-        packageRevenue,
-
+    package: packageRevenue,
     consignment,
-
     transactions
-
 };
-
     }
 
 
@@ -5870,6 +5843,1311 @@ $("detailVerificationButton")
         }
     );
 
+    /* =========================================================
+   QUẢN LÝ KÝ GỬI
+========================================================= */
+
+const consignmentStatusText = {
+    pending: "Chờ duyệt",
+    approved: "Đã duyệt",
+    selling: "Đang ký gửi",
+    sold: "Đã bán",
+    completed: "Hoàn thành",
+    rejected: "Từ chối",
+    cancelled: "Đã hủy"
+};
+
+
+function consignmentStatusLabel(status) {
+    return (
+        consignmentStatusText[status] ||
+        status ||
+        "Không xác định"
+    );
+}
+
+
+function getFilteredConsignments() {
+
+    const keyword =
+        (
+            $("consignmentSearch")?.value ||
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    return consignments.filter(
+        item => {
+
+            const filterMatch =
+                consignmentFilter === "all" ||
+                item.status === consignmentFilter;
+
+
+            const text =
+                [
+                    item.product_name,
+                    item.category,
+                    item.condition,
+                    item.sender?.fullname,
+                    item.sender?.email
+                ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+
+            return (
+                filterMatch &&
+                (
+                    !keyword ||
+                    text.includes(keyword)
+                )
+            );
+
+        }
+    );
+}
+
+
+/* =========================================================
+   LOAD DANH SÁCH KÝ GỬI
+========================================================= */
+
+async function loadConsignments() {
+
+    const list =
+        $("consignmentList");
+
+    if (!list) {
+        return;
+    }
+
+
+    list.innerHTML = `
+        <div class="products-loading">
+            Đang tải yêu cầu ký gửi...
+        </div>
+    `;
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("consignment_requests")
+                .select(`
+                    id,
+                    user_id,
+                    product_name,
+                    category,
+                    condition,
+                    description,
+                    selling_price,
+                    service_fee,
+                    seller_receive,
+                    delivery_method,
+                    image_names,
+                    product_id,
+                    status,
+                    admin_note,
+                    reviewed_by,
+                    reviewed_at,
+                    created_at,
+                    updated_at
+                `)
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        consignments =
+            data || [];
+
+
+        await attachConsignmentUsers();
+
+        renderConsignments();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Consignment error:",
+            error
+        );
+
+
+        list.innerHTML = `
+            <div class="error-box">
+                Không thể tải yêu cầu ký gửi.
+                <br><br>
+                ${escapeHTML(
+                    error.message
+                )}
+            </div>
+        `;
+    }
+}
+
+
+/* =========================================================
+   LẤY THÔNG TIN NGƯỜI GỬI
+========================================================= */
+
+async function attachConsignmentUsers() {
+
+    const ids =
+        [
+            ...new Set(
+                consignments
+                    .map(
+                        item =>
+                            item.user_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+    if (!ids.length) {
+        return;
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("users")
+            .select(`
+                user_id,
+                fullname,
+                email,
+                avatar_url
+            `)
+            .in(
+                "user_id",
+                ids
+            );
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    const userMap =
+        new Map(
+            (data || []).map(
+                user => [
+                    String(
+                        user.user_id
+                    ),
+                    user
+                ]
+            )
+        );
+
+
+    consignments =
+        consignments.map(
+            item => ({
+                ...item,
+
+                sender:
+                    userMap.get(
+                        String(
+                            item.user_id
+                        )
+                    ) || null
+            })
+        );
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function renderConsignments() {
+
+    const list =
+        $("consignmentList");
+
+    if (!list) {
+        return;
+    }
+
+
+    const filtered =
+        getFilteredConsignments();
+
+
+    const total =
+        consignments.length;
+
+    const pending =
+        consignments.filter(
+            item =>
+                item.status === "pending"
+        ).length;
+
+    const selling =
+        consignments.filter(
+            item =>
+                [
+                    "approved",
+                    "selling"
+                ].includes(
+                    item.status
+                )
+        ).length;
+
+    const sold =
+        consignments.filter(
+            item =>
+                [
+                    "sold",
+                    "completed"
+                ].includes(
+                    item.status
+                )
+        ).length;
+
+
+    const summary =
+        $("consignmentSummary");
+
+
+    if (summary) {
+
+        summary.textContent =
+            `${filtered.length} yêu cầu đang hiển thị · ` +
+            `${total} tổng yêu cầu · ` +
+            `${pending} chờ duyệt · ` +
+            `${selling} đang ký gửi · ` +
+            `${sold} đã bán`;
+
+    }
+
+
+    if (!filtered.length) {
+
+        list.innerHTML = `
+            <div class="empty-box">
+                Không có yêu cầu ký gửi phù hợp.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        filtered
+            .map(
+                createConsignmentCard
+            )
+            .join("");
+}
+
+
+/* =========================================================
+   CARD KÝ GỬI
+========================================================= */
+
+function createConsignmentCard(item) {
+
+    const status =
+        item.status || "pending";
+
+
+    const sender =
+        item.sender || {};
+
+
+    return `
+
+        <article
+            class="product-admin-card consignment-admin-card"
+        >
+
+            <div class="product-image">
+
+                <div
+                    style="
+                        width:100%;
+                        height:100%;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:42px;
+                    "
+                >
+                    📦
+                </div>
+
+            </div>
+
+
+            <div class="product-body">
+
+                <div class="product-title">
+
+                    ${escapeHTML(
+                        item.product_name ||
+                        "Không có tên sản phẩm"
+                    )}
+
+                </div>
+
+
+                <div class="product-price">
+
+                    ${formatMoney(
+                        item.selling_price
+                    )}
+
+                </div>
+
+
+                <div class="product-meta">
+
+                    <span>
+                        Người gửi:
+                        ${escapeHTML(
+                            sender.fullname ||
+                            "Không xác định"
+                        )}
+                    </span>
+
+
+                    <span>
+                        Email:
+                        ${escapeHTML(
+                            sender.email ||
+                            "-"
+                        )}
+                    </span>
+
+
+                    <span>
+                        Danh mục:
+                        ${escapeHTML(
+                            item.category ||
+                            "-"
+                        )}
+                    </span>
+
+
+                    <span>
+                        Tình trạng:
+                        ${escapeHTML(
+                            item.condition ||
+                            "-"
+                        )}
+                    </span>
+
+
+                    <span>
+                        Ngày gửi:
+                        ${formatDate(
+                            item.created_at
+                        )}
+                    </span>
+
+                </div>
+
+
+                <div class="product-status-line">
+
+                    <span
+                        class="status-pill ${
+                            status === "pending"
+                                ? "status-pending"
+                                :
+                            [
+                                "approved",
+                                "selling"
+                            ].includes(status)
+                                ? "status-active"
+                                :
+                            [
+                                "sold",
+                                "completed"
+                            ].includes(status)
+                                ? "status-completed"
+                                :
+                                "status-hidden"
+                        }"
+                    >
+
+                        ${consignmentStatusLabel(
+                            status
+                        )}
+
+                    </span>
+
+                </div>
+
+
+                <div class="product-actions">
+
+                    <button
+                        type="button"
+                        class="toggle"
+                        data-consignment-view="${
+                            item.id
+                        }"
+                    >
+                        Xem chi tiết
+                    </button>
+
+                    <button
+    type="button"
+    class="delete"
+    data-consignment-action="delete"
+    data-consignment-id="${item.id}"
+>
+    Xóa
+</button>
+
+
+                    ${
+                        status === "pending"
+
+                            ?
+
+                            `
+                                <button
+                                    type="button"
+                                    class="toggle"
+                                    data-consignment-action="approve"
+                                    data-consignment-id="${item.id}"
+                                >
+                                    Duyệt
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="delete"
+                                    data-consignment-action="reject"
+                                    data-consignment-id="${item.id}"
+                                >
+                                    Từ chối
+                                </button>
+                            `
+
+                            :
+
+                            ""
+                    }
+
+                </div>
+
+            </div>
+
+        </article>
+
+    `;
+}
+
+
+/* =========================================================
+   CHI TIẾT KÝ GỬI
+========================================================= */
+
+function openConsignmentDetail(id) {
+
+    const item =
+        consignments.find(
+            item =>
+                String(item.id) ===
+                String(id)
+        );
+
+
+    if (!item) {
+        return;
+    }
+
+
+    selectedConsignment =
+        item;
+
+
+    const sender =
+        item.sender || {};
+
+
+    const existing =
+        document.getElementById(
+            "consignmentAdminModal"
+        );
+
+
+    if (existing) {
+        existing.remove();
+    }
+
+
+    const modal =
+        document.createElement("div");
+
+
+    modal.id =
+        "consignmentAdminModal";
+
+
+    modal.style.cssText = `
+        position:fixed;
+        inset:0;
+        z-index:999999;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+        background:rgba(15,27,52,.58);
+    `;
+
+
+    modal.innerHTML = `
+
+        <div
+            style="
+                position:relative;
+                width:min(680px,100%);
+                max-height:90vh;
+                overflow:auto;
+                background:#fff;
+                border-radius:18px;
+                padding:28px;
+                box-sizing:border-box;
+                box-shadow:0 25px 70px rgba(0,0,0,.25);
+            "
+        >
+
+            <button
+                type="button"
+                onclick="document.getElementById('consignmentAdminModal')?.remove()"
+                style="
+                    position:absolute;
+                    top:14px;
+                    right:14px;
+                    width:34px;
+                    height:34px;
+                    border:0;
+                    border-radius:50%;
+                    background:#f1f4f8;
+                    cursor:pointer;
+                    font-size:18px;
+                "
+            >
+                ×
+            </button>
+
+
+            <span
+                style="
+                    color:#193f9e;
+                    font-size:11px;
+                    font-weight:800;
+                    letter-spacing:1px;
+                "
+            >
+                YÊU CẦU KÝ GỬI
+            </span>
+
+
+            <h2
+                style="
+                    margin:8px 40px 20px 0;
+                    color:#17233c;
+                "
+            >
+                ${escapeHTML(
+                    item.product_name ||
+                    "Sản phẩm"
+                )}
+            </h2>
+
+
+            <div
+                style="
+                    display:grid;
+                    grid-template-columns:1fr 1fr;
+                    gap:12px;
+                "
+            >
+
+                <div>
+                    <small>Người gửi</small>
+                    <strong>
+                        ${escapeHTML(
+                            sender.fullname ||
+                            "-"
+                        )}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <small>Email</small>
+                    <strong>
+                        ${escapeHTML(
+                            sender.email ||
+                            "-"
+                        )}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <small>Danh mục</small>
+                    <strong>
+                        ${escapeHTML(
+                            item.category ||
+                            "-"
+                        )}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <small>Tình trạng</small>
+                    <strong>
+                        ${escapeHTML(
+                            item.condition ||
+                            "-"
+                        )}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <small>Giá mong muốn</small>
+                    <strong>
+                        ${formatMoney(
+                            item.selling_price
+                        )}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <small>Phí ký gửi</small>
+                    <strong>
+                        ${formatMoney(
+                            item.service_fee
+                        )}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <small>Dự kiến nhận</small>
+                    <strong>
+                        ${formatMoney(
+                            item.seller_receive
+                        )}
+                    </strong>
+                </div>
+
+
+                <div>
+                    <small>Ngày gửi</small>
+                    <strong>
+                        ${formatDate(
+                            item.created_at
+                        )}
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div
+                style="
+                    margin-top:20px;
+                    padding:16px;
+                    background:#f7f9fc;
+                    border-radius:10px;
+                "
+            >
+
+                <strong>
+                    Mô tả
+                </strong>
+
+                <p
+                    style="
+                        margin:8px 0 0;
+                        line-height:1.7;
+                        color:#59657a;
+                        white-space:pre-wrap;
+                    "
+                >
+                    ${escapeHTML(
+                        item.description ||
+                        "Không có mô tả."
+                    )}
+                </p>
+
+            </div>
+
+
+            ${
+                item.admin_note
+
+                    ?
+
+                    `
+                        <div
+                            style="
+                                margin-top:14px;
+                                padding:16px;
+                                background:#fff8df;
+                                border-radius:10px;
+                            "
+                        >
+
+                            <strong>
+                                Phản hồi Admin
+                            </strong>
+
+                            <p>
+                                ${escapeHTML(
+                                    item.admin_note
+                                )}
+                            </p>
+
+                        </div>
+                    `
+
+                    :
+
+                    ""
+            }
+
+
+            <button
+                type="button"
+                onclick="document.getElementById('consignmentAdminModal')?.remove()"
+                style="
+                    width:100%;
+                    margin-top:20px;
+                    height:44px;
+                    border:0;
+                    border-radius:9px;
+                    background:#193f9e;
+                    color:#fff;
+                    font-weight:700;
+                    cursor:pointer;
+                "
+            >
+                Đóng
+            </button>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+}
+
+
+/* =========================================================
+   ACTION KÝ GỬI
+========================================================= */
+
+async function updateConsignmentStatus(
+    id,
+    newStatus
+) {
+
+    const item =
+        consignments.find(
+            item =>
+                String(item.id) ===
+                String(id)
+        );
+
+    if (!item) {
+        return;
+    }
+
+    const actionText =
+        newStatus === "approved"
+            ? "duyệt"
+            : "từ chối";
+
+    if (
+        !confirm(
+            `Bạn có chắc muốn ${actionText} yêu cầu "${item.product_name}"?`
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const {
+            data: {
+                user
+            }
+        } =
+            await supabaseClient.auth.getUser();
+
+
+        /* =================================================
+           TỪ CHỐI
+        ================================================= */
+
+        if (newStatus === "rejected") {
+
+            const { error } =
+                await supabaseClient
+                    .from("consignment_requests")
+                    .update({
+                        status: "rejected",
+
+                        reviewed_by:
+                            user?.id || null,
+
+                        reviewed_at:
+                            new Date().toISOString(),
+
+                        updated_at:
+                            new Date().toISOString(),
+
+                        admin_note:
+                            "Yêu cầu ký gửi chưa được IUH SHOP chấp nhận."
+                    })
+                    .eq(
+                        "id",
+                        id
+                    );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            alert(
+                "Đã từ chối yêu cầu ký gửi."
+            );
+
+            await loadConsignments();
+
+            return;
+        }
+
+
+        /* =================================================
+           DUYỆT → TẠO TIN ĐĂNG
+        ================================================= */
+
+        if (newStatus === "approved") {
+
+            /* ---------------------------------------------
+               Kiểm tra đã tạo tin chưa
+            --------------------------------------------- */
+
+            if (item.product_id) {
+
+                alert(
+                    "Yêu cầu này đã có tin đăng."
+                );
+
+                return;
+            }
+
+
+            /* ---------------------------------------------
+               Tạo tin đăng
+            --------------------------------------------- */
+
+            const {
+                data: product,
+                error: productError
+            } =
+                await supabaseClient
+                    .from("products")
+                    .insert({
+                        seller_id: user.id,
+
+                        name:
+                            item.product_name,
+
+                        category:
+                            item.category,
+
+                        quantity:
+                            1,
+
+                        price:
+                            Number(
+                                item.selling_price
+                            ) || 0,
+
+                        description:
+                            item.description,
+
+                        image_urls:
+                            Array.isArray(
+                                item.image_names
+                            )
+                                ? item.image_names
+                                : [],
+
+                        status:
+                            "active",
+
+                        is_boosted:
+                            false,
+
+                        is_consignment:
+                            true,
+                        
+                        consignment_request_id: item.id,
+                    })
+                    .select("id")
+                    .single();
+
+
+            if (productError) {
+                throw productError;
+            }
+
+
+            /* ---------------------------------------------
+               Nối yêu cầu ký gửi với tin đăng
+            --------------------------------------------- */
+
+            const {
+                error: updateError
+            } =
+                await supabaseClient
+                    .from("consignment_requests")
+                    .update({
+
+                        status:
+                            "selling",
+
+                        product_id:
+                            product.id,
+
+                        reviewed_by:
+                            user?.id || null,
+
+                        reviewed_at:
+                            new Date().toISOString(),
+
+                        updated_at:
+                            new Date().toISOString(),
+
+                        admin_note:
+                            "Đã duyệt. Sản phẩm đã được đưa lên IUH SHOP."
+                    })
+                    .eq(
+                        "id",
+                        id
+                    );
+
+
+            if (updateError) {
+
+                /*
+                 * Nếu nối thất bại thì xóa tin
+                 * vừa tạo để tránh tin mồ côi.
+                 */
+
+                await supabaseClient
+                    .from("products")
+                    .delete()
+                    .eq(
+                        "id",
+                        product.id
+                    );
+
+                throw updateError;
+            }
+
+
+            alert(
+                "Đã duyệt ký gửi và tạo tin đăng thành công!"
+            );
+
+
+            await loadConsignments();
+
+            await loadProducts();
+
+            await loadDashboard();
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Update consignment error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Không thể xử lý yêu cầu ký gửi."
+        );
+    }
+}
+
+
+/* =========================================================
+   EVENTS KÝ GỬI
+========================================================= */
+
+document.addEventListener(
+    "click",
+    async function(event) {
+
+        const viewButton =
+            event.target.closest(
+                "[data-consignment-view]"
+            );
+
+
+        if (viewButton) {
+
+            openConsignmentDetail(
+                viewButton.dataset
+                    .consignmentView
+            );
+
+            return;
+        }
+
+
+        const actionButton =
+            event.target.closest(
+                "[data-consignment-action]"
+            );
+
+
+        if (actionButton) {
+
+            const id =
+                actionButton.dataset
+                    .consignmentId;
+
+
+            const action =
+                actionButton.dataset
+                    .consignmentAction;
+
+            if (action === "delete") {
+
+    const item =
+        consignments.find(
+            item =>
+                String(item.id) ===
+                String(id)
+        );
+
+    if (!item) {
+        return;
+    }
+
+    if (
+        !confirm(
+            `Xóa yêu cầu ký gửi "${item.product_name}"?\n\nDữ liệu này sẽ bị xóa.`
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        // Nếu yêu cầu đã tạo product thì xóa product trước
+        if (item.product_id) {
+
+            const {
+                error: productError
+            } =
+                await supabaseClient
+                    .from("products")
+                    .delete()
+                    .eq(
+                        "id",
+                        item.product_id
+                    );
+
+            if (productError) {
+                throw productError;
+            }
+        }
+
+        // Xóa yêu cầu ký gửi
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("consignment_requests")
+                .delete()
+                .eq(
+                    "id",
+                    id
+                );
+
+        if (error) {
+            throw error;
+        }
+
+        alert("Đã xóa yêu cầu ký gửi.");
+
+        await loadConsignments();
+        await loadProducts();
+        await loadDashboard();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Delete consignment:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Không thể xóa yêu cầu ký gửi."
+        );
+    }
+
+    return;
+}
+
+
+            if (
+                action === "approve"
+            ) {
+
+                await updateConsignmentStatus(
+                    id,
+                    "approved"
+                );
+
+            }
+
+
+            if (
+                action === "reject"
+            ) {
+
+                await updateConsignmentStatus(
+                    id,
+                    "rejected"
+                );
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   FILTER + SEARCH
+========================================================= */
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const button =
+            event.target.closest(
+                "[data-consignment-filter]"
+            );
+
+
+        if (!button) {
+            return;
+        }
+
+
+        consignmentFilter =
+            button.dataset
+                .consignmentFilter;
+
+
+        document
+            .querySelectorAll(
+                "[data-consignment-filter]"
+            )
+            .forEach(
+                item => {
+                    item.classList.toggle(
+                        "active",
+                        item === button
+                    );
+                }
+            );
+
+
+        renderConsignments();
+    }
+);
+
+
+$("consignmentSearch")
+    ?.addEventListener(
+        "input",
+        function() {
+            renderConsignments();
+        }
+    );
+
+
+$("closeConsignment")
+    ?.addEventListener(
+        "click",
+        function() {
+
+            const section =
+                $("consignmentSection");
+
+            if (section) {
+                section.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+            }
+
+        }
+    );
+
 
 /* =========================================================
    REALTIME
@@ -5977,6 +7255,28 @@ function setupRealtime() {
 
             }
         )
+
+        .on(
+    "postgres_changes",
+    {
+        event: "*",
+        schema: "public",
+        table: "consignment_requests"
+    },
+    async function() {
+
+        if (
+            $("consignmentSection") &&
+            $("consignmentSection")
+                .getAttribute("aria-hidden") !== "true"
+        ) {
+            await loadConsignments();
+        }
+
+        await loadDashboard();
+
+    }
+)
 
         .subscribe();
 
