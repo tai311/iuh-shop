@@ -46,6 +46,9 @@ let consignments = [];
 let consignmentFilter = "all";
 let selectedConsignment = null;
 
+let donations = [];
+let donationShowAll = false;
+
 
 /* =========================================================
    HELPERS
@@ -433,6 +436,8 @@ const pageTitles = {
         "Tài chính",
     packages: "Gói dịch vụ",
     consignment: "Ký gửi",
+    donations:
+    "Donate",
 
 };
 
@@ -497,6 +502,10 @@ function openPage(page) {
         loadFinance();
     }
 
+    if (page === "packages") {
+    loadPackages();
+}
+
     if (page === "consignment") {
 
     const section =
@@ -513,6 +522,10 @@ function openPage(page) {
 
         loadConsignments();
     }
+}
+
+    if (page === "donations") {
+    loadDonations();
 }
 
     window.scrollTo({
@@ -726,6 +739,16 @@ if (revenueConsignment) {
         );
 }
 
+const revenueDonation =
+    $("revenueDonation");
+
+if (revenueDonation) {
+    revenueDonation.textContent =
+        formatMoney(
+            revenue.donation
+        );
+}
+
         $("financeTotal").textContent =
             formatMoney(
                 revenue.total
@@ -865,6 +888,7 @@ async function loadAdminRevenue() {
         let boost = 0;
         let packageRevenue = 0;
         let consignment = 0;
+        let donation = 0;
 
 
        transactions.forEach(transaction => {
@@ -875,6 +899,16 @@ async function loadAdminRevenue() {
         String(transaction.description || "").toLowerCase();
 
     const amount = Number(transaction.amount || 0);
+
+     // DONATE
+    if (
+        text.includes("donate") ||
+        text.includes("ủng hộ") ||
+        text.includes("ung ho")
+    ) {
+        donation += amount;
+    }
+    
 
     // PHÍ KÝ GỬI
     if (
@@ -921,12 +955,14 @@ async function loadAdminRevenue() {
         platform +
         boost +
         packageRevenue +
-        consignment,
+        consignment +
+        donation,
 
     platform,
     boost,
     package: packageRevenue,
     consignment,
+    donation,
     transactions
 };
     }
@@ -5431,6 +5467,419 @@ $("packageSearch")
         renderPackages
     );
 
+    /* =========================================================
+   DONATIONS
+========================================================= */
+
+async function loadDonations() {
+
+    const list =
+        $("donationList");
+
+    const summary =
+        $("donationSummary");
+
+    const viewAllButton =
+        $("donationViewAllBtn");
+
+
+    if (!list) {
+        return;
+    }
+
+
+    list.innerHTML = `
+        <div class="loading-box">
+            Đang tải Donate...
+        </div>
+    `;
+
+
+    try {
+
+        const fromDate =
+            $("donationFromDate")?.value || "";
+
+        const toDate =
+            $("donationToDate")?.value || "";
+
+
+        /* =========================================
+           KIỂM TRA KHOẢNG NGÀY
+        ========================================= */
+
+        if (
+            fromDate &&
+            toDate &&
+            fromDate > toDate
+        ) {
+
+            alert(
+                "Ngày bắt đầu không được lớn hơn ngày kết thúc."
+            );
+
+            return;
+        }
+
+
+        let query =
+            supabaseClient
+                .from("donations")
+                .select(`
+                    id,
+                    donor_id,
+                    donor_name,
+                    amount,
+                    payment_method,
+                    transfer_code,
+                    status,
+                    note,
+                    bank_name,
+                    transfer_content,
+                    created_at
+                `)
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        /* =========================================
+           LỌC TỪ NGÀY
+        ========================================= */
+
+        if (fromDate) {
+
+            const start =
+                new Date(
+                    `${fromDate}T00:00:00`
+                );
+
+            query =
+                query.gte(
+                    "created_at",
+                    start.toISOString()
+                );
+        }
+
+
+        /* =========================================
+           LỌC ĐẾN NGÀY
+           → lấy hết ngày được chọn
+        ========================================= */
+
+        if (toDate) {
+
+            const end =
+                new Date(
+                    `${toDate}T00:00:00`
+                );
+
+            end.setDate(
+                end.getDate() + 1
+            );
+
+            query =
+                query.lt(
+                    "created_at",
+                    end.toISOString()
+                );
+        }
+
+
+        const {
+            data,
+            error
+        } =
+            await query;
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        donations =
+            data || [];
+
+
+        donationShowAll = false;
+
+
+        renderDonations();
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Donation error:",
+            error
+        );
+
+
+        list.innerHTML = `
+            <div class="error-box">
+                Không thể tải dữ liệu Donate.
+                <br><br>
+                ${escapeHTML(
+                    error.message
+                )}
+            </div>
+        `;
+
+
+        if (summary) {
+            summary.textContent =
+                "Không thể tải dữ liệu.";
+        }
+
+
+        if (viewAllButton) {
+            viewAllButton.style.display =
+                "none";
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER DONATIONS
+========================================================= */
+
+function renderDonations() {
+
+    const list =
+        $("donationList");
+
+    const summary =
+        $("donationSummary");
+
+    const viewAllButton =
+        $("donationViewAllBtn");
+
+
+    if (!list) {
+        return;
+    }
+
+
+    const total =
+        donations.length;
+
+
+    const displayItems =
+        donationShowAll
+            ? donations
+            : donations.slice(0, 10);
+
+
+    /* =========================================
+       KHÔNG CÓ DONATE
+    ========================================= */
+
+    if (!displayItems.length) {
+
+        list.innerHTML = `
+            <div class="empty-box">
+                Chưa có khoản Donate nào
+                trong khoảng thời gian đã chọn.
+            </div>
+        `;
+
+
+        if (summary) {
+
+            summary.textContent =
+                "0 lượt Donate";
+        }
+
+
+        if (viewAllButton) {
+
+            viewAllButton.style.display =
+                "none";
+        }
+
+
+        return;
+    }
+
+
+    /* =========================================
+       TỔNG TIỀN
+    ========================================= */
+
+    const totalAmount =
+        donations.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.amount || 0
+                ),
+            0
+        );
+
+
+    if (summary) {
+
+        summary.textContent =
+            donationShowAll
+                ? `Đang hiển thị tất cả ${total} lượt Donate • Tổng ${formatMoney(totalAmount)}`
+                : `Đang hiển thị ${Math.min(total, 10)} / ${total} lượt Donate • Tổng ${formatMoney(totalAmount)}`;
+    }
+
+
+    /* =========================================
+       BẢNG
+    ========================================= */
+
+    list.innerHTML =
+        displayItems
+            .map(
+                donation => {
+
+                    const status =
+                        String(
+                            donation.status ||
+                            ""
+                        ).toLowerCase();
+
+
+                    let statusText =
+                        "Không xác định";
+
+                    if (
+                        status ===
+                        "completed"
+                    ) {
+                        statusText =
+                            "Hoàn tất";
+                    }
+                    else if (
+                        status ===
+                        "pending"
+                    ) {
+                        statusText =
+                            "Chờ xử lý";
+                    }
+                    else if (
+                        status ===
+                        "cancelled"
+                    ) {
+                        statusText =
+                            "Đã hủy";
+                    }
+
+
+                    return `
+                        <div class="donation-row">
+
+                            <div class="donation-date">
+                                ${formatDate(
+                                    donation.created_at
+                                )}
+                            </div>
+
+
+                            <div class="donation-donor">
+
+                                <strong>
+                                    ${escapeHTML(
+                                        donation.donor_name ||
+                                        "Ẩn danh"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="donation-bank">
+
+                                ${escapeHTML(
+                                    donation.bank_name ||
+                                    "-"
+                                )}
+
+                            </div>
+
+
+                            <div class="donation-amount">
+
+                                ${formatMoney(
+                                    donation.amount
+                                )}
+
+                            </div>
+
+
+                            <div class="donation-content">
+
+                                ${escapeHTML(
+                                    donation.transfer_content ||
+                                    "-"
+                                )}
+
+                            </div>
+
+
+                            <div class="donation-code">
+
+                                ${escapeHTML(
+                                    donation.transfer_code ||
+                                    "-"
+                                )}
+
+                            </div>
+
+
+                            <div>
+
+                                <span
+                                    class="donation-status ${status}"
+                                >
+                                    ${statusText}
+                                </span>
+
+                            </div>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+
+
+    /* =========================================
+       NÚT XEM TẤT CẢ
+    ========================================= */
+
+    if (viewAllButton) {
+
+        if (total > 10) {
+
+            viewAllButton.style.display =
+                "inline-flex";
+
+            viewAllButton.textContent =
+                donationShowAll
+                    ? "Thu gọn"
+                    : `Xem tất cả (${total})`;
+
+        }
+        else {
+
+            viewAllButton.style.display =
+                "none";
+        }
+
+    }
+
+}
 
 /* =========================================================
    FINANCE
@@ -5489,7 +5938,17 @@ async function loadFinance() {
 
                     let type = "Phí sàn";
 
+
 if (
+    text.includes("donate") ||
+    text.includes("ủng hộ") ||
+    text.includes("ung ho")
+) {
+    type = "Donate";
+}
+
+
+else if (
     text.includes("gói dịch vụ") ||
     text.includes("gói cá nhân") ||
     text.includes("gói nhóm") ||
@@ -5501,11 +5960,22 @@ if (
     type = "Gói dịch vụ";
 }
 
+
 else if (
     text.includes("đẩy tin") ||
     text.includes("nổi bật")
 ) {
     type = "Phí đẩy tin";
+}
+
+
+else if (
+    text.includes("phí ký gửi") ||
+    text.includes("ký gửi") ||
+    text.includes("ky gui") ||
+    text.includes("consignment")
+) {
+    type = "Phí ký gửi";
 }
 
 
@@ -7148,6 +7618,47 @@ $("closeConsignment")
         }
     );
 
+    /* =========================================================
+   DONATION FILTER / REFRESH
+========================================================= */
+
+$("donationFilterBtn")
+    ?.addEventListener(
+        "click",
+        function() {
+
+            donationShowAll = false;
+
+            loadDonations();
+
+        }
+    );
+
+
+$("donationRefreshBtn")
+    ?.addEventListener(
+        "click",
+        function() {
+
+            loadDonations();
+
+        }
+    );
+
+
+$("donationViewAllBtn")
+    ?.addEventListener(
+        "click",
+        function() {
+
+            donationShowAll =
+                !donationShowAll;
+
+            renderDonations();
+
+        }
+    );
+
 
 /* =========================================================
    REALTIME
@@ -7271,6 +7782,29 @@ function setupRealtime() {
                 .getAttribute("aria-hidden") !== "true"
         ) {
             await loadConsignments();
+        }
+
+        await loadDashboard();
+
+    }
+)
+
+.on(
+    "postgres_changes",
+    {
+        event: "*",
+        schema: "public",
+        table: "donations"
+    },
+    async function() {
+
+        if (
+            $("page-donations") &&
+            $("page-donations")
+                .classList
+                .contains("active")
+        ) {
+            await loadDonations();
         }
 
         await loadDashboard();

@@ -45,6 +45,80 @@ function togglePassword(inputId, button) {
 
 const registerForm =
     document.getElementById("registerForm");
+const studentCardInput =
+    document.getElementById("studentCard");
+
+const studentCardPreview =
+    document.getElementById("studentCardPreview");
+
+const isGraduatedInput =
+    document.getElementById("isGraduated");
+
+/* =========================================
+   XEM TRƯỚC THẺ SINH VIÊN
+========================================= */
+
+if (studentCardInput) {
+
+    studentCardInput.addEventListener(
+        "change",
+        function () {
+
+            const file =
+                this.files?.[0];
+
+            if (!file) {
+                studentCardPreview.innerHTML = "";
+                studentCardPreview.classList.remove("show");
+                return;
+            }
+
+            if (!file.type.startsWith("image/")) {
+
+                this.value = "";
+
+                alert(
+                    "Vui lòng chọn file hình ảnh."
+                );
+
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+
+                this.value = "";
+
+                alert(
+                    "Ảnh thẻ sinh viên không được vượt quá 5MB."
+                );
+
+                return;
+            }
+
+            const reader =
+                new FileReader();
+
+            reader.onload =
+                function (event) {
+
+                    studentCardPreview.innerHTML = `
+                        <img
+                            src="${event.target.result}"
+                            alt="Thẻ sinh viên"
+                        >
+                    `;
+
+                    studentCardPreview.classList.add(
+                        "show"
+                    );
+                };
+
+            reader.readAsDataURL(file);
+
+        }
+    );
+
+}
 
 
 registerForm.addEventListener(
@@ -90,6 +164,16 @@ registerForm.addEventListener(
                 .getElementById("phone")
                 .value
                 .trim();
+
+        const studentCardFile =
+    document
+        .getElementById("studentCard")
+        .files?.[0];
+
+const isGraduated =
+    document
+        .getElementById("isGraduated")
+        .checked;
 
 
         const password =
@@ -171,6 +255,28 @@ registerForm.addEventListener(
             return;
         }
 
+        if (!studentCardFile) {
+
+    message.textContent =
+        "Vui lòng tải lên thẻ sinh viên.";
+
+    message.style.color =
+        "#d64545";
+
+    return;
+}
+
+
+if (studentCardFile.size > 5 * 1024 * 1024) {
+
+    message.textContent =
+        "Ảnh thẻ sinh viên không được vượt quá 5MB.";
+
+    message.style.color =
+        "#d64545";
+
+    return;
+}
 
         /* ==============================
            KHÓA BUTTON
@@ -235,6 +341,132 @@ registerForm.addEventListener(
 
             return;
         }
+
+        /* =========================================
+   UPLOAD THẺ SINH VIÊN
+========================================= */
+
+const newUser =
+    data?.user;
+
+if (!newUser) {
+
+    message.textContent =
+        "Không lấy được tài khoản vừa đăng ký.";
+
+    message.style.color =
+        "#d64545";
+
+    button.disabled = false;
+    button.textContent = "ĐĂNG KÝ";
+
+    return;
+}
+
+
+const fileExtension =
+    studentCardFile.name
+        .split(".")
+        .pop()
+        .toLowerCase();
+
+
+const filePath =
+    `${newUser.id}/${Date.now()}.${fileExtension}`;
+
+
+const {
+    error: uploadError
+} =
+    await supabaseClient
+        .storage
+        .from("student-cards")
+        .upload(
+            filePath,
+            studentCardFile,
+            {
+                cacheControl: "3600",
+                upsert: false
+            }
+        );
+
+
+if (uploadError) {
+
+    console.error(
+        "Lỗi upload thẻ sinh viên:",
+        uploadError
+    );
+
+    message.textContent =
+        "Tạo tài khoản thành công nhưng tải thẻ sinh viên thất bại.";
+
+    message.style.color =
+        "#d64545";
+
+    button.disabled = false;
+    button.textContent = "ĐĂNG KÝ";
+
+    return;
+}
+
+
+/* =========================================
+   LẤY URL ẢNH
+========================================= */
+
+const {
+    data: publicUrlData
+} =
+    supabaseClient
+        .storage
+        .from("student-cards")
+        .getPublicUrl(filePath);
+
+
+const studentCardUrl =
+    publicUrlData.publicUrl;
+
+/* =========================================
+   LƯU THÔNG TIN XÁC THỰC
+========================================= */
+
+const {
+    error: profileError
+} =
+    await supabaseClient
+        .from("users")
+        .update({
+            student_card_url:
+                studentCardUrl,
+
+            is_graduated:
+                isGraduated
+        })
+        .eq(
+            "user_id",
+            newUser.id
+        );
+
+
+if (profileError) {
+
+    console.error(
+        "Lỗi lưu thông tin sinh viên:",
+        profileError
+    );
+
+    message.textContent =
+        "Tài khoản đã tạo nhưng không lưu được thông tin thẻ.";
+
+    message.style.color =
+        "#d64545";
+
+    button.disabled = false;
+    button.textContent = "ĐĂNG KÝ";
+
+    return;
+}
 
 
         /* ==============================

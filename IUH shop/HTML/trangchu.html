@@ -557,7 +557,7 @@
                 </svg>
             </div>
 
-            <span>Tìm đồ thất lạc</span>
+            <span>Thiết bị</span>
         </a>
 
 
@@ -629,6 +629,43 @@
             <span>Khác</span>
         </a>
 
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     SẢN PHẨM ĐỀ XUẤT
+========================================= -->
+
+<section
+    class="recommended-products"
+    id="recommendedSection"
+    style="display: none;"
+>
+
+    <div class="recommended-header">
+
+        <div>
+            <span class="recommended-label">
+                GỢI Ý DÀNH CHO BẠN
+            </span>
+
+            <h2>
+                SẢN PHẨM ĐỀ XUẤT
+            </h2>
+
+            <p>
+                Những sản phẩm đang được ưu tiên hiển thị trên IUH SHOP
+            </p>
+        </div>
+
+    </div>
+
+
+    <div
+        id="recommendedProductList"
+        class="recommended-product-list">
     </div>
 
 </section>
@@ -1187,5 +1224,525 @@
         <path d="M6 11l6-6 6 6"></path>
     </svg>
 </button>
+<!-- =====================================================
+     NÚT DONATE
+===================================================== -->
+
+<button
+    id="donateFloatingButton"
+    class="donate-floating-button"
+    type="button"
+    aria-label="Donate cho IUH SHOP"
+>
+
+    <span class="donate-glass-shine"></span>
+
+    <span class="donate-money-stack">
+
+        <span class="money-bill bill-back"></span>
+        <span class="money-bill bill-middle"></span>
+        <span class="money-bill bill-front">
+            ₫
+        </span>
+
+    </span>
+
+    <!-- TIỀN BAY -->
+    <span class="money-rain rain-1">₫</span>
+    <span class="money-rain rain-2">₫</span>
+    <span class="money-rain rain-3">₫</span>
+    <span class="money-rain rain-4">₫</span>
+    <span class="money-rain rain-5">₫</span>
+
+    <span class="donate-mini-text">
+        DONATE
+    </span>
+
+</button>
+<!-- =====================================================
+     POPUP DONATE
+===================================================== -->
+
+<div
+    id="donateModal"
+    class="donate-modal"
+    aria-hidden="true"
+>
+
+    <div
+        id="donateModalOverlay"
+        class="donate-modal-overlay"
+    ></div>
+
+
+    <div
+        class="donate-modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="donateModalTitle"
+    >
+
+        <!-- NÚT ĐÓNG -->
+
+        <button
+            id="closeDonateModal"
+            class="donate-close"
+            type="button"
+            aria-label="Đóng"
+        >
+            ×
+        </button>
+
+
+        <!-- =================================================
+             BƯỚC 1
+        ================================================== -->
+
+        <div
+            id="donatePaymentView"
+            class="donate-view"
+        >
+
+            <div class="donate-popup-icon">
+                ₫
+            </div>
+
+
+            <h2 id="donateModalTitle">
+                DONATE CHO IUH SHOP
+            </h2>
+
+
+            <p class="donate-thankyou">
+                Cảm ơn bạn đã đồng hành và ủng hộ
+                IUH SHOP.
+            </p>
+
+
+            <p class="donate-description">
+                Sự đóng góp của bạn giúp IUH SHOP
+                duy trì và phát triển cộng đồng
+                sinh viên.
+            </p>
+
+
+            <!-- =========================================
+                 QR
+            ========================================== -->
+
+            <div class="donate-qr-box">
+
+                <img
+                    id="donateQrCode"
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=IUH%20SHOP%20DONATE"
+                    alt="QR Donate IUH SHOP"
+                >
+
+            </div>
+
+
+            <div class="donate-qr-note">
+                QR mô phỏng giao dịch Donate
+            </div>
+
+
+            <!-- =========================================
+                 HỌ VÀ TÊN
+            ========================================== -->
+
+            <label
+                for="donateDonorName"
+                class="donate-input-label"
+            >
+                Họ và tên
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <input
+                    id="donateDonorName"
+                    type="text"
+                    maxlength="100"
+                    placeholder="Nhập họ và tên"
+                >
+
+            </div>
+
+
+            <!-- =========================================
+                 NGÂN HÀNG
+            ========================================== -->
+
+            <label
+                for="donateBankName"
+                class="donate-input-label"
+            >
+                Ngân hàng
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <select
+                    id="donateBankName"
+                >
+
+                    <option value="">
+                        Chọn ngân hàng
+                    </option>
+
+                    <option value="Vietcombank">
+                        Vietcombank
+                    </option>
+
+                    <option value="BIDV">
+                        BIDV
+                    </option>
+
+                    <option value="VietinBank">
+                        VietinBank
+                    </option>
+
+                    <option value="MB Bank">
+                        MB Bank
+                    </option>
+
+                    <option value="ACB">
+                        ACB
+                    </option>
+
+                    <option value="Techcombank">
+                        Techcombank
+                    </option>
+
+                    <option value="VPBank">
+                        VPBank
+                    </option>
+
+                    <option value="Sacombank">
+                        Sacombank
+                    </option>
+
+                    <option value="TPBank">
+                        TPBank
+                    </option>
+
+                    <option value="HDBank">
+                        HDBank
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- =========================================
+                 SỐ TIỀN
+            ========================================== -->
+
+            <label
+                for="donateAmount"
+                class="donate-input-label"
+            >
+                Số tiền Donate
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <input
+                    id="donateAmount"
+                    type="number"
+                    min="1000"
+                    step="1000"
+                    placeholder="Nhập số tiền"
+                >
+
+                <span>đ</span>
+
+            </div>
+
+
+            <!-- =========================================
+                 SỐ TIỀN NHANH
+            ========================================== -->
+
+            <div class="donate-quick-amounts">
+
+                <button
+                    type="button"
+                    data-donate-amount="10000"
+                >
+                    10.000đ
+                </button>
+
+                <button
+                    type="button"
+                    data-donate-amount="20000"
+                >
+                    20.000đ
+                </button>
+
+                <button
+                    type="button"
+                    data-donate-amount="50000"
+                >
+                    50.000đ
+                </button>
+
+                <button
+                    type="button"
+                    data-donate-amount="100000"
+                >
+                    100.000đ
+                </button>
+
+            </div>
+
+
+            <!-- =========================================
+                 NỘI DUNG
+            ========================================== -->
+
+            <label
+                for="donateTransferContentInput"
+                class="donate-input-label"
+            >
+                Nội dung chuyển khoản
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <input
+                    id="donateTransferContentInput"
+                    type="text"
+                    maxlength="150"
+                    placeholder="Nội dung chuyển khoản"
+                >
+
+            </div>
+
+
+            <div class="donate-content-note">
+                Hệ thống tự điền nội dung, bạn có thể chỉnh sửa.
+            </div>
+
+
+            <p
+                id="donateMessage"
+                class="donate-message"
+            ></p>
+
+
+            <button
+                id="startDonateTransfer"
+                class="donate-main-button"
+                type="button"
+            >
+                TIẾP TỤC
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             BƯỚC 2
+        ================================================== -->
+
+        <div
+            id="donateTransferView"
+            class="donate-view"
+            hidden
+        >
+
+            <div class="donate-step-title">
+
+                <span class="donate-step-number">
+                    2
+                </span>
+
+                <div>
+
+                    <h3>
+                        Xác nhận chuyển khoản
+                    </h3>
+
+                    <p>
+                        Đây là giao dịch mô phỏng.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="donate-bank-card">
+
+                <div class="donate-bank-header">
+
+                    <span>
+                        CHUYỂN KHOẢN MÔ PHỎNG
+                    </span>
+
+                    <span class="donate-bank-badge">
+                        QR
+                    </span>
+
+                </div>
+
+
+                <div class="donate-bank-row">
+
+                    <span>
+                        Ngân hàng
+                    </span>
+
+                    <strong id="donateTransferBank">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="donate-bank-row">
+
+                    <span>
+                        Người chuyển
+                    </span>
+
+                    <strong id="donateTransferDonor">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="donate-bank-row highlight">
+
+                    <span>
+                        Số tiền
+                    </span>
+
+                    <strong id="donateTransferAmount">
+                        0đ
+                    </strong>
+
+                </div>
+
+
+                <div class="donate-bank-row">
+
+                    <span>
+                        Nội dung
+                    </span>
+
+                    <strong
+                        id="donateTransferContent"
+                        class="transfer-code"
+                    >
+                        —
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <p
+                id="donateTransferMessage"
+                class="donate-message"
+            ></p>
+
+
+            <div class="donate-transfer-actions">
+
+                <button
+                    id="backToDonateAmount"
+                    class="donate-back-button"
+                    type="button"
+                >
+                    QUAY LẠI
+                </button>
+
+
+                <button
+                    id="confirmDonateTransfer"
+                    class="donate-main-button"
+                    type="button"
+                >
+                    XÁC NHẬN CHUYỂN KHOẢN
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             BƯỚC 3
+        ================================================== -->
+
+        <div
+            id="donateSuccessView"
+            class="donate-view donate-success-view"
+            hidden
+        >
+
+            <div class="donate-success-icon">
+                ✓
+            </div>
+
+
+            <h3>
+                DONATE THÀNH CÔNG
+            </h3>
+
+
+            <p>
+                Cảm ơn bạn đã ủng hộ IUH SHOP.
+            </p>
+
+
+            <div class="donate-success-info">
+
+                <span>
+                    Số tiền
+                </span>
+
+                <strong id="donateSuccessAmount">
+                    0đ
+                </strong>
+
+            </div>
+
+
+            <div class="donate-success-info">
+
+                <span>
+                    Mã giao dịch
+                </span>
+
+                <strong id="donateSuccessCode">
+                    —
+                </strong>
+
+            </div>
+
+
+            <button
+                id="finishDonate"
+                class="donate-main-button"
+                type="button"
+            >
+                HOÀN TẤT
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 </body>
 </html>

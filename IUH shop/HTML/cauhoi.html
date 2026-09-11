@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Câu hỏi thường gặp - IUH SHOP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/trangchu.css">
+    <style>
+        :root {
+            --bg: #f5f8ff;
+            --card: #ffffff;
+            --primary: #0b5ed7;
+            --primary-dark: #0a4bb7;
+            --text: #1d2433;
+            --muted: #697386;
+            --line: #e7edf7;
+            --accent: #edf5ff;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Be Vietnam Pro", sans-serif;
+            background: linear-gradient(180deg, #f9fbff 0%, var(--bg) 100%);
+            color: var(--text);
+        }
+        .page-shell {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 0 20px 50px;
+        }
+        .header-box {
+            background: linear-gradient(135deg, #edf5ff, #dfeeff);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            padding: 30px 28px;
+            margin-bottom: 28px;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 2.9rem);
+        }
+        .subtitle {
+            margin-top: 10px;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+        .faq-list {
+            display: grid;
+            gap: 18px;
+        }
+        .faq-item {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            box-shadow: 0 12px 28px rgba(17, 21, 33, 0.04);
+            overflow: hidden;
+        }
+        .faq-question {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 22px 24px;
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            list-style: none;
+        }
+        .faq-question::-webkit-details-marker {
+            display: none;
+        }
+        .faq-question::after {
+            content: "";
+            flex: 0 0 10px;
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid var(--primary);
+            border-bottom: 2px solid var(--primary);
+            transform: rotate(45deg) translateY(-3px);
+            transition: transform 0.2s ease;
+        }
+        .faq-item[open] .faq-question::after {
+            transform: rotate(225deg) translate(-2px, -1px);
+        }
+        .faq-answer {
+            margin: 0;
+            padding: 0 24px 22px;
+            line-height: 1.8;
+            color: var(--muted);
+        }
+        .faq-answer strong {
+            color: var(--text);
+        }
+        @media (max-width: 700px) {
+            .faq-item {
+                border-radius: 16px;
+            }
+            .faq-question {
+                padding: 18px 16px;
+            }
+            .faq-answer {
+                padding: 0 16px 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="top-bar">
+            <div class="top-bar-container">
+                <div class="welcome-text1">Chào mừng bạn đến với IUH SHOP</div>
+                <div class="top-actions">
+                    <form class="search-box">
+                        <input type="search" placeholder="Tìm kiếm sản phẩm, danh mục..." aria-label="Tìm kiếm">
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+
+                    <div class="account-area">
+                        <div id="guestAccount" class="guest-account">
+                            <a href="dangnhap.html" class="top-link login-link">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                                    <path d="M11 8l4 4-4 4"></path>
+                                    <path d="M15 12H4"></path>
+                                </svg>
+                                <span>Đăng nhập</span>
+                            </a>
+                            <span class="top-divider"></span>
+                            <a href="dangky.html" class="top-link register-link">Đăng ký</a>
+                        </div>
+
+                        <div class="user-account-wrapper" id="userAccount" style="display: none;">
+                            <button type="button" id="userAccountButton" class="user-account">
+                                <img id="headerAvatar" src="../Images/default-avatar.svg" alt="Ảnh đại diện" class="header-avatar">
+                                <span id="headerUserName" class="header-user-name">Tài khoản</span>
+                            </button>
+
+                            <div id="accountDropdown" class="account-dropdown">
+                                <a href="taikhoan.html">Tài khoản</a>
+                                <a href="admin.html" id="adminLink" style="display: none;">Quản trị</a>
+                                <button type="button" id="logoutButton">Đăng xuất</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-nav">
+            <div class="nav-container">
+                <a href="trangchu.html" class="brand">
+                    <img src="../Images/logo.png" alt="IUH Shop" class="brand-logo">
+                    <div class="brand-text">
+                        <div class="brand-name"><span>IUH</span> SHOP</div>
+                        <div class="brand-slogan">Kết nối sinh viên – Mua bán dễ dàng</div>
+                    </div>
+                </a>
+
+                <nav class="navigation">
+                    <a href="trangchu.html" class="nav-item">TRANG CHỦ</a>
+                    <a href="gioithieu.html" class="nav-item">GIỚI THIỆU</a>
+                    <a href="sanpham.html" class="nav-item">SẢN PHẨM</a>
+                    <a href="chinhsach.html" class="nav-item">CHÍNH SÁCH</a>
+                    <a href="lienhe.html" class="nav-item">LIÊN HỆ</a>
+
+                    <div class="account-nav-wrapper">
+                        <a href="taikhoan.html" class="nav-item account-nav">TÀI KHOẢN</a>
+                        <button type="button" class="account-arrow-button" id="accountNavArrow" aria-label="Mở menu tài khoản">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M6 9L12 15L18 9"></path>
+                            </svg>
+                        </button>
+
+                        <div class="account-shortcuts" id="accountShortcuts">
+                            <a href="giohang.html"><span class="shortcut-icon">🛒</span><span>Giỏ hàng</span></a>
+                            <a href="donhang.html"><span class="shortcut-icon">📦</span><span>Kiểm tra đơn hàng</span></a>
+                            <a href="dangtin.html"><span class="shortcut-icon">＋</span><span>Đăng tin</span></a>
+                            <a href="quanlytin.html"><span class="shortcut-icon">📋</span><span>Quản lý tin</span></a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section class="header-box">
+            <h1>Câu hỏi thường gặp</h1>
+            <div class="subtitle">
+                Giải đáp nhanh các thắc mắc phổ biến khi sử dụng IUH SHOP để mua bán, thanh toán và đăng tin sản phẩm.
+            </div>
+        </section>
+
+        <section class="faq-list">
+            <details class="faq-item">
+                <summary class="faq-question">1. IUH SHOP là gì?</summary>
+                <div class="faq-answer">
+                    IUH SHOP là nền tảng mua bán, trao đổi và kết nối dành riêng cho sinh viên IUH. Tại đây, người dùng có thể đăng tin bán hàng, mua sản phẩm, trao đổi vật dụng học tập và liên hệ với nhau dễ dàng hơn.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-question">2. Làm sao để đăng sản phẩm lên IUH SHOP?</summary>
+                <div class="faq-answer">
+                    Bạn cần đăng nhập tài khoản, chọn mục <strong>Đăng tin</strong>, điền đầy đủ tên sản phẩm, danh mục, giá, số lượng, mô tả và tải ảnh. Sau đó nhấn nút <strong>Đăng tin</strong> để sản phẩm xuất hiện trên trang sản phẩm.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-question">3. Có cần thanh toán khi đăng sản phẩm không?</summary>
+                <div class="faq-answer">
+                    Hiện tại, việc đăng tin trên IUH SHOP được miễn phí theo quy định nội bộ của hệ thống. Bạn chỉ cần đảm bảo thông tin sản phẩm rõ ràng, đúng mô tả và chất lượng hình ảnh tốt để tăng khả năng bán hàng.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-question">4. Nếu sản phẩm đã bán hết thì sao?</summary>
+                <div class="faq-answer">
+                    Khi số lượng đã được thanh toán và còn lại bằng 0, hệ thống sẽ tự cập nhật sản phẩm về trạng thái hết hàng. Sản phẩm đó sẽ biến mất khỏi danh sách hiển thị trên trang sản phẩm để tránh giao dịch sai số lượng.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-question">5. Có mấy cách thanh toán?</summary>
+                <div class="faq-answer">
+                    Người mua có thể thanh toán theo 2 hình thức: <strong>QR code</strong> hoặc <strong>tiền mặt</strong>. Nếu chọn QR, hệ thống sẽ hiển thị mã QR để quét thanh toán; nếu chọn tiền mặt, bạn có thể thanh toán khi nhận hàng hoặc gặp trực tiếp người bán.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-question">6. Vận chuyển qua trung gian có mất phí không?</summary>
+                <div class="faq-answer">
+                    Có. Nếu chọn <strong>vận chuyển qua trung gian</strong>, sẽ phát sinh thêm <strong>phí 5.000đ</strong> cho mỗi đơn hàng. Nếu chọn <strong>gặp trực tiếp người bán</strong> thì không phát sinh phí vận chuyển.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-question">7. Nếu tôi đã thanh toán qua QR thì phải làm gì?</summary>
+                <div class="faq-answer">
+                    Bạn chỉ cần nhấn nút <strong>Tôi đã thanh toán</strong>, chờ hệ thống xác minh trong vài giây. Sau khi xác minh thành công, hệ thống sẽ cho phép bạn nhấn <strong>Xác nhận thanh toán</strong> để hoàn tất đơn hàng.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-question">8. Tôi có thể báo cáo sản phẩm không đúng mô tả không?</summary>
+                <div class="faq-answer">
+                    Có. Nếu sản phẩm không đúng mô tả, có dấu hiệu lừa đảo, hoặc vi phạm nội dung, bạn có thể sử dụng chức năng <strong>Báo cáo</strong> để gửi thông tin cho hệ thống xem xét và xử lý.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-question">9. Nếu tôi muốn mua sản phẩm nhưng chưa đăng nhập?</summary>
+                <div class="faq-answer">
+                    Bạn cần đăng nhập trước khi thêm vào giỏ hàng hoặc thanh toán. Nếu chưa có tài khoản, hãy đăng ký tài khoản trước khi tiếp tục giao dịch.
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-question">10. Làm sao để liên hệ hỗ trợ?</summary>
+                <div class="faq-answer">
+                    Bạn có thể truy cập mục <strong>Liên hệ</strong> hoặc <strong>Hỗ trợ</strong> trên giao diện website để gửi yêu cầu hỗ trợ, báo cáo hoặc hỏi thêm thông tin chi tiết.
+                </div>
+            </details>
+        </section>
+    </main>
+
+    <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/ok.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+<!-- =====================================================
+     NÚT DONATE
+===================================================== -->
+
+<button
+    id="donateFloatingButton"
+    class="donate-floating-button"
+    type="button"
+    aria-label="Donate cho IUH SHOP"
+>
+
+    <span class="donate-glass-shine"></span>
+
+    <span class="donate-money-stack">
+
+        <span class="money-bill bill-back"></span>
+        <span class="money-bill bill-middle"></span>
+        <span class="money-bill bill-front">
+            ₫
+        </span>
+
+    </span>
+
+    <!-- TIỀN BAY -->
+    <span class="money-rain rain-1">₫</span>
+    <span class="money-rain rain-2">₫</span>
+    <span class="money-rain rain-3">₫</span>
+    <span class="money-rain rain-4">₫</span>
+    <span class="money-rain rain-5">₫</span>
+
+    <span class="donate-mini-text">
+        DONATE
+    </span>
+
+</button>
+<!-- =====================================================
+     POPUP DONATE
+===================================================== -->
+
+<div
+    id="donateModal"
+    class="donate-modal"
+    aria-hidden="true"
+>
+
+    <div
+        id="donateModalOverlay"
+        class="donate-modal-overlay"
+    ></div>
+
+
+    <div
+        class="donate-modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="donateModalTitle"
+    >
+
+        <!-- NÚT ĐÓNG -->
+
+        <button
+            id="closeDonateModal"
+            class="donate-close"
+            type="button"
+            aria-label="Đóng"
+        >
+            ×
+        </button>
+
+
+        <!-- =================================================
+             BƯỚC 1
+        ================================================== -->
+
+        <div
+            id="donatePaymentView"
+            class="donate-view"
+        >
+
+            <div class="donate-popup-icon">
+                ₫
+            </div>
+
+
+            <h2 id="donateModalTitle">
+                DONATE CHO IUH SHOP
+            </h2>
+
+
+            <p class="donate-thankyou">
+                Cảm ơn bạn đã đồng hành và ủng hộ
+                IUH SHOP.
+            </p>
+
+
+            <p class="donate-description">
+                Sự đóng góp của bạn giúp IUH SHOP
+                duy trì và phát triển cộng đồng
+                sinh viên.
+            </p>
+
+
+            <!-- =========================================
+                 QR
+            ========================================== -->
+
+            <div class="donate-qr-box">
+
+                <img
+                    id="donateQrCode"
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=IUH%20SHOP%20DONATE"
+                    alt="QR Donate IUH SHOP"
+                >
+
+            </div>
+
+
+            <div class="donate-qr-note">
+                QR mô phỏng giao dịch Donate
+            </div>
+
+
+            <!-- =========================================
+                 HỌ VÀ TÊN
+            ========================================== -->
+
+            <label
+                for="donateDonorName"
+                class="donate-input-label"
+            >
+                Họ và tên
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <input
+                    id="donateDonorName"
+                    type="text"
+                    maxlength="100"
+                    placeholder="Nhập họ và tên"
+                >
+
+            </div>
+
+
+            <!-- =========================================
+                 NGÂN HÀNG
+            ========================================== -->
+
+            <label
+                for="donateBankName"
+                class="donate-input-label"
+            >
+                Ngân hàng
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <select
+                    id="donateBankName"
+                >
+
+                    <option value="">
+                        Chọn ngân hàng
+                    </option>
+
+                    <option value="Vietcombank">
+                        Vietcombank
+                    </option>
+
+                    <option value="BIDV">
+                        BIDV
+                    </option>
+
+                    <option value="VietinBank">
+                        VietinBank
+                    </option>
+
+                    <option value="MB Bank">
+                        MB Bank
+                    </option>
+
+                    <option value="ACB">
+                        ACB
+                    </option>
+
+                    <option value="Techcombank">
+                        Techcombank
+                    </option>
+
+                    <option value="VPBank">
+                        VPBank
+                    </option>
+
+                    <option value="Sacombank">
+                        Sacombank
+                    </option>
+
+                    <option value="TPBank">
+                        TPBank
+                    </option>
+
+                    <option value="HDBank">
+                        HDBank
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- =========================================
+                 SỐ TIỀN
+            ========================================== -->
+
+            <label
+                for="donateAmount"
+                class="donate-input-label"
+            >
+                Số tiền Donate
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <input
+                    id="donateAmount"
+                    type="number"
+                    min="1000"
+                    step="1000"
+                    placeholder="Nhập số tiền"
+                >
+
+                <span>đ</span>
+
+            </div>
+
+
+            <!-- =========================================
+                 SỐ TIỀN NHANH
+            ========================================== -->
+
+            <div class="donate-quick-amounts">
+
+                <button
+                    type="button"
+                    data-donate-amount="10000"
+                >
+                    10.000đ
+                </button>
+
+                <button
+                    type="button"
+                    data-donate-amount="20000"
+                >
+                    20.000đ
+                </button>
+
+                <button
+                    type="button"
+                    data-donate-amount="50000"
+                >
+                    50.000đ
+                </button>
+
+                <button
+                    type="button"
+                    data-donate-amount="100000"
+                >
+                    100.000đ
+                </button>
+
+            </div>
+
+
+            <!-- =========================================
+                 NỘI DUNG
+            ========================================== -->
+
+            <label
+                for="donateTransferContentInput"
+                class="donate-input-label"
+            >
+                Nội dung chuyển khoản
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <input
+                    id="donateTransferContentInput"
+                    type="text"
+                    maxlength="150"
+                    placeholder="Nội dung chuyển khoản"
+                >
+
+            </div>
+
+
+            <div class="donate-content-note">
+                Hệ thống tự điền nội dung, bạn có thể chỉnh sửa.
+            </div>
+
+
+            <p
+                id="donateMessage"
+                class="donate-message"
+            ></p>
+
+
+            <button
+                id="startDonateTransfer"
+                class="donate-main-button"
+                type="button"
+            >
+                TIẾP TỤC
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             BƯỚC 2
+        ================================================== -->
+
+        <div
+            id="donateTransferView"
+            class="donate-view"
+            hidden
+        >
+
+            <div class="donate-step-title">
+
+                <span class="donate-step-number">
+                    2
+                </span>
+
+                <div>
+
+                    <h3>
+                        Xác nhận chuyển khoản
+                    </h3>
+
+                    <p>
+                        Đây là giao dịch mô phỏng.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="donate-bank-card">
+
+                <div class="donate-bank-header">
+
+                    <span>
+                        CHUYỂN KHOẢN MÔ PHỎNG
+                    </span>
+
+                    <span class="donate-bank-badge">
+                        QR
+                    </span>
+
+                </div>
+
+
+                <div class="donate-bank-row">
+
+                    <span>
+                        Ngân hàng
+                    </span>
+
+                    <strong id="donateTransferBank">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="donate-bank-row">
+
+                    <span>
+                        Người chuyển
+                    </span>
+
+                    <strong id="donateTransferDonor">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="donate-bank-row highlight">
+
+                    <span>
+                        Số tiền
+                    </span>
+
+                    <strong id="donateTransferAmount">
+                        0đ
+                    </strong>
+
+                </div>
+
+
+                <div class="donate-bank-row">
+
+                    <span>
+                        Nội dung
+                    </span>
+
+                    <strong
+                        id="donateTransferContent"
+                        class="transfer-code"
+                    >
+                        —
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <p
+                id="donateTransferMessage"
+                class="donate-message"
+            ></p>
+
+
+            <div class="donate-transfer-actions">
+
+                <button
+                    id="backToDonateAmount"
+                    class="donate-back-button"
+                    type="button"
+                >
+                    QUAY LẠI
+                </button>
+
+
+                <button
+                    id="confirmDonateTransfer"
+                    class="donate-main-button"
+                    type="button"
+                >
+                    XÁC NHẬN CHUYỂN KHOẢN
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             BƯỚC 3
+        ================================================== -->
+
+        <div
+            id="donateSuccessView"
+            class="donate-view donate-success-view"
+            hidden
+        >
+
+            <div class="donate-success-icon">
+                ✓
+            </div>
+
+
+            <h3>
+                DONATE THÀNH CÔNG
+            </h3>
+
+
+            <p>
+                Cảm ơn bạn đã ủng hộ IUH SHOP.
+            </p>
+
+
+            <div class="donate-success-info">
+
+                <span>
+                    Số tiền
+                </span>
+
+                <strong id="donateSuccessAmount">
+                    0đ
+                </strong>
+
+            </div>
+
+
+            <div class="donate-success-info">
+
+                <span>
+                    Mã giao dịch
+                </span>
+
+                <strong id="donateSuccessCode">
+                    —
+                </strong>
+
+            </div>
+
+
+            <button
+                id="finishDonate"
+                class="donate-main-button"
+                type="button"
+            >
+                HOÀN TẤT
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

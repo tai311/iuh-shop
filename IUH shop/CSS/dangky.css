@@ -673,3 +673,132 @@ body {
     opacity: 0.9;
 
 }
+
+
+/* =========================================
+   THẺ SINH VIÊN
+========================================= */
+
+.student-card-upload {
+    width: 100%;
+}
+
+.student-card-upload input[type="file"] {
+    display: none;
+}
+
+.student-card-upload-box {
+    width: 100%;
+    min-height: 82px;
+    padding: 15px;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    border: 1px dashed #cbd4e3;
+    border-radius: 10px;
+
+    background: #f8faff;
+
+    cursor: pointer;
+
+    transition:
+        border-color .2s ease,
+        background .2s ease;
+}
+
+.student-card-upload-box:hover {
+    border-color: #193f9e;
+    background: #f4f7ff;
+}
+
+.student-card-upload-box i {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #eaf0ff;
+    color: #193f9e;
+
+    font-size: 20px;
+}
+
+.student-card-upload-box div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.student-card-upload-box strong {
+    color: #303949;
+    font-size: 13px;
+}
+
+.student-card-upload-box span {
+    color: #8a94a5;
+    font-size: 11px;
+}
+
+
+/* =========================================
+   PREVIEW THẺ
+========================================= */
+
+.student-card-preview {
+    display: none;
+    margin-top: 10px;
+}
+
+.student-card-preview.show {
+    display: block;
+}
+
+.student-card-preview img {
+    width: 100%;
+    max-height: 180px;
+
+    object-fit: contain;
+
+    border: 1px solid #dfe4ec;
+    border-radius: 9px;
+
+    background: #f7f8fa;
+}
+
+
+/* =========================================
+   ĐÃ TỐT NGHIỆP
+========================================= */
+
+.graduated-check {
+    margin: 4px 0 18px;
+}
+
+.graduated-check label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #596579;
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.graduated-check input {
+    width: 15px;
+    height: 15px;
+
+    margin: 0;
+
+    accent-color: #193f9e;
+
+    cursor: pointer;
+}

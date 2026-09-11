@@ -1,0 +1,1495 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ĐIỀU KHOẢN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FONT AWESOME -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/QTCD.css">
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+                     
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+</a>
+
+<!-- ICON GIỎ HÀNG -->
+<a href="giohang.html"
+   class="top-cart-icon"
+   aria-label="Giỏ hàng"
+   title="Giỏ hàng">
+
+    <i class="fa-solid fa-cart-shopping"></i>
+
+</a>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+    
+    <!-- =====================================================
+     ĐIỀU KHOẢN CHUNG IUH SHOP
+===================================================== -->
+
+<main class="terms-page">
+
+    <!-- =========================
+         HERO
+    ========================== -->
+    <section class="terms-hero">
+
+        <div class="terms-hero-content">
+
+            <span class="terms-eyebrow">
+                IUH SHOP • ĐIỀU KHOẢN SỬ DỤNG
+            </span>
+
+            <h1>
+                Điều khoản<br>
+                sử dụng
+            </h1>
+
+            <p>
+                Các quy định chung áp dụng cho người dùng
+                khi đăng ký và sử dụng IUH SHOP.
+            </p>
+
+            <div class="terms-version">
+                Phiên bản 1.0
+                <span>•</span>
+                Cập nhật lần đầu
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         NỘI DUNG
+    ========================== -->
+    <section class="terms-content">
+
+        <div class="terms-layout">
+
+
+            <!-- =========================
+                 SIDEBAR
+            ========================== -->
+            <aside class="terms-sidebar">
+
+                <div class="terms-sidebar-inner">
+
+                    <span>
+                        NỘI DUNG
+                    </span>
+
+                    <a href="#general">
+                        01. Quy định chung
+                    </a>
+
+                    <a href="#account">
+                        02. Tài khoản người dùng
+                    </a>
+
+                    <a href="#verification">
+                        03. Xác thực tài khoản
+                    </a>
+
+                    <a href="#use">
+                        04. Sử dụng IUH SHOP
+                    </a>
+
+                    <a href="#buy-sell">
+                        05. Hoạt động mua bán
+                    </a>
+
+                    <a href="#content">
+                        06. Nội dung & sản phẩm
+                    </a>
+
+                    <a href="#payment">
+                        07. Thanh toán & phí
+                    </a>
+
+                    <a href="#responsibility">
+                        08. Trách nhiệm người dùng
+                    </a>
+
+                    <a href="#violation">
+                        09. Vi phạm & xử lý
+                    </a>
+
+                    <a href="#changes">
+                        10. Thay đổi điều khoản
+                    </a>
+
+                    <a href="#agreement">
+                        11. Chấp nhận điều khoản
+                    </a>
+
+                </div>
+
+            </aside>
+
+
+            <!-- =========================
+                 ARTICLE
+            ========================== -->
+            <article class="terms-article">
+
+
+                <!-- =========================
+                     THÔNG TIN CHUNG
+                ========================== -->
+
+                <div class="community-principles">
+
+                    <div class="community-principles-title">
+
+                        <span>
+                            IUH SHOP
+                        </span>
+
+                        <h2>
+                            Trước khi sử dụng nền tảng
+                        </h2>
+
+                    </div>
+
+
+                    <div class="principles-grid">
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+
+                            <strong>
+                                Tài khoản
+                            </strong>
+
+                            <p>
+                                Cung cấp thông tin chính xác
+                                và bảo mật tài khoản.
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                            </div>
+
+                            <strong>
+                                Mua bán
+                            </strong>
+
+                            <p>
+                                Giao dịch minh bạch và
+                                có trách nhiệm.
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+
+                            <strong>
+                                An toàn
+                            </strong>
+
+                            <p>
+                                Tôn trọng quyền riêng tư
+                                và thông tin của người dùng.
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-scale-balanced"></i>
+                            </div>
+
+                            <strong>
+                                Minh bạch
+                            </strong>
+
+                            <p>
+                                Tuân thủ các quy định và
+                                chính sách của IUH SHOP.
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-handshake"></i>
+                            </div>
+
+                            <strong>
+                                Trách nhiệm
+                            </strong>
+
+                            <p>
+                                Chịu trách nhiệm với hoạt động
+                                phát sinh từ tài khoản.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================
+                     01
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="general"
+                >
+
+                    <div class="section-number">
+                        01
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            QUY ĐỊNH CHUNG
+                        </span>
+
+                        <h2>
+                            Phạm vi áp dụng
+                        </h2>
+
+                        <p>
+                            Điều khoản sử dụng này áp dụng đối với
+                            tất cả người dùng đăng ký tài khoản,
+                            truy cập hoặc sử dụng các chức năng
+                            được cung cấp trên IUH SHOP.
+                        </p>
+
+                        <p>
+                            IUH SHOP là nền tảng hỗ trợ sinh viên
+                            kết nối, đăng tin, mua bán, trao đổi
+                            sản phẩm và sử dụng các dịch vụ
+                            được cung cấp trên hệ thống.
+                        </p>
+
+                        <div class="terms-note">
+
+                            <strong>
+                                Lưu ý
+                            </strong>
+
+                            <span>
+                                Người dùng cần đọc và hiểu các
+                                điều khoản trước khi sử dụng
+                                tài khoản IUH SHOP.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     02
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="account"
+                >
+
+                    <div class="section-number">
+                        02
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            TÀI KHOẢN
+                        </span>
+
+                        <h2>
+                            Tài khoản người dùng
+                        </h2>
+
+                        <p>
+                            Người dùng cần cung cấp thông tin
+                            chính xác và đầy đủ khi đăng ký
+                            tài khoản trên IUH SHOP.
+                        </p>
+
+                        <ul class="community-list">
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Không sử dụng thông tin giả mạo
+                                để tạo tài khoản.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Không sử dụng tài khoản của
+                                người khác khi chưa được phép.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Không mua bán hoặc cho thuê
+                                tài khoản.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Chủ tài khoản chịu trách nhiệm
+                                đối với hoạt động phát sinh từ
+                                tài khoản của mình.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Có trách nhiệm bảo mật thông tin
+                                đăng nhập.
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     03
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="verification"
+                >
+
+                    <div class="section-number">
+                        03
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            XÁC THỰC
+                        </span>
+
+                        <h2>
+                            Xác thực tài khoản
+                        </h2>
+
+                        <p>
+                            Một số chức năng của IUH SHOP có thể
+                            yêu cầu người dùng xác thực thông tin
+                            nhằm đảm bảo môi trường mua bán
+                            phù hợp với cộng đồng sinh viên.
+                        </p>
+
+                        <p>
+                            Người dùng có trách nhiệm cung cấp
+                            thông tin hoặc giấy tờ xác thực
+                            theo yêu cầu của hệ thống.
+                        </p>
+
+                        <div class="terms-note warning">
+
+                            <strong>
+                                Quan trọng
+                            </strong>
+
+                            <span>
+                                Không được sử dụng giấy tờ hoặc
+                                thông tin xác thực của người khác
+                                để đăng ký hoặc sử dụng dịch vụ.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     04
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="use"
+                >
+
+                    <div class="section-number">
+                        04
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            SỬ DỤNG
+                        </span>
+
+                        <h2>
+                            Quy định khi sử dụng IUH SHOP
+                        </h2>
+
+                        <p>
+                            Người dùng chỉ được sử dụng IUH SHOP
+                            cho các mục đích phù hợp với chức năng
+                            và quy định của nền tảng.
+                        </p>
+
+                        <ul class="community-list">
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Sử dụng tài khoản đúng mục đích.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Không thực hiện hành vi lừa đảo
+                                hoặc chiếm đoạt tài sản.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Không can thiệp hoặc truy cập
+                                trái phép vào hệ thống.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Không sử dụng hệ thống để spam
+                                hoặc thao túng hoạt động.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Không sử dụng IUH SHOP cho
+                                các hoạt động trái pháp luật.
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     05
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="buy-sell"
+                >
+
+                    <div class="section-number">
+                        05
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            MUA BÁN
+                        </span>
+
+                        <h2>
+                            Hoạt động mua bán
+                        </h2>
+
+                        <p>
+                            IUH SHOP hỗ trợ người dùng đăng bán,
+                            tìm kiếm và mua sản phẩm trên nền tảng.
+                            Người mua và người bán có trách nhiệm
+                            thực hiện giao dịch một cách minh bạch.
+                        </p>
+
+                        <div class="community-two-column">
+
+                            <div>
+
+                                <h3>
+                                    Người bán
+                                </h3>
+
+                                <ul class="community-list">
+
+                                    <li>
+                                        <i class="fa-solid fa-check"></i>
+                                        Cung cấp thông tin sản phẩm
+                                        chính xác.
+                                    </li>
+
+                                    <li>
+                                        <i class="fa-solid fa-check"></i>
+                                        Đảm bảo sản phẩm phù hợp
+                                        với nội dung đăng bán.
+                                    </li>
+
+                                    <li>
+                                        <i class="fa-solid fa-check"></i>
+                                        Chịu trách nhiệm về sản phẩm
+                                        do mình đăng bán.
+                                    </li>
+
+                                </ul>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3>
+                                    Người mua
+                                </h3>
+
+                                <ul class="community-list">
+
+                                    <li>
+                                        <i class="fa-solid fa-check"></i>
+                                        Kiểm tra thông tin sản phẩm
+                                        trước khi đặt hàng.
+                                    </li>
+
+                                    <li>
+                                        <i class="fa-solid fa-check"></i>
+                                        Cung cấp thông tin nhận hàng
+                                        chính xác.
+                                    </li>
+
+                                    <li>
+                                        <i class="fa-solid fa-check"></i>
+                                        Thực hiện thanh toán theo
+                                        phương thức đã chọn.
+                                    </li>
+
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     06
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="content"
+                >
+
+                    <div class="section-number">
+                        06
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            NỘI DUNG
+                        </span>
+
+                        <h2>
+                            Nội dung và sản phẩm đăng tải
+                        </h2>
+
+                        <p>
+                            Người dùng chịu trách nhiệm đối với
+                            nội dung, hình ảnh và thông tin sản phẩm
+                            do mình đăng tải trên IUH SHOP.
+                        </p>
+
+                        <div class="community-warning-grid">
+
+                            <div class="community-warning-card">
+
+                                <div class="warning-icon">
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                </div>
+
+                                <h3>
+                                    Thông tin sai lệch
+                                </h3>
+
+                                <p>
+                                    Không cố tình cung cấp thông tin
+                                    sai lệch hoặc gây hiểu nhầm
+                                    cho người dùng khác.
+                                </p>
+
+                            </div>
+
+
+                            <div class="community-warning-card">
+
+                                <div class="warning-icon">
+                                    <i class="fa-solid fa-ban"></i>
+                                </div>
+
+                                <h3>
+                                    Sản phẩm không phù hợp
+                                </h3>
+
+                                <p>
+                                    Không đăng bán các sản phẩm
+                                    bị cấm hoặc không phù hợp
+                                    với quy định của IUH SHOP.
+                                </p>
+
+                            </div>
+
+
+                            <div class="community-warning-card">
+
+                                <div class="warning-icon">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+
+                                <h3>
+                                    Quyền của IUH SHOP
+                                </h3>
+
+                                <p>
+                                    IUH SHOP có thể ẩn hoặc xóa
+                                    nội dung vi phạm chính sách
+                                    của nền tảng.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     07
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="payment"
+                >
+
+                    <div class="section-number">
+                        07
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            THANH TOÁN
+                        </span>
+
+                        <h2>
+                            Thanh toán và các khoản phí
+                        </h2>
+
+                        <p>
+                            Người dùng có trách nhiệm thanh toán
+                            đầy đủ các khoản tiền phát sinh từ
+                            giao dịch hoặc dịch vụ mà mình sử dụng.
+                        </p>
+
+                        <ul class="community-list">
+
+                            <li>
+                                <i class="fa-solid fa-wallet"></i>
+                                Thanh toán bằng IUH Wallet
+                                theo số tiền hiển thị.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-qrcode"></i>
+                                Thanh toán QR theo hướng dẫn
+                                trên hệ thống.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-receipt"></i>
+                                Các khoản phí dịch vụ sẽ được
+                                công bố trước khi người dùng
+                                xác nhận sử dụng.
+                            </li>
+
+                        </ul>
+
+                        <div class="terms-note">
+
+                            <strong>
+                                Các loại phí
+                            </strong>
+
+                            <span>
+                                Có thể bao gồm phí sàn, phí giao nhận,
+                                phí ký gửi, phí đẩy tin và phí gói
+                                dịch vụ tùy từng trường hợp.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     08
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="responsibility"
+                >
+
+                    <div class="section-number">
+                        08
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            TRÁCH NHIỆM
+                        </span>
+
+                        <h2>
+                            Trách nhiệm của người dùng
+                        </h2>
+
+                        <p>
+                            Mỗi người dùng có trách nhiệm sử dụng
+                            IUH SHOP một cách trung thực, an toàn
+                            và tôn trọng cộng đồng.
+                        </p>
+
+                        <ul class="community-list">
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Bảo mật tài khoản cá nhân.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Cung cấp thông tin chính xác.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Tuân thủ các chính sách được
+                                công bố trên website.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Chịu trách nhiệm đối với nội dung
+                                và giao dịch do mình thực hiện.
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-check"></i>
+                                Thông báo cho IUH SHOP khi phát hiện
+                                hành vi bất thường hoặc vi phạm.
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     09
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="violation"
+                >
+
+                    <div class="section-number">
+                        09
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            VI PHẠM
+                        </span>
+
+                        <h2>
+                            Vi phạm và xử lý
+                        </h2>
+
+                        <p>
+                            Khi phát hiện hành vi vi phạm Điều khoản
+                            sử dụng hoặc các chính sách của IUH SHOP,
+                            hệ thống có thể áp dụng biện pháp xử lý
+                            phù hợp với mức độ vi phạm.
+                        </p>
+
+                        <div class="handling-list">
+
+                            <div class="handling-item">
+
+                                <span class="handling-number">
+                                    01
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        Nhắc nhở
+                                    </strong>
+
+                                    <p>
+                                        Áp dụng đối với trường hợp
+                                        vi phạm nhẹ hoặc lần đầu.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="handling-item">
+
+                                <span class="handling-number">
+                                    02
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        Ẩn hoặc xóa nội dung
+                                    </strong>
+
+                                    <p>
+                                        Nội dung vi phạm có thể
+                                        bị ẩn hoặc xóa khỏi hệ thống.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="handling-item">
+
+                                <span class="handling-number">
+                                    03
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        Hạn chế tài khoản
+                                    </strong>
+
+                                    <p>
+                                        Một số chức năng của tài khoản
+                                        có thể bị hạn chế trong
+                                        một khoảng thời gian.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="handling-item">
+
+                                <span class="handling-number">
+                                    04
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        Khóa tài khoản
+                                    </strong>
+
+                                    <p>
+                                        Áp dụng đối với trường hợp
+                                        vi phạm nghiêm trọng hoặc
+                                        tái phạm nhiều lần.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     10
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="changes"
+                >
+
+                    <div class="section-number">
+                        10
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            CẬP NHẬT
+                        </span>
+
+                        <h2>
+                            Thay đổi điều khoản
+                        </h2>
+
+                        <p>
+                            IUH SHOP có thể cập nhật hoặc thay đổi
+                            Điều khoản sử dụng khi cần thiết để
+                            phù hợp với hoạt động và sự phát triển
+                            của nền tảng.
+                        </p>
+
+                        <p>
+                            Phiên bản cập nhật sẽ được công bố
+                            trên website. Người dùng nên thường xuyên
+                            kiểm tra các chính sách để nắm được
+                            những thay đổi mới nhất.
+                        </p>
+
+                        <div class="terms-note">
+
+                            <strong>
+                                Phiên bản hiện tại
+                            </strong>
+
+                            <span>
+                                Phiên bản 1.0 • Cập nhật lần đầu
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =========================
+                     11
+                ========================== -->
+
+                <section
+                    class="terms-section"
+                    id="agreement"
+                >
+
+                    <div class="section-number">
+                        11
+                    </div>
+
+                    <div>
+
+                        <span class="section-label">
+                            ĐỒNG Ý
+                        </span>
+
+                        <h2>
+                            Chấp nhận điều khoản
+                        </h2>
+
+                        <p>
+                            Khi đăng ký tài khoản và chọn đồng ý
+                            với Điều khoản sử dụng, người dùng xác
+                            nhận rằng mình đã đọc, hiểu và đồng ý
+                            tuân thủ các quy định của IUH SHOP.
+                        </p>
+
+                        <div class="community-final">
+
+                            <div class="community-final-icon">
+                                <i class="fa-solid fa-handshake"></i>
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    IUH SHOP
+                                </span>
+
+                                <h3>
+                                    Tôi đã đọc, hiểu và đồng ý
+                                    tuân thủ Điều khoản sử dụng
+                                    của IUH SHOP.
+                                </h3>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+     <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/QTCD.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+</body>
+</html>

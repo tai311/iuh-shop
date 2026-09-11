@@ -1,0 +1,1028 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHÍNH SÁCH BẢO MẬT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FONT AWESOME -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/QTCD.css">
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+                     
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+</a>
+
+<!-- ICON GIỎ HÀNG -->
+<a href="giohang.html"
+   class="top-cart-icon"
+   aria-label="Giỏ hàng"
+   title="Giỏ hàng">
+
+    <i class="fa-solid fa-cart-shopping"></i>
+
+</a>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+    
+    <main class="terms-page community-page">
+
+    <!-- HERO -->
+    <section class="terms-hero community-hero">
+
+        <div class="terms-hero-content">
+
+            <div class="terms-eyebrow">
+                IUH SHOP • BẢO MẬT
+            </div>
+
+            <h1>
+                Chính sách<br>
+                bảo mật
+            </h1>
+
+            <p>
+                Quy định về việc thu thập, sử dụng, lưu trữ và bảo vệ
+                thông tin của người dùng khi sử dụng IUH SHOP.
+            </p>
+
+            <div class="terms-version">
+                Phiên bản 1.0 • Áp dụng từ khi chính sách được công bố
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CONTENT -->
+    <div class="terms-content">
+
+        <div class="terms-layout">
+
+            <!-- SIDEBAR -->
+            <aside class="terms-sidebar">
+
+                <div class="terms-sidebar-inner">
+
+                    <span>NỘI DUNG</span>
+
+                    <a href="#gioi-thieu">
+                        01. Giới thiệu
+                    </a>
+
+                    <a href="#thong-tin-thu-thap">
+                        02. Thông tin thu thập
+                    </a>
+
+                    <a href="#muc-dich">
+                        03. Mục đích sử dụng
+                    </a>
+
+                    <a href="#xac-thuc">
+                        04. Xác thực tài khoản
+                    </a>
+
+                    <a href="#chia-se">
+                        05. Chia sẻ thông tin
+                    </a>
+
+                    <a href="#luu-tru">
+                        06. Lưu trữ thông tin
+                    </a>
+
+                    <a href="#bao-mat">
+                        07. Bảo mật dữ liệu
+                    </a>
+
+                    <a href="#quyen-nguoi-dung">
+                        08. Quyền của người dùng
+                    </a>
+
+                    <a href="#cookie">
+                        09. Cookie & dữ liệu kỹ thuật
+                    </a>
+
+                    <a href="#thay-doi">
+                        10. Thay đổi chính sách
+                    </a>
+
+                </div>
+
+            </aside>
+
+
+            <!-- ARTICLE -->
+            <article class="terms-article">
+
+
+                <!-- NGUYÊN TẮC -->
+                <section class="community-principles">
+
+                    <div class="community-principles-title">
+
+                        <span>
+                            IUH SHOP • BẢO VỆ NGƯỜI DÙNG
+                        </span>
+
+                        <h2>
+                            Nguyên tắc bảo mật
+                        </h2>
+
+                    </div>
+
+
+                    <div class="principles-grid">
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
+
+                            <strong>
+                                Bảo vệ thông tin
+                            </strong>
+
+                            <p>
+                                Bảo vệ thông tin cá nhân của người dùng
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+
+                            <strong>
+                                Bảo mật dữ liệu
+                            </strong>
+
+                            <p>
+                                Hạn chế truy cập và sử dụng trái phép
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-database"></i>
+                            </div>
+
+                            <strong>
+                                Thu thập cần thiết
+                            </strong>
+
+                            <p>
+                                Chỉ thu thập thông tin phục vụ hệ thống
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-eye"></i>
+                            </div>
+
+                            <strong>
+                                Minh bạch
+                            </strong>
+
+                            <p>
+                                Thông tin được sử dụng theo chính sách
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+
+                            <strong>
+                                Quyền người dùng
+                            </strong>
+
+                            <p>
+                                Người dùng có quyền kiểm soát thông tin
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 01 -->
+                <section class="terms-section" id="gioi-thieu">
+
+                    <div class="section-number">
+                        01
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Giới thiệu
+                        </h2>
+
+                        <p>
+                            Chính sách bảo mật này quy định cách IUH SHOP
+                            thu thập, sử dụng, lưu trữ và bảo vệ thông tin
+                            của người dùng trong quá trình đăng ký tài khoản,
+                            mua bán và sử dụng các chức năng trên hệ thống.
+                        </p>
+
+                        <p>
+                            Khi đăng ký hoặc tiếp tục sử dụng IUH SHOP,
+                            người dùng xác nhận đã đọc và hiểu các nội dung
+                            được quy định trong Chính sách bảo mật này.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 02 -->
+                <section class="terms-section" id="thong-tin-thu-thap">
+
+                    <div class="section-number">
+                        02
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Thông tin được thu thập
+                        </h2>
+
+                        <p>
+                            IUH SHOP có thể thu thập các thông tin mà người
+                            dùng cung cấp trong quá trình tạo và sử dụng
+                            tài khoản.
+                        </p>
+
+                        <p>
+                            Các thông tin có thể bao gồm họ tên, email,
+                            số điện thoại, thông tin tài khoản và các thông
+                            tin cần thiết cho hoạt động mua bán trên hệ thống.
+                        </p>
+
+                        <p>
+                            Đối với tài khoản sinh viên, hệ thống có thể yêu
+                            cầu thông tin hoặc tài liệu phục vụ quá trình
+                            xác thực theo quy định của IUH SHOP.
+                        </p>
+
+                        <p>
+                            Hệ thống cũng có thể lưu trữ thông tin liên quan
+                            đến sản phẩm đăng bán, đơn hàng, giao dịch,
+                            lịch sử sử dụng và các hoạt động được thực hiện
+                            trên nền tảng.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 03 -->
+                <section class="terms-section" id="muc-dich">
+
+                    <div class="section-number">
+                        03
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Mục đích sử dụng thông tin
+                        </h2>
+
+                        <p>
+                            Thông tin của người dùng được sử dụng để vận hành
+                            và cung cấp các chức năng của IUH SHOP.
+                        </p>
+
+                        <p>
+                            Các mục đích sử dụng có thể bao gồm:
+                        </p>
+
+                        <p>
+                            • Tạo và quản lý tài khoản người dùng.
+                        </p>
+
+                        <p>
+                            • Xác thực người dùng theo quy định của hệ thống.
+                        </p>
+
+                        <p>
+                            • Hỗ trợ đăng bán, mua hàng và quản lý đơn hàng.
+                        </p>
+
+                        <p>
+                            • Xử lý thanh toán và các giao dịch liên quan.
+                        </p>
+
+                        <p>
+                            • Hỗ trợ người dùng khi phát sinh vấn đề trong
+                            quá trình sử dụng dịch vụ.
+                        </p>
+
+                        <p>
+                            • Phát hiện, ngăn chặn các hành vi gian lận,
+                            lạm dụng hoặc vi phạm quy định của IUH SHOP.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 04 -->
+                <section class="terms-section" id="xac-thuc">
+
+                    <div class="section-number">
+                        04
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Xác thực tài khoản
+                        </h2>
+
+                        <p>
+                            IUH SHOP có thể yêu cầu người dùng cung cấp
+                            thông tin hoặc tài liệu xác thực nhằm bảo đảm
+                            tính chính xác của tài khoản và duy trì môi trường
+                            mua bán phù hợp với cộng đồng sinh viên.
+                        </p>
+
+                        <p>
+                            Thông tin xác thực chỉ được sử dụng cho mục đích
+                            kiểm tra và quản lý tài khoản theo quy định của
+                            hệ thống.
+                        </p>
+
+                        <p>
+                            Người dùng có trách nhiệm cung cấp thông tin
+                            chính xác và không được sử dụng giấy tờ hoặc
+                            thông tin của người khác để xác thực tài khoản.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 05 -->
+                <section class="terms-section" id="chia-se">
+
+                    <div class="section-number">
+                        05
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Chia sẻ thông tin
+                        </h2>
+
+                        <p>
+                            IUH SHOP không tùy tiện công khai thông tin cá nhân
+                            của người dùng trên nền tảng.
+                        </p>
+
+                        <p>
+                            Một số thông tin cần thiết có thể được hiển thị
+                            cho các bên liên quan trong quá trình thực hiện
+                            giao dịch, chẳng hạn như thông tin cần thiết để
+                            liên hệ hoặc giao nhận sản phẩm.
+                        </p>
+
+                        <p>
+                            IUH SHOP có thể cung cấp thông tin khi cần thiết
+                            để thực hiện nghĩa vụ theo quy định pháp luật
+                            hoặc xử lý các vấn đề liên quan đến an toàn,
+                            gian lận và bảo mật hệ thống.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 06 -->
+                <section class="terms-section" id="luu-tru">
+
+                    <div class="section-number">
+                        06
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Lưu trữ thông tin
+                        </h2>
+
+                        <p>
+                            Thông tin người dùng được lưu trữ trong hệ thống
+                            phục vụ việc duy trì tài khoản, lịch sử giao dịch
+                            và các chức năng liên quan.
+                        </p>
+
+                        <p>
+                            Thời gian lưu trữ có thể phụ thuộc vào mục đích
+                            sử dụng thông tin, yêu cầu vận hành hệ thống
+                            và các nghĩa vụ liên quan.
+                        </p>
+
+                        <p>
+                            Khi thông tin không còn cần thiết cho mục đích
+                            sử dụng phù hợp, IUH SHOP có thể thực hiện việc
+                            xóa hoặc xử lý thông tin theo quy định của hệ thống.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 07 -->
+                <section class="terms-section" id="bao-mat">
+
+                    <div class="section-number">
+                        07
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Bảo mật dữ liệu
+                        </h2>
+
+                        <p>
+                            IUH SHOP áp dụng các biện pháp phù hợp để bảo vệ
+                            thông tin người dùng khỏi việc truy cập, thay đổi,
+                            sử dụng hoặc tiết lộ trái phép.
+                        </p>
+
+                        <p>
+                            Quyền truy cập thông tin được giới hạn tùy theo
+                            chức năng và trách nhiệm của từng tài khoản
+                            trong hệ thống.
+                        </p>
+
+                        <p>
+                            Người dùng cũng có trách nhiệm bảo vệ thông tin
+                            đăng nhập, mật khẩu và các thông tin bảo mật
+                            liên quan đến tài khoản của mình.
+                        </p>
+
+                        <p>
+                            IUH SHOP không chịu trách nhiệm đối với các thiệt
+                            hại phát sinh do người dùng tự chia sẻ hoặc làm
+                            lộ thông tin đăng nhập của mình.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 08 -->
+                <section class="terms-section" id="quyen-nguoi-dung">
+
+                    <div class="section-number">
+                        08
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Quyền của người dùng
+                        </h2>
+
+                        <p>
+                            Người dùng có quyền kiểm tra và cập nhật các
+                            thông tin cá nhân của mình trong phạm vi các
+                            chức năng mà IUH SHOP cung cấp.
+                        </p>
+
+                        <p>
+                            Người dùng có thể yêu cầu hỗ trợ khi phát hiện
+                            thông tin tài khoản không chính xác hoặc có dấu
+                            hiệu bị truy cập trái phép.
+                        </p>
+
+                        <p>
+                            Người dùng có quyền ngừng sử dụng tài khoản theo
+                            quy định của IUH SHOP. Một số dữ liệu liên quan
+                            đến giao dịch có thể vẫn được lưu trữ khi cần
+                            thiết cho việc quản lý lịch sử giao dịch hoặc
+                            thực hiện các nghĩa vụ liên quan.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 09 -->
+                <section class="terms-section" id="cookie">
+
+                    <div class="section-number">
+                        09
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Cookie và dữ liệu kỹ thuật
+                        </h2>
+
+                        <p>
+                            IUH SHOP có thể sử dụng cookie hoặc các dữ liệu
+                            kỹ thuật cần thiết để duy trì phiên đăng nhập,
+                            ghi nhớ trạng thái người dùng và hỗ trợ hoạt động
+                            của website.
+                        </p>
+
+                        <p>
+                            Hệ thống có thể ghi nhận một số dữ liệu kỹ thuật
+                            liên quan đến thiết bị và quá trình truy cập nhằm
+                            hỗ trợ bảo mật, phát hiện lỗi và cải thiện
+                            trải nghiệm sử dụng.
+                        </p>
+
+                        <p>
+                            Các dữ liệu này được sử dụng trong phạm vi cần
+                            thiết cho hoạt động của hệ thống.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 10 -->
+                <section class="terms-section" id="thay-doi">
+
+                    <div class="section-number">
+                        10
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Thay đổi chính sách
+                        </h2>
+
+                        <p>
+                            IUH SHOP có thể cập nhật Chính sách bảo mật
+                            khi có thay đổi về chức năng, phương thức vận hành
+                            hoặc yêu cầu quản lý của hệ thống.
+                        </p>
+
+                        <p>
+                            Những thay đổi quan trọng sẽ được công bố trên
+                            nền tảng để người dùng có thể xem và nắm được
+                            nội dung mới.
+                        </p>
+
+                        <p>
+                            Việc tiếp tục sử dụng IUH SHOP sau khi chính sách
+                            được cập nhật được xem là người dùng đã đọc và
+                            chấp nhận các thay đổi trong phạm vi áp dụng.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+            </article>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+     <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/QTCD.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+</body>
+</html>

@@ -1,0 +1,1065 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRANH CHẤP & KHIẾU NẠI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FONT AWESOME -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/QTCD.css">
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+                     
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+</a>
+
+<!-- ICON GIỎ HÀNG -->
+<a href="giohang.html"
+   class="top-cart-icon"
+   aria-label="Giỏ hàng"
+   title="Giỏ hàng">
+
+    <i class="fa-solid fa-cart-shopping"></i>
+
+</a>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+    <main class="terms-page community-page">
+
+    <!-- HERO TRANH CHẤP -->
+    <section class="dispute-hero">
+
+        <div class="dispute-hero-inner">
+
+            <div class="dispute-hero-text">
+
+                <div class="dispute-hero-eyebrow">
+                    IUH SHOP • HỖ TRỢ GIAO DỊCH
+                </div>
+
+                <h1>
+                    Tranh chấp<br>
+                    & Khiếu nại
+                </h1>
+
+                <p>
+                    Quy định và quy trình tiếp nhận, xác minh và xử lý
+                    các vấn đề phát sinh trong quá trình mua bán trên IUH SHOP.
+                </p>
+
+                <div class="dispute-hero-meta">
+                    <span>
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Bảo vệ giao dịch
+                    </span>
+
+                    <span>
+                        <i class="fa-solid fa-headset"></i>
+                        Hỗ trợ người dùng
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="dispute-hero-process">
+
+                <div class="dispute-process-title">
+                    QUY TRÌNH XỬ LÝ
+                </div>
+
+                <div class="dispute-process-line"></div>
+
+                <div class="dispute-process-item">
+
+                    <div class="dispute-process-icon">
+                        <i class="fa-solid fa-flag"></i>
+                    </div>
+
+                    <div>
+                        <strong>Gửi khiếu nại</strong>
+                        <span>Người dùng cung cấp thông tin</span>
+                    </div>
+
+                </div>
+
+
+                <div class="dispute-process-item">
+
+                    <div class="dispute-process-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+
+                    <div>
+                        <strong>Xác minh</strong>
+                        <span>IUH SHOP kiểm tra giao dịch</span>
+                    </div>
+
+                </div>
+
+
+                <div class="dispute-process-item">
+
+                    <div class="dispute-process-icon">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div>
+                        <strong>Xử lý</strong>
+                        <span>Đưa ra hướng giải quyết phù hợp</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CONTENT -->
+    <div class="terms-content">
+
+        <div class="terms-layout">
+
+            <!-- SIDEBAR -->
+            <aside class="terms-sidebar">
+
+                <div class="terms-sidebar-inner">
+
+                    <span>NỘI DUNG</span>
+
+                    <a href="#gioi-thieu">
+                        01. Giới thiệu
+                    </a>
+
+                    <a href="#pham-vi">
+                        02. Phạm vi tranh chấp
+                    </a>
+
+                    <a href="#truong-hop">
+                        03. Các trường hợp khiếu nại
+                    </a>
+
+                    <a href="#gui-khieu-nai">
+                        04. Gửi khiếu nại
+                    </a>
+
+                    <a href="#thong-tin">
+                        05. Thông tin cần cung cấp
+                    </a>
+
+                    <a href="#xac-minh">
+                        06. Xác minh tranh chấp
+                    </a>
+
+                    <a href="#xu-ly">
+                        07. Phương án xử lý
+                    </a>
+
+                    <a href="#hoan-tien">
+                        08. Hoàn tiền & giao dịch
+                    </a>
+
+                    <a href="#thoi-gian">
+                        09. Thời gian xử lý
+                    </a>
+
+                    <a href="#cam-ket">
+                        10. Cam kết
+                    </a>
+
+                </div>
+
+            </aside>
+
+
+            <!-- ARTICLE -->
+            <article class="terms-article">
+
+
+                <!-- NGUYÊN TẮC -->
+                <section class="community-principles">
+
+                    <div class="community-principles-title">
+
+                        <span>
+                            IUH SHOP • GIẢI QUYẾT TRANH CHẤP
+                        </span>
+
+                        <h2>
+                            Nguyên tắc xử lý
+                        </h2>
+
+                    </div>
+
+
+                    <div class="principles-grid">
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-scale-balanced"></i>
+                            </div>
+
+                            <strong>
+                                Công bằng
+                            </strong>
+
+                            <p>
+                                Xem xét thông tin từ các bên liên quan
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-file-circle-check"></i>
+                            </div>
+
+                            <strong>
+                                Có căn cứ
+                            </strong>
+
+                            <p>
+                                Dựa trên thông tin và bằng chứng giao dịch
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
+
+                            <strong>
+                                Bảo vệ người dùng
+                            </strong>
+
+                            <p>
+                                Hỗ trợ người mua và người bán khi có vấn đề
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-comments"></i>
+                            </div>
+
+                            <strong>
+                                Minh bạch
+                            </strong>
+
+                            <p>
+                                Trao đổi thông tin rõ ràng trong quá trình xử lý
+                            </p>
+
+                        </div>
+
+
+                        <div class="principle-card">
+
+                            <div class="principle-icon">
+                                <i class="fa-solid fa-handshake"></i>
+                            </div>
+
+                            <strong>
+                                Hợp tác
+                            </strong>
+
+                            <p>
+                                Khuyến khích các bên phối hợp giải quyết
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 01 -->
+                <section class="terms-section" id="gioi-thieu">
+
+                    <div class="section-number">
+                        01
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Giới thiệu
+                        </h2>
+
+                        <p>
+                            Chính sách tranh chấp và khiếu nại quy định
+                            cách IUH SHOP tiếp nhận, xác minh và xử lý
+                            các vấn đề phát sinh giữa người mua, người bán
+                            và hệ thống trong quá trình giao dịch.
+                        </p>
+
+                        <p>
+                            Mục tiêu của chính sách là hỗ trợ các bên giải
+                            quyết vấn đề một cách rõ ràng, dựa trên thông
+                            tin và bằng chứng liên quan đến giao dịch.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 02 -->
+                <section class="terms-section" id="pham-vi">
+
+                    <div class="section-number">
+                        02
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Phạm vi tranh chấp
+                        </h2>
+
+                        <p>
+                            Chính sách được áp dụng đối với các giao dịch
+                            được thực hiện thông qua IUH SHOP.
+                        </p>
+
+                        <p>
+                            Các vấn đề có thể bao gồm tình trạng sản phẩm,
+                            thông tin sản phẩm không chính xác, giao nhận,
+                            thanh toán, hủy đơn hoặc các vấn đề khác liên
+                            quan trực tiếp đến giao dịch.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 03 -->
+                <section class="terms-section" id="truong-hop">
+
+                    <div class="section-number">
+                        03
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Các trường hợp khiếu nại
+                        </h2>
+
+                        <p>
+                            Người dùng có thể gửi khiếu nại khi phát sinh
+                            vấn đề liên quan đến đơn hàng hoặc giao dịch.
+                        </p>
+
+                        <p>
+                            Một số trường hợp có thể bao gồm:
+                        </p>
+
+                        <p>
+                            • Sản phẩm nhận được không đúng với thông tin
+                            được đăng bán.
+                        </p>
+
+                        <p>
+                            • Sản phẩm có vấn đề nhưng thông tin đăng bán
+                            không thể hiện rõ tình trạng thực tế.
+                        </p>
+
+                        <p>
+                            • Phát sinh vấn đề trong quá trình giao nhận.
+                        </p>
+
+                        <p>
+                            • Thanh toán hoặc hoàn tiền không đúng với
+                            trạng thái giao dịch.
+                        </p>
+
+                        <p>
+                            • Hành vi gian lận hoặc vi phạm quy định
+                            của IUH SHOP.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 04 -->
+                <section class="terms-section" id="gui-khieu-nai">
+
+                    <div class="section-number">
+                        04
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Gửi khiếu nại
+                        </h2>
+
+                        <p>
+                            Người dùng có thể gửi khiếu nại thông qua
+                            chức năng hỗ trợ hoặc kênh liên hệ được
+                            IUH SHOP cung cấp.
+                        </p>
+
+                        <p>
+                            Khi gửi khiếu nại, người dùng cần trình bày
+                            rõ vấn đề và cung cấp thông tin liên quan
+                            đến đơn hàng hoặc giao dịch.
+                        </p>
+
+                        <p>
+                            IUH SHOP có thể yêu cầu bổ sung thông tin
+                            nếu nội dung khiếu nại chưa đủ cơ sở để
+                            xác minh.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 05 -->
+                <section class="terms-section" id="thong-tin">
+
+                    <div class="section-number">
+                        05
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Thông tin cần cung cấp
+                        </h2>
+
+                        <p>
+                            Để hỗ trợ xử lý nhanh chóng, người dùng nên
+                            cung cấp các thông tin liên quan như mã đơn hàng,
+                            sản phẩm, nội dung vấn đề và thời điểm phát sinh.
+                        </p>
+
+                        <p>
+                            Người dùng có thể cung cấp hình ảnh, video,
+                            ảnh chụp màn hình hoặc các bằng chứng khác
+                            liên quan đến tranh chấp.
+                        </p>
+
+                        <p>
+                            Thông tin cung cấp phải trung thực và không
+                            được chỉnh sửa hoặc làm sai lệch bằng chứng.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 06 -->
+                <section class="terms-section" id="xac-minh">
+
+                    <div class="section-number">
+                        06
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Xác minh tranh chấp
+                        </h2>
+
+                        <p>
+                            IUH SHOP có thể kiểm tra thông tin đơn hàng,
+                            lịch sử giao dịch, trạng thái thanh toán,
+                            thông tin sản phẩm và các dữ liệu liên quan
+                            để xác minh nội dung khiếu nại.
+                        </p>
+
+                        <p>
+                            Trong trường hợp cần thiết, IUH SHOP có thể
+                            liên hệ với người mua và người bán để yêu cầu
+                            giải trình hoặc bổ sung thông tin.
+                        </p>
+
+                        <p>
+                            Việc xử lý dựa trên thông tin và bằng chứng
+                            mà hệ thống có thể xác minh.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 07 -->
+                <section class="terms-section" id="xu-ly">
+
+                    <div class="section-number">
+                        07
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Phương án xử lý
+                        </h2>
+
+                        <p>
+                            Tùy thuộc vào kết quả xác minh, IUH SHOP có thể
+                            áp dụng các phương án phù hợp với từng trường hợp.
+                        </p>
+
+                        <p>
+                            Các phương án có thể bao gồm hỗ trợ hai bên
+                            thỏa thuận, điều chỉnh trạng thái giao dịch,
+                            hủy đơn hàng hoặc thực hiện hoàn tiền theo
+                            chính sách của hệ thống.
+                        </p>
+
+                        <p>
+                            Đối với trường hợp có dấu hiệu gian lận hoặc
+                            vi phạm nghiêm trọng, IUH SHOP có thể hạn chế
+                            hoặc khóa tài khoản theo quy định.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 08 -->
+                <section class="terms-section" id="hoan-tien">
+
+                    <div class="section-number">
+                        08
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Hoàn tiền & giao dịch
+                        </h2>
+
+                        <p>
+                            Trường hợp giao dịch được xác định đủ điều kiện
+                            hoàn tiền, IUH SHOP sẽ thực hiện hoàn tiền theo
+                            chính sách mua hàng và thanh toán.
+                        </p>
+
+                        <p>
+                            Đối với giao dịch đã thanh toán trực tuyến,
+                            khoản tiền được hoàn sẽ được đưa vào
+                            <strong>Ví IUH Wallet</strong> của người mua
+                            theo quy định của hệ thống.
+                        </p>
+
+                        <p>
+                            Việc hoàn tiền không mặc nhiên được áp dụng
+                            cho mọi khiếu nại mà phụ thuộc vào kết quả
+                            xác minh và điều kiện của giao dịch.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 09 -->
+                <section class="terms-section" id="thoi-gian">
+
+                    <div class="section-number">
+                        09
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Thời gian xử lý
+                        </h2>
+
+                        <p>
+                            IUH SHOP sẽ tiếp nhận và xử lý khiếu nại trong
+                            thời gian phù hợp với mức độ phức tạp của từng
+                            trường hợp.
+                        </p>
+
+                        <p>
+                            Những tranh chấp cần xác minh thêm thông tin
+                            hoặc liên hệ nhiều bên có thể cần thêm thời gian
+                            để xử lý.
+                        </p>
+
+                        <p>
+                            Người dùng cần phối hợp và cung cấp thông tin
+                            đầy đủ khi được yêu cầu để quá trình xử lý
+                            được thực hiện thuận lợi.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- 10 -->
+                <section class="terms-section" id="cam-ket">
+
+                    <div class="section-number">
+                        10
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Cam kết giải quyết
+
+                        </h2>
+
+                        <p>
+                            IUH SHOP cam kết tiếp nhận các phản ánh và
+                            khiếu nại một cách nghiêm túc, minh bạch và
+                            dựa trên thông tin có thể xác minh.
+                        </p>
+
+                        <p>
+                            Người dùng có trách nhiệm cung cấp thông tin
+                            trung thực và phối hợp trong quá trình giải quyết.
+                        </p>
+
+                        <p>
+                            Việc sử dụng chức năng khiếu nại để cố ý cung cấp
+                            thông tin sai lệch, gây ảnh hưởng đến người dùng
+                            khác hoặc lợi dụng chính sách có thể bị xử lý
+                            theo quy định của IUH SHOP.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+            </article>
+
+        </div>
+
+    </div>
+
+</main>
+
+     <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/QTCD.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+</body>
+</html>

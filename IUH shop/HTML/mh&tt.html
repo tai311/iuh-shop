@@ -1,0 +1,966 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHÍNH SÁCH MUA HÀNG VÀ THANH TOÁN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FONT AWESOME -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/QTCD.css">
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <form class="search-box">
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm, danh mục..."
+                            aria-label="Tìm kiếm"
+                        >
+
+                        <button type="submit" class="search-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
+                            </svg>
+                        </button>
+                    </form>
+                     
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+</a>
+
+<!-- ICON GIỎ HÀNG -->
+<a href="giohang.html"
+   class="top-cart-icon"
+   aria-label="Giỏ hàng"
+   title="Giỏ hàng">
+
+    <i class="fa-solid fa-cart-shopping"></i>
+
+</a>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+    
+    <main class="terms-page community-page">
+
+    <!-- HERO -->
+    <section class="terms-hero community-hero">
+        <div class="terms-hero-inner">
+
+            <div class="terms-eyebrow">
+                IUH SHOP • MUA SẮM
+            </div>
+
+            <h1>Chính sách mua hàng & thanh toán</h1>
+
+            <p>
+                Quy định về quá trình mua hàng, thanh toán, giao nhận,
+                hủy đơn và hoàn tiền khi sử dụng IUH SHOP.
+            </p>
+
+            <div class="terms-version">
+                Phiên bản 1.0 • Áp dụng từ khi chính sách được công bố
+            </div>
+
+        </div>
+    </section>
+
+<div class="terms-content">
+    <!-- CONTENT -->
+    <div class="terms-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="terms-sidebar">
+
+        <div class="terms-sidebar-inner">
+
+    <span>NỘI DUNG</span>
+
+    <a href="#mua-hang">
+        01. Phạm vi mua hàng
+    </a>
+
+    <a href="#dat-hang">
+        02. Quy trình đặt hàng
+    </a>
+
+    <a href="#thanh-toan">
+        03. Phương thức thanh toán
+    </a>
+
+    <a href="#phi">
+        04. Giá sản phẩm và phí
+    </a>
+
+    <a href="#giao-nhan">
+        05. Giao nhận sản phẩm
+    </a>
+
+    <a href="#huy-don">
+        06. Hủy đơn hàng
+    </a>
+
+    <a href="#hoan-tien">
+        07. Hoàn tiền
+    </a>
+
+    <a href="#ky-gui">
+        08. Mua sản phẩm ký gửi
+    </a>
+
+    <a href="#trach-nhiem">
+        09. Trách nhiệm người mua
+    </a>
+
+    <a href="#cam-ket">
+        10. Xác nhận chính sách
+    </a>
+
+</div>
+
+    </aside>
+
+
+    <!-- ARTICLE -->
+    <article class="terms-article">
+
+        <!-- NGUYÊN TẮC -->
+        <section class="community-principles">
+
+            <div class="community-principles-title">
+                <span>IUH SHOP • MUA SẮM</span>
+                <h2>Quy định chính</h2>
+            </div>
+
+            <div class="principles-grid">
+
+                <div class="principle-card">
+
+                    <div class="principle-icon">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+
+                    <strong>Mua hàng</strong>
+
+                    <p>
+                        Đặt hàng trực tiếp trên IUH SHOP
+                    </p>
+
+                </div>
+
+
+                <div class="principle-card">
+
+                    <div class="principle-icon">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+
+                    <strong>Thanh toán</strong>
+
+                    <p>
+                        Ví IUH Wallet hoặc thanh toán QR
+                    </p>
+
+                </div>
+
+
+                <div class="principle-card">
+
+                    <div class="principle-icon">
+                        <i class="fa-solid fa-percent"></i>
+                    </div>
+
+                    <strong>Phí sàn</strong>
+
+                    <p>
+                        5% được cộng vào giá người mua
+                    </p>
+
+                </div>
+
+
+                <div class="principle-card">
+
+                    <div class="principle-icon">
+                        <i class="fa-solid fa-truck"></i>
+                    </div>
+
+                    <strong>Giao nhận</strong>
+
+                    <p>
+                        Gặp trực tiếp hoặc qua trung gian
+                    </p>
+
+                </div>
+
+
+                <div class="principle-card">
+
+                    <div class="principle-icon">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+
+                    <strong>Ký gửi</strong>
+
+                    <p>
+                        Người gửi nhận 90% giá bán
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 01 -->
+        <section class="terms-section" id="mua-hang">
+
+            <div class="terms-section-number">
+                01
+            </div>
+
+            <div>
+
+                <h2>Phạm vi mua hàng</h2>
+
+                <p>
+                    IUH SHOP là nền tảng hỗ trợ sinh viên IUH mua bán,
+                    trao đổi các sản phẩm phù hợp với nhu cầu học tập
+                    và sinh hoạt trong cộng đồng sinh viên.
+                </p>
+
+                <p>
+                    Người mua có thể xem thông tin sản phẩm, lựa chọn
+                    sản phẩm cần mua và tiến hành đặt hàng trực tiếp
+                    trên hệ thống IUH SHOP.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 02 -->
+        <section class="terms-section" id="dat-hang">
+
+            <div class="terms-section-number">
+                02
+            </div>
+
+            <div>
+
+                <h2>Quy trình đặt hàng</h2>
+
+                <p>
+                    Người mua cần kiểm tra kỹ thông tin sản phẩm,
+                    giá bán, số lượng và thông tin người bán trước
+                    khi xác nhận đơn hàng.
+                </p>
+
+                <p>
+                    Sau khi đơn hàng được tạo thành công, người mua
+                    có thể theo dõi trạng thái đơn hàng trên tài khoản
+                    IUH SHOP.
+                </p>
+
+                <p>
+                    Đơn hàng chỉ được ghi nhận khi hệ thống xác nhận
+                    việc đặt hàng và thanh toán theo quy định.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 03 -->
+        <section class="terms-section" id="thanh-toan">
+
+            <div class="terms-section-number">
+                03
+            </div>
+
+            <div>
+
+                <h2>Phương thức thanh toán</h2>
+
+                <p>
+                    IUH SHOP hiện hỗ trợ hai phương thức thanh toán:
+                    <strong>Ví IUH Wallet</strong> và
+                    <strong>thanh toán QR</strong>.
+                </p>
+
+                <p>
+                    <strong>Ví IUH Wallet:</strong>
+                    Người mua sử dụng số dư trong Ví IUH để thanh toán
+                    đơn hàng. Số tiền tương ứng sẽ được trừ khỏi ví
+                    khi giao dịch được xác nhận.
+                </p>
+
+                <p>
+                    <strong>Thanh toán QR:</strong>
+                    Người mua thực hiện thanh toán thông qua mã QR
+                    được cung cấp trong quá trình đặt hàng.
+                </p>
+
+                <p>
+                    <strong>IUH SHOP không áp dụng hình thức
+                    thanh toán khi nhận hàng (COD).</strong>
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 04 -->
+        <section class="terms-section" id="phi">
+
+            <div class="terms-section-number">
+                04
+            </div>
+
+            <div>
+
+                <h2>Giá sản phẩm và phí</h2>
+
+                <p>
+                    Giá sản phẩm được xác định dựa trên mức giá
+                    người bán đăng trên hệ thống.
+                </p>
+
+                <p>
+                    Đối với giao dịch mua bán thông thường, IUH SHOP
+                    áp dụng phí nền tảng <strong>5%</strong> trên
+                    giá sản phẩm.
+                </p>
+
+                <p>
+                    Khoản phí này được cộng vào giá mà người mua
+                    thanh toán. Người bán vẫn nhận đủ giá bán ban đầu.
+                </p>
+
+                <p>
+                    Ví dụ: Người bán đăng sản phẩm với giá
+                    <strong>200.000đ</strong>. Người mua thanh toán
+                    <strong>210.000đ</strong>, trong đó 200.000đ là
+                    giá sản phẩm và 10.000đ là phí nền tảng.
+                </p>
+
+                <p>
+                    Nếu chọn giao qua trung gian, người mua thanh toán
+                    thêm <strong>5.000đ</strong> phí trung gian/giao nhận.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 05 -->
+        <section class="terms-section" id="giao-nhan">
+
+            <div class="terms-section-number">
+                05
+            </div>
+
+            <div>
+
+                <h2>Giao nhận sản phẩm</h2>
+
+                <p>
+                    IUH SHOP hỗ trợ hai hình thức giao nhận:
+                    <strong>gặp trực tiếp</strong> hoặc
+                    <strong>qua trung gian</strong>.
+                </p>
+
+                <p>
+                    <strong>Gặp trực tiếp:</strong>
+                    Người mua và người bán tự thỏa thuận địa điểm
+                    và thời gian nhận sản phẩm. Hình thức này không
+                    phát sinh phí trung gian.
+                </p>
+
+                <p>
+                    <strong>Qua trung gian:</strong>
+                    Người mua thanh toán thêm 5.000đ phí
+                    trung gian/giao nhận.
+                </p>
+
+                <p>
+                    Người mua có trách nhiệm kiểm tra sản phẩm khi nhận
+                    và xác nhận tình trạng giao dịch trên hệ thống.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 06 -->
+        <section class="terms-section" id="huy-don">
+
+            <div class="terms-section-number">
+                06
+            </div>
+
+            <div>
+
+                <h2>Hủy đơn hàng</h2>
+
+                <p>
+                    Người mua có thể yêu cầu hủy đơn trong những
+                    trạng thái mà hệ thống cho phép.
+                </p>
+
+                <p>
+                    Việc hủy đơn chỉ được thực hiện trước khi đơn hàng
+                    hoàn tất giao dịch theo quy định của IUH SHOP.
+                </p>
+
+                <p>
+                    IUH SHOP có quyền từ chối yêu cầu hủy khi đơn hàng
+                    đã chuyển sang trạng thái không thể hủy.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 07 -->
+        <section class="terms-section" id="hoan-tien">
+
+            <div class="terms-section-number">
+                07
+            </div>
+
+            <div>
+
+                <h2>Hoàn tiền</h2>
+
+                <p>
+                    Đối với đơn hàng đã thanh toán trực tuyến và được
+                    hủy hợp lệ, số tiền hoàn trả được tính theo giá trị
+                    thanh toán của đơn hàng.
+                </p>
+
+                <p>
+                    Khoản tiền hoàn trả được đưa vào
+                    <strong>Ví IUH Wallet</strong> của người mua.
+                </p>
+
+                <p>
+                    Thời điểm ghi nhận số dư hoàn tiền phụ thuộc vào
+                    quá trình xử lý và xác nhận đơn hàng trên hệ thống.
+                </p>
+
+                <p>
+                    Các giao dịch không đáp ứng điều kiện hủy hoặc
+                    hoàn tiền theo chính sách sẽ không được hoàn trả.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 08 -->
+        <section class="terms-section" id="ky-gui">
+
+            <div class="terms-section-number">
+                08
+            </div>
+
+            <div>
+
+                <h2>Mua sản phẩm ký gửi</h2>
+
+                <p>
+                    Sản phẩm ký gửi là sản phẩm do người dùng gửi cho
+                    IUH SHOP hỗ trợ đăng bán.
+                </p>
+
+                <p>
+                    Đối với sản phẩm ký gửi, IUH SHOP áp dụng phí dịch vụ
+                    ký gửi <strong>10%</strong> trên giá bán sản phẩm.
+                </p>
+
+                <p>
+                    Người gửi nhận lại <strong>90%</strong> giá bán
+                    sau khi giao dịch hoàn tất.
+                </p>
+
+                <p>
+                    Sản phẩm ký gửi <strong>không áp dụng thêm phí nền
+                    tảng 5%</strong> của giao dịch mua bán thông thường.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 09 -->
+        <section class="terms-section" id="trach-nhiem">
+
+            <div class="terms-section-number">
+                09
+            </div>
+
+            <div>
+
+                <h2>Trách nhiệm của người mua</h2>
+
+                <p>
+                    Người mua có trách nhiệm cung cấp thông tin nhận hàng
+                    chính xác và kiểm tra kỹ sản phẩm trước khi đặt mua.
+                </p>
+
+                <p>
+                    Người mua không được cố ý cung cấp thông tin giả,
+                    thực hiện giao dịch gian lận hoặc lợi dụng chính sách
+                    hoàn tiền của IUH SHOP.
+                </p>
+
+                <p>
+                    Mọi hành vi vi phạm có thể dẫn đến việc hủy giao dịch,
+                    hạn chế tài khoản hoặc các biện pháp xử lý phù hợp.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 10 -->
+        <section class="terms-section" id="cam-ket">
+
+            <div class="terms-section-number">
+                10
+            </div>
+
+            <div>
+
+                <h2>Xác nhận chính sách</h2>
+
+                <p>
+                    Khi tiến hành đặt hàng trên IUH SHOP, người mua xác nhận
+                    đã đọc, hiểu và đồng ý với Chính sách mua hàng &
+                    thanh toán này.
+                </p>
+
+                <p>
+                    IUH SHOP có thể cập nhật chính sách để phù hợp với
+                    hoạt động của hệ thống. Những thay đổi sẽ được công bố
+                    trên nền tảng trước khi áp dụng.
+                </p>
+
+                <p>
+                    Việc tiếp tục sử dụng chức năng mua hàng sau khi chính
+                    sách được cập nhật được xem là người dùng đã chấp nhận
+                    nội dung chính sách mới.
+                </p>
+
+            </div>
+
+        </section>
+
+    </article>
+
+    </div>
+
+</div>
+
+</main>
+
+
+     <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/QTCD.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+</body>
+</html>

@@ -862,6 +862,892 @@ document.addEventListener(
     }
 );
 
+/* =====================================================
+   IUH SHOP - SẢN PHẨM ĐỀ XUẤT
+===================================================== */
+
+let recommendedProducts = [];
+
+
+/* =====================================================
+   FORMAT GIÁ
+===================================================== */
+
+function formatRecommendedPrice(value) {
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return "Liên hệ";
+    }
+
+    return new Intl.NumberFormat(
+        "vi-VN"
+    ).format(number) + "đ";
+}
+
+
+/* =====================================================
+   KIỂM TRA ĐẨY TIN CÒN HẠN
+===================================================== */
+
+function isRecommendedBoostActive(product) {
+
+    if (
+        product.is_boosted !== true
+    ) {
+        return false;
+    }
+
+
+    if (
+        !product.boost_started_at ||
+        !product.boost_expires_at
+    ) {
+        return false;
+    }
+
+
+    const now =
+        Date.now();
+
+
+    const startedAt =
+        new Date(
+            product.boost_started_at
+        ).getTime();
+
+
+    const expiresAt =
+        new Date(
+            product.boost_expires_at
+        ).getTime();
+
+
+    return (
+        Number.isFinite(startedAt) &&
+        Number.isFinite(expiresAt) &&
+        startedAt <= now &&
+        expiresAt > now
+    );
+}
+
+
+/* =====================================================
+   KIỂM TRA GÓI DỊCH VỤ CÒN HẠN
+===================================================== */
+
+function isRecommendedPackageActive(pkg) {
+
+    if (!pkg) {
+        return false;
+    }
+
+
+    if (
+        String(
+            pkg.status || ""
+        ).toLowerCase() !== "active"
+    ) {
+        return false;
+    }
+
+
+    if (
+        !pkg.starts_at ||
+        !pkg.expires_at
+    ) {
+        return false;
+    }
+
+
+    const now =
+        Date.now();
+
+
+    const startsAt =
+        new Date(
+            pkg.starts_at
+        ).getTime();
+
+
+    const expiresAt =
+        new Date(
+            pkg.expires_at
+        ).getTime();
+
+
+    return (
+        Number.isFinite(startsAt) &&
+        Number.isFinite(expiresAt) &&
+        startsAt <= now &&
+        expiresAt > now
+    );
+}
+
+
+/* =====================================================
+   TẢI SẢN PHẨM ĐỀ XUẤT
+===================================================== */
+
+async function loadRecommendedProducts() {
+
+    const section =
+        document.getElementById(
+            "recommendedSection"
+        );
+
+
+    const container =
+        document.getElementById(
+            "recommendedProductList"
+        );
+
+
+    if (
+        !section ||
+        !container
+    ) {
+        return;
+    }
+
+
+    /* -----------------------------------------
+       Mặc định ẨN
+    ----------------------------------------- */
+
+    section.style.display = "none";
+
+    container.innerHTML = "";
+
+
+
+    try {
+
+        /* =====================================
+           1. LẤY SẢN PHẨM ĐANG BÁN
+        ===================================== */
+
+        const {
+            data: products,
+            error: productError
+        } = await supabaseClient
+
+            .from("products")
+
+            .select(`
+                id,
+                seller_id,
+                name,
+                category,
+                price,
+                image_urls,
+                status,
+                created_at,
+                is_boosted,
+                boost_started_at,
+                boost_expires_at,
+                is_consignment
+            `)
+
+            .eq(
+                "status",
+                "active"
+            );
+
+
+        if (productError) {
+
+            console.error(
+                "Lỗi tải sản phẩm đề xuất:",
+                productError
+            );
+
+            return;
+        }
+
+
+        if (
+            !products ||
+            products.length === 0
+        ) {
+            return;
+        }
+
+
+
+        /* =====================================
+           2. LẤY ID NGƯỜI BÁN
+        ===================================== */
+
+        const sellerIds = [
+            ...new Set(
+                products
+                    .map(
+                        product =>
+                            product.seller_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+
+        /* =====================================
+           3. LẤY MEMBERSHIP GÓI
+           
+           user_id → package_id
+        ===================================== */
+
+        let memberships = [];
+
+
+        if (
+            sellerIds.length > 0
+        ) {
+
+            const {
+                data,
+                error
+            } = await supabaseClient
+
+                .from(
+                    "service_package_members"
+                )
+
+                .select(`
+                    id,
+                    package_id,
+                    user_id,
+                    member_role,
+                    joined_at
+                `)
+
+                .in(
+                    "user_id",
+                    sellerIds
+                );
+
+
+            if (error) {
+
+                console.error(
+                    "Lỗi tải thành viên gói dịch vụ:",
+                    error
+                );
+
+            } else {
+
+                memberships =
+                    data || [];
+
+            }
+        }
+
+
+
+        /* =====================================
+           4. LẤY THÔNG TIN GÓI
+        ===================================== */
+
+        let packages = [];
+
+
+        const packageIds = [
+            ...new Set(
+                memberships
+                    .map(
+                        member =>
+                            member.package_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+        if (
+            packageIds.length > 0
+        ) {
+
+            const {
+                data,
+                error
+            } = await supabaseClient
+
+                .from(
+                    "service_packages"
+                )
+
+                .select(`
+                    id,
+                    owner_id,
+                    plan_type,
+                    status,
+                    starts_at,
+                    expires_at
+                `)
+
+                .in(
+                    "id",
+                    packageIds
+                );
+
+
+            if (error) {
+
+                console.error(
+                    "Lỗi tải gói dịch vụ:",
+                    error
+                );
+
+            } else {
+
+                packages =
+                    data || [];
+
+            }
+        }
+
+
+
+        /* =====================================
+           5. XÁC ĐỊNH SELLER CÓ GÓI ĐANG HOẠT ĐỘNG
+        ===================================== */
+
+        const activePackageIds =
+            new Set(
+                packages
+
+                    .filter(
+                        pkg =>
+                            isRecommendedPackageActive(
+                                pkg
+                            )
+                    )
+
+                    .map(
+                        pkg =>
+                            String(
+                                pkg.id
+                            )
+                    )
+            );
+
+
+        const packageSellerIds =
+            new Set(
+                memberships
+
+                    .filter(
+                        member =>
+                            activePackageIds.has(
+                                String(
+                                    member.package_id
+                                )
+                            )
+                    )
+
+                    .map(
+                        member =>
+                            String(
+                                member.user_id
+                            )
+                    )
+            );
+
+
+
+        /* =====================================
+           6. LẤY THÔNG TIN SELLER
+        ===================================== */
+
+        let sellers = [];
+
+
+        if (
+            sellerIds.length > 0
+        ) {
+
+            const {
+                data,
+                error
+            } = await supabaseClient
+
+                .from("users")
+
+                .select(`
+                    user_id,
+                    fullname,
+                    avatar_url,
+                    student_verified,
+                    role
+                `)
+
+                .in(
+                    "user_id",
+                    sellerIds
+                );
+
+
+            if (error) {
+
+                console.error(
+                    "Lỗi tải người bán:",
+                    error
+                );
+
+            } else {
+
+                sellers =
+                    data || [];
+
+            }
+        }
+
+
+
+        /* =====================================
+           7. LỌC ĐÚNG ĐIỀU KIỆN ĐỀ XUẤT
+
+           CHỈ CẦN 1 TRONG 2:
+
+           A. Đẩy tin còn hạn
+
+           HOẶC
+
+           B. Seller có gói dịch vụ còn hạn
+        ===================================== */
+
+        const now =
+            Date.now();
+
+
+        recommendedProducts =
+            products
+
+                .map(
+                    product => {
+
+                        const boostActive =
+                            isRecommendedBoostActive(
+                                product
+                            );
+
+
+                        const packageActive =
+                            packageSellerIds.has(
+                                String(
+                                    product.seller_id
+                                )
+                            );
+
+
+                        return {
+
+                            ...product,
+
+                            boostActive,
+
+                            packageActive,
+
+                            seller:
+                                sellers.find(
+                                    seller =>
+                                        String(
+                                            seller.user_id
+                                        ) ===
+                                        String(
+                                            product.seller_id
+                                        )
+                                ) || null
+
+                        };
+
+                    }
+                )
+
+                .filter(
+                    product =>
+                        product.boostActive ||
+                        product.packageActive
+                );
+
+
+
+        /* =====================================
+           8. SẮP XẾP
+
+           Ưu tiên:
+           1. Đẩy tin + Gói
+           2. Đẩy tin
+           3. Gói
+        ===================================== */
+
+        recommendedProducts.sort(
+            (a, b) => {
+
+                const priorityA =
+                    a.boostActive &&
+                    a.packageActive
+                        ? 3
+                        : a.boostActive
+                            ? 2
+                            : 1;
+
+
+                const priorityB =
+                    b.boostActive &&
+                    b.packageActive
+                        ? 3
+                        : b.boostActive
+                            ? 2
+                            : 1;
+
+
+                if (
+                    priorityA !==
+                    priorityB
+                ) {
+
+                    return (
+                        priorityB -
+                        priorityA
+                    );
+
+                }
+
+
+                return (
+                    new Date(
+                        b.created_at
+                    ).getTime() -
+
+                    new Date(
+                        a.created_at
+                    ).getTime()
+                );
+
+            }
+        );
+
+
+
+        /* =====================================
+           9. KHÔNG CÓ → ẨN
+        ===================================== */
+
+        if (
+            recommendedProducts.length === 0
+        ) {
+
+            section.style.display =
+                "none";
+
+            return;
+        }
+
+
+
+        /* =====================================
+           10. CÓ → HIỆN
+        ===================================== */
+
+        section.style.display =
+            "";
+
+
+        renderRecommendedProducts();
+
+
+
+    } catch (error) {
+
+        console.error(
+            "Lỗi phần sản phẩm đề xuất:",
+            error
+        );
+
+
+        recommendedProducts = [];
+
+
+        section.style.display =
+            "none";
+
+    }
+
+}
+
+
+/* =====================================================
+   CARD SẢN PHẨM ĐỀ XUẤT
+===================================================== */
+
+function renderRecommendedCard(
+    product
+) {
+
+    const seller =
+        product.seller || {};
+
+
+    const images =
+        normalizeFeaturedImages(
+            product.image_urls
+        );
+
+
+    const image =
+        images[0] ||
+        "../Images/default-product.png";
+
+
+    const sellerName =
+        seller.fullname ||
+        "Người bán";
+
+
+    const avatar =
+        seller.avatar_url ||
+        "../Images/default-avatar.svg";
+
+
+    const verified =
+        isFeaturedSellerVerified(
+            seller
+        );
+
+
+    const category =
+        product.category ||
+        "Sản phẩm";
+
+
+    /* -----------------------------------------
+       BADGE
+    ----------------------------------------- */
+
+    let badges = "";
+
+
+    if (
+        product.boostActive
+    ) {
+
+        badges += `
+            <span class="recommended-badge boost">
+                🔥 NỔI BẬT
+            </span>
+        `;
+
+    }
+
+
+    if (
+        product.packageActive
+    ) {
+
+        badges += `
+            <span class="recommended-badge package">
+                ⭐ GÓI DỊCH VỤ
+            </span>
+        `;
+
+    }
+
+
+    const badgeHTML =
+        verified
+            ? `
+                <span
+                    class="recommended-seller-badge"
+                    title="Tài khoản đã xác thực">
+                    ✓
+                </span>
+            `
+            : "";
+
+
+    const roleText =
+        seller.role === "admin"
+            ? "Admin"
+            : seller.role === "moderator"
+                ? "Quản trị viên"
+                : "Sinh viên";
+
+
+    return `
+
+        <article
+            class="recommended-product-card"
+            data-recommended-product-id="${product.id}"
+        >
+
+            <!-- ẢNH -->
+
+            <div class="recommended-product-image">
+
+                <img
+                    src="${image}"
+                    alt="${product.name || "Sản phẩm"}"
+                    loading="lazy"
+                    onerror="
+                        this.onerror=null;
+                        this.src='../Images/default-product.png';
+                    "
+                >
+
+
+                <div class="recommended-badges">
+
+                    ${badges}
+
+                </div>
+
+            </div>
+
+
+            <!-- NỘI DUNG -->
+
+            <div class="recommended-product-content">
+
+                <span class="recommended-product-category">
+                    ${category}
+                </span>
+
+
+                <h3 class="recommended-product-name">
+                    ${product.name || "Sản phẩm"}
+                </h3>
+
+
+                <div class="recommended-product-price">
+                    ${formatRecommendedPrice(
+                        product.is_consignment
+                            ? Number(product.price || 0)
+                            : Math.round(
+                                Number(product.price || 0) * 1.05
+                            )
+                    )}
+                </div>
+
+
+                <!-- SELLER -->
+
+                <div class="recommended-seller">
+
+                    <img
+                        class="recommended-seller-avatar"
+                        src="${avatar}"
+                        alt="${sellerName}"
+                        onerror="
+                            this.onerror=null;
+                            this.src='../Images/default-avatar.svg';
+                        "
+                    >
+
+
+                    <div class="recommended-seller-info">
+
+                        <div class="recommended-seller-name">
+
+                            <span
+                                class="recommended-seller-name-text">
+                                ${sellerName}
+                            </span>
+
+                            ${badgeHTML}
+
+                        </div>
+
+
+                        <div class="recommended-seller-role">
+                            ${roleText}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </article>
+
+    `;
+}
+
+
+/* =====================================================
+   HIỂN THỊ
+===================================================== */
+
+function renderRecommendedProducts() {
+
+    const container =
+        document.getElementById(
+            "recommendedProductList"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    if (
+        !recommendedProducts ||
+        recommendedProducts.length === 0
+    ) {
+        return;
+    }
+
+
+    container.innerHTML =
+        recommendedProducts
+            .map(
+                renderRecommendedCard
+            )
+            .join("");
+
+
+    /* =====================================
+       BẤM CARD → CHI TIẾT
+    ===================================== */
+
+    container
+        .querySelectorAll(
+            "[data-recommended-product-id]"
+        )
+        .forEach(
+            card => {
+
+                card.addEventListener(
+                    "click",
+                    function () {
+
+                        const productId =
+                            this.dataset
+                                .recommendedProductId;
+
+
+                        if (!productId) {
+                            return;
+                        }
+
+
+                        window.location.href =
+                            `chitietsanpham.html?id=${encodeURIComponent(
+                                productId
+                            )}`;
+
+                    }
+                );
+
+            }
+        );
+
+}
+
 
 /* =====================================================
    IUH SHOP - SẢN PHẨM NỔI BẬT TRANG CHỦ
@@ -1432,9 +2318,7 @@ function bindFeaturedProductEvents() {
 function setupFeaturedTabs() {
 
     document
-        .querySelectorAll(
-            ".featured-tab"
-        )
+        .querySelectorAll(".featured-tab")
         .forEach(tab => {
 
             tab.addEventListener(
@@ -1442,33 +2326,27 @@ function setupFeaturedTabs() {
                 function () {
 
                     document
-                        .querySelectorAll(
-                            ".featured-tab"
-                        )
-                        .forEach(
-                            item =>
-                                item.classList.remove(
-                                    "active"
-                                )
-                        );
+                        .querySelectorAll(".featured-tab")
+                        .forEach(item => {
+                            item.classList.remove("active");
+                        });
 
 
-                    this.classList.add(
-                        "active"
-                    );
+                    this.classList.add("active");
 
 
                     featuredSort =
-                        this.dataset
-                            .featuredSort ||
+                        this.dataset.featuredSort ||
                         "newest";
 
 
                     renderFeaturedProducts();
+
                 }
             );
 
         });
+
 }
 
 
@@ -1479,6 +2357,8 @@ function setupFeaturedTabs() {
 document.addEventListener(
     "DOMContentLoaded",
     function () {
+
+        loadRecommendedProducts();
 
         loadFeaturedProducts();
 
@@ -1588,6 +2468,876 @@ document.addEventListener(
             );
 
         });
+
+    }
+);
+
+
+/* =====================================================
+   DONATE IUH SHOP
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /* =========================================
+           ELEMENT
+        ========================================= */
+
+        const donateButton =
+            document.getElementById(
+                "donateFloatingButton"
+            );
+
+        const donateModal =
+            document.getElementById(
+                "donateModal"
+            );
+
+        const donateOverlay =
+            document.getElementById(
+                "donateModalOverlay"
+            );
+
+        const closeDonateButton =
+            document.getElementById(
+                "closeDonateModal"
+            );
+
+
+        /* =========================================
+           BƯỚC 1
+        ========================================= */
+
+        const donorNameInput =
+            document.getElementById(
+                "donateDonorName"
+            );
+
+        const bankNameInput =
+            document.getElementById(
+                "donateBankName"
+            );
+
+        const donateAmount =
+            document.getElementById(
+                "donateAmount"
+            );
+
+        const transferContentInput =
+            document.getElementById(
+                "donateTransferContentInput"
+            );
+
+        const donateMessage =
+            document.getElementById(
+                "donateMessage"
+            );
+
+        const startTransferButton =
+            document.getElementById(
+                "startDonateTransfer"
+            );
+
+        const paymentView =
+            document.getElementById(
+                "donatePaymentView"
+            );
+
+
+        /* =========================================
+           BƯỚC 2
+        ========================================= */
+
+        const transferView =
+            document.getElementById(
+                "donateTransferView"
+            );
+
+        const transferBank =
+            document.getElementById(
+                "donateTransferBank"
+            );
+
+        const transferDonor =
+            document.getElementById(
+                "donateTransferDonor"
+            );
+
+        const transferAmount =
+            document.getElementById(
+                "donateTransferAmount"
+            );
+
+        const transferContent =
+            document.getElementById(
+                "donateTransferContent"
+            );
+
+        const transferMessage =
+            document.getElementById(
+                "donateTransferMessage"
+            );
+
+        const confirmTransferButton =
+            document.getElementById(
+                "confirmDonateTransfer"
+            );
+
+        const backToAmountButton =
+            document.getElementById(
+                "backToDonateAmount"
+            );
+
+
+        /* =========================================
+           BƯỚC 3
+        ========================================= */
+
+        const successView =
+            document.getElementById(
+                "donateSuccessView"
+            );
+
+        const successAmount =
+            document.getElementById(
+                "donateSuccessAmount"
+            );
+
+        const successCode =
+            document.getElementById(
+                "donateSuccessCode"
+            );
+
+        const finishButton =
+            document.getElementById(
+                "finishDonate"
+            );
+
+
+        /* =========================================
+           QR
+        ========================================= */
+
+        const donateQrCode =
+            document.getElementById(
+                "donateQrCode"
+            );
+
+
+        if (
+            !donateButton ||
+            !donateModal
+        ) {
+            return;
+        }
+
+
+        /* =========================================
+           BIẾN
+        ========================================= */
+
+        let currentTransferCode = "";
+
+
+        /* =========================================
+           FORMAT TIỀN
+        ========================================= */
+
+        function formatDonateMoney(
+            value
+        ) {
+
+            return (
+                new Intl.NumberFormat(
+                    "vi-VN"
+                ).format(
+                    Number(value) || 0
+                )
+                + "đ"
+            );
+
+        }
+
+
+        /* =========================================
+           TẠO NỘI DUNG MẶC ĐỊNH
+        ========================================= */
+
+        function generateDefaultContent() {
+
+            const now =
+                new Date();
+
+
+            const day =
+                String(
+                    now.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+
+            const month =
+                String(
+                    now.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+
+            const year =
+                now.getFullYear();
+
+
+            const random =
+                Math.random()
+                    .toString(36)
+                    .substring(
+                        2,
+                        7
+                    )
+                    .toUpperCase();
+
+
+            return (
+                "DONATE IUH SHOP - " +
+                day +
+                month +
+                year +
+                " " +
+                random
+            );
+
+        }
+
+
+        /* =========================================
+           CẬP NHẬT QR
+        ========================================= */
+
+        function updateDonateQR() {
+
+            if (!donateQrCode) {
+                return;
+            }
+
+
+            const donor =
+                donorNameInput?.value.trim() ||
+                "Khach Donate";
+
+
+            const bank =
+                bankNameInput?.value ||
+                "Chua chon";
+
+
+            const amount =
+                Number(
+                    donateAmount?.value
+                ) || 0;
+
+
+            const content =
+                transferContentInput?.value.trim() ||
+                "DONATE IUH SHOP";
+
+
+            const qrData =
+                [
+                    "IUH SHOP DONATE",
+                    "Nguoi chuyen: " + donor,
+                    "Ngan hang: " + bank,
+                    "So tien: " + amount,
+                    "Noi dung: " + content
+                ].join("\n");
+
+
+            donateQrCode.src =
+                "https://api.qrserver.com/v1/create-qr-code/" +
+                "?size=220x220&data=" +
+                encodeURIComponent(
+                    qrData
+                );
+
+        }
+
+
+        /* =========================================
+           MỞ POPUP
+        ========================================= */
+
+        function openDonateModal() {
+
+            donateModal.classList.add(
+                "show"
+            );
+
+
+            donateModal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+
+            document.body.style.overflow =
+                "hidden";
+
+
+            paymentView.hidden =
+                false;
+
+            transferView.hidden =
+                true;
+
+            successView.hidden =
+                true;
+
+
+            donateMessage.textContent =
+                "";
+
+            transferMessage.textContent =
+                "";
+
+
+            /*
+             * Nếu chưa có nội dung
+             * thì hệ thống tự điền
+             */
+
+            if (
+                !transferContentInput.value.trim()
+            ) {
+
+                transferContentInput.value =
+                    generateDefaultContent();
+
+            }
+
+
+            updateDonateQR();
+
+
+            setTimeout(
+                function () {
+
+                    donorNameInput?.focus();
+
+                },
+                100
+            );
+
+        }
+
+
+        /* =========================================
+           ĐÓNG POPUP
+        ========================================= */
+
+        function closeDonateModal() {
+
+            donateModal.classList.remove(
+                "show"
+            );
+
+
+            donateModal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+
+            document.body.style.overflow =
+                "";
+
+        }
+
+
+        /* =========================================
+           CLICK DONATE
+        ========================================= */
+
+        donateButton.addEventListener(
+            "click",
+            openDonateModal
+        );
+
+
+        /* =========================================
+           ĐÓNG
+        ========================================= */
+
+        if (closeDonateButton) {
+
+            closeDonateButton.addEventListener(
+                "click",
+                closeDonateModal
+            );
+
+        }
+
+
+        if (donateOverlay) {
+
+            donateOverlay.addEventListener(
+                "click",
+                closeDonateModal
+            );
+
+        }
+
+
+        /* =========================================
+           SỐ TIỀN NHANH
+        ========================================= */
+
+        document
+            .querySelectorAll(
+                "[data-donate-amount]"
+            )
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            donateAmount.value =
+                                this.dataset
+                                    .donateAmount;
+
+
+                            donateMessage.textContent =
+                                "";
+
+
+                            updateDonateQR();
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /* =========================================
+           TỰ ĐỘNG CẬP NHẬT QR
+        ========================================= */
+
+        donorNameInput?.addEventListener(
+            "input",
+            updateDonateQR
+        );
+
+
+        bankNameInput?.addEventListener(
+            "change",
+            updateDonateQR
+        );
+
+
+        donateAmount?.addEventListener(
+            "input",
+            updateDonateQR
+        );
+
+
+        transferContentInput?.addEventListener(
+            "input",
+            updateDonateQR
+        );
+
+
+        /* =========================================
+           TIẾP TỤC
+        ========================================= */
+
+        startTransferButton.addEventListener(
+            "click",
+            function () {
+
+                const donorName =
+                    donorNameInput.value.trim();
+
+
+                const bankName =
+                    bankNameInput.value;
+
+
+                const amount =
+                    Number(
+                        donateAmount.value
+                    );
+
+
+                const transferContent =
+                    transferContentInput.value.trim();
+
+
+                /* =========================
+                   KIỂM TRA TÊN
+                ========================= */
+
+                if (!donorName) {
+
+                    donateMessage.textContent =
+                        "Vui lòng nhập họ và tên.";
+
+                    donorNameInput.focus();
+
+                    return;
+
+                }
+
+
+                /* =========================
+                   KIỂM TRA NGÂN HÀNG
+                ========================= */
+
+                if (!bankName) {
+
+                    donateMessage.textContent =
+                        "Vui lòng chọn ngân hàng.";
+
+                    bankNameInput.focus();
+
+                    return;
+
+                }
+
+
+                /* =========================
+                   KIỂM TRA SỐ TIỀN
+                ========================= */
+
+                if (
+                    !Number.isFinite(amount) ||
+                    amount < 1000
+                ) {
+
+                    donateMessage.textContent =
+                        "Vui lòng nhập số tiền Donate từ 1.000đ trở lên.";
+
+                    donateAmount.focus();
+
+                    return;
+
+                }
+
+
+                /* =========================
+                   KIỂM TRA NỘI DUNG
+                ========================= */
+
+                if (!transferContent) {
+
+                    donateMessage.textContent =
+                        "Vui lòng nhập nội dung chuyển khoản.";
+
+                    transferContentInput.focus();
+
+                    return;
+
+                }
+
+
+                donateMessage.textContent =
+                    "";
+
+
+                /* =========================
+                   MÃ GIAO DỊCH
+                ========================= */
+
+                currentTransferCode =
+                    "DONATE-" +
+                    Date.now();
+
+
+                /* =========================
+                   HIỂN THỊ BƯỚC 2
+                ========================= */
+
+                transferBank.textContent =
+                    bankName;
+
+
+                transferDonor.textContent =
+                    donorName;
+
+
+                transferAmount.textContent =
+                    formatDonateMoney(
+                        amount
+                    );
+
+
+                transferContent.textContent =
+                    transferContent;
+
+
+                paymentView.hidden =
+                    true;
+
+                transferView.hidden =
+                    false;
+
+                successView.hidden =
+                    true;
+
+            }
+        );
+
+
+        /* =========================================
+           QUAY LẠI
+        ========================================= */
+
+        backToAmountButton.addEventListener(
+            "click",
+            function () {
+
+                paymentView.hidden =
+                    false;
+
+                transferView.hidden =
+                    true;
+
+                successView.hidden =
+                    true;
+
+
+                donateMessage.textContent =
+                    "";
+
+            }
+        );
+
+
+        /* =========================================
+           XÁC NHẬN DONATE
+        ========================================= */
+
+        confirmTransferButton.addEventListener(
+            "click",
+            async function () {
+
+                const donorName =
+                    donorNameInput.value.trim();
+
+
+                const bankName =
+                    bankNameInput.value;
+
+
+                const amount =
+                    Number(
+                        donateAmount.value
+                    );
+
+
+                const transferContent =
+                    transferContentInput.value.trim();
+
+
+                if (!donorName) {
+
+                    transferMessage.textContent =
+                        "Vui lòng nhập họ và tên.";
+
+                    return;
+
+                }
+
+
+                if (!bankName) {
+
+                    transferMessage.textContent =
+                        "Vui lòng chọn ngân hàng.";
+
+                    return;
+
+                }
+
+
+                if (
+                    !Number.isFinite(amount) ||
+                    amount < 1000
+                ) {
+
+                    transferMessage.textContent =
+                        "Số tiền Donate không hợp lệ.";
+
+                    return;
+
+                }
+
+
+                if (!transferContent) {
+
+                    transferMessage.textContent =
+                        "Nội dung chuyển khoản không được để trống.";
+
+                    return;
+
+                }
+
+
+                confirmTransferButton.disabled =
+                    true;
+
+
+                confirmTransferButton.textContent =
+                    "ĐANG XỬ LÝ...";
+
+
+                transferMessage.textContent =
+                    "";
+
+
+                try {
+
+                    /* =================================
+                       GỌI RPC
+                    ================================= */
+
+                    const {
+                        data,
+                        error
+                    } =
+                        await supabaseClient
+                            .rpc(
+                                "create_simulated_donation",
+                                {
+                                    p_amount:
+                                        amount,
+
+                                    p_donor_name:
+                                        donorName,
+
+                                    p_bank_name:
+                                        bankName,
+
+                                    p_transfer_content:
+                                        transferContent
+                                }
+                            );
+
+
+                    if (error) {
+                        throw error;
+                    }
+
+
+                    if (
+                        !data ||
+                        data.success !== true
+                    ) {
+
+                        throw new Error(
+                            data?.message ||
+                            "Không thể ghi nhận Donate."
+                        );
+
+                    }
+
+
+                    /* =================================
+                       THÀNH CÔNG
+                    ================================= */
+
+                    successAmount.textContent =
+                        formatDonateMoney(
+                            amount
+                        );
+
+
+                    successCode.textContent =
+                        data.transfer_code ||
+                        currentTransferCode ||
+                        "—";
+
+
+                    paymentView.hidden =
+                        true;
+
+                    transferView.hidden =
+                        true;
+
+                    successView.hidden =
+                        false;
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "Lỗi Donate:",
+                        error
+                    );
+
+
+                    transferMessage.textContent =
+                        error.message ||
+                        "Không thể thực hiện giao dịch Donate.";
+
+                }
+
+                finally {
+
+                    confirmTransferButton.disabled =
+                        false;
+
+
+                    confirmTransferButton.textContent =
+                        "XÁC NHẬN CHUYỂN KHOẢN";
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           HOÀN TẤT
+        ========================================= */
+
+        finishButton.addEventListener(
+            "click",
+            function () {
+
+                closeDonateModal();
+
+            }
+        );
+
+
+        /* =========================================
+           ESC
+        ========================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape" &&
+                    donateModal.classList.contains(
+                        "show"
+                    )
+                ) {
+
+                    closeDonateModal();
+
+                }
+
+            }
+        );
 
     }
 );

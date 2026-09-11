@@ -4482,3 +4482,1823 @@ body {
     display: none;
 }
 
+
+
+
+
+
+/* =========================================
+   SẢN PHẨM ĐỀ XUẤT
+========================================= */
+
+.recommended-products {
+    width: 90%;
+    max-width: 1450px;
+
+    margin: 0 auto;
+
+    padding: 35px 0 55px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.recommended-header {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+}
+
+
+.recommended-label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #e2ad2f;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 1.2px;
+}
+
+
+.recommended-header h2 {
+    margin: 0 0 7px;
+
+    color: #183c87;
+
+    font-size: 26px;
+    font-weight: 800;
+}
+
+
+.recommended-header p {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   DANH SÁCH
+========================= */
+
+.recommended-product-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.recommended-product-card {
+    position: relative;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e9f1;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 20px rgba(20, 48, 105, 0.06);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+
+.recommended-product-card:hover {
+    transform: translateY(-5px);
+
+    border-color: #d6dff1;
+
+    box-shadow:
+        0 12px 28px rgba(20, 48, 105, 0.12);
+}
+
+
+/* =========================
+   ẢNH
+========================= */
+
+.recommended-product-image {
+    position: relative;
+
+    width: 100%;
+    height: 220px;
+
+    overflow: hidden;
+
+    background: #f5f7fb;
+}
+
+
+.recommended-product-image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.3s ease;
+}
+
+
+.recommended-product-card:hover
+.recommended-product-image img {
+    transform: scale(1.04);
+}
+
+
+/* =========================
+   BADGE
+========================= */
+
+.recommended-badges {
+    position: absolute;
+
+    top: 10px;
+    left: 10px;
+
+    z-index: 2;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 5px;
+}
+
+
+.recommended-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border-radius: 5px;
+
+    background: #193f9e;
+
+    color: #ffffff;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+
+.recommended-badge.boost {
+    background: #e5ad19;
+}
+
+
+.recommended-badge.package {
+    background: #193f9e;
+}
+
+
+/* =========================
+   NỘI DUNG
+========================= */
+
+.recommended-product-content {
+    padding: 15px;
+}
+
+
+.recommended-product-category {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #8a94a8;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+.recommended-product-name {
+    margin: 0 0 10px;
+
+    min-height: 40px;
+
+    color: #17233c;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    line-height: 1.45;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+}
+
+
+.recommended-product-price {
+    margin-bottom: 13px;
+
+    color: #193f9e;
+
+    font-size: 18px;
+    font-weight: 800;
+}
+
+
+/* =========================
+   SELLER
+========================= */
+
+.recommended-seller {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding-top: 11px;
+
+    border-top: 1px solid #eef1f6;
+}
+
+
+.recommended-seller-avatar {
+    width: 30px;
+    height: 30px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    background: #f1f3f7;
+}
+
+
+.recommended-seller-info {
+    min-width: 0;
+}
+
+
+.recommended-seller-name {
+    display: flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    color: #344054;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.recommended-seller-name-text {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+.recommended-seller-role {
+    margin-top: 2px;
+
+    color: #98a2b3;
+
+    font-size: 10px;
+}
+
+
+/* =========================
+   TÍCH XANH
+========================= */
+
+.recommended-seller-badge {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 14px;
+    height: 14px;
+
+    border-radius: 50%;
+
+    background: #193f9e;
+
+    color: #ffffff;
+
+    font-size: 9px;
+    font-weight: 800;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1200px) {
+
+    .recommended-product-list {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .recommended-product-list {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .recommended-products {
+        width: 92%;
+
+        padding:
+            30px 0 40px;
+    }
+
+
+    .recommended-product-list {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 12px;
+    }
+
+
+    .recommended-product-image {
+        height: 190px;
+    }
+
+
+    .recommended-header h2 {
+        font-size: 22px;
+    }
+
+}
+
+
+@media (max-width: 420px) {
+
+    .recommended-product-list {
+        grid-template-columns: 1fr;
+    }
+
+
+    .recommended-product-image {
+        height: 230px;
+    }
+
+}
+
+
+/* =====================================================
+   DONATE - GLASS MONEY BUTTON
+===================================================== */
+
+.donate-floating-button {
+    position: fixed;
+
+    right: 26px;
+    bottom: 24px;
+
+    width: 66px;
+    height: 66px;
+
+    padding: 0;
+
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.72),
+            rgba(245, 202, 46, 0.18) 45%,
+            rgba(25, 63, 158, 0.32)
+        );
+
+    box-shadow:
+        0 8px 25px rgba(25, 63, 158, 0.18),
+        inset 0 1px 1px rgba(255,255,255,0.9),
+        inset 0 -1px 2px rgba(25,63,158,0.08);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    overflow: visible;
+
+    z-index: 9998;
+
+    transition:
+        bottom 0.45s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+/* =====================================================
+   ÁNH SÁNG KÍNH
+===================================================== */
+
+.donate-glass-shine {
+    position: absolute;
+
+    width: 27px;
+    height: 12px;
+
+    top: 9px;
+    left: 12px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.48);
+
+    transform: rotate(-28deg);
+
+    pointer-events: none;
+
+    animation: glassShine 3s ease-in-out infinite;
+}
+
+
+/* =====================================================
+   CỌC TIỀN
+===================================================== */
+
+.donate-money-stack {
+    position: relative;
+
+    width: 39px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 3;
+}
+
+
+/* từng tờ tiền */
+
+.money-bill {
+    position: absolute;
+
+    width: 31px;
+    height: 18px;
+
+    border-radius: 4px;
+
+    border: 1px solid rgba(255,255,255,0.75);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,0.55),
+            rgba(245,202,46,0.55)
+        );
+
+    box-shadow:
+        0 2px 4px rgba(25,63,158,0.12);
+
+    transition: transform 0.3s ease;
+}
+
+
+.bill-back {
+    transform:
+        translate(-4px, -5px)
+        rotate(-8deg);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(25,63,158,0.42),
+            rgba(245,202,46,0.34)
+        );
+}
+
+
+.bill-middle {
+    transform:
+        translate(2px, -1px)
+        rotate(5deg);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(245,202,46,0.45),
+            rgba(255,255,255,0.5)
+        );
+}
+
+
+.bill-front {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform:
+        translate(0, 4px)
+        rotate(-2deg);
+
+    color: #193f9e;
+
+    font-family: Georgia, serif;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,247,181,0.82),
+            rgba(245,202,46,0.55)
+        );
+}
+
+
+/* =====================================================
+   TIỀN BAY RA
+===================================================== */
+
+.money-rain {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 11px;
+    height: 7px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 2px;
+
+    color: #8b6900;
+
+    font-size: 7px;
+    font-weight: 800;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fff4a8,
+            #f5ca2e
+        );
+
+    border: 1px solid rgba(255,255,255,0.8);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    z-index: 5;
+}
+
+
+/* mỗi tờ bay một hướng */
+
+.rain-1 {
+    --x: -24px;
+    --y: -34px;
+    animation: moneyRain 4.8s ease-in-out infinite;
+}
+
+.rain-2 {
+    --x: 25px;
+    --y: -28px;
+    animation:
+        moneyRain 4.8s ease-in-out infinite 0.5s;
+}
+
+.rain-3 {
+    --x: -30px;
+    --y: 22px;
+    animation:
+        moneyRain 4.8s ease-in-out infinite 1s;
+}
+
+.rain-4 {
+    --x: 29px;
+    --y: 24px;
+    animation:
+        moneyRain 4.8s ease-in-out infinite 1.5s;
+}
+
+.rain-5 {
+    --x: 2px;
+    --y: -38px;
+    animation:
+        moneyRain 4.8s ease-in-out infinite 2s;
+}
+
+
+/* =====================================================
+   CHỮ DONATE
+===================================================== */
+
+.donate-mini-text {
+    position: absolute;
+
+    bottom: 5px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: #193f9e;
+
+    font-family: "Be Vietnam Pro", sans-serif;
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing: 0.7px;
+
+    z-index: 4;
+}
+
+
+/* =====================================================
+   HOVER
+===================================================== */
+
+.donate-floating-button:hover {
+
+    transform: scale(1.08);
+
+    box-shadow:
+        0 12px 30px rgba(25,63,158,0.25),
+        0 0 15px rgba(245,202,46,0.25);
+}
+
+
+.donate-floating-button:hover .bill-front {
+    transform:
+        translate(0, 2px)
+        rotate(-2deg);
+}
+
+
+/* =====================================================
+   BACK TO TOP
+===================================================== */
+
+body:has(#backToTop.show) #donateFloatingButton {
+    bottom: 98px !important;
+}
+
+
+/* =====================================================
+   CHAT
+===================================================== */
+
+body:has(.chat-bubble) #donateFloatingButton,
+body:has(.chat-button) #donateFloatingButton,
+body:has(.chat-widget) #donateFloatingButton {
+    bottom: 158px !important;
+}
+
+
+/* =====================================================
+   ANIMATION KÍNH
+===================================================== */
+
+@keyframes glassShine {
+
+    0%,
+    65% {
+        opacity: 0.15;
+        transform:
+            translateX(-3px)
+            rotate(-28deg);
+    }
+
+    75% {
+        opacity: 0.65;
+        transform:
+            translateX(10px)
+            rotate(-28deg);
+    }
+
+    100% {
+        opacity: 0.15;
+        transform:
+            translateX(15px)
+            rotate(-28deg);
+    }
+}
+
+
+/* =====================================================
+   ANIMATION MƯA TIỀN
+===================================================== */
+
+@keyframes moneyRain {
+
+    0% {
+        opacity: 0;
+
+        transform:
+            translate(0, 0)
+            rotate(0deg)
+            scale(0.4);
+    }
+
+    8% {
+        opacity: 1;
+    }
+
+    35% {
+        opacity: 1;
+
+        transform:
+            translate(
+                var(--x),
+                var(--y)
+            )
+            rotate(80deg)
+            scale(1);
+    }
+
+    55% {
+        opacity: 0.85;
+
+        transform:
+            translate(
+                calc(var(--x) * 1.25),
+                calc(var(--y) + 18px)
+            )
+            rotate(150deg)
+            scale(0.9);
+    }
+
+    72% {
+        opacity: 0.45;
+
+        transform:
+            translate(
+                calc(var(--x) * 1.45),
+                calc(var(--y) + 35px)
+            )
+            rotate(230deg)
+            scale(0.75);
+    }
+
+    100% {
+        opacity: 0;
+
+        transform:
+            translate(
+                calc(var(--x) * 1.6),
+                calc(var(--y) + 48px)
+            )
+            rotate(300deg)
+            scale(0.45);
+    }
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 768px) {
+
+    .donate-floating-button {
+        right: 17px;
+        bottom: 18px;
+
+        width: 58px;
+        height: 58px;
+    }
+
+    .donate-mini-text {
+        bottom: 4px;
+        font-size: 6.5px;
+    }
+
+    body:has(#backToTop.show) #donateFloatingButton {
+        bottom: 82px !important;
+    }
+
+    body:has(.chat-bubble) #donateFloatingButton,
+    body:has(.chat-button) #donateFloatingButton,
+    body:has(.chat-widget) #donateFloatingButton {
+        bottom: 140px !important;
+    }
+}
+
+
+/* =====================================================
+   DONATE TỰ TRƯỢT LÊN KHI BACK TO TOP XUẤT HIỆN
+===================================================== */
+
+.donate-floating-button {
+    transition:
+        bottom 0.45s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+/* -----------------------------------------
+   BACK TO TOP ĐANG HIỆN
+   → DONATE TRƯỢT LÊN
+----------------------------------------- */
+
+body:has(#backToTop.show) #donateFloatingButton {
+    bottom: 95px !important;
+}
+
+
+/* -----------------------------------------
+   CHAT ĐANG HIỆN
+   → DONATE TRƯỢT LÊN THÊM
+----------------------------------------- */
+
+body:has(.chat-bubble) #donateFloatingButton,
+body:has(.chat-button) #donateFloatingButton,
+body:has(.chat-widget) #donateFloatingButton {
+    bottom: 160px !important;
+}
+
+
+/* -----------------------------------------
+   MOBILE
+----------------------------------------- */
+
+@media (max-width: 768px) {
+
+    body:has(#backToTop.show) #donateFloatingButton {
+        bottom: 82px !important;
+    }
+
+    body:has(.chat-bubble) #donateFloatingButton,
+    body:has(.chat-button) #donateFloatingButton,
+    body:has(.chat-widget) #donateFloatingButton {
+        bottom: 140px !important;
+    }
+}
+
+
+/* =====================================================
+   DONATE POPUP - GLASS
+===================================================== */
+
+.donate-modal {
+    position: fixed;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 10000;
+
+    visibility: hidden;
+    opacity: 0;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+}
+
+
+.donate-modal.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/* =====================================================
+   LỚP NỀN
+===================================================== */
+
+.donate-modal-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        rgba(10, 25, 65, 0.58);
+}
+
+
+/* =====================================================
+   KHUNG POPUP
+===================================================== */
+
+.donate-modal-box {
+
+    position: relative;
+
+    width: min(470px, 94vw);
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    padding: 30px;
+
+    border-radius: 24px;
+
+    border: 1px solid rgba(255,255,255,0.75);
+
+    /*
+     * KÍNH TRONG
+     * Không dùng backdrop-filter blur
+     */
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.93),
+            rgba(232,242,255,0.91) 52%,
+            rgba(255,248,215,0.88)
+        );
+
+    box-shadow:
+        0 25px 70px rgba(5,25,70,0.28),
+        inset 0 1px 1px rgba(255,255,255,0.95);
+
+    transform:
+        translateY(20px)
+        scale(0.96);
+
+    transition:
+        transform 0.3s ease;
+
+    z-index: 2;
+}
+
+
+.donate-modal.show .donate-modal-box {
+
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+
+/* =====================================================
+   NÚT ĐÓNG
+===================================================== */
+
+.donate-close {
+
+    position: absolute;
+
+    top: 14px;
+    right: 16px;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: rgba(25,63,158,0.07);
+
+    color: #193f9e;
+
+    font-size: 25px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.donate-close:hover {
+
+    background: rgba(245,202,46,0.22);
+
+    transform: rotate(90deg);
+}
+
+
+/* =====================================================
+   VIEW
+===================================================== */
+
+.donate-view {
+    width: 100%;
+}
+
+
+.donate-view[hidden] {
+    display: none !important;
+}
+
+
+/* =====================================================
+   ICON POPUP
+===================================================== */
+
+.donate-popup-icon {
+
+    width: 58px;
+    height: 58px;
+
+    margin: 0 auto 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    color: #193f9e;
+
+    font-family: Georgia, serif;
+
+    font-size: 25px;
+    font-weight: 700;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,244,170,0.85),
+            rgba(245,202,46,0.5),
+            rgba(25,63,158,0.15)
+        );
+
+    border: 1px solid rgba(245,202,46,0.7);
+
+    box-shadow:
+        0 6px 18px rgba(25,63,158,0.12);
+}
+
+
+/* =====================================================
+   TIÊU ĐỀ
+===================================================== */
+
+.donate-modal-box h2 {
+
+    margin: 0;
+
+    text-align: center;
+
+    color: #193f9e;
+
+    font-family: "Be Vietnam Pro", sans-serif;
+
+    font-size: 22px;
+
+    font-weight: 900;
+
+    letter-spacing: 0.5px;
+}
+
+
+.donate-thankyou {
+
+    margin: 12px 20px 5px;
+
+    text-align: center;
+
+    color: #344054;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    line-height: 1.6;
+}
+
+
+.donate-description {
+
+    margin: 0 20px 18px;
+
+    text-align: center;
+
+    color: #667085;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   QR
+===================================================== */
+
+.donate-qr-box {
+
+    width: 190px;
+    height: 190px;
+
+    margin: 0 auto 8px;
+
+    padding: 8px;
+
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e9f2;
+
+    box-shadow:
+        0 7px 20px rgba(25,63,158,0.08);
+}
+
+
+.donate-qr-box img {
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: contain;
+}
+
+
+.donate-qr-note {
+
+    margin-bottom: 18px;
+
+    text-align: center;
+
+    color: #8a94a6;
+
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+.donate-input-label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #344054;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.donate-input-wrap {
+
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 14px;
+
+    border-radius: 11px;
+
+    background: rgba(255,255,255,0.82);
+
+    border: 1px solid #dce3ef;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.donate-input-wrap:focus-within {
+
+    border-color: #193f9e;
+
+    box-shadow:
+        0 0 0 3px rgba(25,63,158,0.08);
+}
+
+
+.donate-input-wrap input {
+
+    flex: 1;
+
+    width: 100%;
+
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #17233c;
+
+    font-family: inherit;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+.donate-input-wrap span {
+
+    color: #193f9e;
+
+    font-size: 14px;
+
+    font-weight: 800;
+}
+
+
+/* =====================================================
+   NHANH
+===================================================== */
+
+.donate-quick-amounts {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 7px;
+
+    margin-top: 9px;
+}
+
+
+.donate-quick-amounts button {
+
+    height: 34px;
+
+    border: 1px solid #dfe5ef;
+
+    border-radius: 8px;
+
+    background: rgba(255,255,255,0.65);
+
+    color: #193f9e;
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.donate-quick-amounts button:hover {
+
+    background: rgba(245,202,46,0.15);
+
+    border-color: #f5ca2e;
+
+    transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+.donate-message {
+
+    min-height: 18px;
+
+    margin: 9px 0 5px;
+
+    color: #d92d20;
+
+    text-align: center;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.donate-main-button {
+
+    width: 100%;
+
+    height: 46px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #193f9e;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.4px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.donate-main-button:hover {
+
+    background: #153586;
+
+    transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   BƯỚC CHUYỂN KHOẢN
+===================================================== */
+
+.donate-step-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    margin-bottom: 20px;
+}
+
+
+.donate-step-number {
+
+    width: 35px;
+    height: 35px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #193f9e;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+
+.donate-step-title h3 {
+
+    margin: 0;
+
+    color: #193f9e;
+
+    font-size: 17px;
+}
+
+
+.donate-step-title p {
+
+    margin: 3px 0 0;
+
+    color: #8a94a6;
+
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   THẺ NGÂN HÀNG
+===================================================== */
+
+.donate-bank-card {
+
+    padding: 18px;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(25,63,158,0.94),
+            rgba(46,99,200,0.9)
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 12px 25px rgba(25,63,158,0.18);
+}
+
+
+.donate-bank-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 13px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.8px;
+}
+
+
+.donate-bank-badge {
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+
+    background: rgba(245,202,46,0.95);
+
+    color: #193f9e;
+
+    font-size: 9px;
+}
+
+
+.donate-bank-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 10px 0;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.13);
+
+    font-size: 11px;
+}
+
+
+.donate-bank-row:last-child {
+
+    border-bottom: none;
+}
+
+
+.donate-bank-row span {
+
+    opacity: 0.72;
+}
+
+
+.donate-bank-row strong {
+
+    text-align: right;
+
+    font-size: 12px;
+}
+
+
+.donate-bank-row.highlight strong {
+
+    color: #ffe16a;
+
+    font-size: 15px;
+}
+
+
+.transfer-code {
+
+    max-width: 180px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.donate-transfer-actions {
+
+    display: grid;
+
+    grid-template-columns:
+        105px 1fr;
+
+    gap: 9px;
+
+    margin-top: 10px;
+}
+
+
+.donate-back-button {
+
+    height: 46px;
+
+    border: 1px solid #dce3ef;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #667085;
+
+    font-family: inherit;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+/* =====================================================
+   SUCCESS
+===================================================== */
+
+.donate-success-view {
+
+    text-align: center;
+
+    padding: 15px 0;
+}
+
+
+.donate-success-icon {
+
+    width: 65px;
+    height: 65px;
+
+    margin: 5px auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #193f9e;
+
+    color: #ffe16a;
+
+    font-size: 30px;
+
+    font-weight: 900;
+
+    box-shadow:
+        0 8px 20px rgba(25,63,158,0.18);
+}
+
+
+.donate-success-view h3 {
+
+    margin: 0;
+
+    color: #193f9e;
+
+    font-size: 20px;
+}
+
+
+.donate-success-view > p {
+
+    margin: 8px 0 20px;
+
+    color: #667085;
+
+    font-size: 12px;
+}
+
+
+.donate-success-info {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 12px 14px;
+
+    margin-bottom: 7px;
+
+    border-radius: 9px;
+
+    background: rgba(255,255,255,0.7);
+
+    border: 1px solid #e6eaf1;
+
+    text-align: left;
+
+    font-size: 11px;
+}
+
+
+.donate-success-info span {
+
+    color: #8a94a6;
+}
+
+
+.donate-success-info strong {
+
+    color: #193f9e;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   MOBILE POPUP
+===================================================== */
+
+@media (max-width: 520px) {
+
+    .donate-modal-box {
+
+        padding: 24px 18px;
+
+        border-radius: 20px;
+    }
+
+
+    .donate-modal-box h2 {
+
+        font-size: 18px;
+    }
+
+
+    .donate-qr-box {
+
+        width: 165px;
+        height: 165px;
+    }
+
+
+    .donate-quick-amounts {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .donate-transfer-actions {
+
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =====================================================
+   DONATE - SELECT NGÂN HÀNG
+===================================================== */
+
+.donate-input-wrap select {
+    width: 100%;
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #17233c;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+/* =====================================================
+   GỢI Ý NỘI DUNG
+===================================================== */
+
+.donate-content-note {
+    margin-top: 5px;
+
+    color: #8a94a6;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   KHI INPUT/SELECT ĐƯỢC FOCUS
+===================================================== */
+
+.donate-input-wrap input,
+.donate-input-wrap select {
+    transition: color 0.2s ease;
+}
+
+
+.donate-input-wrap input:focus,
+.donate-input-wrap select:focus {
+    color: #193f9e;
+}
+
+
+/* =====================================================
+   POPUP - CÁCH NHAU GIỮA CÁC TRƯỜNG
+===================================================== */
+
+.donate-modal-box .donate-input-label {
+    margin-top: 12px;
+}
+
+
+.donate-modal-box
+.donate-input-label:first-of-type {
+    margin-top: 0;
+}

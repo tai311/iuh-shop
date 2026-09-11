@@ -2697,3 +2697,26 @@ body {
         text-align: left;
     }
 }
+
+
+/* TĂNG CỠ CHỮ THÊM 1 NẤC */
+
+.summary-header span {
+    font-size: 11px;
+}
+
+.summary-header h2 {
+    font-size: 22px;
+}
+
+.summary-row {
+    font-size: 13px;
+}
+
+.summary-total span {
+    font-size: 14px;
+}
+
+.summary-total strong {
+    font-size: 23px;
+}

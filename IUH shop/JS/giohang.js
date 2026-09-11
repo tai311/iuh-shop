@@ -695,14 +695,14 @@ async function loadCart() {
             await supabaseClient
                 .from("cart_items")
                 .select(`
-                    id,
-                    user_id,
-                    product_id,
-                    quantity,
-                    selected,
-                    created_at,
-                    updated_at
-                `)
+            id,
+            user_id,
+            product_id,
+            quantity,
+            selected,
+            created_at,
+            updated_at
+        `)
                 .eq(
                     "user_id",
                     currentUser.id
@@ -767,16 +767,17 @@ async function loadCart() {
         } =
             await supabaseClient
                 .from("products")
-                .select(`
-                    id,
-                    seller_id,
-                    name,
-                    category,
-                    price,
-                    quantity,
-                    image_urls,
-                    status
-                `)
+                 .select(`
+            id,
+            seller_id,
+            name,
+            category,
+            price,
+            quantity,
+            image_urls,
+            status,
+            is_consignment
+        `)
                 .in(
                     "id",
                     productIds
@@ -882,46 +883,26 @@ async function loadCart() {
 
 
             validCartItems.push({
+    cartId: cartItem.id,
+    userId: cartItem.user_id,
+    productId: product.id,
+    seller_id: product.seller_id,
 
-                cartId:
-                    cartItem.id,
+    name: product.name,
+    category: product.category,
 
-                userId:
-                    cartItem.user_id,
+    price:
+        Number(product.price) || 0,
 
-                productId:
-                    product.id,
+    is_consignment:
+        product.is_consignment === true,
 
-                seller_id:
-                    product.seller_id,
-
-                name:
-                    product.name,
-
-                category:
-                    product.category,
-
-                price:
-                    Number(
-                        product.price
-                    ) || 0,
-
-                stock:
-                    stock,
-
-                image_urls:
-                    product.image_urls || [],
-
-                quantity:
-                    safeQuantity,
-
-                selected:
-                    cartItem.selected !== false,
-
-                status:
-                    product.status
-
-            });
+    stock: stock,
+    image_urls: product.image_urls || [],
+    quantity: safeQuantity,
+    selected: cartItem.selected !== false,
+    status: product.status
+});
 
         }
 
@@ -1151,10 +1132,12 @@ function createCartItemHTML(
         getItemQuantity(item);
 
     const price =
-        Number(item.price) || 0;
+    Math.round(
+        (Number(item.price) || 0) * 1.05
+    );
 
-    const itemTotal =
-        quantity * price;
+const itemTotal =
+    quantity * price;
 
     const selected =
         isItemSelected(item);
@@ -1980,27 +1963,22 @@ function updateSummary() {
      */
 
     const subtotal =
-        selectedItems.reduce(
-            function (
-                sum,
-                item
-            ) {
+    selectedItems.reduce(
+        function (sum, item) {
 
-                return (
-                    sum +
-                    (
-                        getItemQuantity(item) *
-                        (
-                            Number(item.price) ||
-                            0
-                        )
-                    )
+            const price =
+                Math.round(
+                    (Number(item.price) || 0) * 1.05
                 );
 
-            },
-            0
-        );
+            return (
+                sum +
+                getItemQuantity(item) * price
+            );
 
+        },
+        0
+    );
 
     /*
      * Header cart count

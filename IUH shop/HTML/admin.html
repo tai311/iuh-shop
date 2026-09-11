@@ -154,6 +154,15 @@
     <span>Ký gửi</span>
 </button>
 
+<button
+    class="admin-nav-item"
+    data-page="donations"
+    type="button"
+>
+    <span class="nav-icon">💸</span>
+    <span>Donate</span>
+</button>
+
         </nav>
 
 
@@ -486,6 +495,13 @@
     <strong id="revenueConsignment">0đ</strong>
 </div>
 
+<div class="revenue-row">
+    <span>Donate</span>
+    <strong id="revenueDonation">
+        0đ
+    </strong>
+</div>
+
                     </div>
 
                 </div>
@@ -580,6 +596,25 @@
 
         <small>
             Duyệt yêu cầu và thanh toán người gửi
+        </small>
+    </div>
+
+    <b>→</b>
+</button>
+
+<button
+    data-page="donations"
+    type="button"
+>
+    <span>💸</span>
+
+    <div>
+        <strong>
+            Quản lý Donate
+        </strong>
+
+        <small>
+            Theo dõi các khoản Donate của IUH SHOP
         </small>
     </div>
 
@@ -1529,6 +1564,160 @@
 
 </section>
 
+<!-- =================================================
+     DONATIONS
+================================================== -->
+
+<section
+    class="admin-page"
+    id="page-donations"
+>
+
+    <div class="page-header">
+
+        <div>
+
+            <span class="eyebrow">
+                DONATE
+            </span>
+
+            <h2>
+                Quản lý Donate
+            </h2>
+
+            <p>
+                Theo dõi các khoản Donate và thông tin chuyển khoản
+                được ghi nhận trên hệ thống.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- BỘ LỌC -->
+
+    <div class="donation-toolbar">
+
+        <div class="donation-date-group">
+
+            <div class="donation-date-field">
+
+                <label for="donationFromDate">
+                    Từ ngày
+                </label>
+
+                <input
+                    id="donationFromDate"
+                    type="date"
+                >
+
+            </div>
+
+
+            <div class="donation-date-field">
+
+                <label for="donationToDate">
+                    Đến ngày
+                </label>
+
+                <input
+                    id="donationToDate"
+                    type="date"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="donation-toolbar-actions">
+
+            <button
+                id="donationFilterBtn"
+                class="donation-filter-button"
+                type="button"
+            >
+                🔎 Lọc
+            </button>
+
+
+            <button
+                id="donationRefreshBtn"
+                class="donation-refresh-button"
+                type="button"
+            >
+                ↻ Cập nhật
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- TÓM TẮT -->
+
+    <div
+        class="donation-result-summary"
+        id="donationSummary"
+    >
+        Đang tải...
+    </div>
+
+
+    <!-- BẢNG DONATE -->
+
+    <div class="donation-table-wrap">
+
+        <div class="donation-table-head">
+
+            <span>Thời gian</span>
+
+            <span>Người donate</span>
+
+            <span>Ngân hàng</span>
+
+            <span>Số tiền</span>
+
+            <span>Nội dung chuyển khoản</span>
+
+            <span>Mã giao dịch</span>
+
+            <span>Trạng thái</span>
+
+        </div>
+
+
+        <div
+            id="donationList"
+            class="donation-list"
+        >
+
+            <div class="loading-box">
+                Đang tải Donate...
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- XEM TẤT CẢ -->
+
+    <div class="donation-footer">
+
+        <button
+            id="donationViewAllBtn"
+            class="donation-view-all"
+            type="button"
+            style="display:none;"
+        >
+            Xem tất cả
+        </button>
+
+    </div>
+
+</section>
 
     </main>
 
