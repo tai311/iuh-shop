@@ -615,7 +615,7 @@ async function loadCurrentUser() {
     ) {
 
         window.location.href =
-            "dang-nhap.html";
+            "dangnhap.html";
 
         return null;
     }

@@ -37,21 +37,51 @@
                 <div class="top-actions">
 
                     <!-- Tìm kiếm -->
-                    <form class="search-box" id="searchForm">
-    <input
-        type="search"
-        id="searchInput"
-        placeholder="Tìm kiếm sản phẩm, danh mục..."
-        aria-label="Tìm kiếm"
+                    <!-- =========================================================
+     GLOBAL SEARCH
+========================================================= -->
+<div class="global-search" id="globalSearch">
+
+    <div class="global-search-input-wrap">
+
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+        <input
+            type="text"
+            id="globalSearchInput"
+            class="global-search-input"
+            placeholder="Tìm sản phẩm, người dùng, bài viết..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="globalSearchClear"
+            class="global-search-clear"
+            title="Xóa"
+            style="display:none;"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+    </div>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="global-search-dropdown"
+        id="globalSearchDropdown"
     >
 
-                        <button type="submit" class="search-button">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <circle cx="11" cy="11" r="7"></circle>
-                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
-                            </svg>
-                        </button>
-                    </form>
+        <!-- Nội dung sẽ được JS render -->
+        <div
+            id="globalSearchContent"
+            class="global-search-content"
+        ></div>
+
+    </div>
+
+</div>
 
                     <!-- ICON TIN NHẮN -->
 <a href="tinnhan.html"

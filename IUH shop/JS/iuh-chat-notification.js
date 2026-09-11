@@ -4080,3 +4080,2143 @@ return {
 
 })();
 
+
+
+
+/* =========================================================
+   IUH SHOP - GLOBAL SEARCH
+   Tìm kiếm:
+   1. Sản phẩm
+   2. Người dùng
+   3. Bài viết diễn đàn
+   4. Lịch sử tìm kiếm
+   5. Sản phẩm ưu tiên
+========================================================= */
+
+
+/* =========================================================
+   1. CẤU HÌNH
+========================================================= */
+
+const GLOBAL_SEARCH_HISTORY_KEY =
+    "iuh_shop_search_history";
+
+const GLOBAL_SEARCH_MAX_HISTORY = 8;
+
+
+/* =========================================================
+   2. ELEMENT
+========================================================= */
+
+const globalSearch =
+    document.getElementById("globalSearch");
+
+const globalSearchInput =
+    document.getElementById("globalSearchInput");
+
+const globalSearchDropdown =
+    document.getElementById("globalSearchDropdown");
+
+const globalSearchContent =
+    document.getElementById("globalSearchContent");
+
+const globalSearchClear =
+    document.getElementById("globalSearchClear");
+
+
+/* Nếu trang hiện tại không có search thì dừng */
+
+if (
+    globalSearch &&
+    globalSearchInput &&
+    globalSearchDropdown &&
+    globalSearchContent
+) {
+
+    initGlobalSearch();
+
+}
+
+
+/* =========================================================
+   3. KHỞI TẠO
+========================================================= */
+
+function initGlobalSearch() {
+
+    /* Focus */
+
+    globalSearchInput.addEventListener(
+        "focus",
+        async function () {
+
+            showGlobalSearch();
+
+            const keyword =
+                globalSearchInput.value.trim();
+
+            if (!keyword) {
+
+                await renderSearchHome();
+
+            }
+
+        }
+    );
+
+
+    /* Gõ */
+
+    globalSearchInput.addEventListener(
+        "input",
+        debounce(
+            async function () {
+
+                const keyword =
+                    globalSearchInput.value.trim();
+
+                updateClearButton();
+
+                showGlobalSearch();
+
+                if (!keyword) {
+
+                    await renderSearchHome();
+
+                    return;
+
+                }
+
+                await performGlobalSearch(
+                    keyword
+                );
+
+            },
+            300
+        )
+    );
+
+
+    /* Enter */
+
+    globalSearchInput.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key ===
+                "Enter"
+            ) {
+
+                event.preventDefault();
+
+                const keyword =
+                    globalSearchInput.value.trim();
+
+                if (!keyword) {
+                    return;
+                }
+
+                saveSearchHistory(
+                    keyword
+                );
+
+                window.location.href =
+                    `timkiem.html?q=${encodeURIComponent(keyword)}`;
+
+            }
+
+
+            if (
+                event.key ===
+                "Escape"
+            ) {
+
+                hideGlobalSearch();
+
+                globalSearchInput.blur();
+
+            }
+
+        }
+    );
+
+
+    /* Nút xóa input */
+
+    if (globalSearchClear) {
+
+        globalSearchClear.addEventListener(
+            "click",
+            function () {
+
+                globalSearchInput.value = "";
+
+                updateClearButton();
+
+                showGlobalSearch();
+
+                renderSearchHome();
+
+                globalSearchInput.focus();
+
+            }
+        );
+
+    }
+
+
+    /* Click ngoài */
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                !globalSearch.contains(
+                    event.target
+                )
+            ) {
+
+                hideGlobalSearch();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   4. DEBOUNCE
+========================================================= */
+
+function debounce(
+    callback,
+    delay
+) {
+
+    let timer;
+
+    return function (...args) {
+
+        clearTimeout(timer);
+
+        timer = setTimeout(
+            () => callback.apply(this, args),
+            delay
+        );
+
+    };
+
+}
+
+
+/* =========================================================
+   5. SHOW / HIDE
+========================================================= */
+
+function showGlobalSearch() {
+
+    globalSearchDropdown.classList.add(
+        "show"
+    );
+
+}
+
+
+function hideGlobalSearch() {
+
+    globalSearchDropdown.classList.remove(
+        "show"
+    );
+
+}
+
+
+/* =========================================================
+   6. CLEAR BUTTON
+========================================================= */
+
+function updateClearButton() {
+
+    if (!globalSearchClear) {
+        return;
+    }
+
+    globalSearchClear.style.display =
+        globalSearchInput.value.trim()
+            ? "flex"
+            : "none";
+
+}
+
+
+/* =========================================================
+   7. LỊCH SỬ TÌM KIẾM
+========================================================= */
+
+function getSearchHistory() {
+
+    try {
+
+        const history =
+            JSON.parse(
+                localStorage.getItem(
+                    GLOBAL_SEARCH_HISTORY_KEY
+                )
+            );
+
+        return Array.isArray(history)
+            ? history
+            : [];
+
+    }
+    catch {
+
+        return [];
+
+    }
+
+}
+
+
+function saveSearchHistory(
+    keyword
+) {
+
+    keyword =
+        keyword
+            .trim();
+
+    if (!keyword) {
+        return;
+    }
+
+
+    let history =
+        getSearchHistory();
+
+
+    /* Xóa bản cũ nếu tồn tại */
+
+    history =
+        history.filter(
+            item =>
+                item.toLowerCase() !==
+                keyword.toLowerCase()
+        );
+
+
+    /* Đưa lên đầu */
+
+    history.unshift(
+        keyword
+    );
+
+
+    /* Giới hạn */
+
+    history =
+        history.slice(
+            0,
+            GLOBAL_SEARCH_MAX_HISTORY
+        );
+
+
+    localStorage.setItem(
+        GLOBAL_SEARCH_HISTORY_KEY,
+        JSON.stringify(history)
+    );
+
+}
+
+
+function deleteSearchHistory() {
+
+    localStorage.removeItem(
+        GLOBAL_SEARCH_HISTORY_KEY
+    );
+
+    renderSearchHome();
+
+}
+
+
+/* =========================================================
+   8. TRANG SEARCH KHI CHƯA NHẬP
+========================================================= */
+
+async function renderSearchHome() {
+
+    globalSearchContent.innerHTML = `
+        <div class="global-search-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Đang tải...
+        </div>
+    `;
+
+
+    const history =
+        getSearchHistory();
+
+
+    let html = "";
+
+
+    /* =========================
+       LỊCH SỬ
+    ========================= */
+
+    if (
+        history.length
+    ) {
+
+        html += `
+
+            <div class="global-search-section">
+
+                <div
+                    class="global-search-history-header"
+                >
+
+                    <span>
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        Lịch sử tìm kiếm
+                    </span>
+
+                    <button
+                        type="button"
+                        class="global-search-clear-history"
+                        id="clearSearchHistory"
+                    >
+                        Xóa lịch sử
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="global-search-history-list"
+                >
+
+                    ${history.map(
+                        keyword => `
+
+                        <div
+                            class="global-search-history-item"
+                            data-history-keyword="${escapeHTML(
+                                keyword
+                            )}"
+                        >
+
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+
+                            <span>
+                                ${escapeHTML(
+                                    keyword
+                                )}
+                            </span>
+
+                        </div>
+
+                    `
+                    ).join("")}
+
+                </div>
+
+            </div>
+
+            <div class="global-search-divider"></div>
+
+        `;
+
+    }
+
+
+    /* =========================
+       SẢN PHẨM ƯU TIÊN
+    ========================= */
+
+    html += `
+
+        <div class="global-search-section">
+
+            <div class="global-search-section-title">
+
+                <span>
+                    <i class="fa-solid fa-bolt"></i>
+                    Sản phẩm nổi bật
+                </span>
+
+            </div>
+
+            <div id="globalFeaturedProducts">
+
+                <div class="global-search-loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Đang tải sản phẩm...
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    globalSearchContent.innerHTML =
+        html;
+
+
+    /* Bind history */
+
+    bindSearchHistoryEvents();
+
+
+    /* Load sản phẩm */
+
+    await loadFeaturedSearchProducts();
+
+}
+
+
+/* =========================================================
+   9. HISTORY EVENTS
+========================================================= */
+
+function bindSearchHistoryEvents() {
+
+    document
+        .querySelectorAll(
+            ".global-search-history-item"
+        )
+        .forEach(
+            item => {
+
+                item.addEventListener(
+                    "click",
+                    function () {
+
+                        const keyword =
+                            this.dataset
+                                .historyKeyword;
+
+                        globalSearchInput.value =
+                            keyword;
+
+                        updateClearButton();
+
+                        saveSearchHistory(
+                            keyword
+                        );
+
+                        performGlobalSearch(
+                            keyword
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    const clearHistory =
+        document.getElementById(
+            "clearSearchHistory"
+        );
+
+
+    if (clearHistory) {
+
+        clearHistory.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                deleteSearchHistory();
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SẢN PHẨM ƯU TIÊN TRONG GLOBAL SEARCH
+
+   CHỈ HIỂN THỊ:
+
+   1. Sản phẩm đang ĐẨY TIN
+   HOẶC
+   2. Sản phẩm của người bán có GÓI DỊCH VỤ CÒN HẠN
+
+   KHÔNG lấy sản phẩm bình thường.
+========================================================= */
+
+async function loadFeaturedSearchProducts() {
+
+    const container =
+        document.getElementById(
+            "globalFeaturedProducts"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    try {
+
+        /* =====================================================
+           1. LẤY SẢN PHẨM ĐANG ACTIVE
+        ===================================================== */
+
+        const {
+            data: products,
+            error: productError
+        } =
+            await supabaseClient
+                .from("products")
+                .select(`
+                    id,
+                    seller_id,
+                    name,
+                    category,
+                    price,
+                    image_urls,
+                    status,
+                    created_at,
+                    is_boosted,
+                    boost_started_at,
+                    boost_expires_at
+                `)
+                .eq(
+                    "status",
+                    "active"
+                )
+                .limit(100);
+
+
+        if (productError) {
+            throw productError;
+        }
+
+
+        if (
+            !products ||
+            products.length === 0
+        ) {
+
+            container.innerHTML = `
+                <div class="global-search-empty">
+                    <i class="fa-solid fa-box-open"></i>
+                    Chưa có sản phẩm nổi bật.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        /* =====================================================
+           2. LẤY SELLER
+        ===================================================== */
+
+        const sellerIds = [
+            ...new Set(
+                products
+                    .map(
+                        product =>
+                            product.seller_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+        /* =====================================================
+           3. LẤY THÀNH VIÊN GÓI
+           
+           service_package_members:
+           user_id → package_id
+        ===================================================== */
+
+        let memberships = [];
+
+
+        if (
+            sellerIds.length > 0
+        ) {
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .from(
+                        "service_package_members"
+                    )
+                    .select(`
+                        id,
+                        package_id,
+                        user_id,
+                        member_role,
+                        joined_at
+                    `)
+                    .in(
+                        "user_id",
+                        sellerIds
+                    );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            memberships =
+                data || [];
+        }
+
+
+        /* =====================================================
+           4. LẤY GÓI DỊCH VỤ
+        ===================================================== */
+
+        const packageIds = [
+            ...new Set(
+                memberships
+                    .map(
+                        member =>
+                            member.package_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+        let packages = [];
+
+
+        if (
+            packageIds.length > 0
+        ) {
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .from(
+                        "service_packages"
+                    )
+                    .select(`
+                        id,
+                        owner_id,
+                        plan_type,
+                        status,
+                        starts_at,
+                        expires_at
+                    `)
+                    .in(
+                        "id",
+                        packageIds
+                    );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            packages =
+                data || [];
+        }
+
+
+        /* =====================================================
+           5. XÁC ĐỊNH GÓI ĐANG HOẠT ĐỘNG
+        ===================================================== */
+
+        const activePackageIds =
+            new Set(
+
+                packages
+                    .filter(
+                        pkg =>
+                            isSearchPackageActive(
+                                pkg
+                            )
+                    )
+                    .map(
+                        pkg =>
+                            String(
+                                pkg.id
+                            )
+                    )
+
+            );
+
+
+        /* =====================================================
+           6. SELLER CÓ GÓI ĐANG HOẠT ĐỘNG
+        ===================================================== */
+
+        const packageSellerIds =
+            new Set(
+
+                memberships
+                    .filter(
+                        member =>
+                            activePackageIds.has(
+                                String(
+                                    member.package_id
+                                )
+                            )
+                    )
+                    .map(
+                        member =>
+                            String(
+                                member.user_id
+                            )
+                    )
+
+            );
+
+
+        /* =====================================================
+           7. LỌC SẢN PHẨM
+
+           CHỈ:
+           - Đẩy tin
+           - Hoặc người bán có gói
+        ===================================================== */
+
+        let featuredProducts =
+            products
+                .map(
+                    product => {
+
+                        const boostActive =
+                            isSearchBoostActive(
+                                product
+                            );
+
+
+                        const packageActive =
+                            packageSellerIds.has(
+                                String(
+                                    product.seller_id
+                                )
+                            );
+
+
+                        return {
+
+                            ...product,
+
+                            boostActive,
+
+                            packageActive
+
+                        };
+
+                    }
+                )
+                .filter(
+                    product =>
+                        product.boostActive ||
+                        product.packageActive
+                );
+
+
+        /* =====================================================
+           8. SẮP XẾP
+
+           ƯU TIÊN:
+
+           3 = Đẩy tin + Gói
+           2 = Đẩy tin
+           1 = Gói
+        ===================================================== */
+
+        featuredProducts.sort(
+            (a, b) => {
+
+                const priorityA =
+                    a.boostActive &&
+                    a.packageActive
+                        ? 3
+                        : a.boostActive
+                            ? 2
+                            : 1;
+
+
+                const priorityB =
+                    b.boostActive &&
+                    b.packageActive
+                        ? 3
+                        : b.boostActive
+                            ? 2
+                            : 1;
+
+
+                if (
+                    priorityA !==
+                    priorityB
+                ) {
+
+                    return (
+                        priorityB -
+                        priorityA
+                    );
+                }
+
+
+                return (
+                    new Date(
+                        b.created_at
+                    ).getTime()
+                    -
+                    new Date(
+                        a.created_at
+                    ).getTime()
+                );
+
+            }
+        );
+
+
+        /* =====================================================
+           9. CHỈ LẤY 6 SẢN PHẨM
+        ===================================================== */
+
+        featuredProducts =
+            featuredProducts.slice(
+                0,
+                6
+            );
+
+
+        /* =====================================================
+           10. KHÔNG CÓ
+        ===================================================== */
+
+        if (
+            featuredProducts.length === 0
+        ) {
+
+            container.innerHTML = `
+                <div class="global-search-empty">
+                    <i class="fa-solid fa-bolt"></i>
+                    Chưa có sản phẩm được ưu tiên.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        /* =====================================================
+           11. HIỂN THỊ
+        ===================================================== */
+
+        container.innerHTML =
+            featuredProducts
+                .map(
+                    product =>
+                        createProductSearchHTML(
+                            product,
+                            product.boostActive,
+                            product.packageActive
+                        )
+                )
+                .join("");
+
+
+        bindProductSearchEvents();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Global search featured products error:",
+            error
+        );
+
+
+        container.innerHTML = `
+            <div class="global-search-empty">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Không thể tải sản phẩm ưu tiên.
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   KIỂM TRA ĐẨY TIN CÒN HẠN
+========================================================= */
+
+function isSearchBoostActive(
+    product
+) {
+
+    if (
+        product?.is_boosted !== true
+    ) {
+        return false;
+    }
+
+
+    if (
+        !product.boost_started_at ||
+        !product.boost_expires_at
+    ) {
+        return false;
+    }
+
+
+    const now =
+        Date.now();
+
+
+    const start =
+        new Date(
+            product.boost_started_at
+        ).getTime();
+
+
+    const end =
+        new Date(
+            product.boost_expires_at
+        ).getTime();
+
+
+    return (
+        Number.isFinite(start) &&
+        Number.isFinite(end) &&
+        start <= now &&
+        end > now
+    );
+
+}
+
+
+/* =========================================================
+   KIỂM TRA GÓI DỊCH VỤ CÒN HẠN
+========================================================= */
+
+function isSearchPackageActive(
+    pkg
+) {
+
+    if (!pkg) {
+        return false;
+    }
+
+
+    if (
+        String(
+            pkg.status || ""
+        ).toLowerCase() !==
+        "active"
+    ) {
+        return false;
+    }
+
+
+    if (
+        !pkg.starts_at ||
+        !pkg.expires_at
+    ) {
+        return false;
+    }
+
+
+    const now =
+        Date.now();
+
+
+    const start =
+        new Date(
+            pkg.starts_at
+        ).getTime();
+
+
+    const end =
+        new Date(
+            pkg.expires_at
+        ).getTime();
+
+
+    return (
+        Number.isFinite(start) &&
+        Number.isFinite(end) &&
+        start <= now &&
+        end > now
+    );
+
+}
+
+
+/* =========================================================
+   11. SEARCH TOÀN HỆ THỐNG
+========================================================= */
+
+async function performGlobalSearch(
+    keyword
+) {
+
+    keyword =
+        keyword.trim();
+
+
+    if (!keyword) {
+
+        await renderSearchHome();
+
+        return;
+
+    }
+
+
+    globalSearchContent.innerHTML = `
+
+        <div class="global-search-loading">
+
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            Đang tìm kiếm...
+
+        </div>
+
+    `;
+
+
+    try {
+
+        /*
+         * Chạy 3 loại tìm kiếm cùng lúc
+         */
+
+        const [
+            productsResult,
+            usersResult,
+            postsResult
+        ] =
+            await Promise.all([
+
+                searchProducts(
+                    keyword
+                ),
+
+                searchUsers(
+                    keyword
+                ),
+
+                searchForumPosts(
+                    keyword
+                )
+
+            ]);
+
+
+        const products =
+            productsResult || [];
+
+        const users =
+            usersResult || [];
+
+        const posts =
+            postsResult || [];
+
+
+        renderGlobalSearchResults(
+            keyword,
+            products,
+            users,
+            posts
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Global search error:",
+            error
+        );
+
+
+        globalSearchContent.innerHTML = `
+
+            <div class="global-search-empty">
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                Không thể thực hiện tìm kiếm.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   12. SEARCH PRODUCTS
+========================================================= */
+
+async function searchProducts(
+    keyword
+) {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("products")
+            .select(`
+                id,
+                name,
+                price,
+                image_urls,
+                category,
+                seller_id,
+                status,
+                is_boosted,
+                boost_started_at,
+                boost_expires_at
+            `)
+            .eq(
+                "status",
+                "active"
+            )
+            .ilike(
+                "name",
+                `%${keyword}%`
+            )
+            .limit(6);
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    return data || [];
+
+}
+
+
+/* =========================================================
+   13. SEARCH USERS
+========================================================= */
+
+async function searchUsers(
+    keyword
+) {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("users")
+            .select(`
+                user_id,
+                fullname,
+                avatar_url,
+                role,
+                student_verified,
+                bio,
+                faculty
+            `)
+            .ilike(
+                "fullname",
+                `%${keyword}%`
+            )
+            .limit(5);
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    return data || [];
+
+}
+
+
+/* =========================================================
+   14. SEARCH FORUM
+========================================================= */
+
+async function searchForumPosts(
+    keyword
+) {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("forum_posts")
+            .select(`
+                id,
+                author_id,
+                content,
+                post_type,
+                created_at
+            `)
+            .ilike(
+                "content",
+                `%${keyword}%`
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            )
+            .limit(5);
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    return data || [];
+
+}
+
+
+/* =========================================================
+   15. RENDER SEARCH RESULTS
+========================================================= */
+
+function renderGlobalSearchResults(
+    keyword,
+    products,
+    users,
+    posts
+) {
+
+    let html = "";
+
+
+    /* =========================
+       PRODUCTS
+    ========================= */
+
+    if (
+        products.length
+    ) {
+
+        html += `
+
+            <div class="global-search-section">
+
+                <div class="global-search-section-title">
+
+                    <span>
+                        <i class="fa-solid fa-box"></i>
+                        Sản phẩm
+                    </span>
+
+                    <span>
+                        ${products.length}
+                    </span>
+
+                </div>
+
+                ${products.map(
+                    product =>
+                        createProductSearchHTML(
+                            product
+                        )
+                ).join("")}
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =========================
+       USERS
+    ========================= */
+
+    if (
+        users.length
+    ) {
+
+        html += `
+
+            <div class="global-search-divider"></div>
+
+            <div class="global-search-section">
+
+                <div class="global-search-section-title">
+
+                    <span>
+                        <i class="fa-solid fa-user"></i>
+                        Người dùng
+                    </span>
+
+                </div>
+
+                ${users.map(
+                    user =>
+                        createUserSearchHTML(
+                            user
+                        )
+                ).join("")}
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =========================
+       FORUM
+    ========================= */
+
+    if (
+        posts.length
+    ) {
+
+        html += `
+
+            <div class="global-search-divider"></div>
+
+            <div class="global-search-section">
+
+                <div class="global-search-section-title">
+
+                    <span>
+                        <i class="fa-solid fa-comments"></i>
+                        Thảo luận
+                    </span>
+
+                </div>
+
+                ${posts.map(
+                    post =>
+                        createPostSearchHTML(
+                            post
+                        )
+                ).join("")}
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =========================
+       NOTHING
+    ========================= */
+
+    if (
+        !products.length &&
+        !users.length &&
+        !posts.length
+    ) {
+
+        html = `
+
+            <div class="global-search-empty">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <strong>
+                    Không tìm thấy kết quả
+                </strong>
+
+                <br>
+
+                Không có sản phẩm, người dùng hoặc bài viết
+                phù hợp với
+                "<strong>${escapeHTML(keyword)}</strong>".
+
+            </div>
+
+        `;
+
+    }
+
+
+    /*
+     * Nút xem toàn bộ
+     */
+
+    if (
+        products.length ||
+        users.length ||
+        posts.length
+    ) {
+
+        html += `
+
+            <button
+                type="button"
+                class="global-search-view-all"
+                id="globalSearchViewAll"
+            >
+
+                Xem tất cả kết quả cho
+                "${escapeHTML(keyword)}"
+
+            </button>
+
+        `;
+
+    }
+
+
+    globalSearchContent.innerHTML =
+        html;
+
+
+    /*
+     * Lưu lịch sử
+     */
+
+    saveSearchHistory(
+        keyword
+    );
+
+
+    /*
+     * Bind
+     */
+
+    bindProductSearchEvents();
+
+    bindUserSearchEvents();
+
+    bindPostSearchEvents();
+
+
+    const viewAll =
+        document.getElementById(
+            "globalSearchViewAll"
+        );
+
+
+    if (viewAll) {
+
+        viewAll.addEventListener(
+            "click",
+            function () {
+
+                window.location.href =
+                    `timkiem.html?q=${encodeURIComponent(keyword)}`;
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   16. PRODUCT HTML
+========================================================= */
+
+function createProductSearchHTML(
+    product,
+    isBoosted = false,
+    isPackage = false
+) {
+
+    let image =
+        "images/no-image.png";
+
+
+    if (
+        Array.isArray(
+            product.image_urls
+        ) &&
+        product.image_urls.length
+    ) {
+
+        image =
+            product.image_urls[0];
+
+    }
+
+
+    if (
+        typeof product.image_urls ===
+        "string"
+    ) {
+
+        try {
+
+            const parsed =
+                JSON.parse(
+                    product.image_urls
+                );
+
+            if (
+                Array.isArray(parsed) &&
+                parsed.length
+            ) {
+
+                image =
+                    parsed[0];
+
+            }
+
+        }
+        catch {
+
+            image =
+                product.image_urls;
+
+        }
+
+    }
+
+
+    const price =
+        Number(
+            product.price
+        ) || 0;
+
+
+    return `
+
+        <div
+            class="global-search-result global-search-product"
+            data-product-id="${product.id}"
+        >
+
+            <div class="global-search-result-image">
+
+                <img
+                    src="${escapeHTML(image)}"
+                    alt="${escapeHTML(product.name || "Sản phẩm")}"
+                    onerror="this.src='images/no-image.png'"
+                >
+
+            </div>
+
+
+            <div class="global-search-result-info">
+
+                <div class="global-search-result-name">
+
+                    ${escapeHTML(
+                        product.name ||
+                        "Sản phẩm"
+                    )}
+
+                </div>
+
+
+                <div class="global-search-result-meta">
+
+                    <span class="global-search-result-type">
+                        Sản phẩm
+                    </span>
+
+                    ${
+    isBoosted
+        ? `
+            <span
+                class="global-search-badge boosted"
+            >
+                <i class="fa-solid fa-bolt"></i>
+                Đẩy tin
+            </span>
+        `
+        : ""
+}
+
+${
+    isPackage
+        ? `
+            <span
+                class="global-search-badge service"
+            >
+                <i class="fa-solid fa-star"></i>
+                Gói dịch vụ
+            </span>
+        `
+        : ""
+}
+
+                </div>
+
+            </div>
+
+
+            <div class="global-search-price">
+
+                ${formatSearchPrice(price)}
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   17. USER HTML
+========================================================= */
+
+function createUserSearchHTML(
+    user
+) {
+
+    const avatar =
+        user.avatar_url ||
+        "images/default-avatar.png";
+
+
+    return `
+
+        <div
+            class="global-search-result global-search-user"
+            data-user-id="${user.user_id}"
+        >
+
+            <div class="global-search-result-image">
+
+                <img
+                    src="${escapeHTML(avatar)}"
+                    alt="${escapeHTML(
+                        user.fullname ||
+                        "Người dùng"
+                    )}"
+                    onerror="this.src='images/default-avatar.png'"
+                >
+
+            </div>
+
+
+            <div class="global-search-result-info">
+
+                <div class="global-search-result-name">
+
+                    ${escapeHTML(
+                        user.fullname ||
+                        "Người dùng IUH"
+                    )}
+
+                </div>
+
+
+                <div class="global-search-result-meta">
+
+                    <span class="global-search-result-type">
+
+                        <i class="fa-solid fa-user"></i>
+
+                        Người dùng
+
+                    </span>
+
+                    ${
+                        user.student_verified
+                            ? `
+                                <span>
+                                    ✓ Đã xác thực
+                                </span>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   18. POST HTML
+========================================================= */
+
+function createPostSearchHTML(
+    post
+) {
+
+    const content =
+        stripHTML(
+            post.content || ""
+        );
+
+
+    const preview =
+        content.length > 100
+            ? content.substring(
+                0,
+                100
+            ) + "..."
+            : content;
+
+
+    return `
+
+        <div
+            class="global-search-result global-search-post"
+            data-post-id="${post.id}"
+        >
+
+            <div class="global-search-result-icon">
+
+                <i class="fa-solid fa-comments"></i>
+
+            </div>
+
+
+            <div class="global-search-result-info">
+
+                <div class="global-search-result-name">
+
+                    ${escapeHTML(
+                        preview ||
+                        "Bài viết thảo luận"
+                    )}
+
+                </div>
+
+
+                <div class="global-search-result-meta">
+
+                    <span class="global-search-result-type">
+
+                        Thảo luận
+
+                    </span>
+
+                    <span>
+
+                        ${formatSearchDate(
+                            post.created_at
+                        )}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   19. PRODUCT EVENTS
+========================================================= */
+
+function bindProductSearchEvents() {
+
+    document
+        .querySelectorAll(
+            ".global-search-product"
+        )
+        .forEach(
+            item => {
+
+                item.addEventListener(
+                    "click",
+                    function () {
+
+                        const id =
+                            this.dataset
+                                .productId;
+
+                        if (!id) {
+                            return;
+                        }
+
+
+                        const keyword =
+                            globalSearchInput
+                                .value
+                                .trim();
+
+
+                        if (keyword) {
+
+                            saveSearchHistory(
+                                keyword
+                            );
+
+                        }
+
+
+                        window.location.href =
+                            `chitietsanpham.html?id=${encodeURIComponent(id)}`;
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   20. USER EVENTS
+========================================================= */
+
+function bindUserSearchEvents() {
+
+    document
+        .querySelectorAll(
+            ".global-search-user"
+        )
+        .forEach(
+            item => {
+
+                item.addEventListener(
+                    "click",
+                    function () {
+
+                        const id =
+                            this.dataset
+                                .userId;
+
+                        if (!id) {
+                            return;
+                        }
+
+
+                        const keyword =
+                            globalSearchInput
+                                .value
+                                .trim();
+
+
+                        if (keyword) {
+
+                            saveSearchHistory(
+                                keyword
+                            );
+
+                        }
+
+
+                        window.location.href =
+                            `trangcanhan.html?id=${encodeURIComponent(id)}`;
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   21. POST EVENTS
+========================================================= */
+
+function bindPostSearchEvents() {
+
+    document
+        .querySelectorAll(
+            ".global-search-post"
+        )
+        .forEach(
+            item => {
+
+                item.addEventListener(
+                    "click",
+                    function () {
+
+                        const id =
+                            this.dataset
+                                .postId;
+
+                        if (!id) {
+                            return;
+                        }
+
+
+                        const keyword =
+                            globalSearchInput
+                                .value
+                                .trim();
+
+
+                        if (keyword) {
+
+                            saveSearchHistory(
+                                keyword
+                            );
+
+                        }
+
+
+                        window.location.href =
+                            `diendan.html?post=${encodeURIComponent(id)}`;
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   22. FORMAT PRICE
+========================================================= */
+
+function formatSearchPrice(
+    price
+) {
+
+    if (
+        !price ||
+        isNaN(price)
+    ) {
+
+        return "Liên hệ";
+
+    }
+
+
+    return new Intl.NumberFormat(
+        "vi-VN"
+    ).format(price) + " đ";
+
+}
+
+
+/* =========================================================
+   23. FORMAT DATE
+========================================================= */
+
+function formatSearchDate(
+    date
+) {
+
+    if (!date) {
+        return "";
+    }
+
+
+    try {
+
+        return new Date(
+            date
+        ).toLocaleDateString(
+            "vi-VN"
+        );
+
+    }
+    catch {
+
+        return "";
+
+    }
+
+}
+
+
+/* =========================================================
+   24. STRIP HTML
+========================================================= */
+
+function stripHTML(
+    html
+) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.innerHTML =
+        html;
+
+    return (
+        div.textContent ||
+        div.innerText ||
+        ""
+    );
+
+}
+
+
+/* =========================================================
+   25. ESCAPE HTML
+========================================================= */
+
+function escapeHTML(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}

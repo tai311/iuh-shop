@@ -1,0 +1,1004 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IUH Market</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/trangchu.css">
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+    <style>
+:root{
+    --blue:#173f91;
+    --blue-dark:#0d2d70;
+    --blue-2:#2458bd;
+    --yellow:#f5ca2e;
+    --yellow-soft:#fff7d6;
+    --bg:#f5f8fd;
+    --card:#fff;
+    --text:#18243c;
+    --muted:#718098;
+    --line:#e4eaf3;
+    --green:#16845b;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:"Be Vietnam Pro",sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at 5% 10%,rgba(36,88,189,.08),transparent 25%),
+      radial-gradient(circle at 95% 55%,rgba(245,202,46,.09),transparent 23%),
+      var(--bg);
+}
+a{text-decoration:none}
+
+.page-shell{
+    max-width:1180px;
+    margin:0 auto;
+    padding:42px 20px 75px;
+}
+
+/* HERO */
+.guide-hero{
+    position:relative;
+    overflow:hidden;
+    min-height:300px;
+    padding:48px 52px;
+    border-radius:30px;
+    color:#fff;
+    background:
+      radial-gradient(circle at 85% 25%,rgba(245,202,46,.25),transparent 20%),
+      linear-gradient(125deg,#0e2d70,#173f91 55%,#2458bd);
+    box-shadow:0 25px 55px rgba(18,55,127,.18);
+}
+.guide-hero:before{
+    content:"";
+    position:absolute;
+    width:360px;height:360px;
+    right:-120px;top:-180px;
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:50%;
+    box-shadow:0 0 0 40px rgba(255,255,255,.025),
+               0 0 0 80px rgba(255,255,255,.018);
+}
+.guide-hero:after{
+    content:"";
+    position:absolute;
+    width:180px;height:180px;
+    right:270px;bottom:-130px;
+    background:rgba(245,202,46,.09);
+    border-radius:50%;
+}
+.hero-content{position:relative;z-index:2;max-width:700px}
+.hero-kicker{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 13px;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.08);
+    border-radius:999px;
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:1.3px;
+    text-transform:uppercase;
+}
+.hero-kicker:before{
+    content:"";
+    width:7px;height:7px;
+    border-radius:50%;
+    background:var(--yellow);
+    box-shadow:0 0 0 5px rgba(245,202,46,.15);
+}
+.guide-hero h1{
+    margin:20px 0 12px;
+    color:#fff;
+    font-size:clamp(2.3rem,5vw,3.7rem);
+    line-height:1.08;
+    letter-spacing:-.045em;
+    font-weight:800;
+}
+.guide-hero h1 span{color:var(--yellow)}
+.guide-hero p{
+    margin:0;
+    max-width:650px;
+    color:rgba(255,255,255,.78);
+    line-height:1.8;
+    font-size:.95rem;
+}
+.hero-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:22px;
+}
+.hero-meta span{
+    padding:9px 13px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.13);
+    background:rgba(255,255,255,.08);
+    font-size:.73rem;
+    font-weight:600;
+}
+.hero-number{
+    position:absolute;
+    right:58px;top:50%;
+    transform:translateY(-50%);
+    width:155px;height:155px;
+    display:grid;place-items:center;
+    text-align:center;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.08);
+    z-index:2;
+    backdrop-filter:blur(8px);
+}
+.hero-number strong{
+    display:block;
+    color:var(--yellow);
+    font-size:3rem;
+    line-height:1;
+}
+.hero-number span{
+    display:block;
+    margin-top:7px;
+    color:rgba(255,255,255,.75);
+    font-size:.7rem;
+}
+
+/* BODY */
+.guide-layout{
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:22px;
+    margin-top:22px;
+}
+.guide-sidebar{
+    position:sticky;
+    top:20px;
+    align-self:start;
+    padding:22px;
+    border:1px solid var(--line);
+    border-radius:22px;
+    background:#fff;
+    box-shadow:0 14px 35px rgba(25,63,158,.06);
+}
+.side-title{
+    color:var(--blue);
+    font-size:.72rem;
+    font-weight:800;
+    letter-spacing:1.3px;
+    text-transform:uppercase;
+}
+.progress{
+    margin:14px 0 18px;
+    height:7px;
+    border-radius:99px;
+    background:#edf1f7;
+    overflow:hidden;
+}
+.progress span{
+    display:block;
+    width:100%;
+    height:100%;
+    background:linear-gradient(90deg,var(--blue),var(--yellow));
+    border-radius:inherit;
+}
+.side-list{display:grid;gap:7px}
+.side-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px;
+    border-radius:10px;
+    color:var(--muted);
+    font-size:.73rem;
+    font-weight:600;
+}
+.side-item b{
+    width:25px;height:25px;
+    flex:0 0 25px;
+    display:grid;place-items:center;
+    border-radius:8px;
+    background:var(--blue-soft,#edf3ff);
+    color:var(--blue);
+    font-size:.7rem;
+}
+.side-item:last-child b{
+    background:var(--yellow-soft);
+}
+.side-tip{
+    margin-top:18px;
+    padding:13px;
+    border-radius:12px;
+    background:linear-gradient(135deg,#f0f5ff,#fffbea);
+    border:1px solid #e6ebf4;
+    font-size:.68rem;
+    line-height:1.65;
+    color:var(--muted);
+}
+.side-tip strong{color:var(--text)}
+
+.guide-card{
+    padding:31px;
+    border:1px solid var(--line);
+    border-radius:24px;
+    background:#fff;
+    box-shadow:0 15px 40px rgba(25,63,158,.06);
+}
+.intro{
+    margin:0 0 24px;
+    padding:16px 18px;
+    border-radius:15px;
+    background:linear-gradient(90deg,#edf4ff,#fffbea);
+    border:1px solid #e5ebf5;
+    color:var(--muted);
+    font-size:.82rem;
+    line-height:1.7;
+}
+.step{
+    position:relative;
+    margin-top:14px;
+    padding:20px 21px 20px 62px;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:#fbfcff;
+    transition:.2s ease;
+}
+.step:hover{
+    transform:translateY(-2px);
+    border-color:#cdd9ed;
+    box-shadow:0 10px 25px rgba(25,63,158,.07);
+}
+.step:before{
+    content:attr(data-step);
+    position:absolute;
+    left:18px;top:19px;
+    width:32px;height:32px;
+    display:grid;place-items:center;
+    border-radius:10px;
+    background:var(--blue);
+    color:#fff;
+    font-size:.78rem;
+    font-weight:800;
+    box-shadow:0 6px 12px rgba(25,63,158,.18);
+}
+.step:nth-of-type(2n):before{
+    background:var(--yellow);
+    color:var(--blue-dark);
+}
+.step h2{
+    margin:0 0 7px;
+    color:var(--blue);
+    font-size:1rem;
+}
+.step p,.step li{
+    margin:0;
+    color:var(--muted);
+    line-height:1.75;
+    font-size:.8rem;
+}
+.step ul{margin:7px 0 0;padding-left:18px}
+.step li+li{margin-top:3px}
+
+.highlight{
+    position:relative;
+    margin-top:18px;
+    padding:17px 19px 17px 50px;
+    border-radius:15px;
+    background:var(--yellow-soft);
+    border:1px solid #f2df91;
+    color:#65561d;
+    font-size:.77rem;
+    line-height:1.7;
+}
+.highlight:before{
+    content:"!";
+    position:absolute;
+    left:17px;top:17px;
+    width:25px;height:25px;
+    display:grid;place-items:center;
+    border-radius:50%;
+    background:var(--yellow);
+    color:var(--blue-dark);
+    font-weight:800;
+}
+
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:29px 0 14px;
+}
+.section-title h2{
+    margin:0;
+    color:var(--text);
+    font-size:1.2rem;
+}
+.section-title:after{
+    content:"";
+    height:1px;
+    flex:1;
+    background:var(--line);
+}
+.mini-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+.mini-card{
+    position:relative;
+    padding:18px 18px 18px 49px;
+    border:1px solid var(--line);
+    border-radius:15px;
+    background:#fff;
+}
+.mini-card:before{
+    content:"✓";
+    position:absolute;
+    left:16px;top:17px;
+    width:24px;height:24px;
+    display:grid;place-items:center;
+    border-radius:8px;
+    background:#edf9f3;
+    color:var(--green);
+    font-size:.72rem;
+    font-weight:800;
+}
+.mini-card strong{
+    display:block;
+    margin-bottom:5px;
+    color:var(--text);
+    font-size:.8rem;
+}
+.mini-card{
+    color:var(--muted);
+    font-size:.72rem;
+    line-height:1.65;
+}
+.error-list{
+    margin:0;
+    padding:15px 18px 15px 35px;
+    border-radius:15px;
+    background:#fff7f7;
+    border:1px solid #f1dddd;
+}
+.error-list li{
+    color:#756c75;
+    font-size:.77rem;
+    line-height:1.7;
+}
+.error-list li+li{margin-top:4px}
+
+@media(max-width:900px){
+    .guide-layout{grid-template-columns:1fr}
+    .guide-sidebar{position:static}
+    .side-list{grid-template-columns:repeat(2,1fr)}
+    .side-tip{display:none}
+    .guide-hero{padding-right:230px}
+    .hero-number{right:35px;width:145px;height:145px}
+}
+@media(max-width:680px){
+    .page-shell{padding:25px 14px 55px}
+    .guide-hero{padding:32px 23px;border-radius:23px}
+    .guide-hero h1{font-size:2.25rem}
+    .guide-hero{padding-right:23px}
+    .hero-number{position:static;transform:none;margin-top:24px;width:115px;height:115px}
+    .hero-number strong{font-size:2.1rem}
+    .guide-card{padding:20px}
+    .side-list,.mini-grid{grid-template-columns:1fr}
+    .step{padding-left:56px}
+}
+</style>
+</head>
+<body>
+     <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <!-- =========================================================
+     GLOBAL SEARCH
+========================================================= -->
+<div class="global-search" id="globalSearch">
+
+    <div class="global-search-input-wrap">
+
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+        <input
+            type="text"
+            id="globalSearchInput"
+            class="global-search-input"
+            placeholder="Tìm sản phẩm, người dùng, bài viết..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="globalSearchClear"
+            class="global-search-clear"
+            title="Xóa"
+            style="display:none;"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+    </div>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="global-search-dropdown"
+        id="globalSearchDropdown"
+    >
+
+        <!-- Nội dung sẽ được JS render -->
+        <div
+            id="globalSearchContent"
+            class="global-search-content"
+        ></div>
+
+    </div>
+
+</div>
+                     
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+</a>
+
+<!-- ICON GIỎ HÀNG -->
+<a href="giohang.html"
+   class="top-cart-icon"
+   aria-label="Giỏ hàng"
+   title="Giỏ hàng">
+
+    <i class="fa-solid fa-cart-shopping"></i>
+
+</a>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+    <main class="page-shell">
+
+    <section class="guide-hero">
+        <div class="hero-content">
+            <div class="hero-kicker">IUH SHOP · SELLER GUIDE</div>
+
+            <h1>
+                Đăng tin <span>đúng cách.</span><br>
+                Bán hàng hiệu quả.
+            </h1>
+
+            <p>
+                Chỉ vài bước đơn giản để tạo một tin đăng rõ ràng,
+                đáng tin cậy và thu hút người mua trên IUH SHOP.
+            </p>
+
+            <div class="hero-meta">
+                <span>✓ Dễ thực hiện</span>
+                <span>⚡ Tiết kiệm thời gian</span>
+                <span>🎓 Dành cho sinh viên</span>
+            </div>
+        </div>
+
+        <div class="hero-number">
+            <div>
+                <strong>06</strong>
+                <span>bước để hoàn tất<br>một tin đăng</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="guide-layout">
+
+        <aside class="guide-sidebar">
+            <div class="side-title">Lộ trình đăng tin</div>
+
+            <div class="progress"><span></span></div>
+
+            <div class="side-list">
+                <div class="side-item"><b>01</b>Đăng nhập</div>
+                <div class="side-item"><b>02</b>Vào Đăng tin</div>
+                <div class="side-item"><b>03</b>Nhập thông tin</div>
+                <div class="side-item"><b>04</b>Tải ảnh</div>
+                <div class="side-item"><b>05</b>Kiểm tra</div>
+                <div class="side-item"><b>06</b>Xác nhận</div>
+            </div>
+
+            <div class="side-tip">
+                <strong>💡 Mẹo nhỏ</strong><br>
+                Tin đăng càng rõ ràng, hình ảnh càng đẹp và thông tin càng
+                minh bạch thì càng dễ tạo niềm tin với người mua.
+            </div>
+        </aside>
+
+        <div class="guide-card">
+
+            <p class="intro">
+                <strong>🚀 Bắt đầu thôi!</strong>
+                Để đăng sản phẩm lên IUH SHOP, hãy thực hiện lần lượt
+                6 bước dưới đây. Bạn có thể dùng checklist bên trái để
+                kiểm tra tiến độ của mình.
+            </p>
+
+            <div class="step" data-step="01">
+                <h2>Đăng nhập tài khoản</h2>
+                <p>
+                    Truy cập trang đăng nhập và đăng nhập bằng tài khoản
+                    của bạn. Nếu chưa có tài khoản, hãy hoàn tất đăng ký
+                    trước khi bắt đầu đăng tin.
+                </p>
+            </div>
+
+            <div class="step" data-step="02">
+                <h2>Vào chức năng “Đăng tin”</h2>
+                <p>
+                    Trong menu tài khoản hoặc thanh điều hướng, chọn
+                    “Đăng tin” để mở form đăng sản phẩm. Tại đây bạn sẽ
+                    nhập đầy đủ thông tin về món hàng muốn bán.
+                </p>
+            </div>
+
+            <div class="step" data-step="03">
+                <h2>Nhập thông tin sản phẩm chính xác</h2>
+                <ul>
+                    <li>Tên sản phẩm rõ ràng, dễ hiểu.</li>
+                    <li>Danh mục phù hợp như điện tử, đồ học tập, thời trang, gia dụng...</li>
+                    <li>Giá bán hợp lý và không gây nhầm lẫn.</li>
+                    <li>Số lượng hiện có phải trùng với thực tế.</li>
+                    <li>Mô tả chi tiết, nêu rõ tình trạng sản phẩm, ưu điểm và độ mới.</li>
+                </ul>
+            </div>
+
+            <div class="step" data-step="04">
+                <h2>Tải ảnh thật và rõ ràng</h2>
+                <p>
+                    Ảnh chất lượng cao là yếu tố giúp bạn bán nhanh hơn.
+                    Nên chụp sản phẩm ở góc sáng rõ, có thể thấy toàn bộ
+                    sản phẩm, không bị mờ hoặc tối.
+                </p>
+            </div>
+
+            <div class="step" data-step="05">
+                <h2>Kiểm tra trước khi đăng</h2>
+                <p>
+                    Trước khi xác nhận, hãy đọc lại tiêu đề, mô tả,
+                    giá tiền và số lượng. Nếu có sai sót, hãy chỉnh sửa
+                    để tránh làm rối cho người mua.
+                </p>
+            </div>
+
+            <div class="step" data-step="06">
+                <h2>Xác nhận và chờ người mua liên hệ</h2>
+                <p>
+                    Sau khi nhấn “Đăng tin”, sản phẩm của bạn sẽ xuất hiện
+                    trên trang sản phẩm. Khi người mua quan tâm, họ sẽ
+                    liên hệ theo thông tin bạn đã cung cấp.
+                </p>
+            </div>
+
+            <div class="highlight">
+                <strong>Lưu ý quan trọng:</strong>
+                Tin đăng nên phản ánh đúng thực tế, không sử dụng hình ảnh
+                coppy từ nguồn khác hoặc mô tả quá mức khiến người mua khó tin.
+                Sự minh bạch sẽ giúp giao dịch an toàn và nhanh hơn.
+            </div>
+
+            <div class="section-title">
+                <h2>✨ Mẹo để tin bán hiệu quả</h2>
+            </div>
+
+            <div class="mini-grid">
+                <div class="mini-card">
+                    <strong>Viết mô tả rõ ràng</strong>
+                    Nêu tình trạng, thương hiệu, kích thước, màu sắc và thời gian sử dụng (nếu có).
+                </div>
+                <div class="mini-card">
+                    <strong>Chụp ảnh đẹp</strong>
+                    Chọn ảnh sáng, không bị lóa, không cắt mất chi tiết quan trọng của sản phẩm.
+                </div>
+                <div class="mini-card">
+                    <strong>Đặt giá hợp lý</strong>
+                    Giá vừa phải sẽ giúp tăng khả năng bán nhanh mà vẫn giữ được lợi ích cho bạn.
+                </div>
+                <div class="mini-card">
+                    <strong>Trả lời nhanh</strong>
+                    Nhanh chóng phản hồi tin nhắn của người mua để tạo thiện cảm và tăng cơ hội giao dịch.
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h2>⚠ Những lỗi cần tránh</h2>
+            </div>
+
+            <ul class="error-list">
+                <li>Đặt tiêu đề quá ngắn, mơ hồ hoặc thiếu thông tin.</li>
+                <li>Ảnh quá tối, quá mờ hoặc không giống sản phẩm thật.</li>
+                <li>Giá cả không rõ ràng hoặc không thống nhất trong mô tả.</li>
+                <li>Không cập nhật trạng thái sản phẩm khi đã bán xong.</li>
+                <li>Giao dịch thiếu minh bạch hoặc không rõ địa chỉ nhận hàng.</li>
+            </ul>
+
+        </div>
+    </section>
+</main>
+
+    <footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/ok.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+ <button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+</body>
+</html>

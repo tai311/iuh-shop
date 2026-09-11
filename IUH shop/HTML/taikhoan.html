@@ -55,20 +55,51 @@
                 <div class="top-actions">
 
                     <!-- Tìm kiếm -->
-                    <form class="search-box">
-                        <input
-                            type="search"
-                            placeholder="Tìm kiếm sản phẩm, danh mục..."
-                            aria-label="Tìm kiếm"
-                        >
+                    <!-- =========================================================
+     GLOBAL SEARCH
+========================================================= -->
+<div class="global-search" id="globalSearch">
 
-                        <button type="submit" class="search-button">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <circle cx="11" cy="11" r="7"></circle>
-                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
-                            </svg>
-                        </button>
-                    </form>
+    <div class="global-search-input-wrap">
+
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+        <input
+            type="text"
+            id="globalSearchInput"
+            class="global-search-input"
+            placeholder="Tìm sản phẩm, người dùng, bài viết..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="globalSearchClear"
+            class="global-search-clear"
+            title="Xóa"
+            style="display:none;"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+    </div>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="global-search-dropdown"
+        id="globalSearchDropdown"
+    >
+
+        <!-- Nội dung sẽ được JS render -->
+        <div
+            id="globalSearchContent"
+            class="global-search-content"
+        ></div>
+
+    </div>
+
+</div>
 
                      <!-- ICON TIN NHẮN -->
 <a href="tinnhan.html"
@@ -79,6 +110,16 @@
     <i class="fa-solid fa-comment-dots"></i>
 
     <span class="message-unread-dot"></span>
+
+</a>
+
+<!-- ICON GIỎ HÀNG -->
+<a href="giohang.html"
+   class="top-cart-icon"
+   aria-label="Giỏ hàng"
+   title="Giỏ hàng">
+
+    <i class="fa-solid fa-cart-shopping"></i>
 
 </a>
                     <!-- KHU VỰC TÀI KHOẢN -->

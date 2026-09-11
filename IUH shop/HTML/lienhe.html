@@ -1,0 +1,1217 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IUH Market</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/trangchu.css">
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+    <style>
+    :root {
+        --blue: #193f9e;
+        --blue-dark: #102d75;
+        --blue-deep: #0b245f;
+        --blue-soft: #eef4ff;
+        --yellow: #f5ca2e;
+        --yellow-soft: #fff7d6;
+        --text: #17233c;
+        --muted: #69758c;
+        --line: #e4eaf4;
+        --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: "Be Vietnam Pro", sans-serif;
+        background:
+            radial-gradient(circle at 10% 20%, rgba(25,63,158,.07), transparent 28%),
+            radial-gradient(circle at 90% 65%, rgba(245,202,46,.08), transparent 25%),
+            #f6f8fc;
+        color: var(--text);
+    }
+
+    a { text-decoration: none; }
+
+    .contact-page {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 42px 22px 80px;
+    }
+
+    /* HERO */
+    .contact-hero {
+        position: relative;
+        overflow: hidden;
+        min-height: 330px;
+        padding: 54px 58px;
+        border-radius: 30px;
+        background:
+            radial-gradient(circle at 88% 25%, rgba(245,202,46,.24), transparent 20%),
+            radial-gradient(circle at 72% 110%, rgba(255,255,255,.12), transparent 30%),
+            linear-gradient(125deg, #102d75 0%, #193f9e 52%, #2458bd 100%);
+        color: white;
+        box-shadow: 0 24px 55px rgba(16,45,117,.20);
+        isolation: isolate;
+    }
+
+    .contact-hero::before {
+        content: "";
+        position: absolute;
+        width: 430px;
+        height: 430px;
+        right: -145px;
+        top: -210px;
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 50%;
+        box-shadow:
+            0 0 0 45px rgba(255,255,255,.025),
+            0 0 0 90px rgba(255,255,255,.018);
+        z-index: -1;
+    }
+
+    .contact-hero::after {
+        content: "";
+        position: absolute;
+        width: 280px;
+        height: 280px;
+        right: 160px;
+        bottom: -220px;
+        border-radius: 50%;
+        background: rgba(245,202,46,.10);
+        filter: blur(2px);
+        z-index: -1;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 720px;
+    }
+
+    .hero-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 13px;
+        border: 1px solid rgba(255,255,255,.18);
+        border-radius: 999px;
+        background: rgba(255,255,255,.09);
+        color: #fff;
+        font-size: .75rem;
+        font-weight: 700;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        backdrop-filter: blur(8px);
+    }
+
+    .hero-kicker::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--yellow);
+        box-shadow: 0 0 0 5px rgba(245,202,46,.14);
+    }
+
+    .contact-hero h1 {
+        margin: 20px 0 12px;
+        color: white;
+        font-size: clamp(2.4rem, 5vw, 4rem);
+        line-height: 1.08;
+        letter-spacing: -.045em;
+        font-weight: 800;
+    }
+
+    .contact-hero h1 span {
+        color: var(--yellow);
+    }
+
+    .contact-hero p {
+        max-width: 650px;
+        margin: 0;
+        color: rgba(255,255,255,.78);
+        line-height: 1.85;
+        font-size: 1rem;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 11px;
+        margin-top: 25px;
+    }
+
+    .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: rgba(255,255,255,.10);
+        border: 1px solid rgba(255,255,255,.14);
+        color: white;
+        font-size: .78rem;
+        font-weight: 600;
+    }
+
+    .hero-chip strong {
+        color: var(--yellow);
+    }
+
+    .hero-stat {
+        position: absolute;
+        z-index: 3;
+        right: 52px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 190px;
+        height: 190px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,.20);
+        border-radius: 50%;
+        background: rgba(255,255,255,.08);
+        box-shadow: inset 0 0 0 16px rgba(255,255,255,.025);
+        backdrop-filter: blur(10px);
+    }
+
+    .hero-stat strong {
+        display: block;
+        color: var(--yellow);
+        font-size: 2.7rem;
+        line-height: 1;
+        font-weight: 800;
+    }
+
+    .hero-stat span {
+        display: block;
+        margin-top: 7px;
+        color: rgba(255,255,255,.76);
+        font-size: .78rem;
+        line-height: 1.45;
+    }
+
+    /* SECTION GRID */
+    .contact-grid {
+        display: grid;
+        grid-template-columns: .95fr 1.05fr;
+        gap: 24px;
+        margin-top: 26px;
+    }
+
+    .panel {
+        position: relative;
+        overflow: hidden;
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 15px 40px rgba(25,63,158,.06);
+    }
+
+    .panel::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--blue), var(--yellow));
+    }
+
+    .panel-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .panel-heading h2 {
+        margin: 0;
+        color: var(--text);
+        font-size: 1.45rem;
+        letter-spacing: -.025em;
+    }
+
+    .panel-heading p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: .82rem;
+        line-height: 1.6;
+    }
+
+    .heading-mark {
+        width: 43px;
+        height: 43px;
+        flex: 0 0 43px;
+        display: grid;
+        place-items: center;
+        border-radius: 13px;
+        background: var(--blue-soft);
+        color: var(--blue);
+        font-size: 1.25rem;
+    }
+
+    /* INFO */
+    .contact-info-list {
+        display: grid;
+        gap: 10px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 13px 14px;
+        border: 1px solid #edf1f7;
+        border-radius: 15px;
+        background: #fbfcff;
+        transition: .2s ease;
+    }
+
+    .info-item:hover {
+        transform: translateX(4px);
+        border-color: #d5e0f4;
+        box-shadow: 0 8px 22px rgba(25,63,158,.06);
+    }
+
+    .info-icon {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        background: var(--blue-soft);
+        font-size: 1.15rem;
+    }
+
+    .info-item:nth-child(3) .info-icon {
+        background: var(--yellow-soft);
+    }
+
+    .info-item:nth-child(4) .info-icon {
+        background: #edf9f3;
+    }
+
+    .info-meta {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .info-meta strong {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--text);
+        font-size: .83rem;
+    }
+
+    .info-meta span,
+    .info-meta a {
+        display: block;
+        color: var(--muted);
+        font-size: .76rem;
+        line-height: 1.55;
+        word-break: break-word;
+    }
+
+    .info-meta a:hover {
+        color: var(--blue);
+    }
+
+    /* MAP */
+    .map-box {
+        margin-top: 18px;
+        padding: 5px;
+        border-radius: 19px;
+        background: linear-gradient(135deg, #edf3ff, #fff8d9);
+        border: 1px solid #e3e9f3;
+    }
+
+    .map-caption {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 11px;
+    }
+
+    .map-caption strong {
+        color: var(--text);
+        font-size: .8rem;
+    }
+
+    .map-caption span {
+        color: var(--muted);
+        font-size: .68rem;
+    }
+
+    .map-frame {
+        display: block;
+        width: 100%;
+        height: 225px;
+        border: 0;
+        border-radius: 15px;
+        background: #eef4ff;
+    }
+
+    /* FORM */
+    .contact-form {
+        display: grid;
+        gap: 14px;
+    }
+
+    .form-intro {
+        margin: -7px 0 5px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #f2f6ff, #fffdf0);
+        border: 1px solid #e7edf7;
+        color: var(--muted);
+        font-size: .75rem;
+        line-height: 1.6;
+    }
+
+    .field {
+        display: grid;
+        gap: 7px;
+    }
+
+    .field label {
+        color: var(--text);
+        font-size: .78rem;
+        font-weight: 700;
+    }
+
+    .field input,
+    .field textarea {
+        width: 100%;
+        border: 1px solid #dfe6f1;
+        border-radius: 12px;
+        background: #fbfcfe;
+        padding: 12px 14px;
+        font: inherit;
+        font-size: .8rem;
+        color: var(--text);
+        outline: none;
+        transition: .2s ease;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+        color: #a1aabd;
+    }
+
+    .field input:hover,
+    .field textarea:hover {
+        border-color: #cbd7ea;
+        background: white;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+        border-color: var(--blue);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(25,63,158,.08);
+    }
+
+    .field textarea {
+        min-height: 142px;
+        resize: vertical;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .submit-btn {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 48px;
+        margin-top: 3px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+        color: white;
+        font-family: inherit;
+        font-size: .82rem;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(25,63,158,.20);
+        transition: .2s ease;
+    }
+
+    .submit-btn::after {
+        content: "";
+        position: absolute;
+        width: 90px;
+        height: 90px;
+        right: -35px;
+        top: -45px;
+        border-radius: 50%;
+        background: rgba(245,202,46,.18);
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 30px rgba(25,63,158,.25);
+    }
+
+    .form-note {
+        margin: 0;
+        text-align: center;
+        color: #8a95a8;
+        font-size: .67rem;
+    }
+
+    /* BOTTOM HIGHLIGHTS */
+    .contact-highlights {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 20px;
+    }
+
+    .highlight {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 10px 25px rgba(25,63,158,.04);
+    }
+
+    .highlight-icon {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background: var(--blue-soft);
+        font-size: 1.05rem;
+    }
+
+    .highlight:nth-child(2) .highlight-icon {
+        background: var(--yellow-soft);
+    }
+
+    .highlight:nth-child(3) .highlight-icon {
+        background: #edf9f3;
+    }
+
+    .highlight strong {
+        display: block;
+        color: var(--text);
+        font-size: .77rem;
+    }
+
+    .highlight span {
+        display: block;
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: .67rem;
+    }
+
+    @media (max-width: 980px) {
+        .hero-stat {
+            right: 35px;
+            width: 155px;
+            height: 155px;
+        }
+
+        .contact-hero {
+            padding-right: 230px;
+        }
+
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .contact-page {
+            padding: 25px 14px 55px;
+        }
+
+        .contact-hero {
+            min-height: 0;
+            padding: 35px 25px;
+            border-radius: 23px;
+        }
+
+        .contact-hero h1 {
+            font-size: 2.35rem;
+        }
+
+        .hero-stat {
+            position: static;
+            transform: none;
+            width: 125px;
+            height: 125px;
+            margin-top: 25px;
+        }
+
+        .hero-stat strong {
+            font-size: 2rem;
+        }
+
+        .contact-hero {
+            padding-right: 25px;
+        }
+
+        .form-row,
+        .contact-highlights {
+            grid-template-columns: 1fr;
+        }
+
+        .panel {
+            padding: 21px;
+            border-radius: 20px;
+        }
+    }
+</style>
+</head>
+<body>
+     <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với IUH SHOP
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- Tìm kiếm -->
+                    <!-- =========================================================
+     GLOBAL SEARCH
+========================================================= -->
+<div class="global-search" id="globalSearch">
+
+    <div class="global-search-input-wrap">
+
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+        <input
+            type="text"
+            id="globalSearchInput"
+            class="global-search-input"
+            placeholder="Tìm sản phẩm, người dùng, bài viết..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="globalSearchClear"
+            class="global-search-clear"
+            title="Xóa"
+            style="display:none;"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+    </div>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="global-search-dropdown"
+        id="globalSearchDropdown"
+    >
+
+        <!-- Nội dung sẽ được JS render -->
+        <div
+            id="globalSearchContent"
+            class="global-search-content"
+        ></div>
+
+    </div>
+
+</div>
+                     
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+</a>
+
+<!-- ICON GIỎ HÀNG -->
+<a href="giohang.html"
+   class="top-cart-icon"
+   aria-label="Giỏ hàng"
+   title="Giỏ hàng">
+
+    <i class="fa-solid fa-cart-shopping"></i>
+
+</a>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="IUH Shop"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>IUH</span> SHOP
+                        </div>
+
+                        <div class="brand-slogan">
+                            Kết nối sinh viên – Mua bán dễ dàng
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+    <main class="contact-page">
+
+        <!-- HERO -->
+        <section class="contact-hero">
+            <div class="hero-content">
+                <div class="hero-kicker">IUH SHOP · SUPPORT CENTER</div>
+
+                <h1>
+                    Kết nối với <span>IUH SHOP</span>
+                </h1>
+
+                <p>
+                    Bạn cần hỗ trợ về sản phẩm, đơn hàng hay tài khoản?
+                    Hãy liên hệ với chúng tôi. IUH SHOP luôn sẵn sàng
+                    đồng hành để trải nghiệm mua bán của bạn trở nên
+                    đơn giản và thuận tiện hơn.
+                </p>
+
+                <div class="hero-actions">
+                    <div class="hero-chip">⚡ <strong>Phản hồi nhanh</strong></div>
+                    <div class="hero-chip">🎓 Hỗ trợ sinh viên</div>
+                </div>
+            </div>
+
+            <div class="hero-stat">
+                <div>
+                    <strong>24/7</strong>
+                    <span>Luôn sẵn sàng<br>hỗ trợ bạn</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN CONTENT -->
+        <section class="contact-grid">
+
+            <!-- LEFT -->
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2>Thông tin liên hệ</h2>
+                        <p>Những cách nhanh nhất để kết nối với IUH SHOP.</p>
+                    </div>
+                    <div class="heading-mark">✦</div>
+                </div>
+
+                <div class="contact-info-list">
+
+                    <div class="info-item">
+                        <div class="info-icon">📍</div>
+                        <div class="info-meta">
+                            <strong>Địa chỉ</strong>
+                            <span>12 Nguyễn Văn Bảo, Phường Hạnh Thông, TP. Hồ Chí Minh</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">📞</div>
+                        <div class="info-meta">
+                            <strong>Điện thoại</strong>
+                            <a href="tel:0123456789">0123 456 789</a>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">✉️</div>
+                        <div class="info-meta">
+                            <strong>Email hỗ trợ</strong>
+                            <a href="mailto:hotro@iuhshop.vn">hotro@iuhshop.vn</a>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">🕒</div>
+                        <div class="info-meta">
+                            <strong>Giờ làm việc</strong>
+                            <span>Thứ 2 - Thứ 7 · 8:00 - 18:00</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="map-box">
+                    <div class="map-caption">
+                        <strong>📍 Vị trí IUH SHOP</strong>
+                        <span>TP. Hồ Chí Minh</span>
+                    </div>
+
+                    <iframe
+                        class="map-frame"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7837.740508126709!2d106.69225376924159!3d10.821239827503284!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174deb3ef536f31%3A0x8b7bb8b7c956157b!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBDw7RuZyBuZ2hp4buHcCBUUC5IQ00!5e0!3m2!1svi!2s!4v1788325136194!5m2!1svi!2s"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Bản đồ vị trí IUH SHOP">
+                    </iframe>
+                </div>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2>Gửi tin nhắn</h2>
+                        <p>Hãy cho chúng tôi biết bạn đang cần hỗ trợ điều gì.</p>
+                    </div>
+                    <div class="heading-mark">✉</div>
+                </div>
+
+                <form class="contact-form">
+
+                    <div class="form-intro">
+                        💡 Điền đầy đủ thông tin bên dưới để đội ngũ IUH SHOP
+                        có thể phản hồi bạn nhanh và chính xác nhất.
+                    </div>
+
+                    <div class="field">
+                        <label for="name">Họ và tên</label>
+                        <input id="name" type="text" placeholder="Nhập họ và tên của bạn">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input id="email" type="email" placeholder="example@email.com">
+                        </div>
+
+                        <div class="field">
+                            <label for="phone">Số điện thoại</label>
+                            <input id="phone" type="tel" placeholder="0123 456 789">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="message">Nội dung</label>
+                        <textarea id="message" placeholder="Bạn muốn IUH SHOP hỗ trợ vấn đề gì?"></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        GỬI TIN NHẮN
+                        <span>→</span>
+                    </button>
+
+                    <p class="form-note">
+                        Thông tin của bạn được sử dụng để hỗ trợ và phản hồi yêu cầu.
+                    </p>
+
+                </form>
+            </div>
+
+        </section>
+
+        <!-- HIGHLIGHTS -->
+        <section class="contact-highlights">
+
+            <div class="highlight">
+                <div class="highlight-icon">⚡</div>
+                <div>
+                    <strong>Phản hồi nhanh</strong>
+                    <span>Ưu tiên xử lý các yêu cầu hỗ trợ</span>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <div class="highlight-icon">🎓</div>
+                <div>
+                    <strong>Dành cho sinh viên</strong>
+                    <span>Hỗ trợ mua bán và trao đổi trên IUH SHOP</span>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <div class="highlight-icon">🔒</div>
+                <div>
+                    <strong>Hỗ trợ an tâm</strong>
+                    <span>Tiếp nhận và xử lý thông tin của bạn</span>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="IUH Shop"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>IUH</span> SHOP
+            </div>
+
+            <div class="footer-brand-slogan">
+                Kết nối sinh viên – Mua bán dễ dàng
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Nền tảng mua bán và trao đổi dành cho sinh viên,
+          giúp kết nối người mua và người bán một cách thuận tiện.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ IUH SHOP -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 IUH SHOP
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/ok.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+</body>
+</html>

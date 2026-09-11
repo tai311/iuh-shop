@@ -3159,3 +3159,597 @@ body.modal-open {
 
     display: none;
 }
+
+
+/* =====================================================
+   TAB BÀI VIẾT - PROFILE
+===================================================== */
+
+.profile-posts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+
+/* =====================================================
+   POST CARD
+===================================================== */
+
+.profile-post-card {
+
+    position: relative;
+
+    width: 100%;
+
+    padding: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    transition:
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.profile-post-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 22px rgba(20, 48, 105, 0.09);
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.profile-post-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    margin-bottom: 15px;
+}
+
+
+.profile-post-avatar {
+
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    background: #eef2f7;
+
+    border: 1px solid var(--border);
+}
+
+
+.profile-post-author-info {
+
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.profile-post-author {
+
+    color: var(--text-dark);
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+
+.profile-post-date {
+
+    margin-top: 3px;
+
+    color: var(--text-gray);
+
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   LOẠI BÀI VIẾT
+===================================================== */
+
+.profile-post-type {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 8px;
+
+    border-radius: 6px;
+
+    background: #eef3ff;
+
+    color: var(--iuh-blue);
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.profile-post-content {
+
+    color: var(--text-dark);
+
+    font-size: 14px;
+
+    line-height: 1.75;
+
+    white-space: pre-wrap;
+
+    overflow-wrap: anywhere;
+
+    margin-bottom: 16px;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.profile-post-footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding-top: 12px;
+
+    border-top: 1px solid #edf0f5;
+}
+
+
+.profile-post-view {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    color: var(--iuh-blue);
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.profile-post-view:hover {
+
+    color: var(--iuh-blue-dark);
+
+    text-decoration: underline;
+}
+
+
+/* =====================================================
+   NÚT CHỈNH SỬA
+===================================================== */
+
+.profile-post-edit-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 7px 11px;
+
+    border: 1px solid #dfe5ef;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: var(--iuh-blue);
+
+    font-family: inherit;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.profile-post-edit-button:hover {
+
+    background: #eef3ff;
+
+    border-color:
+        rgba(25, 63, 158, 0.25);
+}
+
+
+/* =====================================================
+   POPUP CHỈNH SỬA
+===================================================== */
+
+.profile-post-edit-modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 999999;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(16, 29, 55, 0.48);
+
+    backdrop-filter: blur(3px);
+}
+
+
+.profile-post-edit-modal[hidden] {
+
+    display: none !important;
+}
+
+
+.profile-post-edit-box {
+
+    position: relative;
+
+    width: min(650px, 100%);
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    padding: 25px;
+
+    box-shadow:
+        0 20px 60px rgba(20, 48, 105, 0.20);
+}
+
+
+/* =====================================================
+   CLOSE
+===================================================== */
+
+.profile-post-edit-close {
+
+    position: absolute;
+
+    top: 13px;
+    right: 14px;
+
+    width: 32px;
+    height: 32px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #f3f5f8;
+
+    color: var(--text-gray);
+
+    font-size: 21px;
+
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+
+.profile-post-edit-close:hover {
+
+    background: #eef3ff;
+
+    color: var(--iuh-blue);
+}
+
+
+/* =====================================================
+   HEADING
+===================================================== */
+
+.profile-post-edit-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding-right: 35px;
+
+    margin-bottom: 22px;
+}
+
+
+.profile-post-edit-icon {
+
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #eef3ff;
+
+    color: var(--iuh-blue);
+}
+
+
+.profile-post-edit-heading h2 {
+
+    margin: 0;
+
+    color: var(--text-dark);
+
+    font-size: 20px;
+
+    font-weight: 800;
+}
+
+
+.profile-post-edit-heading p {
+
+    margin-top: 4px;
+
+    color: var(--text-gray);
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.profile-post-edit-form label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--text-dark);
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+#profilePostEditContent {
+
+    width: 100%;
+
+    min-height: 180px;
+
+    resize: vertical;
+
+    padding: 13px 14px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: var(--text-dark);
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+#profilePostEditContent:focus {
+
+    border-color: var(--iuh-blue);
+
+    box-shadow:
+        0 0 0 3px rgba(25, 63, 158, 0.08);
+}
+
+
+/* =====================================================
+   BOTTOM
+===================================================== */
+
+.profile-post-edit-bottom {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 10px;
+}
+
+
+#profilePostEditCounter {
+
+    color: var(--text-gray);
+
+    font-size: 11px;
+}
+
+
+.profile-post-edit-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.profile-post-edit-cancel,
+.profile-post-edit-save {
+
+    height: 36px;
+
+    padding: 0 14px;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.profile-post-edit-cancel {
+
+    border: 1px solid var(--border);
+
+    background: #ffffff;
+
+    color: var(--text-gray);
+}
+
+
+.profile-post-edit-cancel:hover {
+
+    background: #f6f7f9;
+}
+
+
+.profile-post-edit-save {
+
+    border: 1px solid var(--iuh-blue);
+
+    background: var(--iuh-blue);
+
+    color: #ffffff;
+}
+
+
+.profile-post-edit-save:hover {
+
+    background: var(--iuh-blue-dark);
+
+    border-color: var(--iuh-blue-dark);
+}
+
+
+.profile-post-edit-save:disabled {
+
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .profile-post-card {
+
+        padding: 15px;
+    }
+
+
+    .profile-post-footer {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .profile-post-edit-box {
+
+        padding: 20px;
+    }
+
+
+    .profile-post-edit-bottom {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .profile-post-edit-actions {
+
+        width: 100%;
+    }
+
+
+    .profile-post-edit-cancel,
+    .profile-post-edit-save {
+
+        flex: 1;
+    }
+
+}

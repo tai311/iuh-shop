@@ -31,20 +31,51 @@
                 <div class="top-actions">
 
                     <!-- Tìm kiếm -->
-                    <form class="search-box">
-                        <input
-                            type="search"
-                            placeholder="Tìm kiếm sản phẩm, danh mục..."
-                            aria-label="Tìm kiếm"
-                        >
+                    <!-- =========================================================
+     GLOBAL SEARCH
+========================================================= -->
+<div class="global-search" id="globalSearch">
 
-                        <button type="submit" class="search-button">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <circle cx="11" cy="11" r="7"></circle>
-                                <line x1="16.2" y1="16.2" x2="21" y2="21"></line>
-                            </svg>
-                        </button>
-                    </form>
+    <div class="global-search-input-wrap">
+
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+        <input
+            type="text"
+            id="globalSearchInput"
+            class="global-search-input"
+            placeholder="Tìm sản phẩm, người dùng, bài viết..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="globalSearchClear"
+            class="global-search-clear"
+            title="Xóa"
+            style="display:none;"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+    </div>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="global-search-dropdown"
+        id="globalSearchDropdown"
+    >
+
+        <!-- Nội dung sẽ được JS render -->
+        <div
+            id="globalSearchContent"
+            class="global-search-content"
+        ></div>
+
+    </div>
+
+</div>
 
                      <!-- ICON TIN NHẮN -->
 <a href="tinnhan.html"
@@ -562,23 +593,115 @@
 
 
             <div
-                id="postsGrid"
-                class="profile-posts-grid"
+    id="postsGrid"
+    class="profile-posts-grid"
+>
+    <div class="profile-loading">
+        Đang tải bài viết...
+    </div>
+</div>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================================
+     POPUP CHỈNH SỬA BÀI VIẾT
+===================================================== -->
+
+<div
+    class="profile-post-edit-modal"
+    id="profilePostEditModal"
+    hidden
+>
+
+    <div
+        class="profile-post-edit-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="profilePostEditTitle"
+    >
+
+        <!-- NÚT ĐÓNG -->
+
+        <button
+            type="button"
+            class="profile-post-edit-close"
+            id="closeProfilePostEdit"
+            aria-label="Đóng"
+        >
+            ×
+        </button>
+
+
+        <!-- TIÊU ĐỀ -->
+
+        <div class="profile-post-edit-heading">
+
+            <div class="profile-post-edit-icon">
+                <i class="fa-solid fa-pen"></i>
+            </div>
+
+            <div>
+
+                <h2 id="profilePostEditTitle">
+                    Chỉnh sửa bài viết
+                </h2>
+
+                <p>
+                    Cập nhật nội dung bài viết của bạn.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- NỘI DUNG -->
+
+        <div class="profile-post-edit-form">
+
+            <label
+                for="profilePostEditContent"
             >
+                Nội dung bài viết
+            </label>
 
-                <div class="empty-content">
+            <textarea
+                id="profilePostEditContent"
+                maxlength="5000"
+                rows="9"
+                placeholder="Nhập nội dung bài viết..."
+            ></textarea>
 
-                    <div class="empty-icon">
-                        ✍
-                    </div>
 
-                    <h3>
-                        Chưa có bài viết
-                    </h3>
+            <div class="profile-post-edit-bottom">
 
-                    <p>
-                        Người dùng chưa đăng bài viết nào.
-                    </p>
+                <span
+                    id="profilePostEditCounter"
+                >
+                    0/5000
+                </span>
+
+
+                <div class="profile-post-edit-actions">
+
+                    <button
+                        type="button"
+                        id="cancelProfilePostEdit"
+                        class="profile-post-edit-cancel"
+                    >
+                        Hủy
+                    </button>
+
+                    <button
+                        type="button"
+                        id="saveProfilePostEdit"
+                        class="profile-post-edit-save"
+                    >
+                        <i class="fa-solid fa-check"></i>
+                        Lưu thay đổi
+                    </button>
 
                 </div>
 
@@ -586,7 +709,9 @@
 
         </div>
 
-    </section>
+    </div>
+
+</div>
 
 </main>
 

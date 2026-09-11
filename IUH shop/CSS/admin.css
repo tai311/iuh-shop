@@ -148,6 +148,31 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5px;
+
+    /* Cho riêng danh sách menu được cuộn */
+    flex: 1;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding-right: 3px;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,.25) transparent;
+}
+
+.admin-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.admin-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-nav::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,.25);
+    border-radius: 999px;
 }
 
 
@@ -228,11 +253,12 @@ body {
 
 
 .sidebar-bottom {
-    margin-top: auto;
+    margin-top: 15px;
+
+    flex-shrink: 0;
 
     display: flex;
     flex-direction: column;
-
     gap: 8px;
 }
 
@@ -3704,4 +3730,573 @@ body {
         flex: 1;
     }
 
+}
+
+
+/* =========================================================
+   ADVERTISING
+========================================================= */
+
+.advertising-form-card,
+.advertising-list-card {
+    padding: 22px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 14px;
+
+    background: white;
+
+    box-shadow: var(--shadow);
+}
+
+
+.advertising-form-heading {
+    margin-bottom: 20px;
+}
+
+
+.advertising-form-heading h3,
+.advertising-list-header h3 {
+    margin-top: 5px;
+
+    color: var(--text);
+
+    font-size: 16px;
+
+    font-weight: 800;
+}
+
+
+.advertising-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+
+.advertising-field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+
+.advertising-field-wide {
+    grid-column:
+        span 2;
+}
+
+
+.advertising-field label {
+    color: var(--text);
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+.advertising-field input,
+.advertising-field select {
+    width: 100%;
+
+    height: 43px;
+
+    padding: 0 12px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 9px;
+
+    background: white;
+
+    color: var(--text);
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    outline: none;
+
+    transition: .2s ease;
+}
+
+
+.advertising-field input:focus,
+.advertising-field select:focus {
+    border-color:
+        #b9c9e8;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(36,88,189,.06);
+}
+
+
+.advertising-field small {
+    color: var(--muted);
+
+    font-size: 8px;
+}
+
+
+.advertising-money-input {
+    position: relative;
+}
+
+
+.advertising-money-input input {
+    padding-right: 30px;
+}
+
+
+.advertising-money-input span {
+    position: absolute;
+
+    right: 11px;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+.advertising-form-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: 20px;
+
+    padding-top: 17px;
+
+    border-top:
+        1px solid
+        #edf0f5;
+}
+
+
+.advertising-add-button {
+    min-height: 42px;
+
+    padding: 0 18px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: var(--blue);
+
+    color: white;
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+
+.advertising-add-button:hover {
+    background: var(--blue-2);
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* =========================================================
+   OVERVIEW
+========================================================= */
+
+.advertising-overview {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 12px;
+
+    margin:
+        18px 0;
+}
+
+
+.advertising-overview-card {
+    min-height: 95px;
+
+    padding: 17px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 12px;
+
+    background: white;
+
+    box-shadow:
+        0 5px 18px
+        rgba(20,48,105,.04);
+}
+
+
+.advertising-overview-card span {
+    display: block;
+
+    color: var(--muted);
+
+    font-size: 9px;
+}
+
+
+.advertising-overview-card strong {
+    display: block;
+
+    margin-top: 7px;
+
+    color: var(--blue);
+
+    font-size: 21px;
+
+    font-weight: 800;
+}
+
+
+.advertising-overview-card.revenue strong {
+    color: var(--green);
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.advertising-list-card {
+    overflow: hidden;
+}
+
+
+.advertising-list-header {
+    margin-bottom: 18px;
+}
+
+
+.advertising-table-wrap {
+    overflow-x: auto;
+}
+
+
+.advertising-table {
+    min-width: 1100px;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 11px;
+}
+
+
+.advertising-table-head,
+.advertising-row {
+    display: grid;
+
+    grid-template-columns:
+        55px
+        minmax(190px, 1.5fr)
+        minmax(140px, 1fr)
+        90px
+        105px
+        105px
+        120px
+        125px
+        65px;
+
+    gap: 10px;
+
+    align-items: center;
+
+    padding:
+        0 14px;
+}
+
+
+.advertising-table-head {
+    min-height: 45px;
+
+    background: #f8faff;
+
+    color: var(--muted);
+
+    font-size: 8px;
+
+    font-weight: 700;
+}
+
+
+.advertising-row {
+    min-height: 68px;
+
+    border-top:
+        1px solid
+        #edf0f5;
+
+    color: #687388;
+
+    font-size: 9px;
+}
+
+
+.advertising-index {
+    color: var(--muted);
+
+    font-weight: 700;
+
+    text-align: center;
+}
+
+
+.advertising-name strong {
+    display: block;
+
+    color: var(--text);
+
+    font-size: 10px;
+}
+
+
+.advertising-partner {
+    color: #687388;
+}
+
+
+.advertising-duration {
+    color: #687388;
+
+    white-space: nowrap;
+}
+
+
+.advertising-date {
+    color: #687388;
+
+    white-space: nowrap;
+}
+
+
+.advertising-revenue {
+    color: var(--green);
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+.advertising-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 5px 8px;
+
+    border-radius: 999px;
+
+    font-size: 7px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.advertising-status.active {
+    background: #eaf8ef;
+
+    color: #21834b;
+}
+
+
+.advertising-status.stopped {
+    background: #f1f3f6;
+
+    color: #727d8d;
+}
+
+
+.advertising-delete {
+    min-height: 30px;
+
+    padding: 0 9px;
+
+    border:
+        1px solid
+        #f0cccc;
+
+    border-radius: 7px;
+
+    background: #fff5f5;
+
+    color: var(--red);
+
+    font-family: inherit;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+
+.advertising-delete:hover {
+    background: #ffe8e8;
+
+    border-color:
+        #e8aaaa;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .advertising-form-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .advertising-field-wide {
+        grid-column:
+            span 2;
+    }
+
+
+    .advertising-overview {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .advertising-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .advertising-field-wide {
+        grid-column:
+            span 1;
+    }
+
+
+    .advertising-overview {
+        grid-template-columns: 1fr;
+    }
+
+
+    .advertising-form-actions {
+        justify-content: stretch;
+    }
+
+
+    .advertising-add-button {
+        width: 100%;
+    }
+
+}
+
+/* =========================================================
+   QUẢNG CÁO - SELECT TRẠNG THÁI
+========================================================= */
+
+.advertising-status-select {
+    width: 125px;
+    height: 30px;
+
+    padding: 0 25px 0 10px;
+
+    border: 1px solid transparent;
+    border-radius: 999px;
+
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+
+    cursor: pointer;
+    outline: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    background-image:
+        linear-gradient(45deg, transparent 50%, currentColor 50%),
+        linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position:
+        calc(100% - 12px) 12px,
+        calc(100% - 8px) 12px;
+    background-size:
+        4px 4px,
+        4px 4px;
+    background-repeat: no-repeat;
+
+    transition: .2s ease;
+}
+
+/* Đang hoạt động */
+.advertising-status-select.active {
+    background-color: #eaf8ef;
+    color: #21834b;
+}
+
+/* Đã ngưng */
+.advertising-status-select.stopped {
+    background-color: #f1f3f6;
+    color: #727d8d;
+}
+
+/* Hover */
+.advertising-status-select:hover {
+    border-color: #d8dfeb;
+}
+
+/* Focus */
+.advertising-status-select:focus {
+    box-shadow: 0 0 0 2px rgba(23, 63, 145, .10);
 }

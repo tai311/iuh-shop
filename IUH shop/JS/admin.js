@@ -49,6 +49,8 @@ let selectedConsignment = null;
 let donations = [];
 let donationShowAll = false;
 
+let advertisements = [];
+
 
 /* =========================================================
    HELPERS
@@ -434,10 +436,16 @@ const pageTitles = {
 
     finance:
         "Tài chính",
+
     packages: "Gói dịch vụ",
+
     consignment: "Ký gửi",
+
     donations:
     "Donate",
+
+    advertising:
+    "Quảng cáo",
 
 };
 
@@ -526,6 +534,10 @@ function openPage(page) {
 
     if (page === "donations") {
     loadDonations();
+}
+
+    if (page === "advertising") {
+    loadAdvertisements();
 }
 
     window.scrollTo({
@@ -749,6 +761,16 @@ if (revenueDonation) {
         );
 }
 
+const revenueAdvertising =
+    $("revenueAdvertising");
+
+if (revenueAdvertising) {
+    revenueAdvertising.textContent =
+        formatMoney(
+            revenue.advertising
+        );
+}
+
         $("financeTotal").textContent =
             formatMoney(
                 revenue.total
@@ -784,6 +806,10 @@ async function loadAdminRevenue() {
 
     try {
 
+        /* =========================================
+           LẤY ADMIN
+        ========================================= */
+
         const {
             data: admins,
             error: adminError
@@ -791,7 +817,10 @@ async function loadAdminRevenue() {
             await supabaseClient
                 .from("users")
                 .select("user_id")
-                .eq("role", "admin")
+                .eq(
+                    "role",
+                    "admin"
+                )
                 .limit(1);
 
 
@@ -800,73 +829,95 @@ async function loadAdminRevenue() {
         }
 
 
-        if (!admins?.length) {
+        let walletTransactions = [];
 
-            return {
-                total: 0,
-                platform: 0,
-                boost: 0,
-                package: 0,
-                transactions: []
-            };
 
+        /* =========================================
+           LẤY GIAO DỊCH VÍ ADMIN
+        ========================================= */
+
+        if (admins?.length) {
+
+            const {
+                data: wallet,
+                error: walletError
+            } =
+                await supabaseClient
+                    .from("iuh_wallets")
+                    .select("id")
+                    .eq(
+                        "user_id",
+                        admins[0].user_id
+                    )
+                    .maybeSingle();
+
+
+            if (walletError) {
+                throw walletError;
+            }
+
+
+            if (wallet) {
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabaseClient
+                        .from("wallet_transactions")
+                        .select(`
+                            id,
+                            type,
+                            title,
+                            amount,
+                            description,
+                            created_at
+                        `)
+                        .eq(
+                            "wallet_id",
+                            wallet.id
+                        )
+                        .eq(
+                            "type",
+                            "fee"
+                        )
+                        .order(
+                            "created_at",
+                            {
+                                ascending: false
+                            }
+                        );
+
+
+                if (error) {
+                    throw error;
+                }
+
+
+                walletTransactions =
+                    data || [];
+            }
         }
 
+
+        /* =========================================
+           LẤY DOANH THU QUẢNG CÁO
+        ========================================= */
 
         const {
-            data: wallet,
-            error: walletError
+            data: advertisements,
+            error: advertisingError
         } =
             await supabaseClient
-                .from("iuh_wallets")
-                .select("id")
-                .eq(
-                    "user_id",
-                    admins[0].user_id
-                )
-                .maybeSingle();
-
-
-        if (walletError) {
-            throw walletError;
-        }
-
-
-        if (!wallet) {
-
-            return {
-                total: 0,
-                platform: 0,
-                boost: 0,
-                package: 0,
-                transactions: []
-            };
-
-        }
-
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from("wallet_transactions")
+                .from("advertisements")
                 .select(`
                     id,
-                    type,
-                    title,
-                    amount,
-                    description,
+                    ad_name,
+                    partner,
+                    revenue,
+                    status,
                     created_at
                 `)
-                .eq(
-                    "wallet_id",
-                    wallet.id
-                )
-                .eq(
-                    "type",
-                    "fee"
-                )
                 .order(
                     "created_at",
                     {
@@ -875,99 +926,253 @@ async function loadAdminRevenue() {
                 );
 
 
-        if (error) {
-            throw error;
+        if (advertisingError) {
+            throw advertisingError;
         }
 
 
-        const transactions =
-            data || [];
+        const advertisingTransactions =
+            (advertisements || [])
+                .map(
+                    advertisement => ({
 
+                        id:
+                            `advertising-${advertisement.id}`,
+
+                        type:
+                            "fee",
+
+                        title:
+                            `Quảng cáo: ${advertisement.ad_name}`,
+
+                        amount:
+                            Number(
+                                advertisement.revenue || 0
+                            ),
+
+                        description:
+                            `Đối tác: ${advertisement.partner}`,
+
+                        created_at:
+                            advertisement.created_at,
+
+                        source:
+                            "advertising"
+
+                    })
+                );
+
+
+        /* =========================================
+           GỘP GIAO DỊCH
+        ========================================= */
+
+        const transactions = [
+
+            ...walletTransactions,
+
+            ...advertisingTransactions
+
+        ].sort(
+            (a, b) =>
+                new Date(
+                    b.created_at
+                ).getTime() -
+                new Date(
+                    a.created_at
+                ).getTime()
+        );
+
+
+        /* =========================================
+           PHÂN LOẠI DOANH THU
+        ========================================= */
 
         let platform = 0;
         let boost = 0;
         let packageRevenue = 0;
         let consignment = 0;
         let donation = 0;
+        let advertisingRevenue = 0;
 
 
-       transactions.forEach(transaction => {
+        transactions.forEach(
+            transaction => {
 
-    const text =
-        String(transaction.title || "").toLowerCase() +
-        " " +
-        String(transaction.description || "").toLowerCase();
+                const text =
+                    (
+                        String(
+                            transaction.title ||
+                            ""
+                        ) +
+                        " " +
+                        String(
+                            transaction.description ||
+                            ""
+                        )
+                    ).toLowerCase();
 
-    const amount = Number(transaction.amount || 0);
 
-     // DONATE
-    if (
-        text.includes("donate") ||
-        text.includes("ủng hộ") ||
-        text.includes("ung ho")
-    ) {
-        donation += amount;
+                const amount =
+                    Number(
+                        transaction.amount ||
+                        0
+                    );
+
+
+                /* QUẢNG CÁO */
+
+                if (
+                    transaction.source ===
+                    "advertising" ||
+                    text.includes(
+                        "quảng cáo"
+                    ) ||
+                    text.includes(
+                        "quang cao"
+                    )
+                ) {
+
+                    advertisingRevenue +=
+                        amount;
+
+                    return;
+                }
+
+
+                /* DONATE */
+
+                if (
+                    text.includes(
+                        "donate"
+                    ) ||
+                    text.includes(
+                        "ủng hộ"
+                    ) ||
+                    text.includes(
+                        "ung ho"
+                    )
+                ) {
+
+                    donation +=
+                        amount;
+
+                    return;
+                }
+
+
+                /* KÝ GỬI */
+
+                if (
+                    text.includes(
+                        "phí ký gửi"
+                    ) ||
+                    text.includes(
+                        "ký gửi"
+                    ) ||
+                    text.includes(
+                        "ky gui"
+                    ) ||
+                    text.includes(
+                        "consignment"
+                    )
+                ) {
+
+                    consignment +=
+                        amount;
+
+                    return;
+                }
+
+
+                /* GÓI DỊCH VỤ */
+
+                if (
+                    text.includes(
+                        "gói dịch vụ"
+                    ) ||
+                    text.includes(
+                        "gói cá nhân"
+                    ) ||
+                    text.includes(
+                        "gói nhóm"
+                    ) ||
+                    (
+                        text.includes(
+                            "gói"
+                        ) &&
+                        !text.includes(
+                            "đẩy tin"
+                        )
+                    )
+                ) {
+
+                    packageRevenue +=
+                        amount;
+
+                    return;
+                }
+
+
+                /* ĐẨY TIN */
+
+                if (
+                    text.includes(
+                        "đẩy tin"
+                    ) ||
+                    text.includes(
+                        "boost"
+                    ) ||
+                    text.includes(
+                        "nổi bật"
+                    )
+                ) {
+
+                    boost +=
+                        amount;
+
+                    return;
+                }
+
+
+                /* PHÍ SÀN */
+
+                platform +=
+                    amount;
+
+            }
+        );
+
+
+        return {
+
+            total:
+                platform +
+                boost +
+                packageRevenue +
+                consignment +
+                donation +
+                advertisingRevenue,
+
+            platform,
+
+            boost,
+
+            package:
+                packageRevenue,
+
+            consignment,
+
+            donation,
+
+            advertising:
+                advertisingRevenue,
+
+            transactions
+
+        };
+
     }
-    
-
-    // PHÍ KÝ GỬI
-    if (
-        text.includes("phí ký gửi") ||
-        text.includes("ký gửi") ||
-        text.includes("ky gui") ||
-        text.includes("consignment")
-    ) {
-        consignment += amount;
-    }
-
-    // GÓI DỊCH VỤ
-    else if (
-        text.includes("gói dịch vụ") ||
-        text.includes("gói cá nhân") ||
-        text.includes("gói nhóm") ||
-        (
-            text.includes("gói") &&
-            !text.includes("đẩy tin")
-        )
-    ) {
-        packageRevenue += amount;
-    }
-
-    // ĐẨY TIN
-    else if (
-        text.includes("đẩy tin") ||
-        text.includes("boost") ||
-        text.includes("nổi bật")
-    ) {
-        boost += amount;
-    }
-
-    // PHÍ SÀN
-    else {
-        platform += amount;
-    }
-
-});
-
-
-       return {
-    total:
-        platform +
-        boost +
-        packageRevenue +
-        consignment +
-        donation,
-
-    platform,
-    boost,
-    package: packageRevenue,
-    consignment,
-    donation,
-    transactions
-};
-    }
-
-
     catch (error) {
 
         console.error(
@@ -985,6 +1190,12 @@ async function loadAdminRevenue() {
             boost: 0,
 
             package: 0,
+
+            consignment: 0,
+
+            donation: 0,
+
+            advertising: 0,
 
             transactions: []
 
@@ -5882,6 +6093,733 @@ function renderDonations() {
 }
 
 /* =========================================================
+   ADVERTISING
+========================================================= */
+
+async function loadAdvertisements() {
+
+    const list =
+        $("advertisingList");
+
+    if (!list) {
+        return;
+    }
+
+
+    list.innerHTML = `
+        <div class="loading-box">
+            Đang tải quảng cáo...
+        </div>
+    `;
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("advertisements")
+                .select(`
+                    id,
+                    ad_name,
+                    partner,
+                    duration_days,
+                    start_date,
+                    end_date,
+                    revenue,
+                    status,
+                    created_at
+                `)
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        advertisements =
+            data || [];
+
+
+        renderAdvertisements();
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Advertising error:",
+            error
+        );
+
+
+        list.innerHTML = `
+            <div class="error-box">
+                Không thể tải danh sách quảng cáo.
+                <br><br>
+                ${escapeHTML(
+                    error.message
+                )}
+            </div>
+        `;
+    }
+}
+
+
+/* =========================================================
+   RENDER QUẢNG CÁO
+========================================================= */
+
+function renderAdvertisements() {
+
+    const list =
+        $("advertisingList");
+
+
+    if (!list) {
+        return;
+    }
+
+
+    const totalCount =
+        advertisements.length;
+
+
+    const activeCount =
+        advertisements.filter(
+            item =>
+                item.status === "active"
+        ).length;
+
+
+    const stoppedCount =
+        advertisements.filter(
+            item =>
+                item.status === "stopped"
+        ).length;
+
+
+    const totalRevenue =
+        advertisements.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.revenue || 0
+                ),
+            0
+        );
+
+
+    $("advertisingTotalCount")
+        .textContent =
+        totalCount.toLocaleString(
+            "vi-VN"
+        );
+
+
+    $("advertisingActiveCount")
+        .textContent =
+        activeCount.toLocaleString(
+            "vi-VN"
+        );
+
+
+    $("advertisingStoppedCount")
+        .textContent =
+        stoppedCount.toLocaleString(
+            "vi-VN"
+        );
+
+
+    $("advertisingTotalRevenue")
+        .textContent =
+        formatMoney(
+            totalRevenue
+        );
+
+
+    if (!advertisements.length) {
+
+        list.innerHTML = `
+            <div class="empty-box">
+                Chưa có quảng cáo nào.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    list.innerHTML = `
+
+        <div class="advertising-table">
+
+            <div class="advertising-table-head">
+
+                <span>STT</span>
+
+                <span>Tên quảng cáo</span>
+
+                <span>Đối tác</span>
+
+                <span>Thời hạn</span>
+
+                <span>Bắt đầu</span>
+
+                <span>Kết thúc</span>
+
+                <span>Doanh thu</span>
+
+                <span>Tình trạng</span>
+
+                <span></span>
+
+            </div>
+
+
+            ${advertisements
+                .map(
+                    (item, index) => {
+
+                        const status =
+                            item.status ===
+                            "active"
+                                ? "Đang hoạt động"
+                                : "Đã ngưng";
+
+
+                        return `
+
+                            <div
+                                class="advertising-row"
+                            >
+
+                                <div
+                                    class="advertising-index"
+                                >
+                                    ${index + 1}
+                                </div>
+
+
+                                <div
+                                    class="advertising-name"
+                                >
+
+                                    <strong>
+                                        ${escapeHTML(
+                                            item.ad_name
+                                        )}
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    class="advertising-partner"
+                                >
+                                    ${escapeHTML(
+                                        item.partner
+                                    )}
+                                </div>
+
+
+                                <div
+                                    class="advertising-duration"
+                                >
+                                    ${Number(
+                                        item.duration_days
+                                    )} ngày
+                                </div>
+
+
+                                <div
+                                    class="advertising-date"
+                                >
+                                    ${formatShortDate(
+                                        item.start_date
+                                    )}
+                                </div>
+
+
+                                <div
+                                    class="advertising-date"
+                                >
+                                    ${formatShortDate(
+                                        item.end_date
+                                    )}
+                                </div>
+
+
+                                <div
+                                    class="advertising-revenue"
+                                >
+                                    ${formatMoney(
+                                        item.revenue
+                                    )}
+                                </div>
+
+
+                                <div>
+
+                                    <select
+    class="advertising-status-select ${item.status}"
+    data-advertising-status="${item.id}"
+>
+    <option value="active" ${item.status === "active" ? "selected" : ""}>
+        Đang hoạt động
+    </option>
+
+    <option value="stopped" ${item.status === "stopped" ? "selected" : ""}>
+        Đã ngưng
+    </option>
+</select>
+
+                                </div>
+
+
+                                <div>
+
+                                    <button
+                                        class="advertising-delete"
+                                        type="button"
+                                        data-advertising-delete="${item.id}"
+                                    >
+                                        Xóa
+                                    </button>
+
+                                </div>
+
+                            </div>
+                        `;
+                    }
+                )
+                .join("")}
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   FORMAT NGÀY
+========================================================= */
+
+function formatShortDate(value) {
+
+    if (!value) {
+        return "-";
+    }
+
+
+    const date =
+        new Date(
+            `${value}T00:00:00`
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return "-";
+    }
+
+
+    return date.toLocaleDateString(
+        "vi-VN"
+    );
+}
+
+
+/* =========================================================
+   THÊM QUẢNG CÁO
+========================================================= */
+
+async function addAdvertisement() {
+
+    const name =
+        $("advertisingName")
+            ?.value
+            .trim();
+
+    const partner =
+        $("advertisingPartner")
+            ?.value
+            .trim();
+
+    const duration =
+        Number(
+            $("advertisingDuration")
+                ?.value
+        );
+
+    const startDate =
+        $("advertisingStartDate")
+            ?.value;
+
+    const endDate =
+        $("advertisingEndDate")
+            ?.value;
+
+    const revenue =
+        Number(
+            $("advertisingRevenue")
+                ?.value
+        );
+
+    const status =
+        $("advertisingStatus")
+            ?.value;
+
+
+    /* =========================================
+       VALIDATE
+    ========================================= */
+
+    if (!name) {
+
+        alert(
+            "Vui lòng nhập tên quảng cáo."
+        );
+
+        return;
+    }
+
+
+    if (!partner) {
+
+        alert(
+            "Vui lòng nhập tên đối tác."
+        );
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(duration) ||
+        duration <= 0
+    ) {
+
+        alert(
+            "Thời hạn quảng cáo phải lớn hơn 0 ngày."
+        );
+
+        return;
+    }
+
+
+    if (!startDate) {
+
+        alert(
+            "Vui lòng chọn ngày bắt đầu."
+        );
+
+        return;
+    }
+
+
+    if (!endDate) {
+
+        alert(
+            "Vui lòng chọn ngày kết thúc."
+        );
+
+        return;
+    }
+
+
+    if (endDate < startDate) {
+
+        alert(
+            "Ngày kết thúc không được trước ngày bắt đầu."
+        );
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(revenue) ||
+        revenue < 0
+    ) {
+
+        alert(
+            "Doanh thu không hợp lệ."
+        );
+
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `Xác nhận thêm quảng cáo "${name}" với doanh thu ${formatMoney(revenue)}?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const {
+            data: {
+                user
+            }
+        } =
+            await supabaseClient
+                .auth
+                .getUser();
+
+
+        if (!user) {
+
+            alert(
+                "Phiên đăng nhập đã hết. Vui lòng đăng nhập lại."
+            );
+
+            return;
+        }
+
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("advertisements")
+                .insert({
+
+                    ad_name:
+                        name,
+
+                    partner:
+                        partner,
+
+                    duration_days:
+                        duration,
+
+                    start_date:
+                        startDate,
+
+                    end_date:
+                        endDate,
+
+                    revenue:
+                        revenue,
+
+                    status:
+                        status,
+
+                    created_by:
+                        user.id
+
+                });
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        alert(
+            "Đã thêm quảng cáo thành công."
+        );
+
+
+        clearAdvertisingForm();
+
+        await loadAdvertisements();
+
+        await loadDashboard();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Add advertising:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Không thể thêm quảng cáo."
+        );
+    }
+}
+
+async function updateAdvertisementStatus(id, status) {
+    try {
+        const { error } = await supabaseClient
+            .from("advertisements")
+            .update({
+                status: status
+            })
+            .eq("id", id);
+
+        if (error) {
+            throw error;
+        }
+
+        await loadAdvertisements();
+        await loadDashboard();
+
+    } catch (error) {
+        console.error(
+            "Update advertising status:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Không thể cập nhật trạng thái quảng cáo."
+        );
+
+        await loadAdvertisements();
+    }
+}
+
+document.addEventListener(
+    "change",
+    function(event) {
+
+        const select =
+            event.target.closest(
+                "[data-advertising-status]"
+            );
+
+        if (!select) {
+            return;
+        }
+
+        updateAdvertisementStatus(
+            select.dataset.advertisingStatus,
+            select.value
+        );
+    }
+);
+
+
+/* =========================================================
+   XÓA QUẢNG CÁO
+========================================================= */
+
+async function deleteAdvertisement(id) {
+
+    const item =
+        advertisements.find(
+            ad =>
+                Number(ad.id) ===
+                Number(id)
+        );
+
+
+    if (!item) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `Bạn có chắc muốn xóa quảng cáo "${item.ad_name}"?\n\nDoanh thu ${formatMoney(item.revenue)} cũng sẽ được loại khỏi tổng doanh thu quảng cáo.`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("advertisements")
+                .delete()
+                .eq(
+                    "id",
+                    id
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        await loadAdvertisements();
+
+        await loadDashboard();
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Delete advertising:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Không thể xóa quảng cáo."
+        );
+    }
+}
+
+
+/* =========================================================
+   XÓA FORM
+========================================================= */
+
+function clearAdvertisingForm() {
+
+    if ($("advertisingName")) {
+        $("advertisingName").value = "";
+    }
+
+    if ($("advertisingPartner")) {
+        $("advertisingPartner").value = "";
+    }
+
+    if ($("advertisingDuration")) {
+        $("advertisingDuration").value = "";
+    }
+
+    if ($("advertisingStartDate")) {
+        $("advertisingStartDate").value = "";
+    }
+
+    if ($("advertisingEndDate")) {
+        $("advertisingEndDate").value = "";
+    }
+
+    if ($("advertisingRevenue")) {
+        $("advertisingRevenue").value = "";
+    }
+
+    if ($("advertisingStatus")) {
+        $("advertisingStatus").value =
+            "active";
+    }
+}
+
+/* =========================================================
    FINANCE
 ========================================================= */
 
@@ -5937,6 +6875,21 @@ async function loadFinance() {
 
 
                     let type = "Phí sàn";
+
+                    if (
+    text.includes("quảng cáo") ||
+    text.includes("quang cao")
+) {
+    type = "Quảng cáo";
+}
+
+else if (
+    text.includes("donate") ||
+    text.includes("ủng hộ") ||
+    text.includes("ung ho")
+) {
+    type = "Donate";
+}
 
 
 if (
@@ -7658,6 +8611,40 @@ $("donationViewAllBtn")
 
         }
     );
+
+    /* =========================================================
+   ADVERTISING EVENTS
+========================================================= */
+
+$("addAdvertisingBtn")
+    ?.addEventListener(
+        "click",
+        addAdvertisement
+    );
+
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const button =
+            event.target.closest(
+                "[data-advertising-delete]"
+            );
+
+
+        if (!button) {
+            return;
+        }
+
+
+        deleteAdvertisement(
+            button.dataset
+                .advertisingDelete
+        );
+
+    }
+);
 
 
 /* =========================================================

@@ -2044,6 +2044,982 @@ async function loadProfileProducts(userId) {
 
 }
 
+/* =====================================================
+   LOAD BÀI VIẾT CỦA NGƯỜI DÙNG
+===================================================== */
+
+async function loadProfilePosts(userId) {
+
+    const postsGrid =
+        document.getElementById(
+            "postsGrid"
+        );
+
+
+    if (!postsGrid) {
+        return;
+    }
+
+
+    postsGrid.innerHTML = `
+        <div class="profile-loading">
+            Đang tải bài viết...
+        </div>
+    `;
+
+
+    try {
+
+        /* =================================================
+           LẤY BÀI VIẾT CỦA ĐÚNG USER
+
+           forum_posts.author_id
+                    ↓
+           currentProfileUserId
+        ================================================= */
+
+        const {
+            data: posts,
+            error
+        } =
+            await supabaseClient
+                .from("forum_posts")
+                .select(`
+                    id,
+                    author_id,
+                    content,
+                    post_type,
+                    created_at,
+                    moderation_status
+                `)
+                .eq(
+                    "author_id",
+                    userId
+                )
+                .neq(
+                    "moderation_status",
+                    "hidden"
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        /* =================================================
+           KHÔNG CÓ BÀI
+        ================================================= */
+
+        if (
+            !posts ||
+            posts.length === 0
+        ) {
+
+            postsGrid.innerHTML = `
+                <div class="empty-content">
+
+                    <div class="empty-icon">
+                        ✍
+                    </div>
+
+                    <h3>
+                        Chưa có bài viết
+                    </h3>
+
+                    <p>
+                        Người dùng chưa đăng bài viết nào.
+                    </p>
+
+                </div>
+            `;
+
+            return;
+        }
+
+
+        /* =================================================
+           LẤY THÔNG TIN TÁC GIẢ
+        ================================================= */
+
+        const {
+            data: author,
+            error: authorError
+        } =
+            await supabaseClient
+                .from("users")
+                .select(`
+                    user_id,
+                    fullname,
+                    avatar_url
+                `)
+                .eq(
+                    "user_id",
+                    userId
+                )
+                .maybeSingle();
+
+
+        if (authorError) {
+            throw authorError;
+        }
+
+
+        /* =================================================
+           HIỂN THỊ
+        ================================================= */
+
+        postsGrid.innerHTML =
+            posts
+                .map(
+                    post =>
+                        createProfilePostCard(
+                            post,
+                            author
+                        )
+                )
+                .join("");
+
+
+        setupProfilePostEvents();
+
+    }
+    catch (error) {
+
+        console.error(
+            "IUH SHOP - Lỗi tải bài viết:",
+            error
+        );
+
+
+        postsGrid.innerHTML = `
+            <div class="empty-content">
+
+                <div class="empty-icon">
+                    !
+                </div>
+
+                <h3>
+                    Không thể tải bài viết
+                </h3>
+
+                <p>
+                    Vui lòng thử lại sau.
+                </p>
+
+            </div>
+        `;
+    }
+}
+
+/* =====================================================
+   TẠO CARD BÀI VIẾT
+===================================================== */
+
+function createProfilePostCard(
+    post,
+    author
+) {
+
+    const fullname =
+        author?.fullname ||
+        "Người dùng IUH";
+
+
+    const avatar =
+        author?.avatar_url ||
+        DEFAULT_PROFILE_AVATAR;
+
+
+    const postType =
+        getProfilePostType(
+            post.post_type
+        );
+
+
+    const createdAt =
+        formatProfilePostDate(
+            post.created_at
+        );
+
+
+    /*
+       CHỈ CHỦ BÀI VIẾT MỚI ĐƯỢC SỬA
+    */
+
+    const canEdit =
+        isProfileOwner &&
+        String(
+            post.author_id
+        ) ===
+        String(
+            currentAuthUserId
+        );
+
+
+    return `
+
+        <article
+            class="profile-post-card"
+            data-post-id="${escapeProfileHTML(
+                post.id
+            )}"
+        >
+
+            <!-- =========================
+                 HEADER
+            ========================== -->
+
+            <div class="profile-post-header">
+
+                <img
+                    src="${escapeProfileHTML(
+                        avatar
+                    )}"
+                    alt="Avatar"
+                    class="profile-post-avatar"
+                    onerror="
+                        this.src='../Images/default-avatar.svg';
+                    "
+                >
+
+
+                <div class="profile-post-author-info">
+
+                    <div class="profile-post-author">
+
+                        ${escapeProfileHTML(
+                            fullname
+                        )}
+
+                    </div>
+
+
+                    <div class="profile-post-date">
+
+                        ${escapeProfileHTML(
+                            createdAt
+                        )}
+
+                    </div>
+
+                </div>
+
+
+                <span class="profile-post-type">
+
+                    <i class="fa-solid fa-comments"></i>
+
+                    ${escapeProfileHTML(
+                        postType
+                    )}
+
+                </span>
+
+            </div>
+
+
+            <!-- =========================
+                 NỘI DUNG
+            ========================== -->
+
+            <div class="profile-post-content">
+
+                ${escapeProfileHTML(
+                    post.content
+                )}
+
+            </div>
+
+
+            <!-- =========================
+                 FOOTER
+            ========================== -->
+
+            <div class="profile-post-footer">
+
+                <span
+                    class="profile-post-view"
+                    data-action="view"
+                    data-post-id="${escapeProfileHTML(
+                        post.id
+                    )}"
+                >
+
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+                    Xem bài viết trên diễn đàn
+
+                </span>
+
+
+                ${
+                    canEdit
+                        ? `
+
+                    <button
+                        type="button"
+                        class="profile-post-edit-button"
+                        data-action="edit"
+                        data-post-id="${escapeProfileHTML(
+                            post.id
+                        )}"
+                    >
+
+                        <i class="fa-solid fa-pen"></i>
+
+                        Chỉnh sửa
+
+                    </button>
+
+                    `
+                        : ""
+                }
+
+            </div>
+
+        </article>
+
+    `;
+}
+
+/* =====================================================
+   LOẠI BÀI VIẾT
+===================================================== */
+
+function getProfilePostType(
+    postType
+) {
+
+    const types = {
+
+        question:
+            "Câu hỏi",
+
+        discussion:
+            "Thảo luận",
+
+        sharing:
+            "Chia sẻ",
+
+        announcement:
+            "Thông báo",
+
+        other:
+            "Bài viết"
+
+    };
+
+
+    return (
+        types[
+            String(
+                postType ||
+                ""
+            ).toLowerCase()
+        ] ||
+        "Bài viết"
+    );
+}
+
+
+/* =====================================================
+   FORMAT NGÀY
+===================================================== */
+
+function formatProfilePostDate(
+    date
+) {
+
+    if (!date) {
+        return "Không rõ thời gian";
+    }
+
+
+    const value =
+        new Date(date);
+
+
+    if (
+        Number.isNaN(
+            value.getTime()
+        )
+    ) {
+        return "Không rõ thời gian";
+    }
+
+
+    return value.toLocaleString(
+        "vi-VN",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+}
+
+/* =====================================================
+   SỰ KIỆN BÀI VIẾT
+===================================================== */
+
+function setupProfilePostEvents() {
+
+    const postsGrid =
+        document.getElementById(
+            "postsGrid"
+        );
+
+
+    if (!postsGrid) {
+        return;
+    }
+
+
+    postsGrid
+        .querySelectorAll(
+            "[data-action='view']"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const postId =
+                            this.dataset.postId;
+
+
+                        if (!postId) {
+                            return;
+                        }
+
+
+                        window.location.href =
+                            `diendan.html?post=${encodeURIComponent(
+                                postId
+                            )}`;
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* =================================================
+       CHỈNH SỬA
+    ================================================= */
+
+    postsGrid
+        .querySelectorAll(
+            "[data-action='edit']"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.stopPropagation();
+
+
+                        const postId =
+                            this.dataset.postId;
+
+
+                        openProfilePostEditor(
+                            postId
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+/* =====================================================
+   BIẾN BÀI ĐANG CHỈNH SỬA
+===================================================== */
+
+let editingProfilePostId = null;
+
+
+/* =====================================================
+   MỞ EDITOR
+===================================================== */
+
+async function openProfilePostEditor(
+    postId
+) {
+
+    if (!postId) {
+        return;
+    }
+
+
+    /*
+       Không phải chủ tài khoản
+       → không cho sửa
+    */
+
+    if (!isProfileOwner) {
+
+        alert(
+            "Bạn chỉ có thể chỉnh sửa bài viết của chính mình."
+        );
+
+        return;
+    }
+
+
+    const modal =
+        document.getElementById(
+            "profilePostEditModal"
+        );
+
+
+    const textarea =
+        document.getElementById(
+            "profilePostEditContent"
+        );
+
+
+    const counter =
+        document.getElementById(
+            "profilePostEditCounter"
+        );
+
+
+    if (
+        !modal ||
+        !textarea
+    ) {
+        return;
+    }
+
+
+    try {
+
+        /* ==========================================
+           LẤY BÀI VIẾT
+        ========================================== */
+
+        const {
+            data: post,
+            error
+        } =
+            await supabaseClient
+                .from("forum_posts")
+                .select(`
+                    id,
+                    author_id,
+                    content
+                `)
+                .eq(
+                    "id",
+                    postId
+                )
+                .maybeSingle();
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        if (!post) {
+
+            alert(
+                "Không tìm thấy bài viết."
+            );
+
+            return;
+        }
+
+
+        /*
+           KIỂM TRA CHÍNH CHỦ
+        */
+
+        if (
+            String(
+                post.author_id
+            ) !==
+            String(
+                currentAuthUserId
+            )
+        ) {
+
+            alert(
+                "Bạn không có quyền chỉnh sửa bài viết này."
+            );
+
+            return;
+        }
+
+
+        /* ==========================================
+           ĐƯA NỘI DUNG VÀO TEXTAREA
+        ========================================== */
+
+        editingProfilePostId =
+            post.id;
+
+
+        textarea.value =
+            post.content || "";
+
+
+        if (counter) {
+
+            counter.textContent =
+                `${textarea.value.length}/5000`;
+
+        }
+
+
+        modal.hidden =
+            false;
+
+
+        document.body.classList.add(
+            "modal-open"
+        );
+
+
+        setTimeout(
+            function () {
+
+                textarea.focus();
+
+            },
+            50
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi mở chỉnh sửa bài viết:",
+            error
+        );
+
+
+        alert(
+            "Không thể tải bài viết để chỉnh sửa."
+        );
+
+    }
+
+}
+
+/* =====================================================
+   SETUP EDITOR
+===================================================== */
+
+function setupProfilePostEditor() {
+
+    const modal =
+        document.getElementById(
+            "profilePostEditModal"
+        );
+
+
+    const closeButton =
+        document.getElementById(
+            "closeProfilePostEdit"
+        );
+
+
+    const cancelButton =
+        document.getElementById(
+            "cancelProfilePostEdit"
+        );
+
+
+    const saveButton =
+        document.getElementById(
+            "saveProfilePostEdit"
+        );
+
+
+    const textarea =
+        document.getElementById(
+            "profilePostEditContent"
+        );
+
+
+    const counter =
+        document.getElementById(
+            "profilePostEditCounter"
+        );
+
+
+    if (
+        !modal ||
+        !textarea
+    ) {
+        return;
+    }
+
+
+    /* ==========================================
+       ĐẾM KÝ TỰ
+    ========================================== */
+
+    textarea.addEventListener(
+        "input",
+        function () {
+
+            if (counter) {
+
+                counter.textContent =
+                    `${this.value.length}/5000`;
+
+            }
+
+        }
+    );
+
+
+    /* ==========================================
+       ĐÓNG
+    ========================================== */
+
+    function closeEditor() {
+
+        modal.hidden =
+            true;
+
+
+        editingProfilePostId =
+            null;
+
+
+        document.body.classList.remove(
+            "modal-open"
+        );
+
+    }
+
+
+    closeButton?.addEventListener(
+        "click",
+        closeEditor
+    );
+
+
+    cancelButton?.addEventListener(
+        "click",
+        closeEditor
+    );
+
+
+    /* ==========================================
+       CLICK RA NGOÀI
+    ========================================== */
+
+    modal.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target ===
+                modal
+            ) {
+
+                closeEditor();
+
+            }
+
+        }
+    );
+
+
+    /* ==========================================
+       ESC
+    ========================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape" &&
+                !modal.hidden
+            ) {
+
+                closeEditor();
+
+            }
+
+        }
+    );
+
+
+    /* ==========================================
+       LƯU
+    ========================================== */
+
+    saveButton?.addEventListener(
+        "click",
+        async function () {
+
+            const content =
+                textarea.value.trim();
+
+
+            if (!editingProfilePostId) {
+                return;
+            }
+
+
+            if (!content) {
+
+                alert(
+                    "Nội dung bài viết không được để trống."
+                );
+
+                textarea.focus();
+
+                return;
+            }
+
+
+            if (!isProfileOwner) {
+
+                alert(
+                    "Bạn không có quyền chỉnh sửa bài viết này."
+                );
+
+                return;
+            }
+
+
+            saveButton.disabled =
+                true;
+
+
+            saveButton.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Đang lưu...
+            `;
+
+
+            try {
+
+                /* ==================================
+                   UPDATE
+
+                   QUAN TRỌNG:
+
+                   id = bài viết
+                   author_id = tài khoản hiện tại
+
+                   → tránh sửa nhầm bài người khác
+                ================================== */
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabaseClient
+                        .from("forum_posts")
+                        .update({
+                            content:
+                                content
+                        })
+                        .eq(
+                            "id",
+                            editingProfilePostId
+                        )
+                        .eq(
+                            "author_id",
+                            currentAuthUserId
+                        )
+                        .select()
+                        .maybeSingle();
+
+
+                if (error) {
+                    throw error;
+                }
+
+
+                if (!data) {
+
+                    throw new Error(
+                        "Không thể cập nhật bài viết. Có thể bạn không có quyền chỉnh sửa."
+                    );
+
+                }
+
+
+                /* ==================================
+                   ĐÓNG
+                ================================== */
+
+                closeEditor();
+
+
+                /* ==================================
+                   LOAD LẠI TAB BÀI VIẾT
+                ================================== */
+
+                await loadProfilePosts(
+                    currentProfileUserId
+                );
+
+
+                alert(
+                    "Đã cập nhật bài viết."
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Lỗi cập nhật bài viết:",
+                    error
+                );
+
+
+                alert(
+                    "Không thể cập nhật bài viết. Vui lòng thử lại."
+                );
+
+            }
+            finally {
+
+                saveButton.disabled =
+                    false;
+
+
+                saveButton.innerHTML = `
+                    <i class="fa-solid fa-check"></i>
+                    Lưu thay đổi
+                `;
+
+            }
+
+        }
+    );
+
+}
 
 /* =====================================================
    FORMAT GIÁ
@@ -2146,14 +3122,13 @@ function setupProfileTabs() {
         !productsContent ||
         !postsContent
     ) {
-
         return;
     }
 
 
-    /* =================================================
+    /* ==========================================
        TIN ĐĂNG
-    ================================================= */
+    ========================================== */
 
     productsTab.onclick =
         function () {
@@ -2174,15 +3149,16 @@ function setupProfileTabs() {
             postsContent.classList.remove(
                 "active"
             );
+
         };
 
 
-    /* =================================================
+    /* ==========================================
        BÀI VIẾT
-    ================================================= */
+    ========================================== */
 
     postsTab.onclick =
-        function () {
+        async function () {
 
             postsTab.classList.add(
                 "active"
@@ -2200,7 +3176,19 @@ function setupProfileTabs() {
             productsContent.classList.remove(
                 "active"
             );
+
+
+            /*
+               Load lại bài viết mỗi khi
+               người dùng mở tab
+            */
+
+            await loadProfilePosts(
+                currentProfileUserId
+            );
+
         };
+
 }
 
 
@@ -2334,14 +3322,27 @@ document.addEventListener(
                 userId
             );
 
+            /* ==========================================
+   8. LOAD BÀI VIẾT
+========================================== */
 
-            /*
-               ==========================================
-               8. TAB
-               ==========================================
-            */
+await loadProfilePosts(
+    userId
+);
 
-            setupProfileTabs();
+
+/* ==========================================
+   9. TAB
+========================================== */
+
+setupProfileTabs();
+
+
+/* ==========================================
+   10. EDITOR BÀI VIẾT
+========================================== */
+
+setupProfilePostEditor();
 
 
         } catch (error) {

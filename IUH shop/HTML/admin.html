@@ -163,6 +163,15 @@
     <span>Donate</span>
 </button>
 
+<button
+    class="admin-nav-item"
+    data-page="advertising"
+    type="button"
+>
+    <span class="nav-icon">📢</span>
+    <span>Quảng cáo</span>
+</button>
+
         </nav>
 
 
@@ -502,6 +511,14 @@
     </strong>
 </div>
 
+<div class="revenue-row">
+    <span>Quảng cáo</span>
+
+    <strong id="revenueAdvertising">
+        0đ
+    </strong>
+</div>
+
                     </div>
 
                 </div>
@@ -615,6 +632,25 @@
 
         <small>
             Theo dõi các khoản Donate của IUH SHOP
+        </small>
+    </div>
+
+    <b>→</b>
+</button>
+
+        <button
+    data-page="advertising"
+    type="button"
+>
+    <span>📢</span>
+
+    <div>
+        <strong>
+            Quản lý quảng cáo
+        </strong>
+
+        <small>
+            Nhập và theo dõi doanh thu quảng cáo
         </small>
     </div>
 
@@ -1714,6 +1750,315 @@
         >
             Xem tất cả
         </button>
+
+    </div>
+
+</section>
+
+<!-- =================================================
+     ADVERTISING
+================================================== -->
+
+<section
+    class="admin-page"
+    id="page-advertising"
+>
+
+    <div class="page-header">
+
+        <div>
+
+            <span class="eyebrow">
+                ADVERTISING
+            </span>
+
+            <h2>
+                Quản lý quảng cáo
+            </h2>
+
+            <p>
+                Nhập thủ công và theo dõi các khoản doanh thu
+                từ quảng cáo trên IUH SHOP.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         FORM NHẬP QUẢNG CÁO
+    ================================================== -->
+
+    <div class="advertising-form-card">
+
+        <div class="advertising-form-heading">
+
+            <div>
+
+                <span class="eyebrow">
+                    ADD ADVERTISEMENT
+                </span>
+
+                <h3>
+                    Thêm quảng cáo
+                </h3>
+
+            </div>
+
+        </div>
+
+
+        <div class="advertising-form-grid">
+
+            <!-- TÊN QUẢNG CÁO -->
+
+            <div class="advertising-field advertising-field-wide">
+
+                <label for="advertisingName">
+                    Tên quảng cáo
+                </label>
+
+                <input
+                    id="advertisingName"
+                    type="text"
+                    placeholder="Ví dụ: Banner khai giảng 2026"
+                >
+
+            </div>
+
+
+            <!-- ĐỐI TÁC -->
+
+            <div class="advertising-field">
+
+                <label for="advertisingPartner">
+                    Đối tác
+                </label>
+
+                <input
+                    id="advertisingPartner"
+                    type="text"
+                    placeholder="Tên đối tác"
+                >
+
+            </div>
+
+
+            <!-- THỜI HẠN -->
+
+            <div class="advertising-field">
+
+                <label for="advertisingDuration">
+                    Thời hạn quảng cáo
+                </label>
+
+                <input
+                    id="advertisingDuration"
+                    type="number"
+                    min="1"
+                    placeholder="Ví dụ: 30"
+                >
+
+                <small>
+                    Số ngày
+                </small>
+
+            </div>
+
+
+            <!-- BẮT ĐẦU -->
+
+            <div class="advertising-field">
+
+                <label for="advertisingStartDate">
+                    Bắt đầu từ
+                </label>
+
+                <input
+                    id="advertisingStartDate"
+                    type="date"
+                >
+
+            </div>
+
+
+            <!-- KẾT THÚC -->
+
+            <div class="advertising-field">
+
+                <label for="advertisingEndDate">
+                    Kết thúc
+                </label>
+
+                <input
+                    id="advertisingEndDate"
+                    type="date"
+                >
+
+            </div>
+
+
+            <!-- DOANH THU -->
+
+            <div class="advertising-field">
+
+                <label for="advertisingRevenue">
+                    Doanh thu
+                </label>
+
+                <div class="advertising-money-input">
+
+                    <input
+                        id="advertisingRevenue"
+                        type="number"
+                        min="0"
+                        step="1000"
+                        placeholder="Ví dụ: 500000"
+                    >
+
+                    <span>đ</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- TÌNH TRẠNG -->
+
+            <div class="advertising-field">
+
+                <label for="advertisingStatus">
+                    Tình trạng quảng cáo
+                </label>
+
+                <select
+                    id="advertisingStatus"
+                >
+
+                    <option value="active">
+                        Đang hoạt động
+                    </option>
+
+                    <option value="stopped">
+                        Đã ngưng
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="advertising-form-actions">
+
+            <button
+                id="addAdvertisingBtn"
+                class="advertising-add-button"
+                type="button"
+            >
+                + Thêm quảng cáo
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         TỔNG DOANH THU QUẢNG CÁO
+    ================================================== -->
+
+    <div class="advertising-overview">
+
+        <div class="advertising-overview-card">
+
+            <span>
+                Tổng quảng cáo
+            </span>
+
+            <strong id="advertisingTotalCount">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="advertising-overview-card">
+
+            <span>
+                Đang hoạt động
+            </span>
+
+            <strong id="advertisingActiveCount">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="advertising-overview-card">
+
+            <span>
+                Đã ngưng
+            </span>
+
+            <strong id="advertisingStoppedCount">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="advertising-overview-card revenue">
+
+            <span>
+                Tổng doanh thu quảng cáo
+            </span>
+
+            <strong id="advertisingTotalRevenue">
+                0đ
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         DANH SÁCH
+    ================================================== -->
+
+    <div class="advertising-list-card">
+
+        <div class="advertising-list-header">
+
+            <div>
+
+                <span class="eyebrow">
+                    ADVERTISEMENT LIST
+                </span>
+
+                <h3>
+                    Danh sách quảng cáo
+                </h3>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="advertisingList"
+            class="advertising-table-wrap"
+        >
+
+            <div class="loading-box">
+                Đang tải quảng cáo...
+            </div>
+
+        </div>
 
     </div>
 
