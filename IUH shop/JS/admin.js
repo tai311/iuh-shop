@@ -7553,6 +7553,46 @@ function renderConsignments() {
                 )
         ).length;
 
+    /* =========================================================
+   CẬP NHẬT THỐNG KÊ KÝ GỬI
+========================================================= */
+
+const payout =
+    consignments.filter(
+        item =>
+            item.status === "sold"
+    ).length;
+
+
+if ($("consignmentTotal")) {
+    $("consignmentTotal").textContent =
+        total.toLocaleString("vi-VN");
+}
+
+
+if ($("consignmentPending")) {
+    $("consignmentPending").textContent =
+        pending.toLocaleString("vi-VN");
+}
+
+
+if ($("consignmentSelling")) {
+    $("consignmentSelling").textContent =
+        selling.toLocaleString("vi-VN");
+}
+
+
+if ($("consignmentSold")) {
+    $("consignmentSold").textContent =
+        sold.toLocaleString("vi-VN");
+}
+
+
+if ($("consignmentPayout")) {
+    $("consignmentPayout").textContent =
+        payout.toLocaleString("vi-VN");
+}
+
 
     const summary =
         $("consignmentSummary");
