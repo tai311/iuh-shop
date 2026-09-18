@@ -7608,8 +7608,12 @@ function createConsignmentCard(item) {
     return `
 
         <article
-            class="product-admin-card consignment-admin-card"
-        >
+    class="product-admin-card consignment-admin-card ${
+        status === "completed"
+            ? "consignment-completed-card"
+            : ""
+    }"
+>
 
             <div class="product-image">
 
@@ -7730,59 +7734,73 @@ function createConsignmentCard(item) {
                 </div>
 
 
-                <div class="product-actions">
+               <div class="product-actions">
 
-                    <button
-                        type="button"
-                        class="toggle"
-                        data-consignment-view="${
-                            item.id
-                        }"
-                    >
-                        Xem chi tiết
-                    </button>
-
-                    <button
-    type="button"
-    class="delete"
-    data-consignment-action="delete"
-    data-consignment-id="${item.id}"
->
-    Xóa
-</button>
+    <button
+        type="button"
+        class="toggle"
+        data-consignment-view="${item.id}"
+    >
+        Xem chi tiết
+    </button>
 
 
-                    ${
-                        status === "pending"
+    ${
+        status === "completed"
 
-                            ?
+            ?
 
-                            `
-                                <button
-                                    type="button"
-                                    class="toggle"
-                                    data-consignment-action="approve"
-                                    data-consignment-id="${item.id}"
-                                >
-                                    Duyệt
-                                </button>
+            `
+                <button
+                    type="button"
+                    class="consignment-completed-button"
+                    disabled
+                >
+                    ✓ Đã hoàn thành
+                </button>
+            `
 
-                                <button
-                                    type="button"
-                                    class="delete"
-                                    data-consignment-action="reject"
-                                    data-consignment-id="${item.id}"
-                                >
-                                    Từ chối
-                                </button>
-                            `
+        :
 
-                            :
+        status === "pending"
 
-                            ""
-                    }
+            ?
 
-                </div>
+            `
+                <button
+                    type="button"
+                    class="toggle"
+                    data-consignment-action="approve"
+                    data-consignment-id="${item.id}"
+                >
+                    Duyệt
+                </button>
+
+                <button
+                    type="button"
+                    class="delete"
+                    data-consignment-action="reject"
+                    data-consignment-id="${item.id}"
+                >
+                    Từ chối
+                </button>
+            `
+
+        :
+
+            `
+                <button
+                    type="button"
+                    class="delete"
+                    data-consignment-action="delete"
+                    data-consignment-id="${item.id}"
+                >
+                    Xóa
+                </button>
+            `
+    }
+
+</div>
 
             </div>
 

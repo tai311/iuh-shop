@@ -4300,3 +4300,91 @@ body {
 .advertising-status-select:focus {
     box-shadow: 0 0 0 2px rgba(23, 63, 145, .10);
 }
+
+/* =========================================================
+   KÝ GỬI - HOÀN THÀNH
+========================================================= */
+
+.status-completed {
+    background: #e8f7ef;
+    color: #16845b;
+    border: 1px solid #bfe6d1;
+
+    padding: 6px 10px;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: .2px;
+}
+
+
+/* Nút thay thế cho Xóa khi đã hoàn thành */
+
+.consignment-completed-button {
+
+    flex: 1;
+
+    min-height: 32px;
+
+    border:
+        1px solid #bfe6d1;
+
+    border-radius: 7px;
+
+    background:
+        #eaf8f1;
+
+    color:
+        #16845b;
+
+    font-family:
+        inherit;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    cursor: default;
+
+    opacity: 1;
+}
+
+/* Card đã hoàn thành */
+
+.consignment-completed-card {
+
+    border-color:
+        #c9e8d7;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff 0%,
+            #fcfffd 100%
+        );
+
+    position: relative;
+}
+
+
+/* Thanh xanh nhỏ bên trái */
+
+.consignment-completed-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 4px;
+
+    background:
+        #16845b;
+
+    border-radius:
+        13px 0 0 13px;
+}
