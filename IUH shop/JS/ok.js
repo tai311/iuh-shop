@@ -2349,6 +2349,639 @@ function setupFeaturedTabs() {
 
 }
 
+/* =====================================================
+   QUẢNG CÁO ĐỐI TÁC
+===================================================== */
+
+let homepageAdvertisements = [];
+
+let currentAdvertisement = 0;
+
+let advertisementInterval = null;
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeAdvertisementHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =====================================================
+   KIỂM TRA QUẢNG CÁO CÒN HIỆU LỰC
+===================================================== */
+
+function isAdvertisementActive(ad) {
+
+    if (
+        String(ad.status || "")
+            .toLowerCase() !== "active"
+    ) {
+        return false;
+    }
+
+
+    const today =
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+
+    if (
+        ad.start_date &&
+        today < ad.start_date
+    ) {
+        return false;
+    }
+
+
+    if (
+        ad.end_date &&
+        today > ad.end_date
+    ) {
+        return false;
+    }
+
+
+    return true;
+}
+
+
+/* =====================================================
+   TẢI QUẢNG CÁO TRANG CHỦ
+===================================================== */
+
+async function loadHomepageAdvertisements() {
+
+    const section =
+        document.getElementById(
+            "advertisementSection"
+        );
+
+
+    const slider =
+        document.getElementById(
+            "advertisementSlider"
+        );
+
+
+    if (
+        !section ||
+        !slider
+    ) {
+        return;
+    }
+
+
+    /* Mặc định ẩn */
+
+    section.style.display = "none";
+
+    slider.innerHTML = "";
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+
+            .from("advertisements")
+
+            .select(`
+                id,
+                ad_name,
+                partner,
+                duration_days,
+                start_date,
+                end_date,
+                revenue,
+                status,
+                placement,
+                image_url,
+                title,
+                description,
+                button_text,
+                target_url,
+                created_at
+            `)
+
+            .in(
+                "placement",
+                [
+                    "homepage",
+                    "both"
+                ]
+            )
+
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi tải quảng cáo:",
+                error
+            );
+
+            return;
+        }
+
+
+        homepageAdvertisements =
+            (data || [])
+                .filter(
+                    isAdvertisementActive
+                );
+
+
+        if (
+            homepageAdvertisements.length === 0
+        ) {
+
+            return;
+        }
+
+
+        currentAdvertisement = 0;
+
+
+        renderHomepageAdvertisements();
+
+
+        section.style.display = "block";
+
+
+        setupAdvertisementControls();
+
+
+    } catch (error) {
+
+        console.error(
+            "Không thể tải quảng cáo:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   RENDER QUẢNG CÁO
+===================================================== */
+
+function renderHomepageAdvertisements() {
+
+    const slider =
+        document.getElementById(
+            "advertisementSlider"
+        );
+
+
+    if (!slider) {
+        return;
+    }
+
+
+    if (
+        homepageAdvertisements.length === 0
+    ) {
+
+        slider.innerHTML = "";
+
+        return;
+    }
+
+
+    const slides =
+        homepageAdvertisements
+            .map(
+                function (ad, index) {
+
+                    const image =
+                        ad.image_url ||
+                        "../Images/banner1.png";
+
+
+                    const title =
+                        ad.title ||
+                        ad.ad_name ||
+                        "Quảng cáo đối tác";
+
+
+                    const description =
+                        ad.description ||
+                        "";
+
+
+                    const buttonText =
+                        ad.button_text ||
+                        "Xem ngay";
+
+
+                    const partner =
+                        ad.partner ||
+                        "Đối tác";
+
+
+                    return `
+
+                        <div
+                            class="
+                                advertisement-slide
+                                ${index === 0 ? "active" : ""}
+                            "
+                            data-ad-index="${index}"
+                        >
+
+                            <img
+                                class="advertisement-image"
+                                src="${escapeAdvertisementHTML(image)}"
+                                alt="${escapeAdvertisementHTML(title)}"
+                                onerror="
+                                    this.onerror=null;
+                                    this.src='../Images/banner1.png';
+                                "
+                            >
+
+
+                            <div class="advertisement-overlay">
+
+                                <span class="advertisement-sponsored">
+                                    ĐƯỢC TÀI TRỢ
+                                </span>
+
+
+                                <h3 class="advertisement-title">
+                                    ${escapeAdvertisementHTML(title)}
+                                </h3>
+
+
+                                ${
+                                    description
+                                        ? `
+                                            <p class="advertisement-description">
+                                                ${escapeAdvertisementHTML(description)}
+                                            </p>
+                                        `
+                                        : ""
+                                }
+
+
+                                ${
+                                    ad.target_url
+                                        ? `
+                                            <a
+                                                href="${escapeAdvertisementHTML(ad.target_url)}"
+                                                class="advertisement-button"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                ${escapeAdvertisementHTML(buttonText)}
+                                                →
+                                            </a>
+                                        `
+                                        : ""
+                                }
+
+                            </div>
+
+
+                            <span class="advertisement-partner">
+                                ${escapeAdvertisementHTML(partner)}
+                            </span>
+
+                        </div>
+
+                    `;
+                }
+            )
+            .join("");
+
+
+    const arrows =
+        homepageAdvertisements.length > 1
+            ? `
+
+                <button
+                    type="button"
+                    class="
+                        advertisement-arrow
+                        advertisement-prev
+                    "
+                    id="advertisementPrev"
+                    aria-label="Quảng cáo trước"
+                >
+                    ‹
+                </button>
+
+
+                <button
+                    type="button"
+                    class="
+                        advertisement-arrow
+                        advertisement-next
+                    "
+                    id="advertisementNext"
+                    aria-label="Quảng cáo tiếp theo"
+                >
+                    ›
+                </button>
+
+            `
+            : "";
+
+
+    const dots =
+        homepageAdvertisements.length > 1
+            ? `
+                <div
+                    class="advertisement-dots"
+                    id="advertisementDots"
+                >
+
+                    ${homepageAdvertisements
+                        .map(
+                            function (_, index) {
+
+                                return `
+                                    <button
+                                        type="button"
+                                        class="
+                                            advertisement-dot
+                                            ${index === 0 ? "active" : ""}
+                                        "
+                                        data-ad-dot="${index}"
+                                        aria-label="Quảng cáo ${index + 1}"
+                                    ></button>
+                                `;
+
+                            }
+                        )
+                        .join("")
+                    }
+
+                </div>
+            `
+            : "";
+
+
+    slider.innerHTML =
+        slides +
+        arrows +
+        dots;
+
+
+    /* Nếu đang ở slide khác thì cập nhật lại */
+
+    showAdvertisement(
+        currentAdvertisement
+    );
+
+}
+
+
+/* =====================================================
+   HIỂN THỊ QUẢNG CÁO
+===================================================== */
+
+function showAdvertisement(index) {
+
+    const slides =
+        document.querySelectorAll(
+            ".advertisement-slide"
+        );
+
+
+    const dots =
+        document.querySelectorAll(
+            ".advertisement-dot"
+        );
+
+
+    if (
+        slides.length === 0
+    ) {
+        return;
+    }
+
+
+    if (
+        index < 0
+    ) {
+        index =
+            slides.length - 1;
+    }
+
+
+    if (
+        index >= slides.length
+    ) {
+        index = 0;
+    }
+
+
+    slides.forEach(
+        function (slide, i) {
+
+            slide.classList.toggle(
+                "active",
+                i === index
+            );
+
+        }
+    );
+
+
+    dots.forEach(
+        function (dot, i) {
+
+            dot.classList.toggle(
+                "active",
+                i === index
+            );
+
+        }
+    );
+
+
+    currentAdvertisement = index;
+
+}
+
+
+/* =====================================================
+   QUẢNG CÁO TIẾP THEO
+===================================================== */
+
+function nextAdvertisement() {
+
+    showAdvertisement(
+        currentAdvertisement + 1
+    );
+
+}
+
+
+/* =====================================================
+   QUẢNG CÁO TRƯỚC
+===================================================== */
+
+function prevAdvertisement() {
+
+    showAdvertisement(
+        currentAdvertisement - 1
+    );
+
+}
+
+
+/* =====================================================
+   TỰ ĐỘNG CHUYỂN
+===================================================== */
+
+function startAdvertisementSlider() {
+
+    clearInterval(
+        advertisementInterval
+    );
+
+
+    if (
+        homepageAdvertisements.length <= 1
+    ) {
+        return;
+    }
+
+
+    advertisementInterval =
+        setInterval(
+            function () {
+
+                nextAdvertisement();
+
+            },
+            6000
+        );
+
+}
+
+
+/* =====================================================
+   RESET SLIDER
+===================================================== */
+
+function resetAdvertisementSlider() {
+
+    clearInterval(
+        advertisementInterval
+    );
+
+    startAdvertisementSlider();
+
+}
+
+
+/* =====================================================
+   SỰ KIỆN
+===================================================== */
+
+function setupAdvertisementControls() {
+
+    const prev =
+        document.getElementById(
+            "advertisementPrev"
+        );
+
+
+    const next =
+        document.getElementById(
+            "advertisementNext"
+        );
+
+
+    if (prev) {
+
+        prev.addEventListener(
+            "click",
+            function () {
+
+                prevAdvertisement();
+
+                resetAdvertisementSlider();
+
+            }
+        );
+
+    }
+
+
+    if (next) {
+
+        next.addEventListener(
+            "click",
+            function () {
+
+                nextAdvertisement();
+
+                resetAdvertisementSlider();
+
+            }
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(
+            ".advertisement-dot"
+        )
+        .forEach(
+            function (dot) {
+
+                dot.addEventListener(
+                    "click",
+                    function () {
+
+                        const index =
+                            Number(
+                                this.dataset.adDot
+                            );
+
+
+                        showAdvertisement(
+                            index
+                        );
+
+
+                        resetAdvertisementSlider();
+
+                    }
+                );
+
+            }
+        );
+
+
+    startAdvertisementSlider();
+
+}
+
 
 /* =====================================================
    KHỞI ĐỘNG
@@ -2363,6 +2996,8 @@ document.addEventListener(
         loadFeaturedProducts();
 
         setupFeaturedTabs();
+
+        loadHomepageAdvertisements();
 
     }
 );

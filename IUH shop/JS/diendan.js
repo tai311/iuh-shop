@@ -201,6 +201,12 @@ let selectedPostImage =
 let forumRealtimeChannel =
     null;
 
+/* =========================================================
+   QUẢNG CÁO DIỄN ĐÀN
+========================================================= */
+
+let forumAdvertisements = [];
+
 
 
 /* =========================================================
@@ -1861,6 +1867,268 @@ function createPostHTML(
 
 }
 
+/* =========================================================
+   LOAD FORUM ADVERTISEMENTS
+========================================================= */
+
+async function loadForumAdvertisements() {
+
+    const today =
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("advertisements")
+            .select(`
+                id,
+                ad_name,
+                partner,
+                placement,
+                image_url,
+                title,
+                description,
+                button_text,
+                target_url,
+                start_date,
+                end_date,
+                status
+            `)
+            .in(
+                "placement",
+                [
+                    "forum",
+                    "both"
+                ]
+            )
+            .eq(
+                "status",
+                "active"
+            )
+            .lte(
+                "start_date",
+                today
+            )
+            .gte(
+                "end_date",
+                today
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Load forum advertisements error:",
+            error
+        );
+
+        forumAdvertisements = [];
+
+        return;
+    }
+
+
+    forumAdvertisements =
+        data || [];
+
+}
+
+/* =========================================================
+   FORUM ADVERTISEMENT HTML
+========================================================= */
+
+function createForumAdvertisementHTML(
+    ad
+) {
+
+    const image =
+        ad.image_url ||
+        "../Images/banner1.png";
+
+
+    const title =
+        ad.title ||
+        ad.ad_name ||
+        "Quảng cáo";
+
+
+    const description =
+        ad.description ||
+        "";
+
+
+    const buttonText =
+        ad.button_text ||
+        "Xem ngay";
+
+
+    const partner =
+        ad.partner ||
+        "Đối tác IUH SHOP";
+
+
+    const targetUrl =
+        ad.target_url ||
+        "#";
+
+
+    return `
+
+        <article
+            class="forum-sponsored-ad"
+            data-ad-id="${ad.id}"
+        >
+
+            <div class="forum-sponsored-label">
+
+                <i class="fa-solid fa-bullhorn"></i>
+
+                ĐƯỢC TÀI TRỢ
+
+            </div>
+
+
+            <a
+                href="${targetUrl}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="forum-sponsored-link"
+            >
+
+                <div class="forum-sponsored-image">
+
+                    <img
+                        src="${image}"
+                        alt="${title}"
+                        loading="lazy"
+                    >
+
+                </div>
+
+
+                <div class="forum-sponsored-content">
+
+                    <div class="forum-sponsored-partner">
+
+                        <i class="fa-solid fa-handshake"></i>
+
+                        ${partner}
+
+                    </div>
+
+
+                    <h3>
+                        ${title}
+                    </h3>
+
+
+                    ${
+                        description
+                            ? `
+                                <p>
+                                    ${description}
+                                </p>
+                              `
+                            : ""
+                    }
+
+
+                    <span class="forum-sponsored-button">
+
+                        ${buttonText}
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </span>
+
+                </div>
+
+            </a>
+
+        </article>
+
+    `;
+}
+
+/* =========================================================
+   INJECT ADVERTISEMENT INTO FORUM FEED
+========================================================= */
+
+function injectForumAdvertisements(
+    posts
+) {
+
+    if (
+        !forumAdvertisements.length
+    ) {
+
+        return posts.map(
+            post => ({
+                type: "post",
+                data: post
+            })
+        );
+
+    }
+
+
+    const result = [];
+
+
+    posts.forEach(
+        (
+            post,
+            index
+        ) => {
+
+            result.push({
+                type: "post",
+                data: post
+            });
+
+
+            /*
+             * Hiển thị quảng cáo sau mỗi 5 bài viết.
+             */
+
+            if (
+                (index + 1) % 5 === 0
+            ) {
+
+                const ad =
+                    forumAdvertisements[
+                        Math.floor(
+                            index / 5
+                        ) %
+                        forumAdvertisements.length
+                    ];
+
+
+                result.push({
+                    type: "advertisement",
+                    data: ad
+                });
+
+            }
+
+        }
+    );
+
+
+    return result;
+
+}
 
 
 /* =========================================================
@@ -1909,15 +2177,39 @@ function renderForumPosts() {
     }
 
 
-    feed.innerHTML =
+    const feedItems =
+    injectForumAdvertisements(
         posts
-            .map(
-                createPostHTML
-            )
-            .join("");
+    );
 
 
-    bindPostEvents();
+feed.innerHTML =
+    feedItems
+        .map(
+            function (item) {
+
+                if (
+                    item.type ===
+                    "advertisement"
+                ) {
+
+                    return createForumAdvertisementHTML(
+                        item.data
+                    );
+
+                }
+
+
+                return createPostHTML(
+                    item.data
+                );
+
+            }
+        )
+        .join("");
+
+
+bindPostEvents();
 
 }
 
@@ -6573,6 +6865,7 @@ document.addEventListener(
 
         setupCreatePostModal();
 
+        await loadForumAdvertisements();
 
         await loadForumPosts();
 

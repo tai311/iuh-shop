@@ -6122,16 +6122,22 @@ async function loadAdvertisements() {
             await supabaseClient
                 .from("advertisements")
                 .select(`
-                    id,
-                    ad_name,
-                    partner,
-                    duration_days,
-                    start_date,
-                    end_date,
-                    revenue,
-                    status,
-                    created_at
-                `)
+    id,
+    ad_name,
+    partner,
+    duration_days,
+    start_date,
+    end_date,
+    revenue,
+    status,
+    placement,
+    image_url,
+    title,
+    description,
+    button_text,
+    target_url,
+    created_at
+`)
                 .order(
                     "created_at",
                     {
@@ -6270,6 +6276,8 @@ function renderAdvertisements() {
 
                 <span>Đối tác</span>
 
+                <span>Vị trí</span>
+
                 <span>Thời hạn</span>
 
                 <span>Bắt đầu</span>
@@ -6329,6 +6337,18 @@ function renderAdvertisements() {
                                         item.partner
                                     )}
                                 </div>
+
+                                <div class="advertising-placement">
+
+    ${
+        item.placement === "homepage"
+            ? "Trang chủ"
+            : item.placement === "forum"
+                ? "Diễn đàn"
+                : "Trang chủ + Diễn đàn"
+    }
+
+</div>
 
 
                                 <div
@@ -6480,6 +6500,38 @@ async function addAdvertisement() {
         $("advertisingStatus")
             ?.value;
 
+    const placement =
+    $("advertisingPlacement")
+        ?.value;
+
+const imageUrl =
+    $("advertisingImageUrl")
+        ?.value
+        .trim();
+
+const title =
+    $("advertisingTitle")
+        ?.value
+        .trim();
+
+const description =
+    $("advertisingDescription")
+        ?.value
+        .trim();
+
+const buttonText =
+    $("advertisingButtonText")
+        ?.value
+        .trim() || "Xem ngay";
+
+const targetUrl =
+    $("advertisingTargetUrl")
+        ?.value
+        .trim();
+
+    const imageFile =
+    $("advertisingImage")?.files?.[0];
+
 
     /* =========================================
        VALIDATE
@@ -6593,6 +6645,51 @@ async function addAdvertisement() {
             return;
         }
 
+    let imageUrl = null;
+
+if (imageFile) {
+
+    const fileExtension =
+        imageFile.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+    const fileName =
+        `ad-${Date.now()}-${crypto.randomUUID()}.${fileExtension}`;
+
+    const filePath =
+        `banners/${fileName}`;
+
+    const {
+        error: uploadError
+    } = await supabaseClient
+        .storage
+        .from("advertisements")
+        .upload(
+            filePath,
+            imageFile,
+            {
+                cacheControl: "3600",
+                upsert: false
+            }
+        );
+
+    if (uploadError) {
+        throw uploadError;
+    }
+
+    const {
+        data: publicUrlData
+    } = supabaseClient
+        .storage
+        .from("advertisements")
+        .getPublicUrl(filePath);
+
+    imageUrl =
+        publicUrlData.publicUrl;
+}
+
 
         const {
             error
@@ -6601,31 +6698,51 @@ async function addAdvertisement() {
                 .from("advertisements")
                 .insert({
 
-                    ad_name:
-                        name,
+    ad_name:
+        name,
 
-                    partner:
-                        partner,
+    partner:
+        partner,
 
-                    duration_days:
-                        duration,
+    duration_days:
+        duration,
 
-                    start_date:
-                        startDate,
+    start_date:
+        startDate,
 
-                    end_date:
-                        endDate,
+    end_date:
+        endDate,
 
-                    revenue:
-                        revenue,
+    revenue:
+        revenue,
 
-                    status:
-                        status,
+    status:
+        status,
 
-                    created_by:
-                        user.id
+    placement:
+        placement,
 
-                });
+    image_url:
+        imageUrl || null,
+
+    title:
+        title || null,
+
+    description:
+        description || null,
+
+    button_text:
+        buttonText,
+
+    target_url:
+        targetUrl || null,
+    
+    image_url: imageUrl,
+
+    created_by:
+        user.id
+
+});
 
 
         if (error) {
@@ -6812,6 +6929,30 @@ function clearAdvertisingForm() {
     if ($("advertisingRevenue")) {
         $("advertisingRevenue").value = "";
     }
+
+    if ($("advertisingTitle")) {
+    $("advertisingTitle").value = "";
+}
+
+if ($("advertisingDescription")) {
+    $("advertisingDescription").value = "";
+}
+
+if ($("advertisingImageUrl")) {
+    $("advertisingImageUrl").value = "";
+}
+
+if ($("advertisingTargetUrl")) {
+    $("advertisingTargetUrl").value = "";
+}
+
+if ($("advertisingButtonText")) {
+    $("advertisingButtonText").value = "Xem ngay";
+}
+
+if ($("advertisingPlacement")) {
+    $("advertisingPlacement").value = "homepage";
+}
 
     if ($("advertisingStatus")) {
         $("advertisingStatus").value =
