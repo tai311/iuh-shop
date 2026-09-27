@@ -13,6 +13,11 @@ test('payOS orders separate 5% fee, shipping and bank payouts without crediting 
   const created=await order('payos-order-one','mid');
   await assert.rejects(q('select public.payos_prepare_order($1,$2)',[created.order_id,buyer]),/permission denied/);
   const o=await prepare(created.order_id);
+  await q('select public.payos_save_order_qr($1,$2,$3)',[o.payos_order_code,'order_link_'+o.id,'000201PROVIDER-ORDER-QR']);
+  await q('select public.payos_save_order_qr($1,$2,$3)',[o.payos_order_code,'order_link_'+o.id,'000201PROVIDER-ORDER-QR']);
+  await assert.rejects(q('select public.payos_save_order_qr($1,$2,$3)',[o.payos_order_code,'wrong_link','000201FORGED-ORDER-QR']),/khớp/);
+  await assert.rejects(q('select public.payos_save_order_qr($1,$2,$3)',[o.payos_order_code,'order_link_'+o.id,'000201DIFFERENT-ORDER-QR']),/khớp/);
+  await as(buyer);await assert.rejects(q('select public.payos_save_order_qr($1,$2,$3)',[o.payos_order_code,'order_link_'+o.id,'000201PROVIDER-ORDER-QR']),/permission denied/);
   await as(admin);await assert.rejects(q("select public.admin_confirm_order_payment($1,'MANUAL-FAIL')",[o.id]),/payOS/);
   await as(buyer);await assert.rejects(q('select public.cancel_order($1)',[o.id]),/payOS/);
   await as(null,'service_role');let result=await sync(o);assert.equal(result.payment_status,'paid');assert.equal(result.payos_status,'paid');

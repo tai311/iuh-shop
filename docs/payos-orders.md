@@ -2,7 +2,7 @@
 
 ## Cách sử dụng
 
-- Người mua chọn QR khi đặt hàng. Sau khi đơn được lưu, trang Đơn hàng mở khung payOS ngay trong IUH Shop. Có thể đóng và mở lại bằng nút Thanh toán / kiểm tra payOS của cùng đơn.
+- Người mua chọn QR khi đặt hàng. Sau khi đơn được lưu, trang Đơn hàng vẽ trực tiếp dữ liệu `qrCode` do payOS cấp ngay trong IUH Shop, không nhúng iframe. Có thể tải ảnh QR, đóng và mở lại bằng nút Thanh toán / kiểm tra payOS của cùng đơn.
 - Webhook HMAC dùng chung cho mua gói và mua hàng, tra API payOS trước khi ghi nhận. Giá và số tiền lấy từ đơn do database tính; callback từ iframe không xác nhận đã trả tiền.
 - Admin → Đối soát & hỗ trợ → Đơn hàng hiển thị tiền khách trả, phí sàn, vận chuyển, tiền người bán nhận và trạng thái chuyển. Bật Chỉ cần theo dõi để vẫn thấy đơn hoàn tất nhưng chưa chuyển tiền.
 - Trong chi tiết, đơn payOS chưa thu có nút kiểm tra lại payOS. Khi đơn đã thanh toán và hoàn tất, hệ thống tạo khoản chờ chuyển ngân hàng cho đúng người hưởng. Sau khi tự chuyển tiền thành công, admin nhập mã chứng từ và xác nhận. Nút này chỉ ghi nhận việc đã chuyển, không gửi lệnh chuyển ngân hàng.
@@ -28,7 +28,13 @@ Chỉ các đơn đã gắn payOS dùng cơ chế chuyển ngân hàng mới. Đ
 2. Deploy `payos-webhook` với module `_shared/order-payment.ts`, rồi `payos-order`. Cả hai dùng custom authentication: HMAC cho webhook, Supabase Auth và quyền chủ đơn/admin cho gateway.
 3. Triển khai HTML, JS và CSS mới. Bộ khóa payOS và webhook URL hiện có được dùng tiếp.
 
-27 kiểm thử đạt: bổ sung database/tiền/sở hữu/trùng giao dịch/hủy/hoàn, gateway đơn hàng và webhook định tuyến, iframe chỉ tin backend và dọn khi đóng. Source check: 33 JavaScript, 33 HTML. Trình duyệt cục bộ kiểm tra bảng/chỉ tiết admin trên desktop/mobile, SDK payOS thật nhúng URL mẫu và dọn iframe; không phát hành QR hay chuyển tiền thật trong kiểm thử.
+27 kiểm thử đạt: database/tiền/sở hữu/trùng giao dịch/hủy/hoàn, gateway đơn hàng và webhook định tuyến, ảnh QR từ đúng payload của provider, chỉ tin backend và bỏ qua phản hồi khi đã đóng. Source check: 33 JavaScript, 33 HTML. Trình duyệt cục bộ kiểm tra bảng/chi tiết admin và QR trên desktop/mobile; không phát hành QR hay chuyển tiền thật trong kiểm thử.
+
+## Sửa lỗi hiển thị QR ngày 28/09/2026
+
+Khung nhúng provider báo "Thông tin truyền lên không hợp lệ" trên đơn thật, dù gateway trả 200. Khi điều tra, người dùng đã hủy link và đơn nên không còn tái hiện được trạng thái QR đang chờ. Không kết luận tham số cụ thể nào sai dựa trên link đã hủy. Chuyển đơn hàng sang QR trực tiếp: lưu payload gốc của API tạo link bằng RPC chỉ dành cho service_role, trả lại cho chủ đơn và vẽ ảnh với qrcode-generator 2.0.4 được vendored. Không tự dựng nội dung chuyển khoản và không dùng ảnh QR tĩnh. Chữ ký webhook và kiểm tra số tiền vẫn giữ nguyên.
+
+Link cũ không có payload được giữ nguyên và có liên kết mở trang payOS dự phòng; không tự tạo lại đơn hoặc đổi orderCode. Bộ kiểm thử bổ sung kiểm tra không sửa QR qua tài khoản người dùng, không ghi đè QR khác và không ghép QR vào sai link. Bản sửa cần migration `payos_direct_order_qr`, deploy lại `payos-order`, sau đó cập nhật frontend và thư viện QR.
 
 RPC `admin_complete_order_payout` cố ý là SECURITY DEFINER vì tài khoản trình duyệt không có quyền ghi sổ tiền trực tiếp; kiểm tra `auth.uid()` và `private.is_admin()` trước mọi thao tác, search_path rỗng, thu hồi quyền PUBLIC/anon. Cảnh báo [authenticated SECURITY DEFINER](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable) cần được hiểu cùng các kiểm tra quyền này.
 

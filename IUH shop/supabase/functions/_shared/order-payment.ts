@@ -4,7 +4,8 @@ export function orderReceipt(o:any){return {
  success:true,order_id:o.id,order_code:o.order_code,status:o.status,payment_status:o.payment_status,
  total_amount:o.total_amount,payos_status:o.payos_status,payos_order_code:o.payos_order_code,
  needs_payment_review:o.needs_payment_review,
- checkout_url:o.payment_status==='unpaid'&&o.status!=='cancelled'&&o.payos_status==='pending'?o.payos_checkout_url:null
+ checkout_url:o.payment_status==='unpaid'&&o.status!=='cancelled'&&o.payos_status==='pending'?o.payos_checkout_url:null,
+ qr_code:o.payment_status==='unpaid'&&o.status!=='cancelled'&&o.payos_status==='pending'?o.payos_qr_code:null
 };}
 let webhookReady:Promise<unknown>|null=null;
 export async function ensureWebhook(){
@@ -22,5 +23,7 @@ export async function createOrderLink(o:any){
  const result=await payos('/v2/payment-requests','POST',{...data,expiredAt:Math.floor(Math.max(new Date(o.payos_expires_at).getTime(),Date.now()+1800000)/1000),signature:await sign(data,secret('PAYOS_CHECKSUM_KEY'))});
  if(Number(result.orderCode)!==data.orderCode||Number(result.amount)!==data.amount||result.checkoutUrl!==checkoutURL(result.paymentLinkId))throw new Error('Thông tin QR không khớp đơn hàng.');
  await rpc('payos_bind_order',{p_order_code:o.payos_order_code,p_link_id:result.paymentLinkId,p_checkout_url:result.checkoutUrl});
- return {...o,payos_link_id:result.paymentLinkId,payos_checkout_url:result.checkoutUrl,payos_status:'pending'};
+ if(typeof result.qrCode!=='string'||!result.qrCode.startsWith('000201')||result.qrCode.length<20||result.qrCode.length>4096)throw new Error('payOS chưa trả dữ liệu QR hợp lệ. Kiểm tra lại cùng giao dịch.');
+ await rpc('payos_save_order_qr',{p_order_code:o.payos_order_code,p_link_id:result.paymentLinkId,p_qr_code:result.qrCode});
+ return {...o,payos_link_id:result.paymentLinkId,payos_checkout_url:result.checkoutUrl,payos_status:'pending',payos_qr_code:result.qrCode};
 }

@@ -9,7 +9,7 @@ test('Order gateway enforces ownership, server amount and verified webhook routi
   if(url.endsWith('/auth/v1/user')){const id=options.headers.Authorization?.slice(7);return Response.json({id},{status:id==='bad'?401:200});}
   if(url.includes('api-merchant.payos.vn')){
    providerCalls++;if(url.endsWith('/confirm-webhook'))return Response.json({code:'00',data:{}});
-   if(url.endsWith('/v2/payment-requests')){created=value;exists=true;return Response.json({code:'00',data:{orderCode:o.payos_order_code,amount:105000,paymentLinkId:link,checkoutUrl:'https://pay.payos.vn/web/'+link}});}
+   if(url.endsWith('/v2/payment-requests')){created=value;exists=true;return Response.json({code:'00',data:{orderCode:o.payos_order_code,amount:105000,paymentLinkId:link,checkoutUrl:'https://pay.payos.vn/web/'+link,qrCode:'000201PAYOS-QR-TEST-DATA'}});}
    if(!exists)return Response.json({code:'NOT_FOUND'});
    if(url.endsWith('/cancel'))state='CANCELLED';
    return Response.json({code:'00',data:{id:link,orderCode:o.payos_order_code,amount:105000,amountPaid:state==='PAID'?105000:0,status:state,transactions:[{reference:'ORDER-BANK-1'}]}});
@@ -20,6 +20,7 @@ test('Order gateway enforces ownership, server amount and verified webhook routi
   if(url.endsWith('/rpc/payos_prepare_order')){assert.equal(value.p_buyer_id,'buyer');return Response.json({...o});}
   if(url.endsWith('/rpc/payos_claim_order_check'))return Response.json(true);
   if(url.endsWith('/rpc/payos_bind_order')){o.payos_link_id=value.p_link_id;o.payos_checkout_url=value.p_checkout_url;o.payos_status='pending';return new Response(null,{status:204});}
+  if(url.endsWith('/rpc/payos_save_order_qr')){assert.equal(value.p_link_id,link);o.payos_qr_code=value.p_qr_code;return new Response(null,{status:204});}
   if(url.endsWith('/rpc/payos_sync_order')){settlements++;assert.equal(value.p_amount,105000);return Response.json({...o,payment_status:state==='PAID'?'paid':'unpaid',payos_status:state.toLowerCase()});}
   throw new Error('Unexpected fetch '+url);
  };
@@ -28,7 +29,8 @@ test('Order gateway enforces ownership, server amount and verified webhook routi
   const call=(body,id='buyer')=>gateway(new Request('https://edge.test',{method:'POST',headers:{Authorization:'Bearer '+id,Origin:'https://iuh-shop.vercel.app'},body:JSON.stringify(body)}));
   assert.equal((await call({action:'create',orderId:12},'bad')).status,401);
   assert.equal((await call({action:'create',orderId:12},'other')).status,400);assert.equal(providerCalls,0);
-  assert.equal((await call({action:'create',orderId:12,amount:1})).status,200);assert.equal(created.amount,105000);assert.equal(created.orderCode,o.payos_order_code);
+  const createdResponse=await call({action:'create',orderId:12,amount:1});assert.equal(createdResponse.status,200);assert.equal((await createdResponse.json()).qr_code,'000201PAYOS-QR-TEST-DATA');assert.equal(created.amount,105000);assert.equal(created.orderCode,o.payos_order_code);
+  assert.equal((await(await call({action:'create',orderId:12})).json()).qr_code,o.payos_qr_code);
   assert.equal((await call({action:'cancel',orderId:12},'admin')).status,400);
   state='PAID';const result=await (await call({action:'status',orderId:12},'admin')).json();assert.equal(result.payment_status,'paid');assert.equal(settlements,1);
   await import('../IUH shop/supabase/functions/payos-webhook/index.ts');const webhook=handler;
