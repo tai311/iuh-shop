@@ -10,10 +10,7 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 
 
@@ -1278,158 +1275,13 @@ function calculateOverdueDays(
    PHÍ CHẬM
 ===================================================== */
 
-function calculateFeeWithLateCharge(
-    baseFee,
-    overdueDays
-) {
-
-    if (
-        baseFee <= 0 ||
-        overdueDays <= 0
-    ) {
-
-        return baseFee;
-    }
-
-
-    /*
-        0,1% / ngày trên phí gốc.
-
-        Ví dụ:
-        Phí sàn = 10.000đ
-        Trễ 5 ngày
-
-        10.000 × 0,1% × 5
-        = 50đ
-
-        Tổng = 10.050đ
-    */
-
-    return (
-        baseFee +
-        (
-            baseFee *
-            DAILY_LATE_RATE *
-            overdueDays
-        )
-    );
-}
-
+function calculateCODFee(order) { return Math.max(0, getCustomerTotal(order) - getOrderProductTotal(order)); }
 
 /* =====================================================
    KIỂM TRA PHÍ ĐÃ THANH TOÁN
 ===================================================== */
 
-function isFeePaid(order) {
-
-    /*
-        Online:
-        phí được hệ thống tự động tách
-        ngay lúc thanh toán.
-    */
-
-    if (
-        isOnlinePayment(order)
-    ) {
-
-        return true;
-    }
-
-
-    const orderCode =
-        String(
-            getOrderCode(order)
-        )
-        .toLowerCase();
-
-
-    const orderId =
-        String(
-            getOrderId(order)
-        );
-
-
-    /*
-        COD:
-        tìm transaction phí.
-
-        Cho phép cả type = fee
-        và payment nếu RPC hiện tại
-        đang dùng pay_iuh_wallet().
-    */
-
-    return walletTransactions.some(
-        transaction => {
-
-            const description =
-                String(
-                    transaction?.description ||
-                    ""
-                )
-                .toLowerCase();
-
-
-            const title =
-                String(
-                    transaction?.title ||
-                    ""
-                )
-                .toLowerCase();
-
-
-            const type =
-                String(
-                    transaction?.type ||
-                    ""
-                )
-                .toLowerCase();
-
-
-            const isFeeTransaction =
-                (
-                    type === "fee"
-                )
-                ||
-                (
-                    type === "payment" &&
-                    description.includes(
-                        "thanh toán phí sàn"
-                    )
-                )
-                ||
-                (
-                    title.includes(
-                        "phí sàn"
-                    )
-                )
-                ||
-                (
-                    title.includes(
-                        "phi san"
-                    )
-                );
-
-
-            if (
-                !isFeeTransaction
-            ) {
-                return false;
-            }
-
-
-            return (
-                description.includes(
-                    orderCode
-                )
-                ||
-                description.includes(
-                    orderId
-                )
-            );
-        }
-    );
-}
-
+function isFeePaid(order) { return isOnlinePayment(order) ? !!order.settled_at : !!order.platform_fee_paid_at; }
 
 /* =====================================================
    LOAD WALLET
@@ -1849,9 +1701,7 @@ function calculateDashboard() {
                     Phí sàn 5%.
                 */
 
-                const baseFee =
-                    sellerProductTotal *
-                    PLATFORM_FEE_RATE;
+                const baseFee = Math.max(0, getCustomerTotal(order) - getOrderProductTotal(order) - getShippingFee(order));
 
 
                 if (
@@ -1970,10 +1820,7 @@ function calculateDashboard() {
 
 
                     const finalFee =
-    calculateFeeWithLateCharge(
-        baseFee,
-        overdueDays
-    );
+    calculateCODFee(order);
 
 
 const paid =
@@ -2597,12 +2444,7 @@ function renderFees() {
                         COD
                     */
 
-                    const lateFee =
-                        Math.max(
-                            0,
-                            item.finalFee -
-                            item.baseFee
-                        );
+                    const lateFee = 0;
 
 
                     return `
@@ -2822,9 +2664,7 @@ async function payPlatformFee(
         );
 
 
-    const baseFee =
-        sellerProductTotal *
-        PLATFORM_FEE_RATE;
+    const baseFee = Math.max(0, getCustomerTotal(order) - getOrderProductTotal(order) - getShippingFee(order));
 
 
     const overdueDays =
@@ -2836,10 +2676,7 @@ async function payPlatformFee(
 
 
     const finalFee =
-        calculateFeeWithLateCharge(
-            baseFee,
-            overdueDays
-        );
+        calculateCODFee(order);
 
 
     currentPaymentOrderId =
@@ -3016,9 +2853,7 @@ async function confirmPayment() {
         );
 
 
-    const baseFee =
-        sellerProductTotal *
-        PLATFORM_FEE_RATE;
+    const baseFee = Math.max(0, getCustomerTotal(order) - getOrderProductTotal(order) - getShippingFee(order));
 
 
     const overdueDays =
@@ -3030,10 +2865,7 @@ async function confirmPayment() {
 
 
     const finalFee =
-        calculateFeeWithLateCharge(
-            baseFee,
-            overdueDays
-        );
+        calculateCODFee(order);
 
 
     try {
@@ -3050,15 +2882,7 @@ async function confirmPayment() {
         } =
             await supabaseClient
                 .rpc(
-                    "pay_platform_fee",
-                    {
-
-                        p_amount:
-                            finalFee,
-
-                        p_description:
-                            `Thanh toán phí sàn đơn ${getOrderCode(order)}`
-                    }
+                    "pay_order_platform_fee", { p_order_id: getOrderId(order) }
                 );
 
 

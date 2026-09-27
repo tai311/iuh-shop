@@ -1,0 +1,1019 @@
+[
+  {
+    "schemaname": "public",
+    "tablename": "advertisements",
+    "policyname": "Admin can delete advertisements",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "( SELECT private.is_admin() AS is_admin)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "advertisements",
+    "policyname": "Admin can insert advertisements",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "( SELECT private.is_admin() AS is_admin)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "advertisements",
+    "policyname": "Admin can update advertisements",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "( SELECT private.is_admin() AS is_admin)",
+    "with_check": "( SELECT private.is_admin() AS is_admin)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "advertisements",
+    "policyname": "Admin can view advertisements",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "( SELECT private.is_admin() AS is_admin)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "cart_items",
+    "policyname": "Users can add to own cart",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "cart_items",
+    "policyname": "Users can delete own cart",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "cart_items",
+    "policyname": "Users can update own cart",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "cart_items",
+    "policyname": "Users can view own cart",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "consignment_items",
+    "policyname": "admin_manage_consignment",
+    "roles": "{authenticated}",
+    "cmd": "ALL",
+    "qual": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))",
+    "with_check": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "consignment_items",
+    "policyname": "users_create_consignment",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(seller_id = auth.uid())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "consignment_items",
+    "policyname": "users_view_own_consignment",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(seller_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "consignment_requests",
+    "policyname": "Admin can delete consignment requests",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "consignment_requests",
+    "policyname": "Admin can update consignment requests",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))",
+    "with_check": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "consignment_requests",
+    "policyname": "Admins can update consignment requests",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM users u\n  WHERE ((u.user_id = auth.uid()) AND (lower(u.role) = 'admin'::text))))",
+    "with_check": "(EXISTS ( SELECT 1\n   FROM users u\n  WHERE ((u.user_id = auth.uid()) AND (lower(u.role) = 'admin'::text))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "consignment_requests",
+    "policyname": "Admins can view all consignment requests",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM users u\n  WHERE ((u.user_id = auth.uid()) AND (lower(u.role) = 'admin'::text))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "consignment_requests",
+    "policyname": "Users can create consignment requests",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "consignment_requests",
+    "policyname": "Users can view own consignment requests",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "conversation_members",
+    "policyname": "Users can insert conversation members",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((user_id = auth.uid()) OR is_chat_member(conversation_id, auth.uid()))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "conversation_members",
+    "policyname": "chat_members_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((user_id = auth.uid()) OR is_chat_member(conversation_id, auth.uid()))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "conversation_members",
+    "policyname": "chat_members_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((user_id = auth.uid()) OR is_chat_member(conversation_id, auth.uid()))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "conversation_members",
+    "policyname": "chat_members_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "is_chat_member(conversation_id, auth.uid())",
+    "with_check": "is_chat_member(conversation_id, auth.uid())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "conversations",
+    "policyname": "chat_conversations_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() IS NOT NULL)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "conversations",
+    "policyname": "chat_conversations_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "is_chat_member(id, auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "conversations",
+    "policyname": "chat_conversations_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "is_chat_member(id, auth.uid())",
+    "with_check": "is_chat_member(id, auth.uid())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "donations",
+    "policyname": "Admins can view donations",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "donations",
+    "policyname": "Users can view own donations",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(donor_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_articles",
+    "policyname": "Anyone can view forum articles",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_articles",
+    "policyname": "Users can create own forum articles",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = author_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_articles",
+    "policyname": "Users can delete own forum articles",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "(auth.uid() = author_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_articles",
+    "policyname": "Users can update own forum articles",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = author_id)",
+    "with_check": "(auth.uid() = author_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_comment_reactions",
+    "policyname": "Anyone can view comment reactions",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_comment_reactions",
+    "policyname": "Users can add comment reactions",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_comment_reactions",
+    "policyname": "Users can delete own comment reactions",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_comment_reactions",
+    "policyname": "Users can update own comment reactions",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_comments",
+    "policyname": "forum_comments_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(auth.uid() = author_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_comments",
+    "policyname": "forum_comments_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = author_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_comments",
+    "policyname": "forum_comments_select",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_comments",
+    "policyname": "forum_comments_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = author_id)",
+    "with_check": "(auth.uid() = author_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_posts",
+    "policyname": "forum_posts_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(auth.uid() = author_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_posts",
+    "policyname": "forum_posts_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = author_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_posts",
+    "policyname": "forum_posts_select",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_posts",
+    "policyname": "forum_posts_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = author_id)",
+    "with_check": "(auth.uid() = author_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_reactions",
+    "policyname": "forum_reactions_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_reactions",
+    "policyname": "forum_reactions_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_reactions",
+    "policyname": "forum_reactions_select",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "forum_reactions",
+    "policyname": "forum_reactions_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "iuh_wallets",
+    "policyname": "Users can view own wallet",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "message_reactions",
+    "policyname": "chat_reactions_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "message_reactions",
+    "policyname": "chat_reactions_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((user_id = auth.uid()) AND (EXISTS ( SELECT 1\n   FROM messages m\n  WHERE ((m.id = message_reactions.message_id) AND is_chat_member(m.conversation_id, auth.uid())))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "message_reactions",
+    "policyname": "chat_reactions_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM messages m\n  WHERE ((m.id = message_reactions.message_id) AND is_chat_member(m.conversation_id, auth.uid()))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "message_reactions",
+    "policyname": "chat_reactions_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(user_id = auth.uid())",
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "messages",
+    "policyname": "Users can mark messages as read",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM conversation_members cm\n  WHERE ((cm.conversation_id = messages.conversation_id) AND (cm.user_id = auth.uid()))))",
+    "with_check": "(EXISTS ( SELECT 1\n   FROM conversation_members cm\n  WHERE ((cm.conversation_id = messages.conversation_id) AND (cm.user_id = auth.uid()))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "messages",
+    "policyname": "chat_messages_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((sender_id = auth.uid()) AND is_chat_member(conversation_id, auth.uid()))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "messages",
+    "policyname": "chat_messages_select",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "is_chat_member(conversation_id, auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "messages",
+    "policyname": "chat_messages_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "((sender_id = auth.uid()) AND is_chat_member(conversation_id, auth.uid()))",
+    "with_check": "((sender_id = auth.uid()) AND is_chat_member(conversation_id, auth.uid()))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_items",
+    "policyname": "buyers can view own order items",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM orders o\n  WHERE ((o.id = order_items.order_id) AND (o.buyer_id = auth.uid()))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_items",
+    "policyname": "order_items_select_buyer",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "is_order_buyer(order_id, auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_items",
+    "policyname": "order_items_select_seller",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(seller_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_items",
+    "policyname": "sellers can view own order items",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(seller_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_status_history",
+    "policyname": "buyers can view own order history",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM orders o\n  WHERE ((o.id = order_status_history.order_id) AND (o.buyer_id = auth.uid()))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "order_status_history",
+    "policyname": "sellers can view related order history",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM (order_items oi\n     JOIN orders o ON ((o.id = oi.order_id)))\n  WHERE ((oi.seller_id = auth.uid()) AND (o.id = order_status_history.order_id))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "orders",
+    "policyname": "admins can view all orders",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "check_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "orders",
+    "policyname": "buyers can view own orders",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(buyer_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "orders",
+    "policyname": "sellers can view their orders",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "check_is_order_seller(id, auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admin can delete products",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admin can insert products",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admin can update products",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))",
+    "with_check": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admin can view products",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (lower(users.role) = 'admin'::text))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admins can delete products",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admins can update products",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "is_admin()",
+    "with_check": "is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admins can view all products",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Anyone can view active products",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "((status = 'active'::text) OR (auth.uid() = seller_id))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Authenticated users can create products",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = seller_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Seller can delete own products",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(auth.uid() = seller_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Seller can update own products",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = seller_id)",
+    "with_check": "(auth.uid() = seller_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Users can create their own products",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = seller_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Users can update their own products",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(seller_id = auth.uid())",
+    "with_check": "(seller_id = auth.uid())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Users can view their own products",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(seller_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "products_select_public",
+    "roles": "{anon,authenticated}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "service_package_members",
+    "policyname": "Authenticated users can view active package memberships",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM service_packages package\n  WHERE ((package.id = service_package_members.package_id) AND (package.status = 'active'::text) AND (package.expires_at > now()))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "service_package_members",
+    "policyname": "Owners can add package members",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((EXISTS ( SELECT 1\n   FROM service_packages package\n  WHERE ((package.id = service_package_members.package_id) AND (package.owner_id = auth.uid()) AND (package.plan_type = 'group'::text)))) AND (member_role = 'member'::text) AND (( SELECT count(*) AS count\n   FROM service_package_members existing_member\n  WHERE (existing_member.package_id = service_package_members.package_id)) < 3))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "service_package_members",
+    "policyname": "Owners can remove package members",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "((EXISTS ( SELECT 1\n   FROM service_packages package\n  WHERE ((package.id = service_package_members.package_id) AND (package.owner_id = auth.uid())))) AND (member_role = 'member'::text))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "service_packages",
+    "policyname": "Authenticated users can view active service packages",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((status = 'active'::text) AND (expires_at > now()))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "service_packages",
+    "policyname": "Owners can delete their service packages",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(owner_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "service_packages",
+    "policyname": "Owners can update their service packages",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(owner_id = auth.uid())",
+    "with_check": "(owner_id = auth.uid())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "service_packages",
+    "policyname": "Users can create their own service packages",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(owner_id = auth.uid())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "site_reviews",
+    "policyname": "Anyone can view site reviews",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "site_reviews",
+    "policyname": "Users can create own review",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "site_reviews",
+    "policyname": "Users can delete own review",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "site_reviews",
+    "policyname": "Users can update own review",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": "(auth.uid() = user_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "users",
+    "policyname": "Allow public read users",
+    "roles": "{anon,authenticated}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "users",
+    "policyname": "Users can update their own profile",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(user_id = auth.uid())",
+    "with_check": "(user_id = auth.uid())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "users",
+    "policyname": "Users can view their own profile",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(user_id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "wallet_transactions",
+    "policyname": "Users can view own wallet transactions",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "(auth.uid() = user_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Admin can delete advertisement images",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "((bucket_id = 'advertisements'::text) AND (EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (users.role = 'admin'::text)))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Admin can update advertisement images",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "((bucket_id = 'advertisements'::text) AND (EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (users.role = 'admin'::text)))))",
+    "with_check": "((bucket_id = 'advertisements'::text) AND (EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (users.role = 'admin'::text)))))"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Admin can upload advertisement images",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((bucket_id = 'advertisements'::text) AND (EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (users.role = 'admin'::text)))))"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Admins and moderators can view student verifications",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((bucket_id = 'student-verifications'::text) AND (EXISTS ( SELECT 1\n   FROM users\n  WHERE ((users.user_id = auth.uid()) AND (users.role = ANY (ARRAY['admin'::text, 'moderator'::text]))))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Authenticated users can upload consignment images",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((bucket_id = 'consignment-images'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Authenticated users can upload product images",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(bucket_id = 'products'::text)"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Avatar images are publicly accessible",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "(bucket_id = 'avatars'::text)",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Users can delete avatars",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(bucket_id = 'avatars'::text)",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Users can update avatars",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(bucket_id = 'avatars'::text)",
+    "with_check": "(bucket_id = 'avatars'::text)"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Users can update their own student verification",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "((bucket_id = 'student-verifications'::text) AND ((storage.foldername(name))[1] = ( SELECT (auth.uid())::text AS uid)))",
+    "with_check": "((bucket_id = 'student-verifications'::text) AND ((storage.foldername(name))[1] = ( SELECT (auth.uid())::text AS uid)))"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Users can upload avatars",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(bucket_id = 'avatars'::text)"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Users can upload own student card",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((bucket_id = 'student-cards'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Users can upload their own student verification",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((bucket_id = 'student-verifications'::text) AND ((storage.foldername(name))[1] = ( SELECT (auth.uid())::text AS uid)))"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Users can view own student card",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((bucket_id = 'student-cards'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text))",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "Users can view their own student verification",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((bucket_id = 'student-verifications'::text) AND ((storage.foldername(name))[1] = ( SELECT (auth.uid())::text AS uid)))",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "forum_images_delete",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(bucket_id = 'forum-images'::text)",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "forum_images_insert",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(bucket_id = 'forum-images'::text)"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "forum_images_read",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "(bucket_id = 'forum-images'::text)",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "forum_images_update",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "(bucket_id = 'forum-images'::text)",
+    "with_check": null
+  }
+]

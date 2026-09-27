@@ -21,10 +21,7 @@ const SUPABASE_PUBLISHABLE_KEY =
  */
 window.IUH_SUPABASE =
     window.IUH_SUPABASE ||
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 const db = window.IUH_SUPABASE;
 
@@ -46,6 +43,7 @@ let qrPaymentConfirmed = false;
 let walletBalance = 0;
 
 let isSubmitting = false;
+let checkoutSucceeded = false;
 
 
 /* =========================================================
@@ -795,6 +793,7 @@ async function loadBuyNow() {
                         quantity,
                         description,
                         image_urls,
+                        is_consignment,
                         status
                     `)
                     .eq(
@@ -841,8 +840,8 @@ async function loadBuyNow() {
             cart_item_id:
                 null,
 
-            seller_id:
-                product.seller_id,
+            seller_id: product.seller_id,
+            is_consignment: product.is_consignment === true,
 
             name:
                 product.name,
@@ -952,6 +951,7 @@ async function loadCart() {
                         quantity,
                         description,
                         image_urls,
+                        is_consignment,
                         status
                     `)
                     .in(
@@ -1030,8 +1030,8 @@ async function loadCart() {
                         cart_item_id:
                             row.id,
 
-                        seller_id:
-                            product.seller_id,
+                        seller_id: product.seller_id,
+            is_consignment: product.is_consignment === true,
 
                         name:
                             product.name,
@@ -1193,7 +1193,7 @@ function renderItems() {
 const buyerUnitPrice =
     Math.round(
         sellerPrice *
-        (1 + PLATFORM_FEE_RATE)
+        (item.is_consignment ? 1 : 1 + PLATFORM_FEE_RATE)
     );
 
 const total =
@@ -1391,17 +1391,8 @@ function getSellerSubtotal() {
 ========================================================= */
 
 function getPlatformFee() {
-
-    return Math.round(
-        getSellerSubtotal() *
-        PLATFORM_FEE_RATE
-    );
+ return checkoutItems.reduce((sum,item)=>sum+(Math.round(Number(item.price)*(item.is_consignment?1:1.05))-Number(item.price))*Number(item.quantityInCart),0);
 }
-
-
-/* =========================================================
-   TIỀN HÀNG NGƯỜI MUA PHẢI TRẢ
-========================================================= */
 
 function getBuyerSubtotal() {
 
@@ -1513,36 +1504,10 @@ function updateOptionUI() {
    ========================================================= */
 
 function updateQR() {
-
-    if (
-        !qrCodeImage ||
-        !currentUser
-    ) {
-
-        return;
-    }
-
-
-    const total =
-        getTotal();
-
-
-    const content =
-        `IUH SHOP ${currentUser.id} ${total}`;
-
-
-    qrCodeImage.src =
-        "https://api.qrserver.com/v1/create-qr-code/" +
-        "?size=220x220&data=" +
-        encodeURIComponent(
-            content
-        );
+ if (qrCodeImage) qrCodeImage.hidden = true;
+ if (confirmPaymentBtn) confirmPaymentBtn.hidden = true;
+ if (paymentVerificationStatus) paymentVerificationStatus.textContent = 'Đơn chuyển khoản chỉ được xác nhận thanh toán sau khi quản trị viên đối soát. Liên hệ hỗ trợ để nhận thông tin chuyển khoản và ghi mã đơn.';
 }
-
-
-/* =========================================================
-   24. VÍ IUH
-   ========================================================= */
 
 async function loadWallet() {
 
@@ -1770,7 +1735,7 @@ async function updatePaymentUI() {
         if (checkoutButton) {
 
             checkoutButton.disabled =
-                !qrPaymentConfirmed;
+                isSubmitting;
         }
 
 
@@ -1834,85 +1799,7 @@ async function updatePaymentUI() {
    27. XÁC NHẬN QR
    ========================================================= */
 
-function setupQRPayment() {
-
-    if (!confirmPaymentBtn)
-        return;
-
-
-    confirmPaymentBtn.addEventListener(
-        "click",
-        function() {
-
-            if (
-                qrPaymentConfirmed
-            )
-                return;
-
-
-            confirmPaymentBtn.disabled =
-                true;
-
-
-            confirmPaymentBtn.textContent =
-                "Đang xác minh...";
-
-
-            if (
-                paymentVerificationStatus
-            ) {
-
-                paymentVerificationStatus.textContent =
-                    "Đang xác minh thanh toán...";
-            }
-
-
-            setTimeout(
-                function() {
-
-                    qrPaymentConfirmed =
-                        true;
-
-
-                    confirmPaymentBtn.textContent =
-                        "✓ Đã xác nhận thanh toán";
-
-
-                    if (
-                        paymentVerificationStatus
-                    ) {
-
-                        paymentVerificationStatus.textContent =
-                            "Đã xác nhận thanh toán.";
-
-                        paymentVerificationStatus.classList.add(
-                            "success"
-                        );
-                    }
-
-
-                    if (checkoutButton) {
-
-                        checkoutButton.disabled =
-                            false;
-                    }
-
-
-                    showToast(
-                        "Đã xác nhận thanh toán."
-                    );
-
-                },
-                1000
-            );
-        }
-    );
-}
-
-
-/* =========================================================
-   28. KIỂM TRA FORM
-   ========================================================= */
+function setupQRPayment() { updateQR(); }
 
 function validateForm() {
 
@@ -2068,251 +1955,7 @@ async function checkStock() {
    30. TRỪ TIỀN VÍ
    ========================================================= */
 
-async function payWallet() {
-
-    const total =
-        getTotal();
-
-
-    const {
-        data: wallet,
-        error
-    } =
-        await supabaseRequest(
-            () =>
-                db
-                    .from("iuh_wallets")
-                    .select(
-                        "balance"
-                    )
-                    .eq(
-                        "user_id",
-                        currentUser.id
-                    )
-                    .maybeSingle()
-        );
-
-
-    if (error)
-        throw error;
-
-
-    if (!wallet) {
-
-        throw new Error(
-            "Ví IUH chưa được thiết lập."
-        );
-    }
-
-
-    const balance =
-        Number(
-            wallet.balance
-        ) || 0;
-
-
-    if (
-        balance <
-        total
-    ) {
-
-        throw new Error(
-            "Số dư Ví IUH không đủ."
-        );
-    }
-
-
-    const newBalance =
-        balance -
-        total;
-
-
-    const {
-        error: updateError
-    } =
-        await supabaseRequest(
-            () =>
-                db
-                    .from("iuh_wallets")
-                    .update({
-
-                        balance:
-                            newBalance,
-
-                        updated_at:
-                            new Date()
-                                .toISOString()
-
-                    })
-                    .eq(
-                        "user_id",
-                        currentUser.id
-                    )
-        );
-
-
-    if (updateError)
-        throw updateError;
-
-
-    walletBalance =
-        newBalance;
-}
-
-
-/* =========================================================
-   31. TRỪ TỒN KHO
-   ========================================================= */
-
-async function decreaseStock() {
-
-    for (
-        const item of checkoutItems
-    ) {
-
-        const {
-            data: product,
-            error
-        } =
-            await supabaseRequest(
-                () =>
-                    db
-                        .from("products")
-                        .select(
-                            "quantity"
-                        )
-                        .eq(
-                            "id",
-                            item.id
-                        )
-                        .maybeSingle()
-            );
-
-
-        if (error)
-            throw error;
-
-
-        if (!product) {
-
-            throw new Error(
-                `Không tìm thấy sản phẩm "${item.name}".`
-            );
-        }
-
-
-        const oldQuantity =
-            Number(
-                product.quantity
-            ) || 0;
-
-
-        const orderQuantity =
-            Number(
-                item.quantityInCart
-            ) || 0;
-
-
-        const newQuantity =
-            oldQuantity -
-            orderQuantity;
-
-
-        if (
-            newQuantity < 0
-        ) {
-
-            throw new Error(
-                `"${item.name}" không đủ hàng.`
-            );
-        }
-
-
-        const {
-            error: updateError
-        } =
-            await supabaseRequest(
-                () =>
-                    db
-                        .from("products")
-                        .update({
-
-                            quantity:
-                                newQuantity,
-
-                            status:
-                                newQuantity <= 0
-                                    ? "deleted"
-                                    : "active",
-
-                            updated_at:
-                                new Date()
-                                    .toISOString()
-
-                        })
-                        .eq(
-                            "id",
-                            item.id
-                        )
-            );
-
-
-        if (updateError)
-            throw updateError;
-    }
-}
-
-
-/* =========================================================
-   32. XÓA GIỎ HÀNG
-   ========================================================= */
-
-async function removeFromCart() {
-
-    if (isBuyNow)
-        return;
-
-
-    const ids =
-        checkoutItems
-            .map(
-                item =>
-                    item.cart_item_id
-            )
-            .filter(Boolean);
-
-
-    if (!ids.length)
-        return;
-
-
-    const {
-        error
-    } =
-        await supabaseRequest(
-            () =>
-                db
-                    .from("cart_items")
-                    .delete()
-                    .in(
-                        "id",
-                        ids
-                    )
-                    .eq(
-                        "user_id",
-                        currentUser.id
-                    )
-        );
-
-
-    if (error)
-        throw error;
-}
-
-
-/* =========================================================
-   33. TẠO THÔNG TIN ĐƠN
-   ========================================================= */
+// Wallet, stock and cart changes are committed together by create_order.
 
 function buildOrder() {
 
@@ -2451,360 +2094,42 @@ function saveLatestOrder(
    ========================================================= */
 
 async function submitOrder() {
-
-    if (isSubmitting)
-        return;
-
-    if (!currentUser) {
-        showToast("Vui lòng đăng nhập lại.");
-        return;
-    }
-
-    if (!checkoutItems.length) {
-        showToast("Không có sản phẩm để đặt hàng.");
-        return;
-    }
-
-    if (!validateForm())
-        return;
-
-    const paymentMethod =
-        document.querySelector(
-            'input[name="paymentMethod"]:checked'
-        )?.value;
-
-    if (!paymentMethod) {
-        showToast("Vui lòng chọn phương thức thanh toán.");
-        return;
-    }
-
-    /* QR phải xác nhận trước */
-    if (
-        paymentMethod === "qr" &&
-        !qrPaymentConfirmed
-    ) {
-        showToast("Vui lòng xác nhận thanh toán QR.");
-        return;
-    }
-
-    /* Kiểm tra ví */
-    if (paymentMethod === "iuh_wallet") {
-
-        const walletOK =
-            await loadWallet();
-
-        if (
-            !walletOK ||
-            walletBalance < getTotal()
-        ) {
-            showToast(
-                "Số dư Ví IUH không đủ."
-            );
-            return;
-        }
-    }
-
-    isSubmitting = true;
-
-    if (checkoutButton) {
-
-        checkoutButton.disabled = true;
-
-        const text =
-            checkoutButton.querySelector(
-                "span:first-child"
-            );
-
-        if (text)
-            text.textContent =
-                "Đang xử lý...";
-    }
-
-    try {
-
-        /* =========================================
-           1. KIỂM TRA TỒN KHO
-        ========================================= */
-
-        await checkStock();
-
-
-        /* =========================================
-           2. TẠO THÔNG TIN ĐƠN
-        ========================================= */
-
-        const order =
-            buildOrder();
-
-
-        /* =========================================
-           3. CHUYỂN ITEMS SANG JSON CHO RPC
-        ========================================= */
-
-        const orderItems =
-            checkoutItems.map(item => ({
-
-                product_id:
-                    Number(item.id),
-
-                seller_id:
-                    item.seller_id,
-
-                product_name:
-                    item.name,
-
-                product_image:
-                    getProductImage(
-                        item.image_urls
-                    ),
-
-                price:
-                    Number(item.price),
-
-                quantity:
-                    Number(item.quantityInCart),
-
-                subtotal:
-                    Number(item.price) *
-                    Number(item.quantityInCart)
-
-            }));
-
-
-        /* =========================================
-           4. ID GIỎ HÀNG CẦN XÓA
-        ========================================= */
-
-        const cartIds =
-            isBuyNow
-                ? []
-                : checkoutItems
-                    .map(item =>
-                        item.cart_item_id
-                    )
-                    .filter(Boolean);
-
-
-        /* =========================================
-           5. TẠO ĐƠN TRỰC TIẾP TRONG DATABASE
-        ========================================= */
-
-        const {
-            data,
-            error
-        } = await db.rpc(
-            "create_order",
-            {
-                p_recipient_name:
-                    order.recipient_name,
-
-                p_recipient_phone:
-                    order.recipient_phone,
-
-                p_recipient_address:
-                    order.recipient_address,
-
-                p_note:
-                    order.note,
-
-                p_shipping_method:
-                    order.shipping_method,
-
-                p_shipping_fee:
-                    order.shipping_fee,
-
-                p_payment_method:
-                    order.payment_method,
-
-                p_subtotal:
-                    order.subtotal,
-
-                p_total_amount:
-                    order.total_amount,
-
-                p_items:
-                    orderItems,
-
-                p_cart_ids:
-                    cartIds
-            }
-        );
-
-
-        if (error) {
-
-            console.error(
-                "Lỗi tạo đơn:",
-                error
-            );
-
-            throw error;
-        }
-
-
-        if (!data?.success) {
-
-            throw new Error(
-                data?.message ||
-                "Không thể tạo đơn hàng."
-            );
-        }
-
-        /* =========================================
-   6. THANH TOÁN ONLINE -> VÍ ADMIN
-========================================= */
-
-if (
-    paymentMethod === "iuh_wallet" ||
-    paymentMethod === "qr"
-) {
-
-    const createdOrderId =
-        data?.order_id ||
-        data?.id;
-
-
-    if (!createdOrderId) {
-
-        throw new Error(
-            "Đơn đã được tạo nhưng không lấy được ID đơn hàng để thanh toán."
-        );
-    }
-
-
-    const {
-        data: paymentData,
-        error: paymentError
-    } =
-        await db.rpc(
-            "pay_order_to_admin",
-            {
-                p_order_id:
-                    Number(
-                        createdOrderId
-                    )
-            }
-        );
-
-
-    if (paymentError) {
-
-        console.error(
-            "Lỗi thanh toán online:",
-            paymentError
-        );
-
-        throw new Error(
-            paymentError.message ||
-            "Không thể xử lý thanh toán online."
-        );
-    }
-
-
-    if (
-        !paymentData?.success
-    ) {
-
-        throw new Error(
-            "Không thể chuyển tiền thanh toán vào Ví Admin."
-        );
-    }
-
-
-    console.log(
-        "IUH SHOP: Thanh toán online thành công:",
-        paymentData
-    );
+ if (isSubmitting || checkoutSucceeded) return;
+ isSubmitting = true;
+ if (checkoutButton) checkoutButton.disabled = true;
+ try {
+   if (!currentUser) throw new Error('Vui lòng đăng nhập lại.');
+   if (!checkoutItems.length || !validateForm()) return;
+   const kinds=new Set(checkoutItems.map(i=>i.is_consignment));
+   const sellers=new Set(checkoutItems.map(i=>String(i.seller_id)));
+   if(kinds.size>1 || sellers.size>1) throw new Error('Vui lòng đặt riêng từng người bán và tách sản phẩm ký gửi khỏi sản phẩm thường.');
+   const order=buildOrder();
+   const args={p_recipient_name:order.recipient_name,p_recipient_phone:order.recipient_phone,
+     p_recipient_address:order.recipient_address,p_note:order.note,p_shipping_method:order.shipping_method,
+     p_shipping_fee:order.shipping_fee,p_payment_method:order.payment_method,p_subtotal:order.subtotal,
+     p_total_amount:order.total_amount,p_items:checkoutItems.map(i=>({product_id:Number(i.id),quantity:Number(i.quantityInCart)})),
+     p_cart_ids:isBuyNow?[]:checkoutItems.map(i=>i.cart_item_id).filter(Boolean)};
+   const storageKey='iuh-checkout-request:'+currentUser.id;
+   const fingerprint=JSON.stringify(args);
+   let pending; try { pending=JSON.parse(sessionStorage.getItem(storageKey)||'null'); } catch (_) {}
+   if(!pending || pending.fingerprint!==fingerprint) pending={fingerprint,key:crypto.randomUUID()};
+   sessionStorage.setItem(storageKey,JSON.stringify(pending));
+   args.p_idempotency_key=pending.key;
+   const {data,error}=await db.rpc('create_order',args);
+   if(error) throw error;
+   if(!data?.success) throw new Error(data?.message||'Không thể tạo đơn hàng.');
+   checkoutSucceeded=true;
+   sessionStorage.removeItem(storageKey);
+   showToast(data.payment_status==='paid'?'Đặt hàng và thanh toán thành công.':order.payment_method==='qr'?'Đã tạo đơn chờ đối soát chuyển khoản.':'Đặt hàng thành công.');
+   setTimeout(()=>{window.location.href='donhang.html';},1200);
+ } catch(error) {
+   console.error('Lỗi đặt hàng:',error);
+   showToast(error.message||'Chưa xác nhận được kết quả. Bấm lại để kiểm tra cùng yêu cầu, không tạo trùng đơn.');
+ } finally {
+   isSubmitting=false;
+   if(checkoutButton) checkoutButton.disabled=checkoutSucceeded;
+ }
 }
-
-
-        /* =========================================
-           6. THÀNH CÔNG
-        ========================================= */
-
-        if (checkoutButton) {
-
-            const text =
-                checkoutButton.querySelector(
-                    "span:first-child"
-                );
-
-            if (text)
-                text.textContent =
-                    "Đặt hàng thành công";
-        }
-
-
-        showToast(
-            "🎉 Đặt hàng thành công!"
-        );
-
-
-        console.log(
-            "IUH SHOP: Đã tạo đơn:",
-            data
-        );
-
-
-        /* Nếu thanh toán bằng ví thì cập nhật số dư */
-        if (
-            paymentMethod ===
-            "iuh_wallet"
-        ) {
-
-            await loadWallet();
-        }
-
-
-        /* =========================================
-           7. CHUYỂN SANG TRANG SẢN PHẨM
-        ========================================= */
-
-        setTimeout(() => {
-
-            window.location.href =
-                "sanpham.html";
-
-        }, 1500);
-
-
-    } catch (error) {
-
-        console.error(
-            "Lỗi đặt hàng:",
-            error
-        );
-
-        showToast(
-            error.message ||
-            "Đặt hàng thất bại."
-        );
-
-        if (checkoutButton) {
-
-            checkoutButton.disabled =
-                false;
-
-            const text =
-                checkoutButton.querySelector(
-                    "span:first-child"
-                );
-
-            if (text)
-                text.textContent =
-                    "Xác nhận đặt hàng";
-        }
-
-    } finally {
-
-        isSubmitting = false;
-    }
-}
-
-
-/* =========================================================
-   36. RADIO EVENTS
-   ========================================================= */
 
 function setupRadioEvents() {
 
@@ -2820,6 +2145,8 @@ function setupRadioEvents() {
                 updateOptionUI();
 
                 updateSummary();
+                updateQR();
+                await updatePaymentUI();
 
                 return;
             }

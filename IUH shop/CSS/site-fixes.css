@@ -1,0 +1,30 @@
+.iuh-panel{background:#fff;color:#203047;border:1px solid #dbe4ed;border-radius:14px;padding:20px;margin:20px auto;max-width:1100px;overflow-wrap:anywhere}
+.iuh-panel input,.iuh-panel textarea,.iuh-panel button{font:inherit;padding:9px;margin:5px;max-width:100%;box-sizing:border-box}
+.iuh-panel button{cursor:pointer;border:1px solid #b6c7dd;border-radius:7px;background:#edf4ff;color:#173e78}
+.iuh-panel button:disabled{opacity:.5;cursor:wait}
+.iuh-panel table{width:100%;border-collapse:collapse}.iuh-panel td,.iuh-panel th{padding:8px;text-align:left;border-bottom:1px solid #e2e8f0}
+.iuh-requests-list{display:grid;gap:12px}.iuh-requests-list article{border:1px solid #dbe4ed;border-radius:8px;padding:14px;overflow-wrap:anywhere}
+@media(max-width:768px){
+ .site-header .top-bar-container{width:100%;max-width:100%;padding:10px 14px;box-sizing:border-box;display:block}
+ .site-header .welcome-text1,.site-header .welcome-text{display:none}
+ .site-header .top-actions{display:flex!important;flex-direction:row!important;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px;width:100%;max-width:100%}
+ .site-header .global-search,.site-header .search-box{flex:1 0 100%;width:100%!important;min-width:0;max-width:100%;margin:0;box-sizing:border-box}
+ .site-header .global-search-input-wrap{width:100%;box-sizing:border-box}
+ .site-header .global-search-dropdown{width:100%;min-width:0;max-width:100%}
+ .site-header .top-message-icon,.site-header .top-cart-icon{position:static;margin:0;flex:0 0 36px}
+ .site-header .account-area{min-width:0;margin:0;max-width:calc(100% - 96px)}
+ .site-header .main-nav{max-width:100%;overflow-x:auto}
+ .site-header .nav-container{width:max-content;min-width:100%;box-sizing:border-box;gap:12px;padding:8px 14px}
+ .site-header .navigation{flex-wrap:nowrap;gap:16px}
+ .site-header .brand{flex-shrink:0;margin:0}
+ .site-header .brand-logo{width:42px}.site-header .brand-name{font-size:19px}
+ .site-footer .footer-brand-row{flex-wrap:wrap;gap:12px}
+ .site-footer .footer-logo img{width:60px!important;height:auto}
+ .site-footer .footer-brand-text{min-width:0;max-width:100%}
+ .site-footer .footer-brand-slogan{white-space:normal;overflow-wrap:anywhere}
+ .slider-container{height:auto!important;aspect-ratio:3 / 1}
+ .slide img{object-fit:contain!important}
+ .hero-slider{padding-top:14px}
+ .money-rain{display:none!important}
+ .iuh-panel{padding:14px;margin:12px}.iuh-panel form{display:flex;flex-direction:column;align-items:stretch}
+}

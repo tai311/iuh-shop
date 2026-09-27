@@ -9,10 +9,7 @@ const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 /* =====================================================
    MENU ACTIVE
@@ -123,6 +120,7 @@ async function loadProducts() {
     price,
     description,
     image_urls,
+    is_consignment,
     status,
     created_at,
     is_boosted,
@@ -201,7 +199,7 @@ async function loadProducts() {
                 error: userError
             } = await supabaseClient
 
-                .from("users")
+                .from("public_profiles")
 
                 .select(`
                     user_id,
@@ -620,7 +618,7 @@ function renderProductCard(product) {
     const firstImage =
         images.length > 0
             ? images[0]
-            : "../Images/default-product.png";
+            : "../Images/default-product.svg";
 
 
     const verified =
@@ -657,7 +655,7 @@ function renderProductCard(product) {
         alt="${esc(product.name)}"
         loading="lazy"
         onerror="
-            this.src='../Images/default-product.png'
+            this.src='../Images/default-product.svg'
         "
     >
 
@@ -694,7 +692,7 @@ function renderProductCard(product) {
 </div>
 
 <div class="product-price">
-    ${formatCurrency(getBuyerPrice(product.price))}
+    ${formatCurrency(product.is_consignment ? Number(product.price) : getBuyerPrice(product.price))}
 </div>
 
 

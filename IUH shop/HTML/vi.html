@@ -12,6 +12,7 @@
     >
      <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
     <link rel="stylesheet" href="../CSS/vi.css">
+<link rel="stylesheet" href="../CSS/site-fixes.css">
 </head>
 
 <body>
@@ -573,8 +574,8 @@
         </h2>
 
         <p>
-            Mô phỏng chuyển tiền từ tài khoản ngân hàng
-            vào Ví IUH SHOP.
+            Gửi yêu cầu ghi nhận khoản chuyển vào Ví IUH SHOP.
+            Liên hệ quản trị viên để nhận thông tin tài khoản nhận tiền.
         </p>
 
 
@@ -621,12 +622,13 @@
 
         <div class="demo-note">
 
-            Giao dịch này chỉ dùng để mô phỏng,
-            không phát sinh giao dịch ngân hàng thật.
+            Số dư chỉ tăng sau khi quản trị viên đối soát khoản tiền đã nhận.
 
         </div>
 
 
+        <label for="depositReference">Mã giao dịch ngân hàng đã chuyển</label>
+        <input id="depositReference" type="text" maxlength="200" placeholder="Nhập mã giao dịch để đối soát" required>
         <button
             class="modal-primary-btn"
             onclick="confirmDeposit()"
@@ -738,8 +740,8 @@
 
         <div class="demo-note">
 
-            Giao dịch được mô phỏng. Không chuyển tiền
-            thật đến tài khoản ngân hàng.
+            Số tiền yêu cầu được giữ khỏi số dư khả dụng. Quản trị viên chuyển tiền
+            qua ngân hàng rồi ghi nhận kết quả; gửi yêu cầu chưa có nghĩa là đã nhận tiền.
 
         </div>
 
@@ -883,7 +885,9 @@
     </div>
 
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/vendor/supabase.min.js"></script>
+<script src="../JS/vendor/purify.min.js"></script>
+<script src="../JS/iuh-core.js"></script>
 <script src="../JS/iuh-chat-notification.js"></script>
 <script src="../JS/vi.js"></script>
 <script src="../JS/vedau.js"></script>
@@ -902,5 +906,6 @@
         <path d="M6 11l6-6 6 6"></path>
     </svg>
 </button>
+<script src="../JS/wallet-requests.js"></script>
 </body>
 </html>

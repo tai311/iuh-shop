@@ -10,10 +10,7 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 
 
@@ -112,7 +109,7 @@ async function updateUserMenu() {
     data: profile,
     error
 } = await supabaseClient
-    .from("users")
+    .from("public_profiles")
     .select("fullname, avatar_url, role")
     .eq("user_id", user.id)
     .maybeSingle();
@@ -664,7 +661,7 @@ async function loadProfileUser(userId) {
         error
     } = await supabaseClient
 
-        .from("users")
+        .from("public_profiles")
 
         .select(`
             user_id,
@@ -673,7 +670,6 @@ async function loadProfileUser(userId) {
             role,
             student_verified,
             faculty,
-            student_id,
             bio
         `)
 
@@ -841,7 +837,7 @@ function setupProfileOwnerUI(profile) {
 
     const changeAvatarButton =
         document.getElementById("changeAvatarButton");
-    
+
     const profileActionArea =
     document.getElementById("profileActionArea");
 
@@ -964,36 +960,10 @@ if (messageUserButton) {
    NÚT BÁO CÁO
 ========================================== */
 
-if (reportUserButton) {
-
-    reportUserButton.onclick =
-        function () {
-
-            openUserReportModal(
-                currentProfileUserId,
-                profile?.fullname ||
-                "Người dùng"
-            );
-
-        };
-
-}
 
 
-    if (reportUserButton) {
 
-        reportUserButton.onclick =
-            function () {
 
-                openUserReportModal(
-                    currentProfileUserId,
-                    profile?.fullname ||
-                    "Người dùng"
-                );
-
-            };
-
-    }
 
     // ==========================================
     // KHÔNG PHẢI CHỦ TÀI KHOẢN
@@ -1884,7 +1854,7 @@ async function loadProfileProducts(userId) {
 
                 const image =
                     images[0] ||
-                    "../Images/default-product.png";
+                    "../Images/default-product.svg";
 
 
                 /* -----------------------------------------
@@ -1937,7 +1907,7 @@ async function loadProfileProducts(userId) {
                             alt="${escapeProfileHTML(title)}"
                             class="profile-product-image"
                             onerror="
-                                this.src='../Images/default-product.png';
+                                this.src='../Images/default-product.svg';
                             "
                         >
 
@@ -2153,7 +2123,7 @@ async function loadProfilePosts(userId) {
             error: authorError
         } =
             await supabaseClient
-                .from("users")
+                .from("public_profiles")
                 .select(`
                     user_id,
                     fullname,
@@ -3532,34 +3502,20 @@ function setupUserReportModal() {
             }
 
 
-            console.log(
-                "Báo cáo người dùng:",
-                {
-                    reported_user_id:
-                        currentProfileUserId,
+            const button=form.querySelector('[type="submit"]');
+            if(button?.disabled) return;
+            if(button) button.disabled=true;
+            try {
+              const {data:{user},error:authError}=await supabaseClient.auth.getUser();
+              if(authError||!user) throw new Error('Vui lòng đăng nhập để gửi báo cáo.');
+              if(user.id===currentProfileUserId) throw new Error('Bạn không thể báo cáo chính mình.');
+              const {error}=await supabaseClient.from('user_reports').insert({reporter_id:user.id,reported_user_id:currentProfileUserId,reason,description:description||''});
+              if(error) throw error;
+              alert('Đã gửi báo cáo. Cảm ơn bạn đã phản hồi.');
+              closeModal();
+            } catch(error) { alert(error.message||'Không gửi được báo cáo. Vui lòng thử lại.'); }
+            finally {if(button) button.disabled=false;}
 
-                    reason:
-                        reason,
-
-                    description:
-                        description
-                }
-            );
-
-
-            /*
-             * Tạm thời thông báo thành công.
-             *
-             * Khi bạn có bảng reports trong Supabase
-             * thì phần INSERT sẽ đặt ở đây.
-             */
-
-            alert(
-                "Đã gửi báo cáo. Cảm ơn bạn đã phản hồi."
-            );
-
-
-            closeModal();
 
         }
     );

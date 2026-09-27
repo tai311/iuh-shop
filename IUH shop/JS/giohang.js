@@ -10,10 +10,7 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 
 
@@ -1133,7 +1130,7 @@ function createCartItemHTML(
 
     const price =
     Math.round(
-        (Number(item.price) || 0) * 1.05
+        (Number(item.price) || 0) * (item.is_consignment ? 1 : 1.05)
     );
 
 const itemTotal =
@@ -1148,7 +1145,7 @@ const itemTotal =
      */
 
     let imageUrl =
-        "../Images/default-product.png";
+        "../Images/default-product.svg";
 
 
     if (
@@ -1205,7 +1202,7 @@ const itemTotal =
                         "Sản phẩm"
                     )}"
                     onerror="
-                        this.src='../Images/default-product.png'
+                        this.src='../Images/default-product.svg'
                     "
                 >
 
@@ -1778,7 +1775,7 @@ function updateSelectAllState() {
     const selectableItems =
         cartItems.filter(
             item =>
-                Number(item.stock) > 0
+                Number(item.stock) > 0 && item.status === "active"
         );
 
 
@@ -1933,7 +1930,7 @@ function updateSummary() {
         cartItems.filter(
             item =>
                 isItemSelected(item) &&
-                Number(item.stock) > 0
+                Number(item.stock) > 0 && item.status === "active"
         );
 
 
@@ -2067,7 +2064,7 @@ if (proceedCheckout) {
                 cartItems.filter(
                     item =>
                         isItemSelected(item) &&
-                        Number(item.stock) > 0
+                        Number(item.stock) > 0 && item.status === "active"
                 );
 
 
@@ -2087,6 +2084,11 @@ if (proceedCheckout) {
              * Chỉ truyền ID của các dòng cart_items
              * được chọn.
              */
+
+            if(new Set(selectedItems.map(i=>i.is_consignment)).size>1 || new Set(selectedItems.map(i=>String(i.seller_id))).size>1) {
+                showCartMessage('Vui lòng chọn sản phẩm cùng người bán và cùng loại thường/ký gửi cho mỗi đơn.');
+                return;
+            }
 
             const cartIds =
                 selectedItems.map(
@@ -2185,34 +2187,8 @@ function showCartMessage(
    ESCAPE HTML
    ========================================================= */
 
-function escapeHTML(
-    value
-) {
-
-    return String(
-        value ?? ""
-    )
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
-
+function escapeHTML(value) {
+ return String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 
 

@@ -172,6 +172,34 @@
     font-size: 10px;
 }
 
+.service-package-pending {
+    display: grid;
+    gap: 7px;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid #d3dff4;
+    border-radius: 8px;
+    color: #183b78;
+    background: #f1f6ff;
+    overflow-wrap: anywhere;
+    font-size: 12px;
+}
+
+.service-package-pending p { margin: 0; line-height: 1.5; }
+.service-package-pending button {
+    justify-self: start;
+    padding: 7px 10px;
+    border: 1px solid #bdcde8;
+    border-radius: 6px;
+    background: #fff;
+    color: #183b78;
+    cursor: pointer;
+}
+
+.upgrade-modal button:disabled { cursor: not-allowed; opacity: .65; }
+.upgrade-modal button:focus-visible,
+.upgrade-modal input:focus-visible { outline: 3px solid #3977d5; outline-offset: 3px; }
+
 @media (max-width: 540px) {
     .service-package-member-form {
         align-items: stretch;

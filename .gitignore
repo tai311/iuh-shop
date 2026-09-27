@@ -1,0 +1,19 @@
+node_modules/
+.env
+.env.*
+!.env.example
+supabase/.temp/
+IUH shop/supabase/.temp/
+test-results/
+
+# Local audit captures; retain only reports and fixtures needed by regression tests.
+audit/*
+!audit/REPAIR-REPORT.md
+!audit/db-0.json
+!audit/db-1.json
+!audit/db-2.json
+!audit/db-4.json
+!audit/pre-fix-indexes.json
+!audit/pre-fix-tables.json
+!audit/test-chat.cjs
+!audit/test-social.cjs

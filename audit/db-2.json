@@ -1,0 +1,56 @@
+[
+  {
+    "json_build_object": {
+      "indexes": [
+        {
+          "tablename": "service_package_members",
+          "indexname": "service_package_members_pkey",
+          "indexdef": "CREATE UNIQUE INDEX service_package_members_pkey ON public.service_package_members USING btree (id)"
+        },
+        {
+          "tablename": "service_package_members",
+          "indexname": "service_package_members_package_id_user_id_key",
+          "indexdef": "CREATE UNIQUE INDEX service_package_members_package_id_user_id_key ON public.service_package_members USING btree (package_id, user_id)"
+        },
+        {
+          "tablename": "service_package_members",
+          "indexname": "service_package_members_user_id_idx",
+          "indexdef": "CREATE INDEX service_package_members_user_id_idx ON public.service_package_members USING btree (user_id)"
+        },
+        {
+          "tablename": "service_packages",
+          "indexname": "service_packages_pkey",
+          "indexdef": "CREATE UNIQUE INDEX service_packages_pkey ON public.service_packages USING btree (id)"
+        },
+        {
+          "tablename": "service_packages",
+          "indexname": "service_packages_transaction_code_key",
+          "indexdef": "CREATE UNIQUE INDEX service_packages_transaction_code_key ON public.service_packages USING btree (transaction_code)"
+        },
+        {
+          "tablename": "service_packages",
+          "indexname": "service_packages_owner_id_idx",
+          "indexdef": "CREATE INDEX service_packages_owner_id_idx ON public.service_packages USING btree (owner_id)"
+        },
+        {
+          "tablename": "service_packages",
+          "indexname": "service_packages_active_expiry_idx",
+          "indexdef": "CREATE INDEX service_packages_active_expiry_idx ON public.service_packages USING btree (status, expires_at)"
+        },
+        {
+          "tablename": "service_packages",
+          "indexname": "one_active_package_per_owner_idx",
+          "indexdef": "CREATE UNIQUE INDEX one_active_package_per_owner_idx ON public.service_packages USING btree (owner_id) WHERE (status = ANY (ARRAY['pending'::text, 'active'::text]))"
+        }
+      ],
+      "triggers": null,
+      "user_privileges": null,
+      "private_functions": [
+        {
+          "proname": "is_admin",
+          "definition": "CREATE OR REPLACE FUNCTION private.is_admin()\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\n    select exists (\r\n        select 1\r\n        from public.users\r\n        where user_id = (select auth.uid())\r\n          and lower(coalesce(role, '')) = 'admin'\r\n    );\r\n$function$\n"
+        }
+      ]
+    }
+  }
+]

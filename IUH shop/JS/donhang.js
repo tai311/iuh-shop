@@ -11,10 +11,7 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 window.IUH_SUPABASE =
     window.IUH_SUPABASE ||
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 const supabaseClient =
     window.IUH_SUPABASE;
@@ -1524,7 +1521,7 @@ function renderPurchaseCard(order) {
 
                 ${renderStatus(
                     order._status
-                )}
+                )}<span class="order-payment-state">${escapeHtml(order.needs_payment_review ? "Cần đối soát đơn cũ" : order.payment_status === "paid" ? "Đã thanh toán" : order.payment_status === "refunded" ? "Đã hoàn tiền" : order.payment_status === "refund_pending" ? "Chờ hoàn tiền ngân hàng" : order.payment_method === "cash" ? "Thanh toán khi nhận hàng" : "Chờ đối soát chuyển khoản")}</span>
 
             </div>
 
@@ -1813,7 +1810,7 @@ function renderSaleCard(order) {
 
                 ${renderStatus(
                     order._status
-                )}
+                )}<span class="order-payment-state">${escapeHtml(order.needs_payment_review ? "Cần đối soát đơn cũ" : order.payment_status === "paid" ? "Đã thanh toán" : order.payment_status === "refunded" ? "Đã hoàn tiền" : order.payment_status === "refund_pending" ? "Chờ hoàn tiền ngân hàng" : order.payment_method === "cash" ? "Thanh toán khi nhận hàng" : "Chờ đối soát chuyển khoản")}</span>
 
             </div>
 
@@ -1981,6 +1978,7 @@ function renderStatusOptions(
 
 
     return STATUS_ORDER
+        .filter(status => status !== "completed")
         .map(
             (
                 status,
@@ -1989,7 +1987,7 @@ function renderStatusOptions(
 
                 if (
                     index <
-                    currentIndex
+                    currentIndex || index > currentIndex + 1
                 ) {
 
                     return "";
@@ -2251,7 +2249,7 @@ async function cancelOrder(orderId) {
            THÔNG BÁO
         ========================= */
 
-        if (
+        if (data.refund_pending) { alert("Đã hủy đơn. Yêu cầu hoàn tiền ngân hàng đang chờ quản trị viên xử lý; tiền chưa được hoàn vào tài khoản."); } else if (
             data.refunded === true
         ) {
 
@@ -2423,53 +2421,7 @@ async function updateOrderStatus(
             return;
         }
 
-        /* =========================================
-   GIẢI NGÂN ONLINE
-   ADMIN -> SELLER
-========================================= */
-
-if (newStatus === "completed") {
-
-    const {
-        data: settlementData,
-        error: settlementError
-    } = await db.rpc(
-        "settle_online_order",
-        {
-            p_order_id:
-                Number(orderId)
-        }
-    );
-
-
-    if (settlementError) {
-
-        console.error(
-            "Lỗi giải ngân:",
-            settlementError
-        );
-
-        alert(
-            "Đơn đã hoàn tất nhưng giải ngân thất bại:\n\n" +
-            settlementError.message
-        );
-
-        return;
-    }
-
-
-    if (
-        settlementData?.settled === true
-    ) {
-
-        alert(
-            "✓ Đơn hàng đã hoàn tất.\n\n" +
-            "Tiền đã được giải ngân vào Ví IUH của người bán."
-        );
-
-    }
-}
-
+        // update_order_status settles in the same transaction.
 
         alert(
             "✓ Đã cập nhật trạng thái đơn hàng."

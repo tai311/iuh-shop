@@ -12,6 +12,7 @@
     >
     <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
     <link rel="stylesheet" href="../CSS/dashboard.css">
+<link rel="stylesheet" href="../CSS/site-fixes.css">
 </head>
 
 <body>
@@ -679,7 +680,7 @@
                 IUH SHOP. Đối với đơn COD, phí được ghi nhận
                 sau khi đơn hoàn thành. Người bán có thời hạn
                 07 ngày để thanh toán. Khoản phí quá hạn sẽ
-                được tính phí chậm thanh toán theo cơ chế lãi kép.
+                cần thanh toán phí dịch vụ hiển thị trong từng đơn. Hệ thống không tự cộng lãi chậm trả.
             </p>
 
         </div>
@@ -815,7 +816,9 @@
 
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/vendor/supabase.min.js"></script>
+<script src="../JS/vendor/purify.min.js"></script>
+<script src="../JS/iuh-core.js"></script>
 <script src="../JS/iuh-chat-notification.js"></script>
 <script src="../JS/dashboard.js"></script>
 <script src="../JS/vedau.js"></script>
@@ -924,7 +927,7 @@
                 </span>
 
                 <strong class="payment-demo-status">
-                    Mô phỏng
+                    Số dư Ví IUH
                 </strong>
 
             </div>
@@ -941,9 +944,8 @@
             </span>
 
             <p>
-                Đây là giao dịch mô phỏng phục vụ mục đích
-                trình diễn hệ thống. Không phát sinh giao dịch
-                tài chính thực tế.
+                Phí được trừ từ số dư Ví IUH và ghi nhận cho đúng đơn hàng.
+                Thao tác này không tự chuyển tiền từ tài khoản ngân hàng của bạn.
             </p>
 
         </div>

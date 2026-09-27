@@ -10,10 +10,7 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 
 
@@ -621,7 +618,7 @@ function getFirstImage(product) {
     }
 
 
-    return "../Images/default-product.png";
+    return "../Images/default-product.svg";
 
 }
 
@@ -893,7 +890,7 @@ function createProductCard(
             src="${escapeHTML(image)}"
             alt="${escapeHTML(product.name)}"
             onerror="
-                this.src='../Images/default-product.png'
+                this.src='../Images/default-product.svg'
             "
         >
 
@@ -1070,28 +1067,7 @@ async function updateProductStatus(
             sửa được tin của chính mình.
         */
 
-        const {
-            error
-        } =
-            await supabaseClient
-
-                .from("products")
-
-                .update({
-                    status:
-                        newStatus
-                })
-
-                .eq(
-                    "id",
-                    productId
-                )
-
-                .eq(
-                    "seller_id",
-                    currentUser.id
-                );
-
+        const {error}=await supabaseClient.rpc('set_product_status',{p_product_id:Number(productId),p_status:newStatus});
 
         if (error) {
             throw error;

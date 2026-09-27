@@ -1,0 +1,222 @@
+[
+  {
+    "json_build_object": {
+      "triggers": [
+        {
+          "schema_name": "auth",
+          "table_name": "users",
+          "tgname": "on_auth_user_created",
+          "definition": "CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user()"
+        },
+        {
+          "schema_name": "public",
+          "table_name": "service_packages",
+          "tgname": "service_packages_expiry_trigger",
+          "definition": "CREATE TRIGGER service_packages_expiry_trigger BEFORE INSERT OR UPDATE ON public.service_packages FOR EACH ROW EXECUTE FUNCTION expire_service_packages()"
+        },
+        {
+          "schema_name": "public",
+          "table_name": "service_packages",
+          "tgname": "service_packages_owner_trigger",
+          "definition": "CREATE TRIGGER service_packages_owner_trigger AFTER INSERT ON public.service_packages FOR EACH ROW EXECUTE FUNCTION add_service_package_owner()"
+        },
+        {
+          "schema_name": "public",
+          "table_name": "order_items",
+          "tgname": "trg_sync_consignment_on_order_item",
+          "definition": "CREATE TRIGGER trg_sync_consignment_on_order_item AFTER INSERT ON public.order_items FOR EACH ROW EXECUTE FUNCTION sync_consignment_on_order_item()"
+        },
+        {
+          "schema_name": "public",
+          "table_name": "orders",
+          "tgname": "trg_sync_consignment_on_order_completed",
+          "definition": "CREATE TRIGGER trg_sync_consignment_on_order_completed AFTER UPDATE OF status ON public.orders FOR EACH ROW EXECUTE FUNCTION sync_consignment_on_order_completed()"
+        }
+      ],
+      "grants": [
+        {
+          "relname": "iuh_wallets",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "wallet_transactions",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "consignment_items",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "order_items",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "order_status_history",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "orders",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "product_reports",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "consignment_requests",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "products",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "users",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "site_reviews",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "conversations",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "conversation_members",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "messages",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "service_packages",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "service_package_members",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "donations",
+          "can_select": true,
+          "can_insert": false,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "forum_comments",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "message_reactions",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "forum_reactions",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "forum_posts",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "forum_comment_reactions",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "forum_articles",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "advertisements",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        },
+        {
+          "relname": "cart_items",
+          "can_select": true,
+          "can_insert": true,
+          "can_update": true,
+          "can_delete": true
+        }
+      ],
+      "extensions": [
+        "plpgsql",
+        "pg_stat_statements",
+        "uuid-ossp",
+        "pgcrypto",
+        "supabase_vault"
+      ]
+    }
+  }
+]

@@ -1,0 +1,2328 @@
+{
+  "columns": [
+    {
+      "relname": "advertisements",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "advertisements",
+      "attname": "ad_name",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "advertisements",
+      "attname": "partner",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "advertisements",
+      "attname": "duration_days",
+      "data_type": "integer",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "advertisements",
+      "attname": "start_date",
+      "data_type": "date",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "advertisements",
+      "attname": "end_date",
+      "data_type": "date",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "advertisements",
+      "attname": "revenue",
+      "data_type": "numeric(12,2)",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "advertisements",
+      "attname": "status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'active'::text"
+    },
+    {
+      "relname": "advertisements",
+      "attname": "created_by",
+      "data_type": "uuid",
+      "attnotnull": false,
+      "default_value": "auth.uid()"
+    },
+    {
+      "relname": "advertisements",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "advertisements",
+      "attname": "placement",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": "'homepage'::text"
+    },
+    {
+      "relname": "advertisements",
+      "attname": "image_url",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "advertisements",
+      "attname": "title",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "advertisements",
+      "attname": "description",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "advertisements",
+      "attname": "button_text",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": "'Xem ngay'::text"
+    },
+    {
+      "relname": "advertisements",
+      "attname": "target_url",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "cart_items",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "cart_items",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "cart_items",
+      "attname": "product_id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "cart_items",
+      "attname": "quantity",
+      "data_type": "integer",
+      "attnotnull": true,
+      "default_value": "1"
+    },
+    {
+      "relname": "cart_items",
+      "attname": "selected",
+      "data_type": "boolean",
+      "attnotnull": true,
+      "default_value": "true"
+    },
+    {
+      "relname": "cart_items",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "cart_items",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "seller_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "product_name",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "category",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "description",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "image_urls",
+      "data_type": "jsonb",
+      "attnotnull": false,
+      "default_value": "'[]'::jsonb"
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "seller_price",
+      "data_type": "numeric(12,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "commission_rate",
+      "data_type": "numeric(5,2)",
+      "attnotnull": true,
+      "default_value": "5"
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "commission_amount",
+      "data_type": "numeric(12,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "seller_receive",
+      "data_type": "numeric(12,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'pending'::text"
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "received_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "sold_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "returned_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "note",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "consignment_items",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "product_name",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "category",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "condition",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "description",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "selling_price",
+      "data_type": "numeric(12,2)",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "service_fee",
+      "data_type": "numeric(12,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "seller_receive",
+      "data_type": "numeric(12,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "delivery_method",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "image_names",
+      "data_type": "text[]",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'pending'::text"
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "admin_note",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "reviewed_by",
+      "data_type": "uuid",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "reviewed_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "payout_status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'unpaid'::text"
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "sold_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "paid_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "processed_by",
+      "data_type": "uuid",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "payout_transaction_id",
+      "data_type": "bigint",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "consignment_requests",
+      "attname": "product_id",
+      "data_type": "bigint",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "conversation_members",
+      "attname": "conversation_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "conversation_members",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "conversation_members",
+      "attname": "joined_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "conversations",
+      "attname": "id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "conversations",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "conversations",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "conversations",
+      "attname": "last_message",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "conversations",
+      "attname": "last_message_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "conversations",
+      "attname": "is_admin_chat",
+      "data_type": "boolean",
+      "attnotnull": true,
+      "default_value": "false"
+    },
+    {
+      "relname": "donations",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "donations",
+      "attname": "donor_id",
+      "data_type": "uuid",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "donations",
+      "attname": "donor_name",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "donations",
+      "attname": "amount",
+      "data_type": "numeric(12,2)",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "donations",
+      "attname": "payment_method",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'simulated_bank_transfer'::text"
+    },
+    {
+      "relname": "donations",
+      "attname": "transfer_code",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "donations",
+      "attname": "status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'completed'::text"
+    },
+    {
+      "relname": "donations",
+      "attname": "note",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "donations",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "donations",
+      "attname": "bank_name",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "donations",
+      "attname": "transfer_content",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "forum_articles",
+      "attname": "id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "forum_articles",
+      "attname": "author_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_articles",
+      "attname": "title",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_articles",
+      "attname": "category",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": "'THÔNG BÁO'::text"
+    },
+    {
+      "relname": "forum_articles",
+      "attname": "content",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_articles",
+      "attname": "image_url",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "forum_articles",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": "now()"
+    },
+    {
+      "relname": "forum_articles",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": "now()"
+    },
+    {
+      "relname": "forum_comment_reactions",
+      "attname": "id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "forum_comment_reactions",
+      "attname": "comment_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_comment_reactions",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_comment_reactions",
+      "attname": "reaction",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_comment_reactions",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": "now()"
+    },
+    {
+      "relname": "forum_comments",
+      "attname": "id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "forum_comments",
+      "attname": "post_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_comments",
+      "attname": "author_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_comments",
+      "attname": "parent_id",
+      "data_type": "uuid",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "forum_comments",
+      "attname": "content",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_comments",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "forum_comments",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "forum_comments",
+      "attname": "moderation_status",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": "'active'::text"
+    },
+    {
+      "relname": "forum_comments",
+      "attname": "moderated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "forum_comments",
+      "attname": "moderated_by",
+      "data_type": "uuid",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "forum_posts",
+      "attname": "id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "forum_posts",
+      "attname": "author_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_posts",
+      "attname": "content",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_posts",
+      "attname": "image_url",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "forum_posts",
+      "attname": "post_type",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'discussion'::text"
+    },
+    {
+      "relname": "forum_posts",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "forum_posts",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "forum_posts",
+      "attname": "moderation_status",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": "'active'::text"
+    },
+    {
+      "relname": "forum_posts",
+      "attname": "moderated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "forum_posts",
+      "attname": "moderated_by",
+      "data_type": "uuid",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "forum_reactions",
+      "attname": "id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "forum_reactions",
+      "attname": "post_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_reactions",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_reactions",
+      "attname": "reaction",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "forum_reactions",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "iuh_wallets",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "iuh_wallets",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "iuh_wallets",
+      "attname": "balance",
+      "data_type": "numeric(14,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "iuh_wallets",
+      "attname": "pending",
+      "data_type": "numeric(14,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "iuh_wallets",
+      "attname": "total_received",
+      "data_type": "numeric(14,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "iuh_wallets",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "message_reactions",
+      "attname": "id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "message_reactions",
+      "attname": "message_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "message_reactions",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "message_reactions",
+      "attname": "reaction",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "message_reactions",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "messages",
+      "attname": "id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "messages",
+      "attname": "conversation_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "messages",
+      "attname": "sender_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "messages",
+      "attname": "content",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "messages",
+      "attname": "message_type",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'text'::text"
+    },
+    {
+      "relname": "messages",
+      "attname": "image_url",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "messages",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "messages",
+      "attname": "is_read",
+      "data_type": "boolean",
+      "attnotnull": true,
+      "default_value": "false"
+    },
+    {
+      "relname": "messages",
+      "attname": "edited_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "messages",
+      "attname": "recalled_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "messages",
+      "attname": "product_id",
+      "data_type": "bigint",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "order_items",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_items",
+      "attname": "order_id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_items",
+      "attname": "product_id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_items",
+      "attname": "seller_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_items",
+      "attname": "product_name",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_items",
+      "attname": "product_image",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "order_items",
+      "attname": "price",
+      "data_type": "numeric(14,2)",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_items",
+      "attname": "quantity",
+      "data_type": "integer",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_items",
+      "attname": "subtotal",
+      "data_type": "numeric(14,2)",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_items",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "order_status_history",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_status_history",
+      "attname": "order_id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_status_history",
+      "attname": "status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "order_status_history",
+      "attname": "changed_by",
+      "data_type": "uuid",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "order_status_history",
+      "attname": "note",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "order_status_history",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "orders",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "order_code",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "buyer_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "recipient_name",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "recipient_phone",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "recipient_address",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "note",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "shipping_method",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "shipping_fee",
+      "data_type": "numeric(14,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "orders",
+      "attname": "payment_method",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "subtotal",
+      "data_type": "numeric(14,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "orders",
+      "attname": "total_amount",
+      "data_type": "numeric(14,2)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "orders",
+      "attname": "status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'pending'::text"
+    },
+    {
+      "relname": "orders",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "orders",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "orders",
+      "attname": "payment_status",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": "'unpaid'::text"
+    },
+    {
+      "relname": "orders",
+      "attname": "paid_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "settled_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "orders",
+      "attname": "order_type",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'normal'::text"
+    },
+    {
+      "relname": "product_reports",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "product_reports",
+      "attname": "product_id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "product_reports",
+      "attname": "reporter_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "product_reports",
+      "attname": "reason",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "product_reports",
+      "attname": "description",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "product_reports",
+      "attname": "status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'pending'::text"
+    },
+    {
+      "relname": "product_reports",
+      "attname": "admin_note",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "product_reports",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "product_reports",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "products",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "products",
+      "attname": "seller_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "products",
+      "attname": "name",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "products",
+      "attname": "category",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "products",
+      "attname": "quantity",
+      "data_type": "integer",
+      "attnotnull": true,
+      "default_value": "1"
+    },
+    {
+      "relname": "products",
+      "attname": "description",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "products",
+      "attname": "image_urls",
+      "data_type": "jsonb",
+      "attnotnull": true,
+      "default_value": "'[]'::jsonb"
+    },
+    {
+      "relname": "products",
+      "attname": "status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'active'::text"
+    },
+    {
+      "relname": "products",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "products",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "products",
+      "attname": "price",
+      "data_type": "numeric(12,0)",
+      "attnotnull": true,
+      "default_value": "0"
+    },
+    {
+      "relname": "products",
+      "attname": "is_boosted",
+      "data_type": "boolean",
+      "attnotnull": true,
+      "default_value": "false"
+    },
+    {
+      "relname": "products",
+      "attname": "boost_started_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "products",
+      "attname": "boost_expires_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "products",
+      "attname": "is_consignment",
+      "data_type": "boolean",
+      "attnotnull": true,
+      "default_value": "false"
+    },
+    {
+      "relname": "products",
+      "attname": "consignment_request_id",
+      "data_type": "bigint",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "service_package_members",
+      "attname": "id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "service_package_members",
+      "attname": "package_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "service_package_members",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "service_package_members",
+      "attname": "member_role",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'member'::text"
+    },
+    {
+      "relname": "service_package_members",
+      "attname": "joined_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "service_packages",
+      "attname": "id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "service_packages",
+      "attname": "owner_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "service_packages",
+      "attname": "plan_type",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "service_packages",
+      "attname": "price",
+      "data_type": "integer",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "service_packages",
+      "attname": "payment_method",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'wallet'::text"
+    },
+    {
+      "relname": "service_packages",
+      "attname": "transaction_code",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "service_packages",
+      "attname": "status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'active'::text"
+    },
+    {
+      "relname": "service_packages",
+      "attname": "starts_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "service_packages",
+      "attname": "expires_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "service_packages",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "site_reviews",
+      "attname": "review_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "relname": "site_reviews",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "site_reviews",
+      "attname": "rating",
+      "data_type": "smallint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "site_reviews",
+      "attname": "content",
+      "data_type": "character varying(1000)",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "site_reviews",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "site_reviews",
+      "attname": "updated_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    },
+    {
+      "relname": "users",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "fullname",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "student_id",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "faculty",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "email",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "phone",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "password_hash",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "created_at",
+      "data_type": "timestamp without time zone",
+      "attnotnull": false,
+      "default_value": "now()"
+    },
+    {
+      "relname": "users",
+      "attname": "avatar_url",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "role",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'user'::text"
+    },
+    {
+      "relname": "users",
+      "attname": "student_verified",
+      "data_type": "boolean",
+      "attnotnull": true,
+      "default_value": "false"
+    },
+    {
+      "relname": "users",
+      "attname": "verification_status",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'none'::text"
+    },
+    {
+      "relname": "users",
+      "attname": "student_card_url",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "verified_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "verification_method",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": "'none'::text"
+    },
+    {
+      "relname": "users",
+      "attname": "verified_by",
+      "data_type": "uuid",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "bio",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "terms_accepted",
+      "data_type": "boolean",
+      "attnotnull": false,
+      "default_value": "false"
+    },
+    {
+      "relname": "users",
+      "attname": "terms_accepted_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "terms_version",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "users",
+      "attname": "is_graduated",
+      "data_type": "boolean",
+      "attnotnull": true,
+      "default_value": "false"
+    },
+    {
+      "relname": "wallet_transactions",
+      "attname": "id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "wallet_transactions",
+      "attname": "wallet_id",
+      "data_type": "bigint",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "wallet_transactions",
+      "attname": "user_id",
+      "data_type": "uuid",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "wallet_transactions",
+      "attname": "type",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "wallet_transactions",
+      "attname": "title",
+      "data_type": "text",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "wallet_transactions",
+      "attname": "amount",
+      "data_type": "numeric(14,2)",
+      "attnotnull": true,
+      "default_value": null
+    },
+    {
+      "relname": "wallet_transactions",
+      "attname": "description",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "wallet_transactions",
+      "attname": "bank",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "wallet_transactions",
+      "attname": "account",
+      "data_type": "text",
+      "attnotnull": false,
+      "default_value": null
+    },
+    {
+      "relname": "wallet_transactions",
+      "attname": "created_at",
+      "data_type": "timestamp with time zone",
+      "attnotnull": true,
+      "default_value": "now()"
+    }
+  ],
+  "constraints": [
+    {
+      "relname": "iuh_wallets",
+      "conname": "iuh_wallets_balance_check",
+      "definition": "CHECK ((balance >= (0)::numeric))"
+    },
+    {
+      "relname": "iuh_wallets",
+      "conname": "iuh_wallets_pending_check",
+      "definition": "CHECK ((pending >= (0)::numeric))"
+    },
+    {
+      "relname": "iuh_wallets",
+      "conname": "iuh_wallets_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "iuh_wallets",
+      "conname": "iuh_wallets_total_received_check",
+      "definition": "CHECK ((total_received >= (0)::numeric))"
+    },
+    {
+      "relname": "iuh_wallets",
+      "conname": "iuh_wallets_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "iuh_wallets",
+      "conname": "iuh_wallets_user_unique",
+      "definition": "UNIQUE (user_id)"
+    },
+    {
+      "relname": "wallet_transactions",
+      "conname": "wallet_transactions_amount_check",
+      "definition": "CHECK ((amount > (0)::numeric))"
+    },
+    {
+      "relname": "wallet_transactions",
+      "conname": "wallet_transactions_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "wallet_transactions",
+      "conname": "wallet_transactions_type_check",
+      "definition": "CHECK ((type = ANY (ARRAY['deposit'::text, 'withdraw'::text, 'payment'::text, 'fee'::text, 'sale'::text])))"
+    },
+    {
+      "relname": "wallet_transactions",
+      "conname": "wallet_transactions_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "wallet_transactions",
+      "conname": "wallet_transactions_wallet_id_fkey",
+      "definition": "FOREIGN KEY (wallet_id) REFERENCES iuh_wallets(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "consignment_items",
+      "conname": "consignment_items_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "consignment_items",
+      "conname": "consignment_items_seller_id_fkey",
+      "definition": "FOREIGN KEY (seller_id) REFERENCES users(user_id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "consignment_items",
+      "conname": "consignment_items_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'selling'::text, 'sold'::text, 'returned'::text, 'rejected'::text, 'cancelled'::text])))"
+    },
+    {
+      "relname": "order_items",
+      "conname": "order_items_order_id_fkey",
+      "definition": "FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "order_items",
+      "conname": "order_items_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "order_items",
+      "conname": "order_items_product_id_fkey",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT"
+    },
+    {
+      "relname": "order_items",
+      "conname": "order_items_quantity_check",
+      "definition": "CHECK ((quantity > 0))"
+    },
+    {
+      "relname": "order_items",
+      "conname": "order_items_seller_id_fkey",
+      "definition": "FOREIGN KEY (seller_id) REFERENCES users(user_id) ON DELETE RESTRICT"
+    },
+    {
+      "relname": "order_status_history",
+      "conname": "order_status_history_changed_by_fkey",
+      "definition": "FOREIGN KEY (changed_by) REFERENCES users(user_id) ON DELETE SET NULL"
+    },
+    {
+      "relname": "order_status_history",
+      "conname": "order_status_history_order_id_fkey",
+      "definition": "FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "order_status_history",
+      "conname": "order_status_history_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "order_status_history",
+      "conname": "order_status_history_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'shipping'::text, 'delivered'::text, 'completed'::text, 'cancelled'::text])))"
+    },
+    {
+      "relname": "orders",
+      "conname": "orders_buyer_id_fkey",
+      "definition": "FOREIGN KEY (buyer_id) REFERENCES users(user_id) ON DELETE RESTRICT"
+    },
+    {
+      "relname": "orders",
+      "conname": "orders_order_code_key",
+      "definition": "UNIQUE (order_code)"
+    },
+    {
+      "relname": "orders",
+      "conname": "orders_order_type_check",
+      "definition": "CHECK ((order_type = ANY (ARRAY['normal'::text, 'consignment'::text])))"
+    },
+    {
+      "relname": "orders",
+      "conname": "orders_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "orders",
+      "conname": "orders_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'shipping'::text, 'delivered'::text, 'completed'::text, 'cancelled'::text])))"
+    },
+    {
+      "relname": "product_reports",
+      "conname": "product_reports_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "product_reports",
+      "conname": "product_reports_product_id_fkey",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "product_reports",
+      "conname": "product_reports_reporter_id_fkey",
+      "definition": "FOREIGN KEY (reporter_id) REFERENCES users(user_id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "product_reports",
+      "conname": "product_reports_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'reviewing'::text, 'resolved'::text, 'rejected'::text])))"
+    },
+    {
+      "relname": "consignment_requests",
+      "conname": "consignment_requests_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "consignment_requests",
+      "conname": "consignment_requests_selling_price_check",
+      "definition": "CHECK ((selling_price >= (0)::numeric))"
+    },
+    {
+      "relname": "consignment_requests",
+      "conname": "consignment_requests_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "products",
+      "conname": "products_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "products",
+      "conname": "products_quantity_check",
+      "definition": "CHECK ((quantity >= 0))"
+    },
+    {
+      "relname": "products",
+      "conname": "products_seller_id_fkey",
+      "definition": "FOREIGN KEY (seller_id) REFERENCES users(user_id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "products",
+      "conname": "products_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'sold'::text, 'hidden'::text, 'deleted'::text])))"
+    },
+    {
+      "relname": "users",
+      "conname": "users_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "users",
+      "conname": "users_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "users",
+      "conname": "users_verification_method_check",
+      "definition": "CHECK ((verification_method = ANY (ARRAY['none'::text, 'payment'::text, 'admin_grant'::text])))"
+    },
+    {
+      "relname": "users",
+      "conname": "users_verified_by_fkey",
+      "definition": "FOREIGN KEY (verified_by) REFERENCES users(user_id) ON DELETE SET NULL"
+    },
+    {
+      "relname": "site_reviews",
+      "conname": "site_reviews_one_per_user",
+      "definition": "UNIQUE (user_id)"
+    },
+    {
+      "relname": "site_reviews",
+      "conname": "site_reviews_pkey",
+      "definition": "PRIMARY KEY (review_id)"
+    },
+    {
+      "relname": "site_reviews",
+      "conname": "site_reviews_rating_check",
+      "definition": "CHECK (((rating >= 1) AND (rating <= 5)))"
+    },
+    {
+      "relname": "site_reviews",
+      "conname": "site_reviews_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "conversations",
+      "conname": "conversations_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "conversation_members",
+      "conname": "conversation_members_conversation_id_fkey",
+      "definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "conversation_members",
+      "conname": "conversation_members_pkey",
+      "definition": "PRIMARY KEY (conversation_id, user_id)"
+    },
+    {
+      "relname": "conversation_members",
+      "conname": "conversation_members_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "messages",
+      "conname": "messages_conversation_id_fkey",
+      "definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "messages",
+      "conname": "messages_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "messages",
+      "conname": "messages_product_id_fkey",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL"
+    },
+    {
+      "relname": "messages",
+      "conname": "messages_sender_id_fkey",
+      "definition": "FOREIGN KEY (sender_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "service_packages",
+      "conname": "service_packages_check",
+      "definition": "CHECK ((expires_at > starts_at))"
+    },
+    {
+      "relname": "service_packages",
+      "conname": "service_packages_owner_id_fkey",
+      "definition": "FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "service_packages",
+      "conname": "service_packages_payment_method_check",
+      "definition": "CHECK ((payment_method = ANY (ARRAY['wallet'::text, 'bank'::text])))"
+    },
+    {
+      "relname": "service_packages",
+      "conname": "service_packages_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "service_packages",
+      "conname": "service_packages_plan_type_check",
+      "definition": "CHECK ((plan_type = ANY (ARRAY['personal'::text, 'group'::text])))"
+    },
+    {
+      "relname": "service_packages",
+      "conname": "service_packages_price_check",
+      "definition": "CHECK ((price > 0))"
+    },
+    {
+      "relname": "service_packages",
+      "conname": "service_packages_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'active'::text, 'expired'::text, 'cancelled'::text])))"
+    },
+    {
+      "relname": "service_packages",
+      "conname": "service_packages_transaction_code_key",
+      "definition": "UNIQUE (transaction_code)"
+    },
+    {
+      "relname": "service_package_members",
+      "conname": "service_package_members_member_role_check",
+      "definition": "CHECK ((member_role = ANY (ARRAY['owner'::text, 'member'::text])))"
+    },
+    {
+      "relname": "service_package_members",
+      "conname": "service_package_members_package_id_fkey",
+      "definition": "FOREIGN KEY (package_id) REFERENCES service_packages(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "service_package_members",
+      "conname": "service_package_members_package_id_user_id_key",
+      "definition": "UNIQUE (package_id, user_id)"
+    },
+    {
+      "relname": "service_package_members",
+      "conname": "service_package_members_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "service_package_members",
+      "conname": "service_package_members_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "donations",
+      "conname": "donations_amount_check",
+      "definition": "CHECK ((amount >= (1000)::numeric))"
+    },
+    {
+      "relname": "donations",
+      "conname": "donations_donor_id_fkey",
+      "definition": "FOREIGN KEY (donor_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "relname": "donations",
+      "conname": "donations_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "donations",
+      "conname": "donations_transfer_code_key",
+      "definition": "UNIQUE (transfer_code)"
+    },
+    {
+      "relname": "forum_comments",
+      "conname": "forum_comments_author_id_fkey",
+      "definition": "FOREIGN KEY (author_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "forum_comments",
+      "conname": "forum_comments_parent_id_fkey",
+      "definition": "FOREIGN KEY (parent_id) REFERENCES forum_comments(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "forum_comments",
+      "conname": "forum_comments_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "forum_comments",
+      "conname": "forum_comments_post_id_fkey",
+      "definition": "FOREIGN KEY (post_id) REFERENCES forum_posts(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "message_reactions",
+      "conname": "message_reactions_message_id_fkey",
+      "definition": "FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "message_reactions",
+      "conname": "message_reactions_message_id_user_id_key",
+      "definition": "UNIQUE (message_id, user_id)"
+    },
+    {
+      "relname": "message_reactions",
+      "conname": "message_reactions_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "message_reactions",
+      "conname": "message_reactions_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "forum_reactions",
+      "conname": "forum_reactions_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "forum_reactions",
+      "conname": "forum_reactions_post_id_fkey",
+      "definition": "FOREIGN KEY (post_id) REFERENCES forum_posts(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "forum_reactions",
+      "conname": "forum_reactions_post_id_user_id_key",
+      "definition": "UNIQUE (post_id, user_id)"
+    },
+    {
+      "relname": "forum_reactions",
+      "conname": "forum_reactions_reaction_check",
+      "definition": "CHECK ((reaction = ANY (ARRAY['like'::text, 'love'::text, 'haha'::text, 'wow'::text, 'sad'::text, 'angry'::text])))"
+    },
+    {
+      "relname": "forum_reactions",
+      "conname": "forum_reactions_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "forum_posts",
+      "conname": "forum_posts_author_id_fkey",
+      "definition": "FOREIGN KEY (author_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "forum_posts",
+      "conname": "forum_posts_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "forum_posts",
+      "conname": "forum_posts_post_type_check",
+      "definition": "CHECK ((post_type = ANY (ARRAY['discussion'::text, 'question'::text])))"
+    },
+    {
+      "relname": "forum_comment_reactions",
+      "conname": "forum_comment_reactions_comment_id_fkey",
+      "definition": "FOREIGN KEY (comment_id) REFERENCES forum_comments(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "forum_comment_reactions",
+      "conname": "forum_comment_reactions_comment_id_user_id_key",
+      "definition": "UNIQUE (comment_id, user_id)"
+    },
+    {
+      "relname": "forum_comment_reactions",
+      "conname": "forum_comment_reactions_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "forum_comment_reactions",
+      "conname": "forum_comment_reactions_reaction_check",
+      "definition": "CHECK ((reaction = ANY (ARRAY['like'::text, 'love'::text, 'haha'::text, 'wow'::text, 'sad'::text, 'angry'::text])))"
+    },
+    {
+      "relname": "forum_comment_reactions",
+      "conname": "forum_comment_reactions_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "forum_articles",
+      "conname": "forum_articles_author_id_fkey",
+      "definition": "FOREIGN KEY (author_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "forum_articles",
+      "conname": "forum_articles_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "advertisements",
+      "conname": "advertisements_check",
+      "definition": "CHECK ((end_date >= start_date))"
+    },
+    {
+      "relname": "advertisements",
+      "conname": "advertisements_created_by_fkey",
+      "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "relname": "advertisements",
+      "conname": "advertisements_duration_days_check",
+      "definition": "CHECK ((duration_days > 0))"
+    },
+    {
+      "relname": "advertisements",
+      "conname": "advertisements_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "advertisements",
+      "conname": "advertisements_revenue_check",
+      "definition": "CHECK ((revenue >= (0)::numeric))"
+    },
+    {
+      "relname": "advertisements",
+      "conname": "advertisements_status_check",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'stopped'::text])))"
+    },
+    {
+      "relname": "cart_items",
+      "conname": "cart_items_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "relname": "cart_items",
+      "conname": "cart_items_product_id_fkey",
+      "definition": "FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "cart_items",
+      "conname": "cart_items_quantity_check",
+      "definition": "CHECK ((quantity > 0))"
+    },
+    {
+      "relname": "cart_items",
+      "conname": "cart_items_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE"
+    },
+    {
+      "relname": "cart_items",
+      "conname": "cart_items_user_product_unique",
+      "definition": "UNIQUE (user_id, product_id)"
+    }
+  ]
+}

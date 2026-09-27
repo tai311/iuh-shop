@@ -1,3 +1,20 @@
+/* Private chat attachments: store object paths and sign only for members. */
+window.IUHChatMedia = {
+ async signedURL(client,value) {
+   if(!value) return '';
+   let objectPath=String(value);
+   if(/^https?:/i.test(objectPath)) {
+     const url=new URL(objectPath);
+     if(url.origin!=='https://xecxofmogvqysejjpxvl.supabase.co') return '';
+     const match=url.pathname.match(/^\/storage\/v1\/object\/(?:public|sign|authenticated)\/chat-images\/(.+)$/);
+     if(!match) return '';
+     objectPath=decodeURIComponent(match[1]);
+   }
+   const {data,error}=await client.storage.from('chat-images').createSignedUrl(objectPath,300);
+   if(error) {console.error('Không tải được ảnh riêng tư:',error);return '';}
+   return data.signedUrl;
+ }
+};
 /* =========================================================
    IUH SHOP - GLOBAL CHAT NOTIFICATION
    Bóng chat + thông báo web + browser notification
@@ -47,10 +64,7 @@
     window.IUH_SUPABASE ||
     (
         window.IUH_SUPABASE =
-            window.supabase.createClient(
-                SUPABASE_URL,
-                SUPABASE_PUBLISHABLE_KEY
-            )
+            window.IUHCore.getClient()
     );
 
 
@@ -767,8 +781,8 @@ async function renderMiniMessage(
             image.className =
                 "iuh-mini-message-image";
 
-            image.src =
-                message.image_url;
+            const signedImageURL=await window.IUHChatMedia.signedURL(supabaseClient,message.image_url);
+            if (signedImageURL) image.src=signedImageURL; else image.hidden=true;
 
             image.alt =
                 "Hình ảnh";
@@ -781,10 +795,7 @@ async function renderMiniMessage(
                 "click",
                 () => {
 
-                    window.open(
-                        message.image_url,
-                        "_blank"
-                    );
+                    window.open(signedImageURL,"_blank","noopener,noreferrer");
 
                 }
             );
@@ -2086,50 +2097,10 @@ function closeMiniChat() {
    MARK READ
    ========================================================= */
 
-async function markMiniChatAsRead(
-    conversationId
-) {
-
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("messages")
-            .update({
-
-                is_read:
-                    true
-
-            })
-            .eq(
-                "conversation_id",
-                conversationId
-            )
-            .neq(
-                "sender_id",
-                currentUser.id
-            )
-            .eq(
-                "is_read",
-                false
-            );
-
-
-    if (error) {
-
-        console.error(
-            "Lỗi mark read:",
-            error
-        );
-
-    }
-
+async function markMiniChatAsRead(conversationId) {
+ const {error}=await supabaseClient.rpc('mark_conversation_read',{p_conversation_id:conversationId});
+ if(error) console.error('Không thể đánh dấu đã đọc:',error);
 }
-
-
-/* =========================================================
-   GỬI TIN
-   ========================================================= */
 
 async function sendMiniChatMessage(
     conversationId,
@@ -2968,7 +2939,7 @@ else {
 
         } =
             await supabaseClient
-                .from("users")
+                .from("public_profiles")
                 .select(
     "user_id, fullname, avatar_url, role, student_verified"
 )
@@ -3656,9 +3627,8 @@ return {
                                 );
 
 
-                        const unreadList =
-                            unreadMessages ||
-                            [message];
+                        const unreadList = unreadMessages || [message];
+                        if (!unreadList.length) return;
 
 
                         const latest =
@@ -4747,156 +4717,11 @@ async function loadFeaturedSearchProducts() {
            user_id → package_id
         ===================================================== */
 
-        let memberships = [];
-
-
-        if (
-            sellerIds.length > 0
-        ) {
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .from(
-                        "service_package_members"
-                    )
-                    .select(`
-                        id,
-                        package_id,
-                        user_id,
-                        member_role,
-                        joined_at
-                    `)
-                    .in(
-                        "user_id",
-                        sellerIds
-                    );
-
-
-            if (error) {
-                throw error;
-            }
-
-
-            memberships =
-                data || [];
-        }
-
-
-        /* =====================================================
-           4. LẤY GÓI DỊCH VỤ
-        ===================================================== */
-
-        const packageIds = [
-            ...new Set(
-                memberships
-                    .map(
-                        member =>
-                            member.package_id
-                    )
-                    .filter(Boolean)
-            )
-        ];
-
-
-        let packages = [];
-
-
-        if (
-            packageIds.length > 0
-        ) {
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .from(
-                        "service_packages"
-                    )
-                    .select(`
-                        id,
-                        owner_id,
-                        plan_type,
-                        status,
-                        starts_at,
-                        expires_at
-                    `)
-                    .in(
-                        "id",
-                        packageIds
-                    );
-
-
-            if (error) {
-                throw error;
-            }
-
-
-            packages =
-                data || [];
-        }
-
-
-        /* =====================================================
-           5. XÁC ĐỊNH GÓI ĐANG HOẠT ĐỘNG
-        ===================================================== */
-
-        const activePackageIds =
-            new Set(
-
-                packages
-                    .filter(
-                        pkg =>
-                            isSearchPackageActive(
-                                pkg
-                            )
-                    )
-                    .map(
-                        pkg =>
-                            String(
-                                pkg.id
-                            )
-                    )
-
-            );
-
-
-        /* =====================================================
-           6. SELLER CÓ GÓI ĐANG HOẠT ĐỘNG
-        ===================================================== */
-
-        const packageSellerIds =
-            new Set(
-
-                memberships
-                    .filter(
-                        member =>
-                            activePackageIds.has(
-                                String(
-                                    member.package_id
-                                )
-                            )
-                    )
-                    .map(
-                        member =>
-                            String(
-                                member.user_id
-                            )
-                    )
-
-            );
-
-
-        /* =====================================================
-           7. LỌC SẢN PHẨM
-
-           CHỈ:
-           - Đẩy tin
-           - Hoặc người bán có gói
-        ===================================================== */
+        const {data:badges,error:badgeError}=sellerIds.length
+          ? await supabaseClient.from('service_package_badges').select('user_id,package_id,owner_id,plan_type,status,starts_at,expires_at').in('user_id',sellerIds)
+          : {data:[],error:null};
+        if(badgeError) throw badgeError;
+        const packageSellerIds=new Set((badges||[]).filter(isSearchPackageActive).map(item=>String(item.user_id)));
 
         let featuredProducts =
             products
@@ -5334,7 +5159,7 @@ async function searchUsers(
         error
     } =
         await supabaseClient
-            .from("users")
+            .from("public_profiles")
             .select(`
                 user_id,
                 fullname,
@@ -5374,7 +5199,7 @@ async function searchForumPosts(
         error
     } =
         await supabaseClient
-            .from("forum_posts")
+            .from("forum_posts").eq("moderation_status","active")
             .select(`
                 id,
                 author_id,
@@ -6167,8 +5992,7 @@ function stripHTML(
             "div"
         );
 
-    div.innerHTML =
-        html;
+    div.innerHTML = window.IUHSecurity.sanitizeHTML(html);
 
     return (
         div.textContent ||
