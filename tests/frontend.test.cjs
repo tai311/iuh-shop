@@ -6,7 +6,7 @@ const flush=()=>new Promise(resolve=>setTimeout(resolve,15));
 function fixture(rpc){
  const dom=new JSDOM(read('HTML/taikhoan.html'),{url:'https://shop.invalid/HTML/taikhoan.html',runScripts:'outside-only'});
  const w=dom.window;w.alert=()=>{};w.confirm=()=>true;
- const client={auth:{getUser:async()=>({data:{user:{id:'user-a'}}})},rpc};
+ const client={auth:{getUser:async()=>({data:{user:{id:'user-a'}}})},rpc,functions:{invoke:async(name,options)=>{assert.equal(name,'payos-package');return rpc(name,options.body);}}};
  w.supabase={createClient:()=>client};
  w.eval(read('JS/vendor/purify.min.js'));w.eval(read('JS/iuh-core.js'));w.eval(read('JS/service-package.js'));
  w.IUHServicePackage.setupModal(client);
@@ -24,7 +24,7 @@ test('Package modal submits one bank request and never labels pending payment as
  let calls=0,release;let pending=false;
  const f=fixture(async(name,args)=>{
   if(name==='get_my_service_package')return {data:{package:null,members:[],pending_requests:pending?[{transaction_code:'pending-bank',price:19000}]:[]}};
-  if(name==='purchase_service_package'){calls++;await new Promise(r=>release=r);pending=true;return {data:{status:'pending',plan_type:'personal',transaction_code:args.p_transaction_code,price:19000}};}
+  if(name==='payos-package'){assert.equal(args.action,'create');calls++;await new Promise(r=>release=r);pending=true;return {data:{status:'pending',plan_type:'personal',transaction_code:args.transaction,price:19000,payos_status:'pending',checkout_url:'https://pay.payos.vn/web/fixture12345'}};}
   throw Error(name);
  });
  try{

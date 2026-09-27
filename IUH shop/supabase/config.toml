@@ -1,0 +1,6 @@
+[functions.payos-package]
+verify_jwt = false
+# Auth is checked against /auth/v1/user before accessing any payment.
+[functions.payos-webhook]
+verify_jwt = false
+# payOS HMAC is verified before reading or changing payment data.

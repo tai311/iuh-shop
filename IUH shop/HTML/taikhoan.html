@@ -1285,7 +1285,7 @@
             </div>
 
             <div id="upgradeBankInfo" class="upgrade-bank-info" hidden>
-                <div><strong>Chuyển khoản được xác nhận thủ công</strong><span>Sau khi gửi yêu cầu, liên hệ Admin với mã yêu cầu để nhận thông tin chuyển khoản chính thức.</span><span>Gói chỉ kích hoạt khi Admin xác nhận đã nhận tiền. Ví IUH không bị trừ cho phương thức này.</span></div>
+                <div><strong>Chuyển khoản qua payOS</strong><span>Hệ thống tạo trang thanh toán có mã QR và đúng số tiền của gói.</span><span>Gói tự kích hoạt khi hệ thống xác minh đã nhận đủ tiền. Phương thức này không trừ Ví IUH.</span></div>
             </div>
 
             <div class="upgrade-order-summary">
@@ -1303,7 +1303,8 @@
             <h3 id="upgradeSuccessHeading">Gói dịch vụ đã được kích hoạt</h3>
             <p id="upgradeSuccessText">Bạn đã nâng cấp thành công Gói Cá nhân.</p>
             <div class="upgrade-success-details"><span>Mã giao dịch</span><strong id="upgradeTransactionCode">—</strong><span>Hiệu lực đến</span><strong id="upgradeExpiryDate">—</strong></div>
-            <button type="button" id="finishUpgradeButton" class="upgrade-confirm-button">Hoàn tất</button>
+            <div id="payosPackageActions" hidden><a id="payosCheckoutLink" class="upgrade-confirm-button" target="_blank" rel="noopener noreferrer" hidden>Mở mã QR trên payOS</a><button type="button" id="payosCheckPayment" class="upgrade-confirm-button">Kiểm tra thanh toán</button><p id="payosPaymentStatus" role="status" aria-live="polite"></p></div>
+            <button type="button" id="finishUpgradeButton" class="upgrade-confirm-button">Đóng</button>
         </div>
     </div>
 </div>
@@ -1453,7 +1454,7 @@
 <script src="../JS/vendor/purify.min.js"></script>
 <script src="../JS/iuh-core.js"></script>
     <script src="../JS/iuh-chat-notification.js"></script>
-    <script src="../JS/service-package.js"></script>
+    <script src="../JS/service-package.js?v=20260927-payos"></script>
     <script
         src="../JS/taikhoan.js"
     ></script>
