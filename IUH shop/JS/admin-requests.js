@@ -1,83 +1,99 @@
-(function(){
+(function () {
  'use strict';
  const db=IUHCore.getClient(),e=IUHSecurity.escapeHTML;
- const nav=document.querySelector('.admin-sidebar nav')||document.querySelector('.admin-sidebar');
- const target=document.querySelector('main')||document.querySelector('.admin-content');
- if(!nav||!target)return;
- const button=document.createElement('button');button.type='button';button.className='admin-nav-item';button.dataset.page='requests';button.textContent='Đối soát và hỗ trợ';nav.append(button);
- const page=document.createElement('section');page.id='page-requests';page.className='admin-page';
- page.innerHTML='<div class="iuh-panel"><h2>Đối soát và hỗ trợ</h2><p>Chỉ xác nhận thanh toán sau khi kiểm tra giao dịch ngân hàng thực tế. Mã giao dịch ngân hàng chỉ được sử dụng một lần.</p><button type="button" id="reloadRequests">Tải lại</button><p id="requestsStatus" role="status"></p><div class="iuh-requests-list" id="requestsList"></div></div>';
- target.append(page);
- button.addEventListener('click',()=>openPage('requests'));
- const list=page.querySelector('#requestsList'),status=page.querySelector('#requestsStatus');
- let rows=new Map(),loading=false;
- const labels={packages:'Gói dịch vụ chờ thanh toán',orders:'Đơn hàng chờ thanh toán',wallet_requests:'Nạp/rút ví',bank_refund_requests:'Hoàn tiền ngân hàng',donations:'Donate',product_reports:'Báo cáo sản phẩm',user_reports:'Báo cáo người dùng',contact_requests:'Yêu cầu hỗ trợ',verification:'Thẻ sinh viên chờ duyệt'};
- const formats={deposit:'Nạp tiền',withdraw:'Rút tiền',pending:'Chờ xử lý',unpaid:'Chưa thanh toán'};
- function actions(kind,row,key){
-  if(kind==='orders'&&row.needs_payment_review)return '<p>Đơn cũ cần đối chiếu chứng từ; không tự thu lại hoặc hoàn tiền.</p>';
-  const approve=['packages','orders','wallet_requests','bank_refund_requests','donations','verification'].includes(kind);
-  return `<button type="button" data-key="${e(key)}" data-action="approve">${approve?'Xác nhận':'Lưu phản hồi'}</button>`+
-   (['packages','wallet_requests','donations'].includes(kind)?`<button type="button" data-key="${e(key)}" data-action="reject">Từ chối</button>`:'');
+ const nav=document.querySelector('.admin-sidebar nav'),main=document.querySelector('main');
+ if(!nav||!main)return;
+ const kinds={orders:'Đơn hàng',packages:'Gói dịch vụ',wallet_requests:'Nạp / rút ví',bank_refund_requests:'Hoàn tiền',contact_requests:'Hỗ trợ',product_reports:'Báo cáo sản phẩm',user_reports:'Báo cáo người dùng',verification:'Xác minh sinh viên',donations:'Ủng hộ'};
+ const labels={pending:'Chờ xử lý',confirmed:'Đã xác nhận',shipping:'Đang giao',delivered:'Đã giao',completed:'Hoàn tất',cancelled:'Đã hủy',paid:'Đã thanh toán',unpaid:'Chưa thanh toán',refunded:'Đã hoàn tiền',refund_pending:'Chờ hoàn tiền',approved:'Đã duyệt',rejected:'Từ chối',reviewing:'Đang hỗ trợ',resolved:'Đã giải quyết',none:'Chưa xác minh',cash:'Tiền mặt',qr:'Chuyển khoản QR',iuh_wallet:'Ví IUH',wallet:'Ví IUH',bank:'Ngân hàng',bank_transfer:'Chuyển khoản',deposit:'Nạp ví',withdraw:'Rút ví',personal:'Cá nhân',group:'Nhóm',meet:'Gặp trực tiếp',delivery:'Giao hàng'};
+ const states={orders:['pending','confirmed','shipping','delivered','completed','cancelled'],packages:['pending','paid','cancelled'],wallet_requests:['pending','approved','rejected'],bank_refund_requests:['pending','completed'],donations:['pending','completed','rejected'],verification:['pending','approved'],contact_requests:['pending','reviewing','resolved','rejected'],product_reports:['pending','reviewing','resolved','rejected'],user_reports:['pending','reviewing','resolved','rejected']};
+ const money=v=>v==null?'—':Number(v).toLocaleString('vi-VN')+' ₫',date=v=>v?new Date(v).toLocaleString('vi-VN'):'—',label=v=>labels[v]||v||'—';
+ const badge=v=>`<span class="ops-badge ops-${/^[a-z_]+$/.test(v)?v:'unknown'}">${e(label(v))}</span>`;
+ const button=document.createElement('button');button.type='button';button.className='admin-nav-item';button.dataset.page='requests';button.textContent='Đối soát & hỗ trợ';nav.insertBefore(button,nav.querySelector('[data-page=orders]'));
+ const page=document.createElement('section');page.id='page-requests';page.className='admin-page ops';
+ page.innerHTML=`<header class="ops-heading"><div><span class="ops-eyebrow">KHÔNG GIAN QUẢN TRỊ</span><h2>Đối soát & hỗ trợ</h2><p>Theo dõi đơn phát sinh, dòng tiền và yêu cầu của người dùng.</p></div><button type="button" id="opsReload">Làm mới</button></header>
+ <div class="ops-tabs" role="group" aria-label="Nhóm hồ sơ">${Object.entries(kinds).map(([k,v])=>`<button type="button" data-kind="${k}">${v}<span data-count="${k}">—</span></button>`).join('')}</div>
+ <p class="ops-hint">Số trên mỗi nhóm là hồ sơ cần theo dõi trong toàn hệ thống. Danh sách bao gồm cả lịch sử.</p>
+ <form class="ops-filters" id="opsFilters"><label>Tìm hồ sơ<input id="opsSearch" maxlength="120" placeholder="Mã hồ sơ, tên hoặc ID người tạo"></label><label>Trạng thái xử lý<select id="opsState"></select></label><label id="opsPaymentLabel">Thanh toán<select id="opsPayment"><option value="">Tất cả thanh toán</option><option value="unpaid">Chưa thanh toán</option><option value="paid">Đã thanh toán</option><option value="refund_pending">Chờ hoàn tiền</option><option value="refunded">Đã hoàn tiền</option></select></label><label class="ops-check"><input type="checkbox" id="opsAttention">Chỉ cần theo dõi</label><button type="submit">Tìm / lọc</button></form>
+ <div class="ops-list-heading"><h3 id="opsTitle">Đơn hàng</h3><span id="opsStatus" role="status" aria-live="polite"></span></div><div id="opsList"></div><div class="ops-pagination"><button type="button" id="opsPrev">← Trước</button><span id="opsPage"></span><button type="button" id="opsNext">Sau →</button></div>`;
+ main.append(page);
+ const dialog=document.createElement('dialog');dialog.className='ops-dialog';dialog.setAttribute('aria-labelledby','opsDetailTitle');dialog.innerHTML='<div class="ops-detail-top"><h2 id="opsDetailTitle">Chi tiết hồ sơ</h2><button type="button" id="opsClose" aria-label="Đóng chi tiết">Đóng ×</button></div><div id="opsDetail"></div>';document.body.append(dialog);
+ const $=id=>document.getElementById(id);
+ let kind='orders',pageNumber=1,total=0,request=0,detailRequest=0,selected=null,busy=false,authorized=false;
+ let filters={status:'',payment:'',search:'',attention:false};
+ async function requireAdmin(){const {data,error}=await db.auth.getUser();if(error||!data?.user)throw new Error('Vui lòng đăng nhập tài khoản admin.');const profile=await db.from('users').select('role').eq('user_id',data.user.id).single();if(profile.error||profile.data?.role!=='admin')throw new Error('Chỉ tài khoản admin được xem khu vực này.');}
+ function clearPrivate(){request++;detailRequest++;authorized=false;selected=null;$('opsList').replaceChildren();$('opsDetail').replaceChildren();$('opsStatus').textContent='Phiên quản trị đã kết thúc.';if(dialog.open)dialog.close();}
+ db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'||event==='USER_DELETED')clearPrivate();});
+ function controls(){
+  $('opsTitle').textContent=kinds[kind];page.querySelectorAll('[data-kind]').forEach(b=>{b.classList.toggle('selected',b.dataset.kind===kind);b.setAttribute('aria-pressed',String(b.dataset.kind===kind));});
+  $('opsState').innerHTML='<option value="">Tất cả trạng thái</option>'+states[kind].map(s=>`<option value="${s}">${label(s)}</option>`).join('');$('opsState').value=filters.status;$('opsPayment').value=filters.payment;$('opsPaymentLabel').hidden=!['orders','packages'].includes(kind);
  }
  async function load(){
-  if(loading)return;loading=true;status.textContent='Đang tải…';list.replaceChildren();rows=new Map();
-  const sources=[['packages',()=>db.from('service_package_payment_requests').select('*').eq('status','pending')],
-   ['orders',()=>db.from('orders').select('id,order_code,total_amount,status,payment_status,needs_payment_review,buyer_id').in('payment_method',['qr','iuh_wallet']).neq('status','cancelled').or('payment_status.eq.unpaid,needs_payment_review.eq.true')],
-   ['wallet_requests',()=>db.from('wallet_requests').select('*').eq('status','pending')],
-   ['bank_refund_requests',()=>db.from('bank_refund_requests').select('*').eq('status','pending')],
-   ['donations',()=>db.from('donations').select('*').eq('status','pending')],
-   ...['product_reports','user_reports','contact_requests'].map(t=>[t,()=>db.from(t).select('*').in('status',['pending','reviewing'])]),
-   ['verification',()=>db.from('users').select('user_id,fullname,student_card_url,verification_status').eq('verification_status','pending')]];
-  let failed=0,count=0;
+  const token=++request;$('opsStatus').textContent='Đang tải…';$('opsList').replaceChildren();$('opsPrev').disabled=true;$('opsNext').disabled=true;
   try{
-   const results=await Promise.allSettled(sources.map(async([kind,get])=>({kind,result:await get().limit(100)})));
-   for(let i=0;i<results.length;i++){
-    const r=results[i],kind=sources[i][0];
-    if(r.status==='rejected'||r.value.result.error){failed++;const p=document.createElement('p');p.textContent=`${labels[kind]}: chưa tải được dữ liệu.`;list.append(p);continue;}
-    for(const row of r.value.result.data||[]){
-     const key=`${kind}:${row.id||row.transaction_code||row.user_id}`;rows.set(key,{kind,row});count++;
-     const article=document.createElement('article');
-     const money=row.amount??row.total_amount??row.price;
-     article.innerHTML=`<strong>${e(labels[kind])} — ${e(row.order_code||row.transaction_code||row.id||row.fullname)}</strong>
-      ${money!=null?`<p>Số tiền: ${e(Number(money).toLocaleString('vi-VN'))}đ</p>`:''}
-      <p>${e(row.owner_name||row.fullname||row.donor_name||'')} ${e(row.plan_type||formats[row.kind]||'')}</p>
-      <p>Tài khoản: ${e(row.owner_id||row.user_id||row.buyer_id||row.reporter_id||row.donor_id||'—')}${row.order_id?` · Đơn #${e(row.order_id)}`:''}</p>
-      <p>${e(row.bank||row.bank_name||'')} ${e(row.account||'')}</p>
-      <p>${e(row.customer_reference||row.transfer_content||'')}</p>
-      <p>${e(row.reason||'')} ${e(row.description||row.message||'')}</p>
-      ${actions(kind,row,key)}`;
-     if(kind==='verification'&&row.student_card_url){const img=document.createElement('img');img.alt='Thẻ sinh viên đang chờ duyệt';img.style.cssText='display:block;max-width:320px;max-height:220px;object-fit:contain';article.prepend(img);
-      const bucket=row.student_card_url.includes('/student-verifications/')?'student-verifications':'student-cards';
-      IUHCore.privateImageURL(row.student_card_url,bucket).then(url=>img.src=url).catch(()=>{img.alt='Không tải được ảnh thẻ';});}
-     list.append(article);
-    }
-   }
-   status.textContent=`${count} mục đang chờ${failed?`; ${failed} nhóm chưa tải được`:''}.`;
-  }finally{loading=false;}
+   await requireAdmin();if(token!==request)return;authorized=true;
+   const {data,error}=await db.rpc('admin_operations_list',{p_kind:kind,p_status:filters.status,p_payment:filters.payment,p_search:filters.search,p_page:pageNumber,p_attention:filters.attention});
+   if(token!==request)return;if(error)throw error;
+   total=Number(data.total);if(pageNumber>1&&total<=(pageNumber-1)*20){pageNumber=Math.max(1,Math.ceil(total/20));return load();}
+   page.querySelectorAll('[data-count]').forEach(s=>s.textContent=data.counts?.[s.dataset.count]||0);$('opsStatus').textContent=`${total.toLocaleString('vi-VN')} hồ sơ · mới nhất trước`;
+   $('opsList').innerHTML=data.rows.length?`<div class="ops-table-wrap"><table class="ops-table"><thead><tr><th>Hồ sơ / phát sinh</th><th>Người tạo / người mua</th><th>Số tiền</th><th>Xử lý</th><th>Thanh toán / hình thức</th><th>Chi tiết</th></tr></thead><tbody>${data.rows.map(r=>`<tr><td><strong>${e(r.code)}</strong><small>${e(date(r.created_at))}</small>${r.needs_payment_review?'<span class="ops-warning">Đơn cũ cần đối chiếu</span>':''}</td><td>${e(r.actor_name||'Không có tên')}<small>${e(r.actor_id||'Khách chưa có tài khoản')}</small></td><td>${money(r.amount)}</td><td>${badge(r.status)}</td><td>${r.payment_status?badge(r.payment_status):''}<small>${e(label(r.payment_method))}</small></td><td><button type="button" data-detail="${e(r.id)}">Xem chi tiết</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="ops-empty">Không có hồ sơ phù hợp với bộ lọc này.</div>';
+   const columns=['Hồ sơ / phát sinh','Người tạo / người mua','Số tiền','Xử lý','Thanh toán / hình thức','Chi tiết'];$('opsList').querySelectorAll('tbody tr').forEach(tr=>Array.from(tr.cells).forEach((td,i)=>td.dataset.label=columns[i]));
+   $('opsPage').textContent=`Trang ${pageNumber} / ${Math.max(1,Math.ceil(total/20))}`;$('opsPrev').disabled=pageNumber===1;$('opsNext').disabled=pageNumber*20>=total;
+  }catch(err){if(token!==request)return;authorized=false;$('opsStatus').textContent=err.message||'Không tải được dữ liệu. Hãy thử làm mới.';$('opsPage').textContent='';}
  }
- list.addEventListener('click',async event=>{
-  const b=event.target.closest('button[data-key]');if(!b||b.disabled)return;
-  const entry=rows.get(b.dataset.key);if(!entry)return;
-  const {kind,row}=entry,approve=b.dataset.action==='approve';
-  let reference=null,note=null;
-  if(approve&&['packages','orders','wallet_requests','bank_refund_requests','donations'].includes(kind)){
-   reference=prompt('Nhập mã giao dịch ngân hàng đã đối soát (rút/hoàn: mã chuyển tiền đi thành công):');if(!reference?.trim())return;
-  }else if(kind!=='verification'){note=prompt('Ghi chú / phản hồi cho người gửi:');if(note===null)return;}
-  if(!confirm('Xác nhận thông tin đã được kiểm tra?'))return;
-  b.disabled=true;status.textContent='Đang xử lý…';
+ const fields={order_code:'Mã đơn',transaction_code:'Mã thanh toán',plan_type:'Loại gói',kind:'Loại yêu cầu',payment_method:'Hình thức thanh toán',recipient_name:'Người nhận hàng',recipient_phone:'Điện thoại nhận hàng',recipient_address:'Địa chỉ nhận hàng',shipping_method:'Cách giao hàng',shipping_fee:'Phí vận chuyển',subtotal:'Tiền hàng',total_amount:'Tổng thanh toán',amount:'Số tiền',price:'Giá gói',captured_amount:'Đã ghi nhận thu',payment_reference:'Mã giao dịch thu',bank_reference:'Mã giao dịch ngân hàng',bank:'Ngân hàng nhận',account:'Tài khoản nhận',customer_reference:'Mã khách cung cấp',order_id:'Đơn liên quan',product_id:'Sản phẩm được báo cáo',fullname:'Họ tên liên hệ',email:'Email liên hệ',phone:'Điện thoại liên hệ',message:'Nội dung hỗ trợ',reason:'Lý do',description:'Mô tả',note:'Ghi chú',admin_note:'Phản hồi quản trị',cancellation_reason:'Lý do hủy',donor_name:'Người ủng hộ',bank_name:'Ngân hàng',transfer_content:'Nội dung chuyển khoản',created_at:'Thời điểm tạo',updated_at:'Cập nhật cuối',paid_at:'Ghi nhận thanh toán',settled_at:'Phân bổ tiền vào ví',completed_at:'Hoàn tất',reviewed_at:'Duyệt yêu cầu',expires_at:'Hết hạn',verified_at:'Xác minh'};
+ function actionForm(r,k){
+  const support=['contact_requests','product_reports','user_reports'].includes(k);
+  const actionable=support||(!r.needs_payment_review&&(k==='orders'?r.payment_status==='unpaid'&&r.payment_method==='qr'&&!['cancelled','completed'].includes(r.status):(r.status||r.verification_status)==='pending'));
+  if(!actionable)return '<p class="ops-hint">Hồ sơ này không có thao tác đối soát đang chờ.</p>';
+  if(k==='verification')return '<form id="opsAction"><p>Kiểm tra ảnh thẻ trước khi duyệt xác minh.</p><button name="decision" value="approve">Duyệt xác minh</button><p id="opsActionStatus" role="status"></p></form>';
+  return `<form id="opsAction" class="ops-action"><h3>${support?'Xử lý hỗ trợ':'Đối soát giao dịch'}</h3>${support?'<label>Trạng thái phản hồi<select id="opsResolution">'+states[k].map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${label(s)}</option>`).join('')+'</select></label>':'<p>Chỉ xác nhận sau khi kiểm tra giao dịch ngân hàng thực tế. Rút / hoàn tiền: nhập mã chuyển tiền đi thành công.</p><label>Mã giao dịch ngân hàng<input id="opsReference" maxlength="200" autocomplete="off"></label>'}<label>Ghi chú / phản hồi<textarea id="opsNote" maxlength="2000" rows="3">${e(r.admin_note||'')}</textarea></label><label class="ops-check"><input type="checkbox" required>Tôi đã kiểm tra hồ sơ và thông tin xử lý.</label><div><button name="decision" value="approve">${support?'Lưu phản hồi':'Xác nhận giao dịch'}</button> ${['packages','wallet_requests','donations'].includes(k)?'<button name="decision" value="reject" class="ops-secondary">Từ chối</button>':''}</div><p id="opsActionStatus" role="status"></p></form>`;
+ }
+ async function openDetail(id,k=kind){
+  const token=++detailRequest;selected=null;$('opsDetailTitle').textContent=kinds[k]+' · '+id;$('opsDetail').textContent='Đang tải chi tiết…';if(!dialog.open)dialog.showModal();
   try{
-   let query;
-   if(kind==='packages')query=db.rpc(approve?'approve_service_package_payment':'reject_service_package_payment',approve?{p_transaction_code:row.transaction_code,p_bank_reference:reference}:{p_transaction_code:row.transaction_code,p_reason:note});
-   else if(kind==='orders')query=db.rpc('admin_confirm_order_payment',{p_order_id:row.id,p_reference:reference});
-   else if(kind==='wallet_requests')query=db.rpc('review_wallet_request',{p_request_id:row.id,p_approve:approve,p_bank_reference:reference,p_note:note});
-   else if(kind==='bank_refund_requests')query=db.rpc('complete_bank_refund',{p_request_id:row.id,p_bank_reference:reference});
-   else if(kind==='donations')query=db.rpc('review_donation',{p_donation_id:row.id,p_approve:approve,p_bank_reference:reference,p_note:note});
-   else if(kind==='verification')query=db.rpc('admin_set_student_verified',{target_user_id:row.user_id,verified:true});
-   else query=db.from(kind).update({status:'resolved',admin_note:note,updated_at:new Date().toISOString()}).eq('id',row.id).select('id').single();
+   await requireAdmin();if(token!==detailRequest)return;const {data,error}=await db.rpc('admin_operation_detail',{p_kind:k,p_id:id});if(token!==detailRequest)return;if(error)throw error;
+   const r=data.record;selected={id,k,row:r};
+   $('opsDetail').innerHTML=`<div class="ops-detail-status">${badge(r.status||r.verification_status)} ${r.payment_status?badge(r.payment_status):''}</div>${r.needs_payment_review?'<p class="ops-warning">Đơn cũ cần kiểm tra chứng từ. Không thu hoặc hoàn tiền lại từ màn hình này.</p>':''}<p class="ops-hint">Thông tin riêng tư chỉ phục vụ giao nhận, đối soát và hỗ trợ. Không chia sẻ ra ngoài.</p><h3>Người liên quan</h3><div class="ops-people">${data.people.map(p=>`<div><small>${e(p.role)}</small><strong>${e(p.fullname||'Chưa có tên')}</strong><small>${e(p.user_id)}</small></div>`).join('')||'<p>Không có tài khoản liên kết.</p>'}</div><dl class="ops-facts">${Object.entries(fields).filter(([key])=>r[key]!=null&&r[key]!=='').map(([key,title])=>`<div><dt>${title}</dt><dd>${e(key.endsWith('_at')?date(r[key]):['shipping_fee','subtotal','total_amount','amount','price','captured_amount'].includes(key)?money(r[key]):label(r[key]))}</dd></div>`).join('')}</dl>
+   ${data.items.length?'<h3>Sản phẩm & người bán</h3>'+data.items.map(i=>`<article class="ops-item"><strong>${e(i.product_name)}</strong><p>${e(i.seller_name||'Không có tên người bán')} · ${e(i.seller_id||'—')}</p><p>${e(i.quantity)} × ${money(i.price)} = ${money(i.subtotal)}</p></article>`).join(''):''}
+   ${(data.payouts||[]).length?'<h3>Người hưởng tiền bán hàng</h3>'+data.payouts.map(p=>`<article class="ops-item"><strong>${e(p.fullname||p.user_id)}</strong><small>${e(p.user_id)}</small><p>${money(p.amount)} · ${r.settled_at?'Đã phân bổ vào ví':'Dự kiến khi hoàn tất đơn'}</p></article>`).join(''):''}
+   ${r.settled_at?'<p class="ops-hint">Đã phân bổ vào số dư ví trên hệ thống. Việc chuyển khoản ra ngân hàng được theo dõi riêng trong mục Nạp / rút ví.</p>':''}
+   ${(data.receipts||[]).length?'<h3>Chứng từ đã đối soát</h3>'+data.receipts.map(b=>`<article class="ops-item"><strong>${e(b.reference)}</strong><small>${e(date(b.created_at))} · ${e(b.reviewed_by||'Admin')}</small></article>`).join(''):''}
+   ${data.history.length?'<h3>Lịch sử đơn hàng</h3><ol class="ops-timeline">'+data.history.map(h=>`<li>${badge(h.status)} <small>${e(date(h.created_at))} · ${e(h.actor_name||h.changed_by||'Hệ thống')}</small><p>${e(h.note||'')}</p></li>`).join('')+'</ol>':''}
+   ${r.student_card_url?'<button type="button" id="opsViewCard">Xem ảnh thẻ sinh viên</button><div id="opsCard"></div>':''}${actionForm(r,k)}`;
+   if(k==='orders'&&!r.needs_payment_review&&(r.payment_method==='cash'||r.payment_status==='paid')){
+    const next={pending:'confirmed',confirmed:'shipping',shipping:'delivered',delivered:'completed'}[r.status];
+    if(next){const form=document.createElement('form');form.id='opsOrderAction';form.className='ops-action';form.dataset.next=next;form.innerHTML=`<h3>Cập nhật tiến độ đơn</h3><p>Chuyển từ ${e(label(r.status))} sang ${e(label(next))}.${next==='completed'?' Đơn thanh toán online sẽ được phân bổ tiền vào ví khi hoàn tất.':''}</p><label class="ops-check"><input type="checkbox" required>Tôi đã xác minh tiến độ giao nhận thực tế.</label><button name="decision" value="advance">${e(label(next))}</button><p role="status"></p>`;form.addEventListener('submit',save);$('opsDetail').append(form);}
+   }
+   $('opsAction')?.addEventListener('submit',save);
+   $('opsViewCard')?.addEventListener('click',async()=>{const b=$('opsViewCard');b.disabled=true;try{const url=await IUHCore.privateImageURL(r.student_card_url,r.student_card_url.includes('/student-verifications/')?'student-verifications':'student-cards');if(token!==detailRequest)return;const img=document.createElement('img');img.src=url;img.alt='Thẻ sinh viên cần xác minh';$('opsCard').replaceChildren(img);}catch{if(token===detailRequest){b.textContent='Không tải được ảnh. Nhấn để thử lại';b.disabled=false;}}});
+  }catch(err){if(token===detailRequest)$('opsDetail').textContent=err.message||'Không tải được chi tiết.';}
+ }
+ async function save(event){
+  event.preventDefault();if(busy||!selected)return;
+  const entry=selected,{row:r,k,id}=entry,advance=event.currentTarget.id==='opsOrderAction',next=event.currentTarget.dataset.next,feedback=event.currentTarget.querySelector('[role=status]'),approve=event.submitter?.value!=='reject',reference=$('opsReference')?.value.trim()||null,note=$('opsNote')?.value.trim()||null;
+  const financial=['packages','orders','wallet_requests','bank_refund_requests','donations'].includes(k);
+  if(financial&&approve&&!advance&&!reference){feedback.textContent='Nhập mã giao dịch ngân hàng đã kiểm tra.';return;}
+  if(!approve&&!note){feedback.textContent='Nhập lý do từ chối để người dùng biết.';return;}
+  const resolution=$('opsResolution')?.value;busy=true;dialog.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=true);feedback.textContent='Đang xử lý…';
+  try{
+   await requireAdmin();if(selected!==entry)return;let query;
+   if(advance)query=db.rpc('update_order_status',{p_order_id:id,p_new_status:next});
+   else if(k==='packages')query=db.rpc(approve?'approve_service_package_payment':'reject_service_package_payment',approve?{p_transaction_code:r.transaction_code,p_bank_reference:reference}:{p_transaction_code:r.transaction_code,p_reason:note});
+   else if(k==='orders')query=db.rpc('admin_confirm_order_payment',{p_order_id:id,p_reference:reference});
+   else if(k==='wallet_requests')query=db.rpc('review_wallet_request',{p_request_id:id,p_approve:approve,p_bank_reference:reference,p_note:note});
+   else if(k==='bank_refund_requests')query=db.rpc('complete_bank_refund',{p_request_id:id,p_bank_reference:reference});
+   else if(k==='donations')query=db.rpc('review_donation',{p_donation_id:id,p_approve:approve,p_bank_reference:reference,p_note:note});
+   else if(k==='verification')query=db.rpc('admin_set_student_verified',{target_user_id:r.user_id,verified:true});
+   else query=db.from(k).update({status:resolution,admin_note:note,updated_at:new Date().toISOString()}).eq('id',id).eq('status',r.status).select('id').single();
    const {data,error}=await query;if(error||data?.success===false)throw error||new Error(data.message);
-   await load();status.textContent='Đã xử lý. '+status.textContent;
-  }catch(error){status.textContent=error.message||'Chưa xử lý được yêu cầu.';}finally{b.disabled=false;}
- });
- page.querySelector('#reloadRequests').addEventListener('click',()=>load().catch(err=>status.textContent=err.message));
- window.IUHAdminRequests={load:()=>load().catch(err=>status.textContent=err.message)};
+   if(selected!==entry)return;await openDetail(id,k);await load();
+  }catch(err){if(selected===entry)feedback.textContent=err.message||'Không xử lý được. Làm mới để kiểm tra lại hồ sơ.';}
+  finally{busy=false;dialog.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=false);}
+ }
+ function close(){if(busy)return;detailRequest++;selected=null;dialog.close();$('opsDetail').replaceChildren();}
+ $('opsClose').addEventListener('click',close);dialog.addEventListener('cancel',event=>{event.preventDefault();close();});button.addEventListener('click',()=>openPage('requests'));
+ page.addEventListener('click',event=>{const tab=event.target.closest('[data-kind]');if(tab){kind=tab.dataset.kind;pageNumber=1;filters.status='';filters.payment='';controls();load();}const b=event.target.closest('[data-detail]');if(b&&authorized)openDetail(b.dataset.detail);});
+ $('opsFilters').addEventListener('submit',event=>{event.preventDefault();filters={status:$('opsState').value,payment:['orders','packages'].includes(kind)?$('opsPayment').value:'',search:$('opsSearch').value.trim(),attention:$('opsAttention').checked};pageNumber=1;load();});
+ $('opsPrev').addEventListener('click',()=>{pageNumber--;load();});$('opsNext').addEventListener('click',()=>{pageNumber++;load();});$('opsReload').addEventListener('click',load);
+ controls();window.IUHAdminRequests={load,openOrders:()=>{kind='orders';filters.status='';filters.payment='';pageNumber=1;controls();load();}};
 })();

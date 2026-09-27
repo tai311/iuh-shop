@@ -260,6 +260,10 @@ const pageTitles = {
 
 
 function openPage(page) {
+    if(page === "orders") {
+        page = "requests";
+        window.IUHAdminRequests?.openOrders();
+    } else
     if(page === "requests") window.IUHAdminRequests?.load();
 
     document
@@ -3210,6 +3214,7 @@ document.addEventListener(
 ========================================================= */
 
 async function loadOrders() {
+    if(window.IUHAdminRequests) return window.IUHAdminRequests.openOrders();
 
     const list =
         $("ordersList");
