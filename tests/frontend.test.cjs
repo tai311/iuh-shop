@@ -50,3 +50,43 @@ test('Signup and chat regression scenarios',()=>{
  const {execFileSync}=require('node:child_process');
  for(const file of ['test-social.cjs','test-chat.cjs'])execFileSync(process.execPath,[path.resolve(__dirname,'../audit',file)],{stdio:'pipe'});
 });
+
+test('Embedded payOS stays in the modal and only server confirmation activates a package',async()=>{
+ let checks=0,paid=false,config,exits=0;
+ const receipt={status:'pending',plan_type:'personal',transaction_code:'IUH-embedded-test',price:19000,payos_status:'pending',checkout_url:'https://pay.payos.vn/web/fixture12345'};
+ const f=fixture(async(name,args)=>{
+  if(name==='get_my_service_package')return {data:{package:null,members:[],pending_requests:[]}};
+  if(name==='payos-package'){if(args.action==='status')checks++;return {data:{...receipt,status:paid?'paid':'pending',payos_status:paid?'paid':'pending'}};}
+ });
+ f.w.PayOSCheckout={usePayOS:value=>{config=value;return {open(){const frame=f.w.document.createElement('iframe');frame.src='about:blank';f.el(value.ELEMENT_ID).append(frame);},exit(){exits++;f.el(value.ELEMENT_ID).replaceChildren();}};}};
+ try{
+  f.el('openUpgradeModalButton').click();await flush();f.w.document.querySelector('[data-method=bank]').click();f.el('confirmUpgradeButton').click();await flush();
+  assert.equal(config.embedded,true);assert.equal(config.RETURN_URL,'https://shop.invalid/HTML/taikhoan.html');assert.equal(f.el('payosEmbeddedCheckout').querySelectorAll('iframe').length,1);
+  config.onSuccess({status:'PAID'});await flush();assert.equal(checks,1);assert.match(f.el('upgradeSuccessHeading').textContent,/chờ xác nhận/);assert.equal(f.el('payosEmbeddedCheckout').querySelectorAll('iframe').length,1);
+  const stale=config;f.el('finishUpgradeButton').click();assert.equal(f.el('payosEmbeddedCheckout').children.length,0);stale.onSuccess({status:'PAID'});await flush();assert.equal(checks,1);
+  f.el('openUpgradeModalButton').click();await flush();f.w.document.querySelector('[data-method=bank]').click();f.el('confirmUpgradeButton').click();await flush();
+  paid=true;config.onSuccess({status:'PAID'});await flush();assert.equal(checks,2);assert.match(f.el('upgradeSuccessHeading').textContent,/đã được kích hoạt/);assert.equal(f.el('payosEmbeddedCheckout').children.length,0);assert.equal(f.el('payosPackageActions').hidden,true);assert.ok(exits>=2);
+ }finally{f.dom.window.close();}
+});
+
+test('Closing while checkout SDK is loading cannot reopen an old payment',async()=>{
+ let opened=0;
+ const f=fixture(async(name,args)=>name==='get_my_service_package'?{data:{package:null,members:[],pending_requests:[]}}:{data:{status:'pending',plan_type:'personal',transaction_code:args.transaction,price:19000,checkout_url:'https://pay.payos.vn/web/fixture12345'}});
+ try{
+  f.el('openUpgradeModalButton').click();await flush();f.w.document.querySelector('[data-method=bank]').click();f.el('confirmUpgradeButton').click();await flush();
+  const script=f.w.document.querySelector('script[src*="payos-initialize"]');assert.ok(script);
+  f.el('finishUpgradeButton').click();f.w.PayOSCheckout={usePayOS:()=>({open(){opened++;},exit(){}})};script.dispatchEvent(new f.w.Event('load'));await flush();
+  assert.equal(opened,0);assert.equal(f.el('payosEmbeddedCheckout').children.length,0);
+ }finally{f.dom.window.close();}
+});
+
+test('Checkout SDK load errors allow retry without creating a second payment',async()=>{
+ let purchases=0;
+ const f=fixture(async(name,args)=>{if(name==='get_my_service_package')return {data:{package:null,members:[],pending_requests:[]}};purchases++;return {data:{status:'pending',plan_type:'personal',transaction_code:args.transaction,price:19000,checkout_url:'https://pay.payos.vn/web/fixture12345'}};});
+ try{
+  f.el('openUpgradeModalButton').click();await flush();f.w.document.querySelector('[data-method=bank]').click();f.el('confirmUpgradeButton').click();await flush();
+  f.w.document.querySelector('script[src*="payos-initialize"]').dispatchEvent(new f.w.Event('error'));await flush();assert.equal(f.el('payosReloadCheckout').hidden,false);assert.equal(f.el('payosCheckoutLink').hidden,false);
+  f.w.PayOSCheckout={usePayOS:config=>({open(){f.el(config.ELEMENT_ID).append(f.w.document.createElement('iframe'));},exit(){f.el(config.ELEMENT_ID).replaceChildren();}})};
+  f.el('payosReloadCheckout').click();await flush();assert.equal(purchases,1);assert.equal(f.el('payosEmbeddedCheckout').querySelectorAll('iframe').length,1);
+ }finally{f.dom.window.close();}
+});

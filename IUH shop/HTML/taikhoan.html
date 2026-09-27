@@ -29,7 +29,7 @@
         <link rel="stylesheet" href="../CSS/service-package.css">
     <link
         rel="stylesheet"
-        href="../CSS/taikhoan.css"
+        href="../CSS/taikhoan.css?v=20260927-payos-embedded"
     >
     <link rel="stylesheet" href="../CSS/mobile-responsive.css">
 
@@ -1303,7 +1303,13 @@
             <h3 id="upgradeSuccessHeading">Gói dịch vụ đã được kích hoạt</h3>
             <p id="upgradeSuccessText">Bạn đã nâng cấp thành công Gói Cá nhân.</p>
             <div class="upgrade-success-details"><span>Mã giao dịch</span><strong id="upgradeTransactionCode">—</strong><span>Hiệu lực đến</span><strong id="upgradeExpiryDate">—</strong></div>
-            <div id="payosPackageActions" hidden><a id="payosCheckoutLink" class="upgrade-confirm-button" target="_blank" rel="noopener noreferrer" hidden>Mở mã QR trên payOS</a><button type="button" id="payosCheckPayment" class="upgrade-confirm-button">Kiểm tra thanh toán</button><p id="payosPaymentStatus" role="status" aria-live="polite"></p></div>
+            <div id="payosPackageActions" hidden>
+                <p id="payosPaymentStatus" role="status" aria-live="polite"></p>
+                <div id="payosEmbeddedCheckout" class="payos-embedded-checkout" hidden></div>
+                <button type="button" id="payosReloadCheckout" class="upgrade-confirm-button" hidden>Tải lại mã QR</button>
+                <button type="button" id="payosCheckPayment" class="upgrade-confirm-button">Kiểm tra thanh toán</button>
+                <a id="payosCheckoutLink" class="payos-checkout-fallback" target="_blank" rel="noopener noreferrer" hidden>Mở tab riêng nếu khung QR không hiển thị</a>
+            </div>
             <button type="button" id="finishUpgradeButton" class="upgrade-confirm-button">Đóng</button>
         </div>
     </div>
@@ -1454,7 +1460,7 @@
 <script src="../JS/vendor/purify.min.js"></script>
 <script src="../JS/iuh-core.js"></script>
     <script src="../JS/iuh-chat-notification.js"></script>
-    <script src="../JS/service-package.js?v=20260927-payos"></script>
+    <script src="../JS/service-package.js?v=20260927-payos-embedded"></script>
     <script
         src="../JS/taikhoan.js"
     ></script>

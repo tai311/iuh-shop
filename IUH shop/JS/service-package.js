@@ -3,6 +3,19 @@
     const packageCache = new Map();
     const ATTEMPT_KEY = "iuhPackageAttempt:";
     let client = window.IUHCore?.getClient() || null;
+    let checkoutSDKPromise=null;
+    function loadCheckoutSDK(){
+        if(window.PayOSCheckout?.usePayOS)return Promise.resolve(window.PayOSCheckout);
+        if(!checkoutSDKPromise)checkoutSDKPromise=new Promise((resolve,reject)=>{
+            const script=document.createElement('script');
+            script.src='https://cdn.payos.vn/payos-checkout/v1/stable/payos-initialize.js';script.async=true;
+            const fail=()=>{clearTimeout(timer);script.remove();checkoutSDKPromise=null;reject(new Error('Không tải được khung thanh toán. Bấm tải lại QR hoặc mở tab riêng.'));};
+            const timer=setTimeout(fail,15000);
+            script.onload=()=>{clearTimeout(timer);if(window.PayOSCheckout?.usePayOS)resolve(window.PayOSCheckout);else fail();};
+            script.onerror=fail;document.head.append(script);
+        });
+        return checkoutSDKPromise;
+    }
 
     function normalizePackage(value) {
         if (!value) return null;
@@ -107,6 +120,7 @@
         let loaded = false;
         let epoch = 0;
         let receiptTransaction=null,pollTimer=null;
+        let checkout=null,checkoutVersion=0,checkoutReceipt=null,frameTimer=null;
         const money = (value) => new Intl.NumberFormat("vi-VN").format(value) + "đ";
         const memberOnly = () => !!state.package && state.package.owner_id !== userId;
 
@@ -176,28 +190,78 @@
             return true;
         }
 
+        function clearCheckout(){
+            checkoutVersion++;
+            clearTimeout(frameTimer);
+            if(checkout&&byId('payosEmbeddedCheckout').querySelector('iframe'))checkout.exit();
+            checkout=null;byId('payosEmbeddedCheckout').replaceChildren();byId('payosEmbeddedCheckout').hidden=true;
+        }
+
+        async function mountCheckout(receipt){
+            clearCheckout();checkoutReceipt=receipt;
+            const version=checkoutVersion,currentEpoch=epoch;
+            const active=()=>version===checkoutVersion&&currentEpoch===epoch&&modal.classList.contains('open');
+            const holder=byId('payosEmbeddedCheckout'),retry=byId('payosReloadCheckout');
+            retry.hidden=true;holder.hidden=false;byId('payosPaymentStatus').textContent='Đang tải mã QR…';
+            try{
+                const sdk=await loadCheckoutSDK();if(!active())return;
+                checkout=sdk.usePayOS({
+                    RETURN_URL:location.origin+location.pathname,
+                    ELEMENT_ID:'payosEmbeddedCheckout',CHECKOUT_URL:receipt.checkout_url,embedded:true,
+                    // Browser callbacks only request a server check; they never activate a package.
+                    onSuccess:()=>{if(active())checkPayment();},
+                    onCancel:()=>{if(active())checkPayment();},
+                    onExit:()=>{if(!active())return;clearTimeout(frameTimer);holder.hidden=true;retry.hidden=false;byId('payosPaymentStatus').textContent='Khung thanh toán đã đóng hoặc chưa tải được. Bạn có thể tải lại QR của cùng giao dịch.';}
+                });
+                checkout.open();
+                const frame=holder.querySelector('iframe');if(!frame)throw new Error('Chưa mở được khung QR. Vui lòng tải lại.');
+                frame.title='Quét QR thanh toán gói IUH Shop qua payOS';
+                frameTimer=setTimeout(()=>{if(active()){retry.hidden=false;byId('payosPaymentStatus').textContent='Khung QR tải chậm. Bạn có thể tải lại hoặc mở tab riêng bằng liên kết bên dưới.';}},20000);
+                frame.addEventListener('load',()=>{if(active()){clearTimeout(frameTimer);retry.hidden=true;byId('payosPaymentStatus').textContent='';}},{once:true});
+            }catch(error){if(!active())return;holder.hidden=true;retry.hidden=false;byId('payosPaymentStatus').textContent=error.message;}
+        }
+
+        async function checkPayment(){
+            if(busy||!receiptTransaction)return;
+            const currentEpoch=epoch,transaction=receiptTransaction;
+            busy=true;renderControls();const b=byId('payosCheckPayment');b.disabled=true;
+            byId('payosPaymentStatus').textContent='Đang kiểm tra với payOS…';
+            try{
+                const result=await payosRequest('status',{transaction});
+                if(currentEpoch!==epoch||transaction!==receiptTransaction)return;
+                if(result.error)throw result.error;showReceipt(result.data);await reloadState();
+            }catch(error){if(currentEpoch===epoch)byId('payosPaymentStatus').textContent=error.message;}
+            finally{busy=false;b.disabled=false;renderControls();}
+        }
+
         function showReceipt(receipt) {
+            clearCheckout();checkoutReceipt=null;
             clearTimeout(pollTimer);receiptTransaction=receipt.transaction_code;
             const pending = receipt.status === "pending";
             const cancelled=receipt.status==='cancelled',review=receipt.payos_status==='review';
             const icon=successView.querySelector('.upgrade-success-icon i');if(icon)icon.className='fa-solid '+(review?'fa-triangle-exclamation':cancelled?'fa-xmark':pending?'fa-clock':'fa-check');
             byId("upgradeSuccessEyebrow").textContent = pending ? "YÊU CẦU ĐÃ ĐƯỢC GHI NHẬN" : "THANH TOÁN THÀNH CÔNG";
             byId("upgradeSuccessHeading").textContent = pending ? "Đang chờ xác nhận chuyển khoản" : "Gói dịch vụ đã được kích hoạt";
-            byId("upgradeSuccessText").textContent = pending ? "Mở mã QR payOS để chuyển khoản. Gói tự kích hoạt sau khi hệ thống xác minh đã nhận đủ tiền. Ví IUH không bị trừ." : "Đã thanh toán " + money(receipt.price) + " cho " + plans[receipt.plan_type].name + ". Hạn sử dụng bên dưới đã được hệ thống xác nhận.";
+            byId("upgradeSuccessText").textContent = pending ? "Quét mã QR ngay bên dưới bằng ứng dụng ngân hàng. Gói tự kích hoạt sau khi hệ thống xác minh đã nhận đủ tiền. Ví IUH không bị trừ." : "Đã thanh toán " + money(receipt.price) + " cho " + plans[receipt.plan_type].name + ". Hạn sử dụng bên dưới đã được hệ thống xác nhận.";
             if(cancelled||review){byId('upgradeSuccessEyebrow').textContent='THÔNG TIN GIAO DỊCH';byId('upgradeSuccessHeading').textContent=review?'Cần hỗ trợ đối soát':'Yêu cầu đã hủy / hết hạn';byId('upgradeSuccessText').textContent=review?'Hệ thống đã ghi nhận giao dịch cần kiểm tra. Không thanh toán lại; liên hệ hỗ trợ kèm mã bên dưới.':'Gói chưa kích hoạt từ yêu cầu này. Đóng và mở lại để tạo thanh toán mới.';}
             byId('payosPackageActions').hidden=!pending||review;
             const link=byId('payosCheckoutLink');link.hidden=true;link.removeAttribute('href');
-            if(pending&&!review&&typeof receipt.checkout_url==='string'&&/^https:\/\/pay\.payos\.vn\/web\/[A-Za-z0-9_-]+$/.test(receipt.checkout_url)){link.href=receipt.checkout_url;link.hidden=false;}
+            const hasCheckout=pending&&!review&&typeof receipt.checkout_url==='string'&&/^https:\/\/pay\.payos\.vn\/web\/[A-Za-z0-9_-]+$/.test(receipt.checkout_url);
+            if(hasCheckout){link.href=receipt.checkout_url;link.hidden=false;}
+            byId('payosReloadCheckout').hidden=true;
             byId('payosPaymentStatus').textContent='';
             byId("upgradeTransactionCode").textContent = receipt.transaction_code;
             byId("upgradeExpiryDate").textContent = receipt.expires_at ? service.formatExpiry(receipt.expires_at) : "Chưa kích hoạt";
             formView.hidden = true; successView.hidden = false;
+            modal.querySelector('.upgrade-modal-content').scrollTop=0;
+            if(hasCheckout)mountCheckout(receipt);
             if(pending&&!review){const currentEpoch=epoch;pollTimer=setTimeout(async function poll(){if(currentEpoch!==epoch||!modal.classList.contains('open'))return;const result=await service.loadCurrent(userId);if(currentEpoch!==epoch)return;if(result.data){state=result.data;const fresh=(state.recent_transactions||[]).find(r=>r.transaction_code===receiptTransaction);if(fresh&&(fresh.status!=='pending'||fresh.payos_status==='review')){showReceipt(fresh);return;}}pollTimer=setTimeout(poll,10000);},10000);}
         }
 
         async function openModal() {
             if (busy) return;
             const currentEpoch = ++epoch;
+            clearCheckout();checkoutReceipt=null;clearTimeout(pollTimer);
             busy = true; loaded = false; findingMember = false;
             formView.hidden = false; successView.hidden = true;
             message.textContent = "Đang tải gói từ hệ thống..."; memberMessage.textContent = "";
@@ -228,6 +292,7 @@
             if (busy) return;
             epoch++;
             clearTimeout(pollTimer);
+            clearCheckout();checkoutReceipt=null;
             modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
             openButton.focus();
         }
@@ -284,7 +349,8 @@
         addMemberButton.addEventListener("click", addMember);
         memberEmail.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addMember(); } });
         confirmButton.addEventListener("click", purchase);
-        byId('payosCheckPayment').addEventListener('click',async()=>{if(busy||!receiptTransaction)return;busy=true;renderControls();const b=byId('payosCheckPayment');b.disabled=true;byId('payosPaymentStatus').textContent='Đang kiểm tra với payOS…';try{const result=await payosRequest('status',{transaction:receiptTransaction});if(result.error)throw result.error;showReceipt(result.data);await reloadState();}catch(error){byId('payosPaymentStatus').textContent=error.message;}finally{busy=false;b.disabled=false;renderControls();}});
+        byId('payosCheckPayment').addEventListener('click',checkPayment);
+        byId('payosReloadCheckout').addEventListener('click',()=>{if(checkoutReceipt&&!busy)mountCheckout(checkoutReceipt);});
         document.addEventListener("keydown", (event) => { if (event.key === "Escape" && modal.classList.contains("open")) closeModal(); });
         renderControls();
         if(new URLSearchParams(location.search).get('payos_return')==='1'){history.replaceState(null,'',location.pathname+location.hash);openModal();}

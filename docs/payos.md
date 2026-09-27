@@ -21,10 +21,10 @@ Trang khách quay về cố định: `https://iuh-shop.vercel.app/HTML/taikhoan.
 ## Luồng
 
 1. Tài khoản → Nâng cấp gói → Chuyển khoản ngân hàng → Tạo mã QR payOS.
-2. Backend tạo yêu cầu với giá lấy từ DB, cấp một orderCode duy nhất, giữ cùng mã khi retry. Khách mở trang QR do payOS cung cấp.
+2. Backend tạo yêu cầu với giá lấy từ DB, cấp một orderCode duy nhất, giữ cùng mã khi retry. Giao diện nhúng QR payOS ngay trong cửa sổ mua gói bằng SDK chính thức tải từ CDN payOS; khách không cần chuyển tab. Nếu khung không tải, có nút tải lại cùng QR và liên kết mở tab riêng dự phòng.
 3. Webhook xác minh chữ ký rồi truy vấn lại giao dịch qua API payOS. Đồng bộ kiểm tra mã link, số tiền, trạng thái và số đã nhận trước khi kích hoạt.
 4. DB ghi chứng từ, gia hạn và bút toán trong cùng giao dịch. Không trừ/cộng ví người mua khi trả bằng ngân hàng. Bút toán doanh thu admin dùng cơ chế hiện có.
-5. Khi cửa sổ đang mở, giao diện đọc trạng thái DB mỗi 10 giây; nút Kiểm tra thanh toán đối chiếu API nếu webhook chậm. Đóng trang không ngăn webhook hoạt động.
+5. Khi cửa sổ đang mở, giao diện đọc trạng thái DB mỗi 10 giây; nút Kiểm tra thanh toán và callback của khung nhúng chỉ yêu cầu backend đối chiếu API. Callback không tự kích hoạt gói. Đóng cửa sổ dọn iframe/listener; kết quả SDK tải chậm không mở lại giao dịch đã đóng. Đóng trang không ngăn webhook hoạt động.
 6. Hủy link qua payOS trước khi hủy yêu cầu trên hệ thống. Không cho RPC thủ công thay đổi giao dịch đã gắn payOS. Trạng thái PAID đã ghi nhận không bị ghi đè bởi thông báo hủy/chờ cũ.
 
 ## Trường hợp cần hỗ trợ
