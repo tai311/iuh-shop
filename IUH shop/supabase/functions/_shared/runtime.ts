@@ -13,7 +13,21 @@ export async function database(path:string,options:RequestInit={},token?:string)
  const headers:Record<string,string>={apikey:key,'Content-Type':'application/json'};
  if(token||key?.startsWith('eyJ'))headers.Authorization='Bearer '+(token||key);
  const res=await fetch(base+'/rest/v1/'+path,{...options,headers,signal:AbortSignal.timeout(15000)});
- const value=await res.json();if(!res.ok)throw new Error(value.message||'Không truy cập được dữ liệu.');return value;
+ // PostgREST returns HTTP 204 with no body for RPCs declared RETURNS void.
+ // Parsing that successful response as JSON aborts settlement after binding the link.
+ const text=await res.text();
+ let value:any=null;
+ if(text.trim()){
+  try{value=JSON.parse(text);}catch{
+   console.error(JSON.stringify({event:'payos_database_invalid_response',status:res.status}));
+   throw new Error('Phản hồi dữ liệu không hợp lệ. Vui lòng kiểm tra lại giao dịch.');
+  }
+ }
+ if(!res.ok){
+  console.error(JSON.stringify({event:'payos_database_error',status:res.status,code:value?.code}));
+  throw new Error(value?.message||'Không truy cập được dữ liệu.');
+ }
+ return value;
 }
 export const rpc=(name:string,args:unknown,token?:string)=>database('rpc/'+name,{method:'POST',body:JSON.stringify(args)},token);
 export async function user(req:Request){

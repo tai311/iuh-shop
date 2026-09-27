@@ -15,5 +15,8 @@ Deno.serve(async req=>{
   if(info.id!==d.paymentLinkId)return response({error:'Payment link mismatch'},400);
   await sync(p,info);
   return response({received:true});
- }catch{return response({error:'Webhook processing temporarily unavailable'},500);}
+ }catch(error){
+  console.error(JSON.stringify({event:'payos_webhook_failed',errorType:error instanceof Error?error.name:'UnknownError'}));
+  return response({error:'Webhook processing temporarily unavailable'},500);
+ }
 });

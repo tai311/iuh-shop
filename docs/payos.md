@@ -33,10 +33,16 @@ Trang khách quay về cố định: `https://iuh-shop.vercel.app/HTML/taikhoan.
 
 ## Kiểm tra đã thực hiện
 
-- 21 kiểm thử: DB/RLS trong PGlite, ký/xác minh HMAC, giả mạo giá, webhook giả, ownership, timeout/retry cùng mã, trùng thông báo, chặn đối soát thủ công, thanh toán muộn/sai số tiền, bảo toàn ví; cùng các regression trước đó.
+- 24 kiểm thử: DB/RLS trong PGlite, ký/xác minh HMAC, giả mạo giá, webhook giả, ownership, timeout/retry cùng mã, trùng thông báo, chặn đối soát thủ công, thanh toán muộn/sai số tiền, bảo toàn ví, khung checkout nhúng; cùng các regression trước đó.
 - 32 JS/33 HTML qua source checks; các file TS Edge qua kiểm tra cú pháp Node và triển khai Supabase.
 - Trình duyệt với dữ liệu giả: chọn ngân hàng, tạo yêu cầu, hiện nút mở QR và nút kiểm tra; không lỗi JavaScript.
 - Production: hai hàm ACTIVE; gateway không đăng nhập trả 401; webhook sai chữ ký trả 401. Không dùng tài khoản thật để tạo giao dịch thu tiền khi kiểm thử.
-- Chưa thử chuyển khoản ngân hàng thật và chưa xác nhận bộ khóa với một lần tạo QR thật. Người vận hành cần kiểm tra một lần mua gói trước khi cho người khác sử dụng.
+- Khi triển khai ban đầu chưa thử chuyển khoản ngân hàng thật. Ngày 27/09/2026, giao dịch thật do người vận hành thực hiện đã phát hiện lỗi xử lý phản hồi RPC không có nội dung, được sửa như dưới đây.
+
+## Sửa lỗi webhook ngày 27/09/2026
+
+`payos_bind_package` trả `void`, nên PostgREST trả HTTP 204 không có body. Helper cũ gọi `res.json()` vô điều kiện, làm webhook trả 500 trước khi gọi `payos_sync_package`; giao dịch vẫn pending dù đã có thông báo từ payOS. Helper nay đọc body rỗng thành `null`, vẫn kiểm tra lỗi HTTP và từ chối JSON hỏng. Gateway và webhook đều cần triển khai lại vì cùng dùng helper này.
+
+Kiểm thử Edge dùng phản hồi 204 thực tế thay cho JSON `null`: thất bại với code cũ, đạt sau bản sửa cho cả tạo QR, kiểm tra trạng thái và webhook hợp lệ. Có log lỗi chỉ chứa loại lỗi/mã HTTP/mã lỗi DB, không ghi khóa hoặc payload thanh toán. Đồng bộ lại vẫn phải xác minh chữ ký hoặc người dùng đăng nhập, truy vấn trạng thái từ API payOS và áp dụng kiểm tra số tiền/trùng giao dịch hiện có.
 
 Tài liệu: https://payos.vn/docs/api/ và https://payos.vn/docs/tich-hop-webhook/kiem-tra-du-lieu-voi-signature/.

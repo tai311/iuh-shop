@@ -19,7 +19,7 @@ test('Edge handlers authenticate callers, ignore client price and verify webhook
   if(url.endsWith('/rpc/purchase_service_package')){assert.equal(value.p_payment_method,'bank');return Response.json({status:'pending'});}
   if(url.endsWith('/rpc/payos_prepare_package')){assert.equal(value.p_owner_id,'buyer');return Response.json({...p});}
   if(url.endsWith('/rpc/payos_claim_check'))return Response.json(true);
-  if(url.endsWith('/rpc/payos_bind_package')){p.payos_link_id=value.p_link_id;p.payos_checkout_url=value.p_checkout_url;p.payos_status='pending';return Response.json(null);}
+  if(url.endsWith('/rpc/payos_bind_package')){p.payos_link_id=value.p_link_id;p.payos_checkout_url=value.p_checkout_url;p.payos_status='pending';return new Response(null,{status:204});}
   if(url.endsWith('/rpc/payos_sync_package')){settlements++;assert.equal(value.p_amount,19000);assert.equal(value.p_received,providerState==='PAID'?19000:0);return Response.json({...p,status:providerState==='PAID'?'paid':'pending',payos_status:providerState==='PAID'?'paid':'pending'});}
   throw new Error('Unexpected fetch '+url);
  };
