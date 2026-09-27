@@ -1619,6 +1619,7 @@ function renderPurchaseCard(order) {
 
 
                 <div class="order-actions">
+                    ${order.payment_method==='qr'&&order.payment_status==='unpaid'&&order._status!=='cancelled'&&!order.needs_payment_review?'<button type="button" class="order-btn" data-payos-order="'+escapeHtml(order._databaseId)+'">Thanh toán / kiểm tra payOS</button>':''}
 
                     ${
                         canCancelOrder(order)
@@ -2206,13 +2207,15 @@ async function cancelOrder(orderId) {
         const {
             data,
             error
-        } = await db.rpc(
+        } = await (async()=>{
+            if(order.payos_order_code&&order.payment_status==='unpaid')await window.IUHPayosOrders.request('cancel',orderId);
+            return db.rpc(
             "cancel_order",
             {
                 p_order_id:
                     Number(orderId)
-            }
-        );
+            });
+        })();
 
 
         if (error) {

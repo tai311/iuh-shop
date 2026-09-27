@@ -1,6 +1,6 @@
 # Thanh toán gói bằng payOS
 
-Phạm vi: mua/gia hạn gói cá nhân/nhóm bằng chuyển khoản. Thanh toán ví IUH giữ nguyên. Chuyển khoản mua hàng, nạp/rút ví chưa nối payOS trong thay đổi này.
+Tài liệu này mô tả mua/gia hạn gói cá nhân/nhóm bằng chuyển khoản. Thanh toán ví IUH giữ nguyên. Thanh toán đơn hàng đã có tài liệu riêng tại [payos-orders.md](payos-orders.md); nạp/rút ví chưa nối payOS.
 
 ## Cấu hình production
 

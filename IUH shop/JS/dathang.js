@@ -1506,7 +1506,7 @@ function updateOptionUI() {
 function updateQR() {
  if (qrCodeImage) qrCodeImage.hidden = true;
  if (confirmPaymentBtn) confirmPaymentBtn.hidden = true;
- if (paymentVerificationStatus) paymentVerificationStatus.textContent = 'Đơn chuyển khoản chỉ được xác nhận thanh toán sau khi quản trị viên đối soát. Liên hệ hỗ trợ để nhận thông tin chuyển khoản và ghi mã đơn.';
+ if (paymentVerificationStatus) paymentVerificationStatus.textContent = 'Bấm Đặt hàng để tạo QR payOS riêng cho đơn này. Quét QR ngay trên IUH Shop; hệ thống tự xác nhận khi nhận đủ tiền.';
 }
 
 async function loadWallet() {
@@ -2120,8 +2120,8 @@ async function submitOrder() {
    if(!data?.success) throw new Error(data?.message||'Không thể tạo đơn hàng.');
    checkoutSucceeded=true;
    sessionStorage.removeItem(storageKey);
-   showToast(data.payment_status==='paid'?'Đặt hàng và thanh toán thành công.':order.payment_method==='qr'?'Đã tạo đơn chờ đối soát chuyển khoản.':'Đặt hàng thành công.');
-   setTimeout(()=>{window.location.href='donhang.html';},1200);
+   showToast(data.payment_status==='paid'?'Đặt hàng và thanh toán thành công.':order.payment_method==='qr'?'Đã tạo đơn. Đang mở mã QR payOS…':'Đặt hàng thành công.');
+   setTimeout(()=>{window.location.href='donhang.html'+(order.payment_method==='qr'?'?payos_order='+encodeURIComponent(data.order_id):'');},1200);
  } catch(error) {
    console.error('Lỗi đặt hàng:',error);
    showToast(error.message||'Chưa xác nhận được kết quả. Bấm lại để kiểm tra cùng yêu cầu, không tạo trùng đơn.');

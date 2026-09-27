@@ -4,3 +4,6 @@ verify_jwt = false
 [functions.payos-webhook]
 verify_jwt = false
 # payOS HMAC is verified before reading or changing payment data.
+[functions.payos-order]
+verify_jwt = false
+# Auth and order ownership / admin status access are checked in the handler.
