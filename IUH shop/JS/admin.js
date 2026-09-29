@@ -691,9 +691,9 @@ async function loadAdminRevenue() {
                             "wallet_id",
                             wallet.id
                         )
-                        .eq(
+                        .in(
                             "type",
-                            "fee"
+                            ["fee", "sale"]
                         )
                         .order(
                             "created_at",
@@ -709,7 +709,13 @@ async function loadAdminRevenue() {
 
 
                 walletTransactions =
-                    data || [];
+                    (data || []).filter(
+                        transaction =>
+                            transaction.type !== "sale" ||
+                            `${transaction.title || ""} ${transaction.description || ""}`
+                                .toLowerCase()
+                                .includes("phí")
+                    );
             }
         }
 
