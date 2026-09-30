@@ -2589,12 +2589,7 @@ async function submitOrder() {
            5. TẠO ĐƠN TRỰC TIẾP TRONG DATABASE
         ========================================= */
 
-        const {
-            data,
-            error
-        } = await db.rpc(
-            "create_order",
-            {
+        const requestArgs = {
                 p_recipient_name:
                     order.recipient_name,
 
@@ -2627,7 +2622,51 @@ async function submitOrder() {
 
                 p_cart_ids:
                     cartIds
-            }
+        };
+
+        const storageKey =
+            `iuh-checkout-request:${currentUser.id}`;
+
+        const fingerprint =
+            JSON.stringify(requestArgs);
+
+        let pendingRequest;
+
+        try {
+            pendingRequest = JSON.parse(
+                sessionStorage.getItem(storageKey) || "null"
+            );
+        } catch (_) {
+            pendingRequest = null;
+        }
+
+        if (
+            !pendingRequest ||
+            pendingRequest.fingerprint !== fingerprint ||
+            typeof pendingRequest.key !== "string" ||
+            !pendingRequest.key.trim() ||
+            pendingRequest.key.length > 100
+        ) {
+            pendingRequest = {
+                fingerprint,
+                key: crypto.randomUUID()
+            };
+        }
+
+        sessionStorage.setItem(
+            storageKey,
+            JSON.stringify(pendingRequest)
+        );
+
+        requestArgs.p_idempotency_key =
+            pendingRequest.key;
+
+        const {
+            data,
+            error
+        } = await db.rpc(
+            "create_order",
+            requestArgs
         );
 
 
