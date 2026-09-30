@@ -11,7 +11,10 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 
 const supabaseClient =
-    window.IUHCore.getClient();
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 
 const DEFAULT_AVATAR =
@@ -104,7 +107,7 @@ async function updateUserMenu() {
             data: profile
         } =
             await supabaseClient
-                .from("public_profiles")
+                .from("users")
                 .select(
                     "fullname, avatar_url, role"
                 )
@@ -243,7 +246,15 @@ function $$(
 
 function escapeHTML(value) {
 
-    return window.IUHSecurity.escapeHTML(value);
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        value ?? "";
+
+    return div.innerHTML;
 
 }
 
@@ -267,11 +278,12 @@ async function getProfile(
         error
     } =
         await supabaseClient
-            .from("public_profiles")
+            .from("users")
             .select(
                 `
                 user_id,
                 fullname,
+                email,
                 avatar_url,
                 role,
                 student_verified
@@ -671,7 +683,7 @@ async function searchMentionUsers(
 
     let query =
         supabaseClient
-            .from("public_profiles")
+            .from("users")
             .select(
                 `
                 user_id,
@@ -835,7 +847,7 @@ function setupMentionInput(
                             >
 
                                 <img
-                                    src="${escapeHTML(window.IUHSecurity.safeURL(user.avatar_url, DEFAULT_AVATAR))}"
+                                    src="${user.avatar_url || DEFAULT_AVATAR}"
                                     alt="Avatar"
                                 >
 
@@ -1070,7 +1082,7 @@ async function loadForumPosts() {
             error: profileError
         } =
             await supabaseClient
-                .from("public_profiles")
+                .from("users")
                 .select(
                     `
                     user_id,
@@ -1532,7 +1544,7 @@ function createPostHTML(
                     >
 
                         <img
-                            src="${escapeHTML(window.IUHSecurity.safeURL(avatar, DEFAULT_AVATAR))}"
+                            src="${avatar}"
                             alt="${escapeHTML(authorName)}"
                             onerror="this.src='${DEFAULT_AVATAR}'"
                         >
@@ -1649,7 +1661,7 @@ function createPostHTML(
                         <div class="post-image">
 
                             <img
-                                src="${escapeHTML(window.IUHSecurity.safeURL(post.image_url))}"
+                                src="${post.image_url}"
                                 alt="Ảnh bài viết"
                             >
 
@@ -1807,7 +1819,10 @@ function createPostHTML(
                     <div class="comment-input-avatar">
 
                         <img
-                            src="${escapeHTML(window.IUHSecurity.safeURL(currentProfile?.avatar_url, DEFAULT_AVATAR))}"
+                            src="${
+                                currentProfile?.avatar_url ||
+                                DEFAULT_AVATAR
+                            }"
                             alt="Avatar"
                         >
 
@@ -1985,7 +2000,7 @@ function createForumAdvertisementHTML(
 
 
             <a
-                href="${escapeHTML(window.IUHSecurity.safeURL(targetUrl, "#"))}"
+                href="${targetUrl}"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="forum-sponsored-link"
@@ -1994,8 +2009,8 @@ function createForumAdvertisementHTML(
                 <div class="forum-sponsored-image">
 
                     <img
-                        src="${escapeHTML(window.IUHSecurity.safeURL(image))}"
-                        alt="${escapeHTML(title)}"
+                        src="${image}"
+                        alt="${title}"
                         loading="lazy"
                     >
 
@@ -2008,13 +2023,13 @@ function createForumAdvertisementHTML(
 
                         <i class="fa-solid fa-handshake"></i>
 
-                        ${escapeHTML(partner)}
+                        ${partner}
 
                     </div>
 
 
                     <h3>
-                        ${escapeHTML(title)}
+                        ${title}
                     </h3>
 
 
@@ -2022,7 +2037,7 @@ function createForumAdvertisementHTML(
                         description
                             ? `
                                 <p>
-                                    ${escapeHTML(description)}
+                                    ${description}
                                 </p>
                               `
                             : ""
@@ -2031,7 +2046,7 @@ function createForumAdvertisementHTML(
 
                     <span class="forum-sponsored-button">
 
-                        ${escapeHTML(buttonText)}
+                        ${buttonText}
 
                         <i class="fa-solid fa-arrow-right"></i>
 
@@ -2545,7 +2560,7 @@ if (commentIds.length) {
             data: profileData
         } =
             await supabaseClient
-                .from("public_profiles")
+                .from("users")
                 .select(
                     `
                     user_id,
@@ -2739,7 +2754,7 @@ const reactionIcons =
             >
 
                 <img
-                    src="${escapeHTML(window.IUHSecurity.safeURL(avatar, DEFAULT_AVATAR))}"
+                    src="${avatar}"
                     alt="${escapeHTML(name)}"
                     onerror="this.src='${DEFAULT_AVATAR}'"
                 >
@@ -5413,9 +5428,17 @@ function setupActiveNavigation() {
 
 supabaseClient
     .auth
-    .onAuthStateChange(function () {
- setTimeout(async () => { try { await loadCurrentUser(); await updateUserMenu(); await loadForumPosts(); } catch(error) { console.error(error); } },0);
-});
+    .onAuthStateChange(
+        async function () {
+
+            await loadCurrentUser();
+
+            await updateUserMenu();
+
+            await loadForumPosts();
+
+        }
+    );
 
 
 /* =========================================================
@@ -5518,7 +5541,7 @@ function openArticleModal(article = null) {
             "THÔNG BÁO";
 
         editor.innerHTML =
-            window.IUHSecurity.sanitizeHTML(article.content || "");
+            article.content || "";
 
     } else {
 
@@ -5677,7 +5700,7 @@ async function uploadArticleImage(
 
 
     const path =
-        `${currentUser.id}/articles/${fileName}`;
+        `articles/${currentUser.id}/${fileName}`;
 
 
     const {
@@ -5838,7 +5861,7 @@ async function loadOfficialArticles() {
             data
         } =
             await supabaseClient
-                .from("public_profiles")
+                .from("users")
                 .select(`
                     user_id,
                     fullname,
@@ -5915,7 +5938,7 @@ function createArticleCard(
 
 
     plainText.innerHTML =
-        window.IUHSecurity.sanitizeHTML(article.content || "");
+        article.content || "";
 
 
     const excerpt =
@@ -6226,20 +6249,97 @@ async function deleteArticle(
    VIEW BÀI VIẾT
 ========================================================= */
 
-function openArticleViewer(article) {
- let modal=document.getElementById('articleViewerModal');
- if(!modal) {
-   modal=document.createElement('div');modal.id='articleViewerModal';modal.className='article-modal';
-   modal.innerHTML='<div class="article-modal-overlay"></div><div class="article-modal-box"><div class="article-modal-header"><h2></h2><button type="button" class="article-modal-close" aria-label="Đóng">×</button></div><div class="article-full-content" style="padding:24px"></div></div>';
-   const close=()=>{modal.classList.remove('show');document.body.style.overflow='';};
-   modal.querySelector('.article-modal-close').addEventListener('click',close);
-   modal.querySelector('.article-modal-overlay').addEventListener('click',close);
-   document.addEventListener('keydown',event=>{if(event.key==='Escape') close();});
-   document.body.appendChild(modal);
- }
- modal.querySelector('h2').textContent=article.title||'Bài viết';
- modal.querySelector('.article-full-content').innerHTML=window.IUHSecurity.sanitizeHTML(article.content||'');
- modal.classList.add('show');document.body.style.overflow='hidden';
+function openArticleViewer(
+    article
+) {
+
+    const modal =
+        document.getElementById(
+            "articleModal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+
+    const modalBox =
+        modal.querySelector(
+            ".article-modal-box"
+        );
+
+
+    modalBox.innerHTML = `
+
+        <div class="article-modal-header">
+
+            <div>
+
+                <span class="article-modal-eyebrow">
+                    IUH SHOP INFORMATION
+                </span>
+
+                <h2>
+                    ${escapeHTML(
+                        article.title ||
+                        "Bài viết"
+                    )}
+                </h2>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="article-modal-close"
+                onclick="closeArticleModal()"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <div
+            style="
+                padding: 25px 28px 30px;
+            "
+        >
+
+            ${
+                article.image_url
+                    ? `
+                        <img
+                            src="${escapeHTML(article.image_url)}"
+                            alt="${escapeHTML(article.title || "Bài viết")}"
+                            style="
+                                width:100%;
+                                max-height:420px;
+                                object-fit:cover;
+                                border-radius:12px;
+                                margin-bottom:22px;
+                            "
+                        >
+                    `
+                    : ""
+            }
+
+
+            <div class="article-full-content">
+                ${article.content || ""}
+            </div>
+
+        </div>
+
+    `;
+
+
+    modal.classList.add(
+        "show"
+    );
+
+    document.body.style.overflow =
+        "hidden";
 }
 
 function setupOfficialArticles() {
@@ -6447,7 +6547,7 @@ async function saveArticle() {
         categoryInput.value;
 
     const content =
-        window.IUHSecurity.sanitizeHTML(editor.innerHTML).trim();
+        editor.innerHTML.trim();
 
 
     if (!title) {

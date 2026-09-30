@@ -15,7 +15,10 @@ const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient =
-    window.IUHCore.getClient();
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 
 /* =========================================================
@@ -1599,14 +1602,239 @@ if (boostPaymentMethodButtons.length > 0) {
    THANH TOÁN BẰNG VÍ IUH
    ========================================================= */
 
-if (payBoostWallet) payBoostWallet.addEventListener('click',submitProductForReal);
-if (confirmBoostQr) confirmBoostQr.hidden=true;
-if (boostQrPayment) boostQrPayment.hidden=true;
-let postingBusy=false;
-let postingPayloadKey=null;
-let postingImageCache=null;
+if (payBoostWallet) {
+    payBoostWallet.addEventListener("click", async function () {
 
-async function processBoostPayment() { return submitProductForReal(); }
+        if (!currentUser) {
+            showToast("Vui lòng đăng nhập trước khi thanh toán.");
+            return;
+        }
+
+        payBoostWallet.disabled = true;
+        payBoostWallet.textContent = "Đang thanh toán...";
+
+        if (boostPaymentStatus) {
+            boostPaymentStatus.textContent =
+                "Đang xử lý thanh toán...";
+            boostPaymentStatus.className =
+                "boost-payment-status loading";
+        }
+
+        try {
+
+            const { data, error } = await supabaseClient
+                .rpc("pay_boost_fee");
+
+            if (error) {
+                console.error("Lỗi thanh toán đẩy tin:", error);
+
+                throw new Error(
+                    error.message || "Không thể thanh toán phí đẩy tin."
+                );
+            }
+
+            if (!data || data.success !== true) {
+                throw new Error(
+                    data?.message || "Thanh toán không thành công."
+                );
+            }
+
+            boostPaymentMethod = "iuh_wallet";
+            boostPaymentCompleted = true;
+
+            if (boostPaymentStatus) {
+                boostPaymentStatus.textContent =
+                    `Thanh toán ${formatBoostCurrency(BOOST_FEE)} thành công.`;
+
+                boostPaymentStatus.className =
+                    "boost-payment-status success";
+            }
+
+            showToast("Thanh toán phí đẩy tin thành công!");
+
+            setTimeout(async function () {
+                closeBoostPaymentModal();
+
+                await submitProductForReal();
+
+            }, 700);
+
+        } catch (error) {
+
+            console.error(error);
+
+            if (boostPaymentStatus) {
+                boostPaymentStatus.textContent =
+                    error.message || "Thanh toán thất bại.";
+
+                boostPaymentStatus.className =
+                    "boost-payment-status error";
+            }
+
+            showToast(
+                error.message || "Thanh toán thất bại."
+            );
+
+        } finally {
+
+            payBoostWallet.disabled = false;
+            payBoostWallet.textContent =
+                `Thanh toán ${formatBoostCurrency(BOOST_FEE)}`;
+        }
+    });
+}
+
+
+/* =========================================================
+   CHỌN THANH TOÁN QR
+   ========================================================= */
+
+if (boostQrPayment) {
+    boostQrPayment.addEventListener("click", function () {
+
+        boostPaymentMethod = "qr_simulated";
+
+        boostQrPayment.classList.add("active");
+
+        if (boostWalletPayment) {
+            boostWalletPayment.classList.remove("active");
+        }
+
+        if (boostPaymentStatus) {
+            boostPaymentStatus.textContent =
+                "Thanh toán QR mô phỏng. Sau khi chuyển khoản, bấm xác nhận.";
+            
+            boostPaymentStatus.className =
+                "boost-payment-status";
+        }
+    });
+}
+
+
+/* =========================================================
+   XÁC NHẬN THANH TOÁN QR MÔ PHỎNG
+   ========================================================= */
+
+if (confirmBoostQr) {
+    confirmBoostQr.addEventListener("click", async function () {
+
+        if (!currentUser) {
+            showToast("Vui lòng đăng nhập trước.");
+            return;
+        }
+
+        confirmBoostQr.disabled = true;
+        confirmBoostQr.textContent = "Đang xác nhận...";
+
+        try {
+
+    // QR là thanh toán mô phỏng
+    // Không trừ tiền trong Ví IUH
+
+    const { data, error } = await supabaseClient
+        .rpc("record_boost_qr_payment");
+
+    if (error) {
+        console.error("Lỗi ghi nhận thanh toán QR:", error);
+
+        throw new Error(
+            error.message || "Không thể xác nhận thanh toán QR."
+        );
+    }
+
+    if (!data || data.success !== true) {
+        throw new Error(
+            data?.message || "Thanh toán QR không thành công."
+        );
+    }
+
+    boostPaymentMethod = "qr_simulated";
+    boostPaymentCompleted = true;
+
+    if (boostPaymentStatus) {
+        boostPaymentStatus.textContent =
+            "Thanh toán QR đã được xác nhận.";
+
+        boostPaymentStatus.className =
+            "boost-payment-status success";
+    }
+
+    showToast("Thanh toán phí đẩy tin thành công!");
+
+    setTimeout(async function () {
+        closeBoostPaymentModal();
+
+        await submitProductForReal();
+
+    }, 700);
+
+} catch (error) {
+
+    console.error(error);
+
+    if (boostPaymentStatus) {
+        boostPaymentStatus.textContent =
+            error.message ||
+            "Không thể xác nhận thanh toán.";
+
+        boostPaymentStatus.className =
+            "boost-payment-status error";
+    }
+
+    showToast(
+        error.message ||
+        "Không thể xác nhận thanh toán."
+    );
+
+} finally {
+
+    confirmBoostQr.disabled = false;
+
+    confirmBoostQr.textContent =
+        "Tôi đã thanh toán";
+}
+    });
+}
+
+
+/* =========================================================
+   XỬ LÝ THANH TOÁN ĐẨY TIN
+   ========================================================= */
+
+async function processBoostPayment() {
+
+    /*
+     * Không chọn đẩy tin
+     * → đăng sản phẩm bình thường.
+     */
+    if (!boostEnabled) {
+        boostPaymentCompleted = false;
+        boostPaymentMethod = null;
+
+        await submitProductForReal();
+        return;
+    }
+
+    /*
+     * Đã thanh toán rồi
+     * → không thanh toán lại.
+     */
+    if (boostPaymentCompleted) {
+        await submitProductForReal();
+        return;
+    }
+
+    /*
+     * Chọn đẩy tin
+     * → mở modal thanh toán.
+     */
+    openBoostPaymentModal();
+}
+
+
+/* =========================================================
+   TẠO SẢN PHẨM
+========================================================= */
 
 async function createProduct() {
 
@@ -1698,7 +1926,7 @@ async function createProduct() {
         !Number.isFinite(
             price
         ) ||
-        price < 1000
+        price < 0
     ) {
 
         throw new Error(
@@ -1732,9 +1960,10 @@ async function createProduct() {
        UPLOAD ẢNH
     ----------------------------------------- */
 
-    const signature=selectedFiles.map(f=>[f.name,f.size,f.lastModified].join(':')).join('|');
-    if(!postingImageCache || postingImageCache.signature!==signature) postingImageCache={signature,urls:await uploadImages(currentUser.id)};
-    const imageUrls=postingImageCache.urls;
+    const imageUrls =
+        await uploadImages(
+            currentUser.id
+        );
 
 
     /* -----------------------------------------
@@ -1755,11 +1984,40 @@ async function createProduct() {
     /* -----------------------------------------
        LƯU SẢN PHẨM
     ----------------------------------------- */
-    const args={p_name:name,p_category:category,p_quantity:quantity,p_price:price,p_description:productDescription,
-      p_image_urls:imageUrls,p_boost:boostEnabled};
-    const fingerprint=JSON.stringify(args);
-    if(!postingPayloadKey || postingPayloadKey.fingerprint!==fingerprint) postingPayloadKey={fingerprint,key:crypto.randomUUID()};
-    const {data:product,error}=await supabaseClient.rpc('create_product_with_boost',{...args,p_idempotency_key:postingPayloadKey.key});
+    const boostStartedAt = boostPaymentCompleted
+    ? new Date()
+    : null;
+
+const boostExpiresAt = boostPaymentCompleted
+    ? new Date(
+        Date.now() + BOOST_DURATION_HOURS * 60 * 60 * 1000
+      )
+    : null;
+
+    const {
+        data: product,
+        error
+    } =
+        await supabaseClient
+            .from("products")
+            .insert({
+            seller_id: currentUser.id,
+            name,
+            category,
+            quantity,
+            price,
+            description: productDescription,
+            image_urls: imageUrls,
+            status: "active",
+
+            // Đẩy tin
+            is_boosted: boostPaymentCompleted,
+            boost_started_at: boostStartedAt,
+            boost_expires_at: boostExpiresAt
+        })
+            .select("id")
+            .single();
+
 
     if (error) {
 
@@ -1795,8 +2053,6 @@ async function createProduct() {
 ========================================================= */
 
 async function submitProductForReal() {
-    if(postingBusy) return;
-    postingBusy=true;
 
     if (!currentUser) {
 
@@ -1873,7 +2129,6 @@ async function submitProductForReal() {
         );
 
 
-        postingBusy=false;
         submitProduct.disabled =
             false;
 

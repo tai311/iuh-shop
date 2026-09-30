@@ -10,7 +10,10 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 
 const supabaseClient =
-    window.IUHCore.getClient();
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 
 

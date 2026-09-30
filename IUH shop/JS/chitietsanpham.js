@@ -14,7 +14,10 @@ const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient =
-    window.IUHCore.getClient();
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 
 /* =========================================================
@@ -241,7 +244,7 @@ function renderProductImages(product) {
         if (mainProductImage) {
 
             mainProductImage.src =
-                "../Images/default-product.svg";
+                "../Images/default-product.png";
 
             mainProductImage.alt =
                 product.name ||
@@ -408,7 +411,7 @@ const sellerPrice =
     Number(product.price) || 0;
 
 const buyerPrice =
-    product.is_consignment ? sellerPrice : getBuyerPrice(sellerPrice);
+    getBuyerPrice(sellerPrice);
 
 if (productPrice) {
     productPrice.textContent =
@@ -560,7 +563,7 @@ async function loadSeller(sellerId) {
             data: seller,
             error
         } = await supabaseClient
-            .from("public_profiles")
+            .from("users")
             .select(`
                 user_id,
                 fullname,
@@ -761,7 +764,6 @@ async function loadProduct() {
                 price,
                 description,
                 image_urls,
-                is_consignment,
                 status
             `)
             .eq(
@@ -2250,21 +2252,42 @@ function setupReportListing() {
             closeReportModalFunc
         );
 
-    let reportBusy=false;
-    submitReportBtn?.addEventListener('click', async function() {
-      if(reportBusy) return;
-      reportBusy=true; submitReportBtn.disabled=true;
-      try {
-        const selectedReason=document.querySelector('input[name="reportReason"]:checked');
-        if(!selectedReason || !currentProduct) throw new Error('Vui lòng chọn lý do báo cáo.');
-        const {data:{user},error:authError}=await supabaseClient.auth.getUser();
-        if(authError || !user) throw new Error('Vui lòng đăng nhập để gửi báo cáo.');
-        if(user.id===currentProduct.seller_id) throw new Error('Bạn không thể báo cáo tin của chính mình.');
-        const {error}=await supabaseClient.from('product_reports').insert({product_id:currentProduct.id,
-          reporter_id:user.id,reason:selectedReason.value,description:$('reportDescription')?.value.trim()||'',status:'pending'});
-        if(error) throw error;
-        closeReportModalFunc(); showToast('Đã gửi báo cáo sản phẩm để kiểm tra.');
-      } catch(error) {showToast(error.code==='23505'?'Báo cáo sản phẩm này đang được xử lý.':error.message||'Không thể gửi báo cáo.');}
-      finally {reportBusy=false;submitReportBtn.disabled=false;}
-    });
+    submitReportBtn?.addEventListener(
+        "click",
+        function () {
+
+            const selectedReason =
+                document.querySelector(
+                    'input[name="reportReason"]:checked'
+                );
+
+            if (!selectedReason) {
+
+                showToast(
+                    "Vui lòng chọn lý do báo cáo."
+                );
+
+                return;
+            }
+
+            const description =
+                $("reportDescription")?.value.trim() || "";
+
+            console.log(
+                "Báo cáo tin đăng:",
+                {
+                    product_id: currentProduct?.id,
+                    seller_id: currentProduct?.seller_id,
+                    reason: selectedReason.value,
+                    description: description
+                }
+            );
+
+            closeReportModalFunc();
+
+            showToast(
+                "Báo cáo của bạn đã được ghi nhận."
+            );
+        }
+    );
 }

@@ -15,7 +15,10 @@ const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient =
-    window.IUHCore.getClient();
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 
 /* =========================================================
@@ -86,7 +89,11 @@ const mobileBack =
 
 function escapeHTML(value) {
 
-    return window.IUHSecurity.escapeHTML(value);
+    const div = document.createElement("div");
+
+    div.textContent = value ?? "";
+
+    return div.innerHTML;
 }
 
 
@@ -104,7 +111,7 @@ async function getUserProfile(userId) {
         data,
         error
     } = await supabaseClient
-        .from("public_profiles")
+        .from("users")
         .select(
     "user_id, fullname, avatar_url, role, student_verified"
 )
@@ -174,7 +181,7 @@ async function getAdminUser() {
         data,
         error
     } = await supabaseClient
-        .from("public_profiles")
+        .from("users")
         .select(
          "user_id, fullname, avatar_url, role, student_verified"
         )
@@ -629,18 +636,226 @@ async function loadCurrentUser() {
    TÌM CONVERSATION VỚI MỘT USER
    ========================================================= */
 
-async function findConversationWithUser(otherUserId) {
- if(!currentUser || !otherUserId || currentUser.id===otherUserId) return null;
- const {data,error}=await supabaseClient.rpc('get_or_create_direct_conversation',{p_other_user_id:otherUserId});
- if(error) throw error;
- return data.id;
+async function findConversationWithUser(
+    otherUserId
+) {
+
+    if (
+        !currentUser ||
+        !otherUserId
+    ) {
+        return null;
+    }
+
+    const {
+        data: memberships,
+        error
+    } =
+        await supabaseClient
+            .from("conversation_members")
+            .select("conversation_id")
+            .eq(
+                "user_id",
+                currentUser.id
+            );
+
+    if (
+        error ||
+        !memberships?.length
+    ) {
+        return null;
+    }
+
+
+    for (
+        const membership
+        of memberships
+    ) {
+
+        const conversationId =
+            membership.conversation_id;
+
+
+        const {
+            data: otherMember,
+            error: memberError
+        } =
+            await supabaseClient
+                .from("conversation_members")
+                .select("user_id")
+                .eq(
+                    "conversation_id",
+                    conversationId
+                )
+                .eq(
+                    "user_id",
+                    otherUserId
+                )
+                .maybeSingle();
+
+
+        if (
+            !memberError &&
+            otherMember
+        ) {
+
+            return conversationId;
+        }
+    }
+
+    return null;
 }
 
-async function createConversation(otherUserId) {
- const {data,error}=await supabaseClient.rpc('get_or_create_direct_conversation',{p_other_user_id:otherUserId});
- if(error) throw error;
- return data;
+
+/* =========================================================
+   TẠO CONVERSATION
+   ========================================================= */
+
+async function createConversation(
+    otherUserId,
+    isAdminChat = false
+) {
+
+    if (!currentUser) {
+
+        throw new Error(
+            "Chưa đăng nhập."
+        );
+    }
+
+    if (!otherUserId) {
+
+        throw new Error(
+            "Không xác định được người dùng."
+        );
+    }
+
+
+    /* KIỂM TRA LẠI TRƯỚC KHI TẠO */
+
+    const existing =
+        await findConversationWithUser(
+            otherUserId
+        );
+
+    if (existing) {
+
+        return {
+            id: existing
+        };
+    }
+
+
+    const conversationId =
+        crypto.randomUUID();
+
+
+    /* TẠO CONVERSATION */
+
+    const {
+        error: conversationError
+    } =
+        await supabaseClient
+            .from("conversations")
+            .insert({
+                id:
+                    conversationId,
+
+                is_admin_chat:
+                    isAdminChat
+            });
+
+
+    if (conversationError) {
+
+        console.error(
+            "Lỗi tạo conversation:",
+            conversationError
+        );
+
+        throw conversationError;
+    }
+
+
+    /* THÊM USER HIỆN TẠI */
+
+    const {
+        error: selfError
+    } =
+        await supabaseClient
+            .from("conversation_members")
+            .insert({
+                conversation_id:
+                    conversationId,
+
+                user_id:
+                    currentUser.id
+            });
+
+
+    if (selfError) {
+
+        console.error(
+            "Lỗi thêm thành viên hiện tại:",
+            selfError
+        );
+
+        throw selfError;
+    }
+
+
+    /* THÊM USER CÒN LẠI */
+
+    const {
+        error: otherError
+    } =
+        await supabaseClient
+            .from("conversation_members")
+            .insert({
+                conversation_id:
+                    conversationId,
+
+                user_id:
+                    otherUserId
+            });
+
+
+    if (otherError) {
+
+        console.error(
+            "Lỗi thêm thành viên còn lại:",
+            otherError
+        );
+
+        throw otherError;
+    }
+
+
+    return {
+        id:
+            conversationId,
+
+        is_admin_chat:
+            isAdminChat,
+
+        created_at:
+            new Date().toISOString(),
+
+        updated_at:
+            new Date().toISOString(),
+
+        last_message:
+            null,
+
+        last_message_at:
+            null
+    };
 }
+
+
+/* =========================================================
+   ĐẢM BẢO ADMIN LUÔN CÓ
+   ========================================================= */
 
 async function ensureAdminChat() {
 
@@ -1536,7 +1751,7 @@ async function openConversation(
 
     currentOtherUser =
         conversation.otherUser;
-
+    
     if (
     window.IUHChatNotification &&
     typeof window.IUHChatNotification
@@ -1833,7 +2048,6 @@ async function loadMessages(
             );
 
 
-    if (currentConversationId !== conversationId) return;
     if (error) {
 
         console.error(
@@ -1936,8 +2150,9 @@ async function loadMessages(
        RENDER MESSAGES
        ========================================= */
 
-    if(currentConversationId !== conversationId) return;
-    await renderMessages(messages);
+    await renderMessages(
+        messages
+    );
 
 }
 
@@ -2184,7 +2399,7 @@ function renderAdminGreeting() {
     }
 
 
-    if (message.conversation_id === currentConversationId) messagesArea.appendChild(row);
+    messagesArea.appendChild(row);
 }
 
 async function getProductById(productId) {
@@ -2260,7 +2475,7 @@ async function renderProductCard(
 
 
     let imageUrl =
-        "../Images/default-product.svg";
+        "../Images/default-product.png";
 
 
     if (
@@ -2419,7 +2634,7 @@ async function renderSingleMessage(
     if (existing) {
         return;
     }
-
+    
     /*
  * Nếu tin nhắn gắn với sản phẩm
  * → hiện Product Card trước tin đó.
@@ -2532,8 +2747,8 @@ if (
             image.className =
                 "message-image";
 
-            const signedImageURL = await window.IUHChatMedia.signedURL(supabaseClient,message.image_url);
-            if (signedImageURL) image.src = signedImageURL; else image.hidden = true;
+            image.src =
+                message.image_url;
 
             image.alt =
                 "Hình ảnh";
@@ -2545,7 +2760,10 @@ if (
                 "click",
                 function() {
 
-                    window.open(signedImageURL, "_blank", "noopener,noreferrer");
+                    window.open(
+                        message.image_url,
+                        "_blank"
+                    );
                 }
             );
 
@@ -2690,7 +2908,9 @@ if (
     }
 
 
-    if (message.conversation_id === currentConversationId) messagesArea.appendChild(row);
+    messagesArea.appendChild(
+        row
+    );
 }
 
 function createMessageActions(
@@ -3374,44 +3594,246 @@ if (
    GỬI MESSAGE
    ========================================================= */
 
-let chatSendInFlight = false;
 async function sendMessage() {
- if(chatSendInFlight || !currentUser || !currentConversationId) return;
- const conversationId=currentConversationId;
- const senderId=currentUser.id;
- const content=messageInput?.value?.trim() || '';
- const draftImage=selectedImage;
- const productId=pendingProductId || null;
- if(!content && !draftImage) return;
- chatSendInFlight=true;
- if(sendButton) sendButton.disabled=true;
- try {
-   const imagePath=draftImage ? await uploadChatImage(draftImage,conversationId,senderId) : null;
-   const {data,error}=await supabaseClient.from('messages').insert({
-     conversation_id:conversationId,sender_id:senderId,product_id:productId,
-     content:content||null,message_type:imagePath?'image':'text',image_url:imagePath,is_read:false
-   }).select().single();
-   if(error) throw error;
-   await updateConversationLastMessage(conversationId,content||'[Hình ảnh]');
-   if(currentConversationId===conversationId) {
-     if(messageInput?.value?.trim()===content) messageInput.value='';
-     if(selectedImage===draftImage) removeSelectedImage();
-     if(pendingProductId===productId) pendingProductId=null;
-     if(data) await renderSingleMessage(data);
-     scrollToBottom();
-   }
-   const conversation=conversations.find(item=>item.id===conversationId);
-   if(conversation) {
-     conversation.last_message='Bạn: '+(content||'[Hình ảnh]');
-     conversation.last_message_at=data.created_at;
-     conversation.updated_at=data.created_at;
-   }
-   renderConversationList(conversations);
- } catch(error) { console.error('Gửi tin nhắn:',error); alert('Không thể gửi tin nhắn. Vui lòng thử lại.'); }
- finally { chatSendInFlight=false; if(sendButton) sendButton.disabled=false; if(currentConversationId===conversationId) messageInput?.focus(); }
+
+    if (
+        !currentUser ||
+        !currentConversationId
+    ) {
+        return;
+    }
+
+
+    const content =
+        messageInput?.value
+            ?.trim() ||
+        "";
+
+
+    if (
+        !content &&
+        !selectedImage
+    ) {
+        return;
+    }
+
+
+    if (sendButton) {
+        sendButton.disabled =
+            true;
+    }
+
+
+    try {
+
+        let imageUrl =
+            null;
+
+
+        /* UPLOAD IMAGE */
+
+        if (selectedImage) {
+
+            imageUrl =
+                await uploadChatImage(
+                    selectedImage
+                );
+        }
+
+
+        /* INSERT MESSAGE */
+        const productIdForMessage =
+    pendingProductId || null;
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("messages")
+                .insert({
+
+            conversation_id:
+                currentConversationId,
+
+            sender_id:
+                currentUser.id,
+
+            product_id:
+                productIdForMessage,
+
+            content:
+                content ||
+                null,
+
+            message_type:
+                imageUrl
+                    ? "image"
+                    : "text",
+
+            image_url:
+                imageUrl,
+
+            is_read:
+                false
+
+        })
+                .select()
+                .single();
+
+
+        if (error) {
+            throw error;
+        }
+
+        /*
+ * Chỉ tin nhắn đầu tiên được gửi
+ * từ trang sản phẩm mang product_id.
+ */
+if (productIdForMessage) {
+    pendingProductId = null;
 }
 
-async function uploadChatImage(file, conversationId = currentConversationId, senderId = currentUser.id) {
+
+        /* UPDATE CONVERSATION */
+
+        const preview =
+            content ||
+            "[Hình ảnh]";
+
+
+        await updateConversationLastMessage(
+            currentConversationId,
+            preview
+        );
+
+
+        /* CLEAR INPUT */
+
+        if (messageInput) {
+            messageInput.value = "";
+        }
+
+
+        removeSelectedImage();
+
+
+        /*
+           Hiển thị ngay.
+
+           Realtime cũng nhận được message
+           nhưng renderSingleMessage sẽ kiểm tra
+           data-message-id nên không bị trùng.
+        */
+
+        if (data) {
+
+            await renderSingleMessage(
+                data
+            );
+
+            scrollToBottom();
+        }
+
+
+        /* UPDATE LOCAL */
+
+        const conversation =
+            conversations.find(
+                item =>
+                    item.id ===
+                    currentConversationId
+            );
+
+
+        if (conversation) {
+
+            conversation.last_message =
+                preview;
+
+            conversation.last_message_at =
+                new Date().toISOString();
+
+            conversation.updated_at =
+                new Date().toISOString();
+        }
+
+
+        /*
+           ADMIN vẫn ghim đầu.
+        */
+
+        conversations.sort(
+            (
+                a,
+                b
+            ) => {
+
+                if (
+                    a.isPinned &&
+                    !b.isPinned
+                ) {
+                    return -1;
+                }
+
+                if (
+                    !a.isPinned &&
+                    b.isPinned
+                ) {
+                    return 1;
+                }
+
+                return (
+                    new Date(
+                        b.updated_at || 0
+                    ) -
+                    new Date(
+                        a.updated_at || 0
+                    )
+                );
+            }
+        );
+
+
+        renderConversationList(
+            conversations
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi gửi tin nhắn:",
+            error
+        );
+
+        alert(
+            error?.message ||
+            "Không thể gửi tin nhắn."
+        );
+
+    }
+    finally {
+
+        if (sendButton) {
+            sendButton.disabled =
+                false;
+        }
+
+        if (messageInput) {
+            messageInput.focus();
+        }
+    }
+}
+
+
+/* =========================================================
+   UPLOAD ẢNH
+   ========================================================= */
+
+async function uploadChatImage(
+    file
+) {
 
     if (!file) {
         return null;
@@ -3458,7 +3880,7 @@ async function uploadChatImage(file, conversationId = currentConversationId, sen
 
 
     const path =
-        `${senderId}/${conversationId}/${filename}`;
+        `${currentUser.id}/${currentConversationId}/${filename}`;
 
 
     const {
@@ -3486,7 +3908,19 @@ async function uploadChatImage(file, conversationId = currentConversationId, sen
     }
 
 
-    return path;
+    const {
+        data
+    } =
+        supabaseClient.storage
+            .from(
+                CHAT_BUCKET
+            )
+            .getPublicUrl(
+                path
+            );
+
+
+    return data.publicUrl;
 }
 
 
@@ -3540,11 +3974,57 @@ async function updateConversationLastMessage(
    MARK AS READ
    ========================================================= */
 
-async function markMessagesAsRead(conversationId) {
- if(!conversationId) return;
- const {error}=await supabaseClient.rpc('mark_conversation_read',{p_conversation_id:conversationId});
- if(error) console.error('Không thể đánh dấu đã đọc:',error);
+async function markMessagesAsRead(
+    conversationId
+) {
+
+    if (!conversationId) {
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .update({
+
+                is_read:
+                    true
+
+            })
+            .eq(
+                "conversation_id",
+                conversationId
+            )
+            .neq(
+                "sender_id",
+                currentUser.id
+            )
+            .eq(
+                "is_read",
+                false
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Lỗi đánh dấu đã đọc:",
+            error
+        );
+    }
 }
+
+
+/* =========================================================
+   REALTIME
+   ========================================================= */
+
+/* =========================================================
+   REALTIME - NHẬN TIN NHẮN MỚI
+========================================================= */
 
 function subscribeToMessages() {
 
@@ -4240,7 +4720,7 @@ supabaseClient.auth.onAuthStateChange(
         ) {
 
             window.location.href =
-                "dangnhap.html";
+                "dang-nhap.html";
         }
     }
 );
@@ -4275,7 +4755,7 @@ async function initChat() {
 
         /* =========================================
            ĐỌC THAM SỐ TỪ URL
-
+           
            Ví dụ:
            tinnhan.html?
            product=123&
@@ -4490,11 +4970,11 @@ return;
 
         /* =================================================
            KHÔNG CÓ sellerId
-
+           
            → KHÔNG TỰ ĐỘNG MỞ CHAT NÀO
-
+           
            → Hiện màn hình chờ
-
+           
            Đây chính là hành vi bạn yêu cầu trước đó.
            ================================================= */
 

@@ -1,35 +1,238 @@
-const SUPABASE_URL = "https://xecxofmogvqysejjpxvl.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
-const supabaseClient = window.IUHCore.getClient();
+/* =========================================
+   SUPABASE
+========================================= */
+
+const SUPABASE_URL =
+    "https://xecxofmogvqysejjpxvl.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+
+
+/* =========================================
+   HIỆN / ẨN MẬT KHẨU
+========================================= */
+
 function togglePassword(inputId, button) {
-    const input = document.getElementById(inputId);
-    input.type = input.type === "password" ? "text" : "password";
-    button.textContent = input.type === "password" ? "Hiện" : "Ẩn";
-}
-const loginForm = document.getElementById("loginForm");
-let loginInFlight = false;
-loginForm?.addEventListener("submit", async event => {
-    event.preventDefault();
-    if (loginInFlight) return;
-    const email = document.getElementById("loginAccount").value.trim();
-    const password = document.getElementById("loginPassword").value;
-    if (!email.includes("@") || !password) { alert("Vui lòng dùng email đã đăng ký và nhập mật khẩu."); return; }
-    const button = loginForm.querySelector(".auth-button");
-    loginInFlight = true;
-    button.disabled = true;
-    button.textContent = "ĐANG ĐĂNG NHẬP...";
-    try {
-        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        window.location.href = new URLSearchParams(location.search).get("verify") === "1"
-            ? "taikhoan.html?verify=1" : "trangchu.html";
-    } catch (error) {
-        alert(error.code === "email_not_confirmed"
-            ? "Vui lòng xác nhận email trước khi đăng nhập."
-            : "Chưa thể đăng nhập. Hãy kiểm tra email, mật khẩu và thử lại.");
-    } finally {
-        loginInFlight = false;
-        button.disabled = false;
-        button.textContent = "ĐĂNG NHẬP";
+
+    const input =
+        document.getElementById(inputId);
+
+    if (input.type === "password") {
+
+        input.type = "text";
+
+        button.textContent = "Ẩn";
+
+    } else {
+
+        input.type = "password";
+
+        button.textContent = "Hiện";
     }
-});
+}
+
+
+/* =========================================
+   ĐĂNG NHẬP
+========================================= */
+
+const loginForm =
+    document.getElementById("loginForm");
+
+
+loginForm.addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+
+        /* ==============================
+           LẤY DỮ LIỆU
+        ============================== */
+
+        const account =
+            document
+                .getElementById("loginAccount")
+                .value
+                .trim();
+
+        const password =
+            document
+                .getElementById("loginPassword")
+                .value;
+
+
+        const button =
+            loginForm.querySelector(
+                ".auth-button"
+            );
+
+
+        /* ==============================
+           KIỂM TRA
+        ============================== */
+
+        if (!account || !password) {
+
+            alert(
+                "Vui lòng nhập đầy đủ email và mật khẩu."
+            );
+
+            return;
+        }
+
+
+        /* ==============================
+           KHÓA BUTTON
+        ============================== */
+
+        button.disabled = true;
+
+        button.textContent =
+            "ĐANG ĐĂNG NHẬP...";
+
+
+        /* ==============================
+           XÁC ĐỊNH EMAIL
+        ============================== */
+
+        let email = account;
+
+
+        /*
+         Nếu người dùng nhập MSSV
+         thì tìm email tương ứng
+         trong bảng users.
+        */
+
+        if (!account.includes("@")) {
+
+            const {
+                data: userProfile,
+                error: profileError
+            } = await supabaseClient
+
+                .from("users")
+
+                .select("email")
+
+                .eq("student_id", account)
+
+                .maybeSingle();
+
+
+            if (profileError) {
+
+                console.error(
+                    "Lỗi tìm tài khoản:",
+                    profileError
+                );
+
+                alert(
+                    "Không thể tìm thông tin tài khoản."
+                );
+
+                button.disabled = false;
+
+                button.textContent =
+                    "Đăng nhập";
+
+                return;
+            }
+
+
+            if (!userProfile) {
+
+                alert(
+                    "Không tìm thấy mã sinh viên này."
+                );
+
+                button.disabled = false;
+
+                button.textContent =
+                    "Đăng nhập";
+
+                return;
+            }
+
+
+            email =
+                userProfile.email;
+        }
+
+
+        /* ==============================
+           ĐĂNG NHẬP SUPABASE
+        ============================== */
+
+        const {
+            data,
+            error
+        } = await supabaseClient.auth.signInWithPassword({
+
+            email: email,
+
+            password: password
+
+        });
+
+
+        /* ==============================
+           XỬ LÝ LỖI
+        ============================== */
+
+        if (error) {
+
+            console.error(
+                "Lỗi đăng nhập:",
+                error
+            );
+
+            alert(
+                "Email hoặc mật khẩu không chính xác."
+            );
+
+            button.disabled = false;
+
+            button.textContent =
+                "Đăng nhập";
+
+            return;
+        }
+
+
+        /* ==============================
+           ĐĂNG NHẬP THÀNH CÔNG
+        ============================== */
+
+        console.log(
+            "Đăng nhập thành công:",
+            data.user
+        );
+
+
+        button.textContent =
+            "ĐĂNG NHẬP THÀNH CÔNG";
+
+
+        /* ==============================
+           CHUYỂN VỀ TRANG CHỦ
+        ============================== */
+
+        setTimeout(function () {
+
+            window.location.href =
+                "../HTML/trangchu.html";
+
+        }, 700);
+
+    }
+);

@@ -308,7 +308,10 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 
 const supabaseClient =
-    window.IUHCore.getClient();
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 
 
@@ -1096,12 +1099,167 @@ async function loadRecommendedProducts() {
            user_id → package_id
         ===================================== */
 
-        const { data: badges, error: badgeError } = await supabaseClient
-            .from("service_package_badges")
-            .select("user_id,package_id,status,starts_at,expires_at")
-            .in("user_id", sellerIds);
-        if (badgeError) throw badgeError;
-        const packageSellerIds = new Set((badges || []).map(item => String(item.user_id)));
+        let memberships = [];
+
+
+        if (
+            sellerIds.length > 0
+        ) {
+
+            const {
+                data,
+                error
+            } = await supabaseClient
+
+                .from(
+                    "service_package_members"
+                )
+
+                .select(`
+                    id,
+                    package_id,
+                    user_id,
+                    member_role,
+                    joined_at
+                `)
+
+                .in(
+                    "user_id",
+                    sellerIds
+                );
+
+
+            if (error) {
+
+                console.error(
+                    "Lỗi tải thành viên gói dịch vụ:",
+                    error
+                );
+
+            } else {
+
+                memberships =
+                    data || [];
+
+            }
+        }
+
+
+
+        /* =====================================
+           4. LẤY THÔNG TIN GÓI
+        ===================================== */
+
+        let packages = [];
+
+
+        const packageIds = [
+            ...new Set(
+                memberships
+                    .map(
+                        member =>
+                            member.package_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+        if (
+            packageIds.length > 0
+        ) {
+
+            const {
+                data,
+                error
+            } = await supabaseClient
+
+                .from(
+                    "service_packages"
+                )
+
+                .select(`
+                    id,
+                    owner_id,
+                    plan_type,
+                    status,
+                    starts_at,
+                    expires_at
+                `)
+
+                .in(
+                    "id",
+                    packageIds
+                );
+
+
+            if (error) {
+
+                console.error(
+                    "Lỗi tải gói dịch vụ:",
+                    error
+                );
+
+            } else {
+
+                packages =
+                    data || [];
+
+            }
+        }
+
+
+
+        /* =====================================
+           5. XÁC ĐỊNH SELLER CÓ GÓI ĐANG HOẠT ĐỘNG
+        ===================================== */
+
+        const activePackageIds =
+            new Set(
+                packages
+
+                    .filter(
+                        pkg =>
+                            isRecommendedPackageActive(
+                                pkg
+                            )
+                    )
+
+                    .map(
+                        pkg =>
+                            String(
+                                pkg.id
+                            )
+                    )
+            );
+
+
+        const packageSellerIds =
+            new Set(
+                memberships
+
+                    .filter(
+                        member =>
+                            activePackageIds.has(
+                                String(
+                                    member.package_id
+                                )
+                            )
+                    )
+
+                    .map(
+                        member =>
+                            String(
+                                member.user_id
+                            )
+                    )
+            );
+
+
+
+        /* =====================================
+           6. LẤY THÔNG TIN SELLER
+        ===================================== */
 
         let sellers = [];
 
@@ -1115,7 +1273,7 @@ async function loadRecommendedProducts() {
                 error
             } = await supabaseClient
 
-                .from("public_profiles")
+                .from("users")
 
                 .select(`
                     user_id,
@@ -1341,7 +1499,7 @@ function renderRecommendedCard(
 
     const image =
         images[0] ||
-        "../Images/default-product.svg";
+        "../Images/default-product.png";
 
 
     const sellerName =
@@ -1422,7 +1580,7 @@ function renderRecommendedCard(
 
         <article
             class="recommended-product-card"
-            data-recommended-product-id="${IUHSecurity.escapeHTML(product.id)}"
+            data-recommended-product-id="${product.id}"
         >
 
             <!-- ẢNH -->
@@ -1430,12 +1588,12 @@ function renderRecommendedCard(
             <div class="recommended-product-image">
 
                 <img
-                    src="${IUHSecurity.escapeHTML(IUHSecurity.safeURL(image))}"
-                    alt="${IUHSecurity.escapeHTML(product.name || "Sản phẩm")}"
+                    src="${image}"
+                    alt="${product.name || "Sản phẩm"}"
                     loading="lazy"
                     onerror="
                         this.onerror=null;
-                        this.src='../Images/default-product.svg';
+                        this.src='../Images/default-product.png';
                     "
                 >
 
@@ -1454,12 +1612,12 @@ function renderRecommendedCard(
             <div class="recommended-product-content">
 
                 <span class="recommended-product-category">
-                    ${IUHSecurity.escapeHTML(category)}
+                    ${category}
                 </span>
 
 
                 <h3 class="recommended-product-name">
-                    ${IUHSecurity.escapeHTML(product.name || "Sản phẩm")}
+                    ${product.name || "Sản phẩm"}
                 </h3>
 
 
@@ -1480,8 +1638,8 @@ function renderRecommendedCard(
 
                     <img
                         class="recommended-seller-avatar"
-                        src="${IUHSecurity.escapeHTML(IUHSecurity.safeURL(avatar))}"
-                        alt="${IUHSecurity.escapeHTML(sellerName)}"
+                        src="${avatar}"
+                        alt="${sellerName}"
                         onerror="
                             this.onerror=null;
                             this.src='../Images/default-avatar.svg';
@@ -1495,7 +1653,7 @@ function renderRecommendedCard(
 
                             <span
                                 class="recommended-seller-name-text">
-                                ${IUHSecurity.escapeHTML(sellerName)}
+                                ${sellerName}
                             </span>
 
                             ${badgeHTML}
@@ -1504,7 +1662,7 @@ function renderRecommendedCard(
 
 
                         <div class="recommended-seller-role">
-                            ${IUHSecurity.escapeHTML(roleText)}
+                            ${roleText}
                         </div>
 
                     </div>
@@ -1799,7 +1957,7 @@ async function loadFeaturedProducts() {
                 error: userError
             } = await supabaseClient
 
-                .from("public_profiles")
+                .from("users")
 
                 .select(`
                     user_id,
@@ -1900,7 +2058,7 @@ function renderFeaturedCard(product) {
 
     const image =
         images[0] ||
-        "../Images/default-product.svg";
+        "../Images/default-product.png";
 
 
     const sellerName =
@@ -1948,18 +2106,18 @@ function renderFeaturedCard(product) {
 
         <article
             class="featured-product-card"
-            data-featured-product-id="${IUHSecurity.escapeHTML(product.id)}">
+            data-featured-product-id="${product.id}">
 
             <!-- Ảnh -->
             <div class="featured-product-image">
 
                 <img
-                    src="${IUHSecurity.escapeHTML(IUHSecurity.safeURL(image))}"
-                    alt="${IUHSecurity.escapeHTML(product.name || "Sản phẩm")}"
+                    src="${image}"
+                    alt="${product.name || "Sản phẩm"}"
                     loading="lazy"
                     onerror="
                         this.onerror=null;
-                        this.src='../Images/default-product.svg';
+                        this.src='../Images/default-product.png';
                     "
                 >
 
@@ -1974,12 +2132,12 @@ function renderFeaturedCard(product) {
             <div class="featured-product-content">
 
                 <span class="featured-product-category">
-                    ${IUHSecurity.escapeHTML(category)}
+                    ${category}
                 </span>
 
 
                 <h3 class="featured-product-name">
-                    ${IUHSecurity.escapeHTML(product.name || "Sản phẩm")}
+                    ${product.name || "Sản phẩm"}
                 </h3>
 
 
@@ -1993,8 +2151,8 @@ function renderFeaturedCard(product) {
 
                     <img
                         class="featured-seller-avatar"
-                        src="${IUHSecurity.escapeHTML(IUHSecurity.safeURL(avatar))}"
-                        alt="${IUHSecurity.escapeHTML(sellerName)}"
+                        src="${avatar}"
+                        alt="${sellerName}"
                         onerror="
                             this.onerror=null;
                             this.src='../Images/default-avatar.svg';
@@ -2008,7 +2166,7 @@ function renderFeaturedCard(product) {
 
                             <span
                                 class="featured-seller-name-text">
-                                ${IUHSecurity.escapeHTML(sellerName)}
+                                ${sellerName}
                             </span>
 
                             ${badgeHTML}
@@ -2017,7 +2175,7 @@ function renderFeaturedCard(product) {
 
 
                         <div class="featured-seller-role">
-                            ${IUHSecurity.escapeHTML(roleText)}
+                            ${roleText}
                         </div>
 
                     </div>
@@ -2297,13 +2455,16 @@ async function loadHomepageAdvertisements() {
             error
         } = await supabaseClient
 
-            .from("published_advertisements")
+            .from("advertisements")
 
             .select(`
                 id,
                 ad_name,
+                partner,
+                duration_days,
                 start_date,
                 end_date,
+                revenue,
                 status,
                 placement,
                 image_url,
@@ -2450,7 +2611,7 @@ function renderHomepageAdvertisements() {
 
                             <img
                                 class="advertisement-image"
-                                src="${escapeAdvertisementHTML(IUHSecurity.safeURL(image))}"
+                                src="${escapeAdvertisementHTML(image)}"
                                 alt="${escapeAdvertisementHTML(title)}"
                                 onerror="
                                     this.onerror=null;
@@ -2486,7 +2647,7 @@ function renderHomepageAdvertisements() {
                                     ad.target_url
                                         ? `
                                             <a
-                                                href="${escapeAdvertisementHTML(IUHSecurity.safeURL(ad.target_url))}"
+                                                href="${escapeAdvertisementHTML(ad.target_url)}"
                                                 class="advertisement-button"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
@@ -3686,7 +3847,7 @@ document.addEventListener(
                     } =
                         await supabaseClient
                             .rpc(
-                                "request_donation",
+                                "create_simulated_donation",
                                 {
                                     p_amount:
                                         amount,
@@ -3698,8 +3859,7 @@ document.addEventListener(
                                         bankName,
 
                                     p_transfer_content:
-                                        transferContent,
-                                    p_request_key: currentTransferCode
+                                        transferContent
                                 }
                             );
 

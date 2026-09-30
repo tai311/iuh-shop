@@ -13,7 +13,6 @@
     >
     <link rel="stylesheet" href="../CSS/dathang.css">
     <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
-<link rel="stylesheet" href="../CSS/site-fixes.css">
 </head>
 
 <body>
@@ -692,7 +691,7 @@
                         </h2>
 
                         <p>
-                            Chế độ thanh toán miễn phí đang bật khi chạy thử
+                            Chọn phương thức thanh toán phù hợp
                         </p>
 
                     </div>
@@ -704,12 +703,14 @@
                 <div class="choice-group">
 
 
+                    <!-- QR -->
+
                     <label class="option-box selected">
 
                         <input
                             type="radio"
                             name="paymentMethod"
-                            value="trial"
+                            value="qr"
                             checked
                         >
 
@@ -720,23 +721,58 @@
                         <div class="option-content">
 
                             <strong>
-                                Thanh toán thử miễn phí
+                                Thanh toán qua QR Code
                             </strong>
 
                             <small>
-                                Tạo đơn và kiểm thử quy trình mà không thu tiền thật
+                                Quét mã QR để thanh toán nhanh chóng
                             </small>
 
                         </div>
 
 
                         <span class="payment-badge">
-                            0đ
+                            QR
                         </span>
 
 
                     </label>
 
+
+
+                    <!-- VÍ IUH -->
+
+                    <label class="option-box">
+
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="iuh_wallet"
+                        >
+
+
+                        <div class="option-radio"></div>
+
+
+                        <div class="option-content">
+
+                            <strong>
+                                Thanh toán bằng Ví IUH
+                            </strong>
+
+                            <small>
+                                Sử dụng số dư trong Ví IUH để thanh toán
+                            </small>
+
+                        </div>
+
+
+                        <span class="payment-badge wallet-badge">
+                            IUH
+                        </span>
+
+
+                    </label>
 
 
                 </div>
@@ -762,7 +798,7 @@
                             </strong>
 
                             <p>
-                                QR sẽ xuất hiện sau khi bạn bấm Đặt hàng
+                                Sử dụng ứng dụng ngân hàng để quét mã
                             </p>
 
                         </div>
@@ -783,7 +819,7 @@
 
                             <img
                                 id="qrCodeImage"
-                                hidden
+                                src="..//Images/qrtt.png"
                                 alt="Mã QR thanh toán IUH SHOP"
                             >
 
@@ -1356,11 +1392,9 @@
     </div>
 
 </footer>
-<script src="../JS/vendor/supabase.min.js"></script>
-<script src="../JS/vendor/purify.min.js"></script>
-<script src="../JS/iuh-core.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../JS/iuh-chat-notification.js"></script>
-<script src="../JS/dathang.js?v=20260930-trial-mode"></script>
+<script src="../JS/dathang.js"></script>
 <script src="../JS/vedau.js"></script>
 <!-- NÚT VỀ ĐẦU TRANG -->
 <button

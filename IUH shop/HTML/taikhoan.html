@@ -29,11 +29,10 @@
         <link rel="stylesheet" href="../CSS/service-package.css">
     <link
         rel="stylesheet"
-        href="../CSS/taikhoan.css?v=20260930-trial-mode"
+        href="../CSS/taikhoan.css"
     >
     <link rel="stylesheet" href="../CSS/mobile-responsive.css">
 
-<link rel="stylesheet" href="../CSS/site-fixes.css">
 </head>
 
 
@@ -1233,7 +1232,6 @@
                 <h2 id="upgradeModalTitle">Nâng cấp gói dịch vụ</h2>
                 <p>Đưa tin đăng của bạn nổi bật hơn trong 30 ngày.</p>
                 <div id="servicePackageReminder" class="service-package-reminder" hidden></div>
-                <div id="servicePackagePendingRequests" aria-live="polite"></div>
             </div>
             <button type="button" id="closeUpgradeModalButton" class="upgrade-close" aria-label="Đóng">×</button>
         </div>
@@ -1250,7 +1248,7 @@
                     <span class="plan-card-top"><strong>Gói Cá nhân</strong><b>19.000đ<small>/30 ngày</small></b></span>
                     <span class="plan-users"><i class="fa-solid fa-circle-check"></i> 1 tài khoản</span>
                     <span class="plan-description">Dành cho bạn tự quảng bá những tin đăng của mình.</span>
-                    <span class="plan-benefits"><span>✓ Đẩy tin nổi bật miễn phí khi gói còn hạn</span><span>✓ Ưu tiên hiển thị sản phẩm</span><span>✓ Nhãn “Người bán nổi bật”</span><span>✓ Xem hạn gói và nhắc gia hạn</span></span>
+                    <span class="plan-benefits"><span>✓ Đẩy tin nổi bật miễn phí</span><span>✓ Ưu tiên hiển thị sản phẩm</span><span>✓ Nhãn “Người bán nổi bật”</span><span>✓ Nhắc tin sắp hết hạn</span></span>
                 </button>
 
                 <button type="button" class="service-plan-card" data-plan="group">
@@ -1259,7 +1257,7 @@
                     <span class="plan-card-top"><strong>Gói Nhóm</strong><b>29.000đ<small>/30 ngày</small></b></span>
                     <span class="plan-users"><i class="fa-solid fa-circle-check"></i> Tối đa 3 tài khoản</span>
                     <span class="plan-description">Chia sẻ chi phí cùng nhóm, mỗi thành viên dùng tài khoản riêng.</span>
-                    <span class="plan-benefits"><span>✓ Cả nhóm đẩy tin miễn phí khi gói còn hạn</span><span>✓ Ưu tiên tin của cả nhóm</span><span>✓ Nhãn thành viên nổi bật</span><span>✓ Xem hạn gói và nhắc gia hạn</span></span>
+                    <span class="plan-benefits"><span>✓ Mỗi thành viên có lượt đẩy tin</span><span>✓ Ưu tiên tin của cả nhóm</span><span>✓ Nhãn thành viên nổi bật</span><span>✓ Nhắc tin sắp hết hạn</span></span>
                 </button>
             </div>
 
@@ -1276,11 +1274,17 @@
 
             <div class="upgrade-step-heading payment-heading">
                 <span>02</span>
-                <div><strong>Chế độ chạy thử</strong><small>Không thu tiền thật trong giai đoạn thử nghiệm.</small></div>
+                <div><strong>Thông tin thanh toán</strong><small>Giao dịch được ghi nhận an toàn trên IUH SHOP.</small></div>
             </div>
 
-            <div class="upgrade-bank-info">
-                <div><strong>Kích hoạt miễn phí</strong><span>Gói dùng thử không trừ Ví IUH và không tạo giao dịch tiền thật.</span></div>
+            <div class="payment-methods" role="radiogroup" aria-label="Phương thức thanh toán">
+                <button type="button" class="payment-method selected" data-method="wallet"><i class="fa-solid fa-wallet"></i><span><strong>Ví IUH SHOP</strong><small>Số dư khả dụng</small></span><i class="fa-solid fa-circle-check method-check"></i></button>
+                <button type="button" class="payment-method" data-method="bank"><i class="fa-solid fa-building-columns"></i><span><strong>Chuyển khoản ngân hàng</strong><small>Quét mã QR sau khi xác nhận</small></span><i class="fa-regular fa-circle method-check"></i></button>
+            </div>
+
+            <div id="upgradeBankInfo" class="upgrade-bank-info" hidden>
+                <div><strong>IUH SHOP</strong><span>Ngân hàng Vietcombank · 0123 456 789</span><span>Nội dung: IUH <b id="upgradeTransferCode">SHOP</b></span></div>
+                <img src="../Images/qr.jpg" alt="Mã QR thanh toán gói dịch vụ">
             </div>
 
             <div class="upgrade-order-summary">
@@ -1289,29 +1293,21 @@
             </div>
             <p id="upgradePaymentMessage" class="upgrade-payment-message" role="status"></p>
             <button type="button" id="confirmUpgradeButton" class="upgrade-confirm-button"><i class="fa-solid fa-lock"></i> Xác nhận thanh toán <span id="upgradeConfirmAmount">19.000đ</span></button>
-            <p class="upgrade-secure-note"><i class="fa-solid fa-flask"></i> Chế độ miễn phí đang bật trong thời gian chạy thử</p>
+            <p class="upgrade-secure-note"><i class="fa-solid fa-shield-halved"></i> Thông tin thanh toán được bảo mật bởi IUH SHOP</p>
         </div>
 
         <div id="upgradeSuccessView" class="upgrade-success-view" hidden>
             <div class="upgrade-success-icon"><i class="fa-solid fa-check"></i></div>
-            <span class="upgrade-eyebrow" id="upgradeSuccessEyebrow">KÍCH HOẠT DÙNG THỬ</span>
-            <h3 id="upgradeSuccessHeading">Gói dùng thử đã được kích hoạt</h3>
+            <span class="upgrade-eyebrow">THANH TOÁN THÀNH CÔNG</span>
+            <h3>Gói dịch vụ đã được kích hoạt</h3>
             <p id="upgradeSuccessText">Bạn đã nâng cấp thành công Gói Cá nhân.</p>
             <div class="upgrade-success-details"><span>Mã giao dịch</span><strong id="upgradeTransactionCode">—</strong><span>Hiệu lực đến</span><strong id="upgradeExpiryDate">—</strong></div>
-            <button type="button" id="finishUpgradeButton" class="upgrade-confirm-button">Đóng</button>
+            <button type="button" id="finishUpgradeButton" class="upgrade-confirm-button">Hoàn tất</button>
         </div>
     </div>
 </div>
 
-    <section id="accountVerificationPanel" class="iuh-panel">
- <h2>Xác thực sinh viên</h2><p id="accountVerificationStatus" role="status">Đang tải trạng thái…</p>
- <img id="accountVerificationPreview" alt="Thẻ sinh viên của bạn" hidden style="max-width:320px;max-height:220px;object-fit:contain">
- <form id="accountVerificationForm"><label for="accountVerificationFile">Ảnh thẻ sinh viên (JPG, PNG, WebP; tối đa 5MB)</label>
- <input id="accountVerificationFile" type="file" accept="image/jpeg,image/png,image/webp" required>
- <button id="accountVerificationSubmit" type="submit">Gửi thẻ để xác thực</button>
- <button id="accountVerificationReload" type="button">Tải lại trạng thái</button></form>
- <p id="accountVerificationMessage" role="status" aria-live="polite"></p></section>
- </main>
+    </main>
 
 
 
@@ -1444,11 +1440,11 @@
 
     <!-- SUPABASE -->
 
-    <script src="../JS/vendor/supabase.min.js"></script>
-<script src="../JS/vendor/purify.min.js"></script>
-<script src="../JS/iuh-core.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
     <script src="../JS/iuh-chat-notification.js"></script>
-    <script src="../JS/service-package.js?v=20260930-trial-mode"></script>
+    <script src="../JS/service-package.js"></script>
     <script
         src="../JS/taikhoan.js"
     ></script>
@@ -1470,7 +1466,6 @@
 </button>
 
 <script src="../JS/account-nav.js"></script>
-<script src="../JS/account-verification.js"></script>
 </body>
 
 </html>

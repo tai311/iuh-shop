@@ -9,7 +9,10 @@ const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient =
-    window.IUHCore.getClient();
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 const DEFAULT_AVATAR =
     "../Images/default-avatar.svg";
@@ -833,7 +836,380 @@ document.addEventListener(
    POPUP NÂNG CẤP GÓI DỊCH VỤ
 ========================================= */
 
-document.addEventListener("DOMContentLoaded", () => IUHServicePackage.setupModal(supabaseClient));
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("upgradeModal");
+    const openButton = document.getElementById("openUpgradeModalButton");
+    const closeButton = document.getElementById("closeUpgradeModalButton");
+    const overlay = document.getElementById("upgradeModalOverlay");
+    const formView = document.getElementById("upgradeFormView");
+    const successView = document.getElementById("upgradeSuccessView");
+    const confirmButton = document.getElementById("confirmUpgradeButton");
+    const finishButton = document.getElementById("finishUpgradeButton");
+    const message = document.getElementById("upgradePaymentMessage");
+    const bankInfo = document.getElementById("upgradeBankInfo");
+    const groupManager = document.getElementById("servicePackageGroupManager");
+    const memberCount = document.getElementById("servicePackageMemberCount");
+    const memberEmail = document.getElementById("servicePackageMemberEmail");
+    const addMemberButton = document.getElementById("addServicePackageMemberButton");
+    const memberMessage = document.getElementById("servicePackageMemberMessage");
+    const memberList = document.getElementById("servicePackageMemberList");
+    const packageReminder = document.getElementById("servicePackageReminder");
+    const plans = { personal: { name: "Gói Cá nhân", price: 19000 }, group: { name: "Gói Nhóm", price: 29000 } };
+    let selectedPlan = "personal";
+    let selectedMethod = "wallet";
+    let selectedGroupMembers = [];
+
+    if (!modal || !openButton) return;
+
+    function money(value) { return new Intl.NumberFormat("vi-VN").format(value) + "đ"; }
+    function updatePlan() {
+        const plan = plans[selectedPlan];
+        document.querySelectorAll(".service-plan-card").forEach((card) => card.classList.toggle("selected", card.dataset.plan === selectedPlan));
+        groupManager.hidden = selectedPlan !== "group";
+        document.getElementById("upgradeSelectedPlan").textContent = plan.name;
+        document.getElementById("upgradeTotal").textContent = money(plan.price);
+        document.getElementById("upgradeConfirmAmount").textContent = money(plan.price);
+        message.textContent = "";
+    }
+    function renderGroupMembers() {
+        const total = selectedGroupMembers.length + 1;
+        memberCount.textContent = total + "/3";
+        memberList.innerHTML = selectedGroupMembers.map((member, index) => `
+            <div class="service-package-member">
+                <img class="service-package-member-avatar" src="${IUHServicePackage.escapeHTML(member.avatar_url || "../Images/default-avatar.svg")}" alt="">
+                <span class="service-package-member-info"><strong>${IUHServicePackage.escapeHTML(member.fullname || "Thành viên")}</strong><span>${IUHServicePackage.escapeHTML(member.email || "")}</span></span>
+                <button type="button" class="service-package-member-remove" data-member-index="${index}" aria-label="Xóa thành viên"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        `).join("");
+        memberList.querySelectorAll(".service-package-member-remove").forEach((button) => button.addEventListener("click", () => {
+            selectedGroupMembers.splice(Number(button.dataset.memberIndex), 1);
+            renderGroupMembers();
+        }));
+    }
+    async function addGroupMember() {
+        const email = memberEmail.value.trim().toLowerCase();
+        memberMessage.textContent = "";
+        if (!email || !email.includes("@")) { memberMessage.textContent = "Vui lòng nhập email hợp lệ."; return; }
+        if (selectedGroupMembers.length >= 2) { memberMessage.textContent = "Gói Nhóm chỉ hỗ trợ tối đa 3 tài khoản."; return; }
+        if (selectedGroupMembers.some((member) => member.email?.toLowerCase() === email)) { memberMessage.textContent = "Tài khoản này đã có trong nhóm."; return; }
+        if (typeof currentAuthUserId !== "undefined" && email === (window.currentUserEmail || "").toLowerCase()) { memberMessage.textContent = "Bạn đã là chủ gói của nhóm."; return; }
+        addMemberButton.disabled = true;
+        try {
+            const { data: member, error } = await supabaseClient.from("users").select("user_id, fullname, email, avatar_url").eq("email", email).maybeSingle();
+            if (error || !member) { memberMessage.textContent = "Không tìm thấy tài khoản IUH SHOP với email này."; return; }
+            if (member.user_id === currentAuthUserId) { memberMessage.textContent = "Bạn đã là chủ gói của nhóm."; return; }
+            selectedGroupMembers.push(member); memberEmail.value = ""; renderGroupMembers();
+        } catch (error) { memberMessage.textContent = "Không thể tìm thành viên lúc này."; }
+        finally { addMemberButton.disabled = false; }
+    }
+    function updateMethod() {
+        document.querySelectorAll(".payment-method").forEach((method) => {
+            const selected = method.dataset.method === selectedMethod;
+            method.classList.toggle("selected", selected);
+            method.querySelector(".method-check").className = selected ? "fa-solid fa-circle-check method-check" : "fa-regular fa-circle method-check";
+        });
+        bankInfo.hidden = selectedMethod !== "bank";
+    }
+    function closeModal() {
+        modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
+    }
+    function openModal() {
+        formView.hidden = false; successView.hidden = true; message.textContent = ""; confirmButton.disabled = false;
+        const savedPackage = typeof currentAuthUserId !== "undefined" && IUHServicePackage.getPackage(currentAuthUserId);
+        selectedGroupMembers = savedPackage?.plan === "group" ? [...savedPackage.members] : [];
+        if (savedPackage) {
+            const packageName = plans[savedPackage.plan]?.name || "Gói dịch vụ";
+            const daysLeft = Math.max(0, Math.ceil((new Date(savedPackage.expiry) - new Date()) / 86400000));
+            packageReminder.hidden = false;
+            packageReminder.innerHTML = `<strong>Đang sử dụng ${packageName}</strong>Còn hiệu lực đến ${IUHServicePackage.formatExpiry(savedPackage.expiry)} (${daysLeft} ngày). Hệ thống sẽ nhắc bạn gia hạn khi gói sắp hết hạn.`;
+        } else {
+            packageReminder.hidden = true;
+            packageReminder.textContent = "";
+        }
+        renderGroupMembers();
+        modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+    }
+    async function showSuccess() {
+        const plan = plans[selectedPlan];
+        const transaction = "IUH" + Date.now().toString().slice(-8) + Math.floor(1000 + Math.random() * 9000);
+        const expiry = new Date(); expiry.setDate(expiry.getDate() + 30);
+        const expiryText = expiry.toLocaleDateString("vi-VN");
+        const groupMembers = selectedPlan === "group" ? selectedGroupMembers : [];
+        const packageValue = { plan: selectedPlan, owner_id: currentAuthUserId, price: plan.price, paymentMethod: selectedMethod, transaction, expiry: expiry.toISOString(), members: groupMembers };
+        const remoteResult = await IUHServicePackage.saveRemote(currentAuthUserId, packageValue);
+        if (remoteResult.error) {
+            message.textContent = "Chưa lưu được gói lên hệ thống. Hãy chạy file supabase/service_packages.sql trong Supabase rồi thử lại.";
+            confirmButton.disabled = false;
+            return;
+        }
+        IUHServicePackage.save(currentAuthUserId, packageValue);
+        groupMembers.forEach((member) => IUHServicePackage.save(member.user_id, { ...packageValue, members: [{ user_id: currentAuthUserId }, ...groupMembers] }));
+        document.getElementById("upgradeSuccessText").textContent = "Bạn đã nâng cấp thành công " + plan.name + ". Quyền lợi đã sẵn sàng sử dụng.";
+        document.getElementById("upgradeTransactionCode").textContent = transaction;
+        document.getElementById("upgradeExpiryDate").textContent = expiryText;
+        formView.hidden = true; successView.hidden = false;
+    }
+    openButton.addEventListener("click", openModal);
+    closeButton.addEventListener("click", closeModal);
+    overlay.addEventListener("click", closeModal);
+    finishButton.addEventListener("click", closeModal);
+    document.querySelectorAll(".service-plan-card").forEach((card) => card.addEventListener("click", () => { selectedPlan = card.dataset.plan; updatePlan(); }));
+    document.querySelectorAll(".payment-method").forEach((method) => method.addEventListener("click", () => { selectedMethod = method.dataset.method; updateMethod(); }));
+    addMemberButton.addEventListener("click", addGroupMember);
+    memberEmail.addEventListener("keydown", (event) => { if (event.key === "Enter") addGroupMember(); });
+    confirmButton.addEventListener("click", async () => {
+
+    if (
+        typeof currentAuthUserId === "undefined" ||
+        !currentAuthUserId
+    ) {
+        message.textContent =
+            "Vui lòng đăng nhập để nâng cấp gói dịch vụ.";
+        return;
+    }
+
+    const plan = plans[selectedPlan];
+
+    confirmButton.disabled = true;
+
+    confirmButton.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
+
+    try {
+
+        /* ==========================================
+           TẠO MÃ GIAO DỊCH
+        ========================================== */
+
+        const transaction =
+            "IUH" +
+            Date.now().toString().slice(-8) +
+            Math.floor(
+                1000 + Math.random() * 9000
+            );
+
+
+        /* ==========================================
+           THANH TOÁN VÍ IUH
+        ========================================== */
+
+        if (selectedMethod === "wallet") {
+
+            const { data, error } =
+                await supabaseClient
+                    .rpc(
+                        "pay_service_package",
+                        {
+                            p_plan_type:
+                                selectedPlan,
+
+                            p_price:
+                                plan.price,
+
+                            p_transaction_code:
+                                transaction
+                        }
+                    );
+
+            if (error) {
+                throw error;
+            }
+
+            if (!data?.success) {
+                throw new Error(
+                    data?.message ||
+                    "Thanh toán gói thất bại."
+                );
+            }
+        }
+
+
+        /* ==========================================
+           QR MÔ PHỎNG
+        ========================================== */
+
+        if (selectedMethod === "qr") {
+
+            /*
+             * QR hiện tại là mô phỏng.
+             * Sau khi người dùng xác nhận QR,
+             * ghi nhận doanh thu cho Admin.
+             */
+
+            const { data, error } =
+                await supabaseClient
+                    .rpc(
+                        "pay_service_package",
+                        {
+                            p_plan_type:
+                                selectedPlan,
+
+                            p_price:
+                                plan.price,
+
+                            p_transaction_code:
+                                transaction
+                        }
+                    );
+
+            if (error) {
+                throw error;
+            }
+
+            if (!data?.success) {
+                throw new Error(
+                    data?.message ||
+                    "Thanh toán QR thất bại."
+                );
+            }
+        }
+
+
+        /* ==========================================
+           LƯU GÓI
+        ========================================== */
+
+        const expiry = new Date();
+
+        expiry.setDate(
+            expiry.getDate() + 30
+        );
+
+        const groupMembers =
+            selectedPlan === "group"
+                ? selectedGroupMembers
+                : [];
+
+
+        const packageValue = {
+
+            plan:
+                selectedPlan,
+
+            owner_id:
+                currentAuthUserId,
+
+            price:
+                plan.price,
+
+            paymentMethod:
+                selectedMethod,
+
+            transaction:
+                transaction,
+
+            expiry:
+                expiry.toISOString(),
+
+            members:
+                groupMembers
+        };
+
+
+        const remoteResult =
+            await IUHServicePackage.saveRemote(
+                currentAuthUserId,
+                packageValue
+            );
+
+
+        if (remoteResult.error) {
+            throw new Error(
+                remoteResult.error.message ||
+                "Không thể lưu gói dịch vụ."
+            );
+        }
+
+
+        /* Lưu local */
+
+        IUHServicePackage.save(
+            currentAuthUserId,
+            packageValue
+        );
+
+
+        /* Lưu thành viên nhóm */
+
+        groupMembers.forEach(member => {
+
+            IUHServicePackage.save(
+                member.user_id,
+                {
+                    ...packageValue,
+
+                    members: [
+                        {
+                            user_id:
+                                currentAuthUserId
+                        },
+                        ...groupMembers
+                    ]
+                }
+            );
+
+        });
+
+
+        /* ==========================================
+           HIỂN THỊ THÀNH CÔNG
+        ========================================== */
+
+        document
+            .getElementById(
+                "upgradeSuccessText"
+            )
+            .textContent =
+                "Bạn đã nâng cấp thành công " +
+                plan.name +
+                ". Quyền lợi đã sẵn sàng sử dụng.";
+
+
+        document
+            .getElementById(
+                "upgradeTransactionCode"
+            )
+            .textContent =
+                transaction;
+
+
+        document
+            .getElementById(
+                "upgradeExpiryDate"
+            )
+            .textContent =
+                expiry.toLocaleDateString(
+                    "vi-VN"
+                );
+
+
+        formView.hidden = true;
+        successView.hidden = false;
+
+
+    } catch (error) {
+
+        console.error(
+            "Service package payment error:",
+            error
+        );
+
+        message.textContent =
+            error.message ||
+            "Không thể thanh toán gói dịch vụ.";
+
+        confirmButton.disabled = false;
+
+        confirmButton.innerHTML =
+            '<i class="fa-solid fa-lock"></i> Xác nhận thanh toán <span id="upgradeConfirmAmount">' +
+            money(plan.price) +
+            "</span>";
+    }
+
+});
+    document.addEventListener("keydown", (event) => { if (event.key === "Escape" && modal.classList.contains("open")) closeModal(); });
+    updatePlan(); updateMethod();
+});
 
 /* =========================================
    DROPDOWN TÀI KHOẢN - 3 LỐI TẮT
@@ -2326,6 +2702,125 @@ document.addEventListener(
 
     }
 );
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const paymentButton =
+        document.getElementById("confirmVerificationPayment");
+
+    const uploadButton =
+        document.getElementById("uploadStudentCard");
+
+    const cameraButton =
+        document.getElementById("openStudentCamera");
+
+    const fileInput =
+        document.getElementById("studentCardFile");
+
+    const submitButton =
+        document.getElementById("submitVerification");
+
+    const paymentStatus =
+        document.getElementById("verificationPaymentStatus");
+
+
+    // BAN ĐẦU: KHÓA
+    function lockVerification() {
+
+        if (uploadButton) {
+            uploadButton.disabled = true;
+            uploadButton.classList.add("payment-locked");
+        }
+
+        if (cameraButton) {
+            cameraButton.disabled = true;
+            cameraButton.classList.add("payment-locked");
+        }
+
+        if (fileInput) {
+            fileInput.disabled = true;
+        }
+
+        if (submitButton) {
+            submitButton.disabled = true;
+        }
+    }
+
+
+    // SAU KHI THANH TOÁN: MỞ
+    function unlockVerification() {
+
+        if (uploadButton) {
+            uploadButton.disabled = false;
+            uploadButton.classList.remove("payment-locked");
+        }
+
+        if (cameraButton) {
+            cameraButton.disabled = false;
+            cameraButton.classList.remove("payment-locked");
+        }
+
+        if (fileInput) {
+            fileInput.disabled = false;
+        }
+
+        // Chưa có ảnh thì vẫn chưa cho gửi
+        if (submitButton) {
+            submitButton.disabled = true;
+        }
+    }
+
+
+    // Khóa lúc mới vào
+    lockVerification();
+
+
+    // BẤM "TÔI ĐÃ THANH TOÁN"
+    if (paymentButton) {
+
+        paymentButton.addEventListener("click", function () {
+
+            unlockVerification();
+
+            paymentButton.disabled = true;
+
+            paymentButton.textContent =
+                "✓ Đã xác nhận thanh toán";
+
+            if (paymentStatus) {
+                paymentStatus.textContent =
+                    "Đã xác nhận thanh toán. Bạn có thể tải ảnh thẻ sinh viên hoặc mở camera.";
+
+                paymentStatus.classList.add("show");
+            }
+
+        });
+
+    }
+
+
+    // Khi chọn ảnh → mới mở nút gửi
+    if (fileInput) {
+
+        fileInput.addEventListener("change", function () {
+
+            if (
+                fileInput.files &&
+                fileInput.files.length > 0
+            ) {
+
+                if (submitButton) {
+                    submitButton.disabled = false;
+                }
+
+            }
+
+        });
+
+    }
+
+});
+
 
 /* =====================================================
    ĐÁNH GIÁ IUH SHOP

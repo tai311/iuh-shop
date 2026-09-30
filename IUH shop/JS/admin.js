@@ -9,7 +9,10 @@ const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient =
-    window.IUHCore.getClient();
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 
 const DEFAULT_AVATAR =
@@ -172,12 +175,201 @@ function paymentText(method) {
 ========================================================= */
 
 async function checkAdmin() {
-   const {data:{user},error}=await supabaseClient.auth.getUser();
-   if(error||!user){ location.replace('dangnhap.html'); return null; }
-   const {data:profile,error:profileError}=await supabaseClient.from('users').select('user_id,fullname,avatar_url,role').eq('user_id',user.id).single();
-   if(profileError) { document.body.textContent='Không kiểm tra được quyền truy cập. Vui lòng tải lại trang.'; return null; }
-   if(profile.role!=='admin'){location.replace('trangchu.html');return null;}
-   currentAdmin=profile; return profile;
+
+    console.log("========== CHECK ADMIN ==========");
+
+    try {
+
+        const {
+            data: {
+                user
+            },
+            error: authError
+        } =
+            await supabaseClient.auth.getUser();
+
+
+        console.log(
+            "Auth user:",
+            user
+        );
+
+
+        /* =========================================
+           CHƯA ĐĂNG NHẬP
+        ========================================= */
+
+        if (
+            authError ||
+            !user
+        ) {
+
+            console.error(
+                "Không có phiên đăng nhập:",
+                authError
+            );
+
+            alert(
+                "Phiên đăng nhập không tồn tại. Vui lòng đăng nhập lại."
+            );
+
+            return null;
+        }
+
+
+        /* =========================================
+           LẤY PROFILE ADMIN
+        ========================================= */
+
+        const {
+            data: profile,
+            error: profileError
+        } =
+            await supabaseClient
+                .from("users")
+                .select("*")
+                .eq(
+                    "user_id",
+                    user.id
+                )
+                .maybeSingle();
+
+
+        console.log(
+            "User ID:",
+            user.id
+        );
+
+        console.log(
+            "Profile:",
+            profile
+        );
+
+        console.log(
+            "Profile error:",
+            profileError
+        );
+
+
+        /* =========================================
+           LỖI DATABASE / RLS
+        ========================================= */
+
+        if (profileError) {
+
+            console.error(
+                "Lỗi lấy profile:",
+                profileError
+            );
+
+            alert(
+                "Không lấy được thông tin quyền Admin.\n\n" +
+                profileError.message
+            );
+
+            return null;
+        }
+
+
+        /* =========================================
+           KHÔNG TÌM THẤY USER
+        ========================================= */
+
+        if (!profile) {
+
+            console.error(
+                "Không tìm thấy dòng users với user_id:",
+                user.id
+            );
+
+            alert(
+                "Tài khoản đăng nhập chưa có thông tin trong bảng users."
+            );
+
+            return null;
+        }
+
+
+        /* =========================================
+           KIỂM TRA ROLE
+        ========================================= */
+
+        const role =
+            String(
+                profile.role || ""
+            )
+            .trim()
+            .toLowerCase();
+
+
+        console.log(
+            "ROLE THỰC TẾ:",
+            profile.role
+        );
+
+
+        if (
+            role !== "admin"
+        ) {
+
+            alert(
+                "Tài khoản này chưa có quyền Admin.\n\n" +
+                "Role hiện tại: " +
+                (
+                    profile.role ||
+                    "NULL"
+                )
+            );
+
+            return null;
+        }
+
+
+        /* =========================================
+           XÁC NHẬN ADMIN
+        ========================================= */
+
+        console.log(
+            "✅ ADMIN ACCESS GRANTED"
+        );
+
+
+        const adminName =
+            document.getElementById(
+                "adminName"
+            );
+
+
+        if (adminName) {
+
+            adminName.textContent =
+                profile.fullname ||
+                "Admin";
+
+        }
+
+
+        return {
+            ...user,
+            profile
+        };
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "CHECK ADMIN ERROR:",
+            error
+        );
+
+        alert(
+            "Có lỗi khi kiểm tra quyền Admin:\n\n" +
+            error.message
+        );
+
+        return null;
+    }
 }
 
 
@@ -226,7 +418,6 @@ $("adminLogout")
 ========================================================= */
 
 const pageTitles = {
-    requests: "Đối soát và hỗ trợ",
 
     dashboard:
         "Tổng quan",
@@ -260,11 +451,6 @@ const pageTitles = {
 
 
 function openPage(page) {
-    if(page === "orders") {
-        page = "requests";
-        window.IUHAdminRequests?.openOrders();
-    } else
-    if(page === "requests") window.IUHAdminRequests?.load();
 
     document
         .querySelectorAll(".admin-page")
@@ -691,9 +877,9 @@ async function loadAdminRevenue() {
                             "wallet_id",
                             wallet.id
                         )
-                        .in(
+                        .eq(
                             "type",
-                            ["fee", "sale"]
+                            "fee"
                         )
                         .order(
                             "created_at",
@@ -709,13 +895,7 @@ async function loadAdminRevenue() {
 
 
                 walletTransactions =
-                    (data || []).filter(
-                        transaction =>
-                            transaction.type !== "sale" ||
-                            `${transaction.title || ""} ${transaction.description || ""}`
-                                .toLowerCase()
-                                .includes("phí")
-                    );
+                    data || [];
             }
         }
 
@@ -3220,7 +3400,6 @@ document.addEventListener(
 ========================================================= */
 
 async function loadOrders() {
-    if(window.IUHAdminRequests) return window.IUHAdminRequests.openOrders();
 
     const list =
         $("ordersList");
@@ -4670,7 +4849,7 @@ document.addEventListener(
                     .eq(
                         "id",
                         post.id
-                    ).select("id").single();
+                    );
 
 
             if (error) {
@@ -8122,12 +8301,249 @@ function openConsignmentDetail(id) {
    ACTION KÝ GỬI
 ========================================================= */
 
-async function updateConsignmentStatus(id,newStatus) {
-  if(!confirm('Xác nhận xử lý yêu cầu ký gửi?'))return;
-  try { const {data,error}=await supabaseClient.rpc('admin_process_consignment',{p_request_id:id,p_status:newStatus});
-   if(error||!data?.success)throw error||new Error(data?.message||'Chưa xử lý được yêu cầu.');
-   await Promise.all([loadConsignments(),loadProducts(),loadDashboard()]);
-  }catch(error){alert(error.message);}
+async function updateConsignmentStatus(
+    id,
+    newStatus
+) {
+
+    const item =
+        consignments.find(
+            item =>
+                String(item.id) ===
+                String(id)
+        );
+
+    if (!item) {
+        return;
+    }
+
+    const actionText =
+        newStatus === "approved"
+            ? "duyệt"
+            : "từ chối";
+
+    if (
+        !confirm(
+            `Bạn có chắc muốn ${actionText} yêu cầu "${item.product_name}"?`
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const {
+            data: {
+                user
+            }
+        } =
+            await supabaseClient.auth.getUser();
+
+
+        /* =================================================
+           TỪ CHỐI
+        ================================================= */
+
+        if (newStatus === "rejected") {
+
+            const { error } =
+                await supabaseClient
+                    .from("consignment_requests")
+                    .update({
+                        status: "rejected",
+
+                        reviewed_by:
+                            user?.id || null,
+
+                        reviewed_at:
+                            new Date().toISOString(),
+
+                        updated_at:
+                            new Date().toISOString(),
+
+                        admin_note:
+                            "Yêu cầu ký gửi chưa được IUH SHOP chấp nhận."
+                    })
+                    .eq(
+                        "id",
+                        id
+                    );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            alert(
+                "Đã từ chối yêu cầu ký gửi."
+            );
+
+            await loadConsignments();
+
+            return;
+        }
+
+
+        /* =================================================
+           DUYỆT → TẠO TIN ĐĂNG
+        ================================================= */
+
+        if (newStatus === "approved") {
+
+            /* ---------------------------------------------
+               Kiểm tra đã tạo tin chưa
+            --------------------------------------------- */
+
+            if (item.product_id) {
+
+                alert(
+                    "Yêu cầu này đã có tin đăng."
+                );
+
+                return;
+            }
+
+
+            /* ---------------------------------------------
+               Tạo tin đăng
+            --------------------------------------------- */
+
+            const {
+                data: product,
+                error: productError
+            } =
+                await supabaseClient
+                    .from("products")
+                    .insert({
+                        seller_id: user.id,
+
+                        name:
+                            item.product_name,
+
+                        category:
+                            item.category,
+
+                        quantity:
+                            1,
+
+                        price:
+                            Number(
+                                item.selling_price
+                            ) || 0,
+
+                        description:
+                            item.description,
+
+                        image_urls:
+                            Array.isArray(
+                                item.image_names
+                            )
+                                ? item.image_names
+                                : [],
+
+                        status:
+                            "active",
+
+                        is_boosted:
+                            false,
+
+                        is_consignment:
+                            true,
+                        
+                        consignment_request_id: item.id,
+                    })
+                    .select("id")
+                    .single();
+
+
+            if (productError) {
+                throw productError;
+            }
+
+
+            /* ---------------------------------------------
+               Nối yêu cầu ký gửi với tin đăng
+            --------------------------------------------- */
+
+            const {
+                error: updateError
+            } =
+                await supabaseClient
+                    .from("consignment_requests")
+                    .update({
+
+                        status:
+                            "selling",
+
+                        product_id:
+                            product.id,
+
+                        reviewed_by:
+                            user?.id || null,
+
+                        reviewed_at:
+                            new Date().toISOString(),
+
+                        updated_at:
+                            new Date().toISOString(),
+
+                        admin_note:
+                            "Đã duyệt. Sản phẩm đã được đưa lên IUH SHOP."
+                    })
+                    .eq(
+                        "id",
+                        id
+                    );
+
+
+            if (updateError) {
+
+                /*
+                 * Nếu nối thất bại thì xóa tin
+                 * vừa tạo để tránh tin mồ côi.
+                 */
+
+                await supabaseClient
+                    .from("products")
+                    .delete()
+                    .eq(
+                        "id",
+                        product.id
+                    );
+
+                throw updateError;
+            }
+
+
+            alert(
+                "Đã duyệt ký gửi và tạo tin đăng thành công!"
+            );
+
+
+            await loadConsignments();
+
+            await loadProducts();
+
+            await loadDashboard();
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Update consignment error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Không thể xử lý yêu cầu ký gửi."
+        );
+    }
 }
 
 
@@ -8173,7 +8589,87 @@ document.addEventListener(
                 actionButton.dataset
                     .consignmentAction;
 
-            if(action==='delete'){await updateConsignmentStatus(id,'cancelled');return;}
+            if (action === "delete") {
+
+    const item =
+        consignments.find(
+            item =>
+                String(item.id) ===
+                String(id)
+        );
+
+    if (!item) {
+        return;
+    }
+
+    if (
+        !confirm(
+            `Xóa yêu cầu ký gửi "${item.product_name}"?\n\nDữ liệu này sẽ bị xóa.`
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        // Nếu yêu cầu đã tạo product thì xóa product trước
+        if (item.product_id) {
+
+            const {
+                error: productError
+            } =
+                await supabaseClient
+                    .from("products")
+                    .delete()
+                    .eq(
+                        "id",
+                        item.product_id
+                    );
+
+            if (productError) {
+                throw productError;
+            }
+        }
+
+        // Xóa yêu cầu ký gửi
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("consignment_requests")
+                .delete()
+                .eq(
+                    "id",
+                    id
+                );
+
+        if (error) {
+            throw error;
+        }
+
+        alert("Đã xóa yêu cầu ký gửi.");
+
+        await loadConsignments();
+        await loadProducts();
+        await loadDashboard();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Delete consignment:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Không thể xóa yêu cầu ký gửi."
+        );
+    }
+
+    return;
+}
+
 
             if (
                 action === "approve"

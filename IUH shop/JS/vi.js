@@ -10,7 +10,10 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 
 const supabaseClient =
-    window.IUHCore.getClient();
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
 
 
 
@@ -567,8 +570,8 @@ document.addEventListener(
    LƯU TRỮ:
    - Số dư ví       -> Supabase: iuh_wallets
    - Giao dịch      -> Supabase: wallet_transactions
-   - Nạp tiền       -> yêu cầu đối soát
-   - Rút tiền       -> yêu cầu chuyển khoản
+   - Nạp tiền       -> mô phỏng
+   - Rút tiền       -> mô phỏng
    ========================================================= */
 
 
@@ -577,8 +580,6 @@ document.addEventListener(
    ========================================================= */
 
 let currentWallet = null;
-let currentUser = null;
-let walletRequestBusy = false;
 
 
 /* =========================================================
@@ -849,42 +850,369 @@ function updateWithdrawBalance() {
    Không kết nối ngân hàng thật.
 
    Khi người dùng xác nhận:
-   - gọi RPC request_wallet_deposit
-   - ghi yêu cầu chờ đối soát
+   - gọi RPC deposit_iuh_wallet
+   - cộng tiền vào database
    - tạo lịch sử giao dịch
    ========================================================= */
 
-async function sendWalletRequest(kind) {
- if(walletRequestBusy) return;
- walletRequestBusy=true;
- try {
-  const {data:{user},error:authError}=await supabaseClient.auth.getUser();
-  if(authError || !user) throw new Error('Vui lòng đăng nhập.');
-  currentUser=user;
-  const amount=Number(document.getElementById(kind+'Amount')?.value);
-  if(!Number.isSafeInteger(amount)||amount<1000) throw new Error('Số tiền phải là số nguyên từ 1.000đ.');
-  const bank=document.getElementById(kind+'Bank')?.value||'';
-  const extra=kind==='deposit'?document.getElementById('depositReference')?.value.trim():document.getElementById('withdrawAccount')?.value.trim();
-  if(!extra) throw new Error(kind==='deposit'?'Nhập mã giao dịch chuyển khoản để đối soát.':'Nhập số tài khoản nhận tiền.');
-  const args={p_amount:amount,p_bank:bank,...(kind==='deposit'?{p_reference:extra}:{p_account:extra})};
-  const storageKey='iuh-wallet-request:'+user.id+':'+kind;
-  const fingerprint=JSON.stringify(args);
-  let previous;try{previous=JSON.parse(sessionStorage.getItem(storageKey)||'null');}catch(_){}
-  if(!previous||previous.fingerprint!==fingerprint) previous={fingerprint,key:crypto.randomUUID()};
-  sessionStorage.setItem(storageKey,JSON.stringify(previous));
-  const {data,error}=await supabaseClient.rpc(kind==='deposit'?'request_wallet_deposit':'request_wallet_withdrawal',{...args,p_request_key:previous.key});
-  if(error) throw error;
-  if(!data?.success) throw new Error(data?.message||'Không thể gửi yêu cầu.');
-  sessionStorage.removeItem(storageKey);
-  closeWalletModal(kind==='deposit'?'depositModal':'withdrawModal');
-  await refreshWallet();
-  await window.IUHWalletRequests?.load();
-  alert(data.message||'Đã gửi yêu cầu chờ quản trị viên đối soát. Chưa xác nhận chuyển tiền ngân hàng.');
- } catch(error){alert(error.message||'Không thể gửi yêu cầu.');}
- finally{walletRequestBusy=false;}
+async function confirmDeposit() {
+
+    if (!currentUser) {
+
+        alert(
+            "Vui lòng đăng nhập trước."
+        );
+
+        return;
+    }
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "depositAmount"
+            )?.value
+        );
+
+
+    const bank =
+        document.getElementById(
+            "depositBank"
+        )?.value || "";
+
+
+    /* -----------------------------------------------------
+       KIỂM TRA SỐ TIỀN
+       ----------------------------------------------------- */
+
+    if (
+        !amount ||
+        amount < 1000
+    ) {
+
+        alert(
+            "Số tiền nạp tối thiểu là 1.000đ."
+        );
+
+        return;
+    }
+
+
+    if (!Number.isFinite(amount)) {
+
+        alert(
+            "Số tiền không hợp lệ."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .rpc(
+                "deposit_iuh_wallet",
+                {
+                    p_amount: amount,
+                    p_bank: bank
+                }
+            );
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi nạp tiền:",
+                error
+            );
+
+            alert(
+                "Nạp tiền thất bại.\n\n" +
+                error.message
+            );
+
+            return;
+        }
+
+
+        /*
+         * RPC trả về số dư mới.
+         */
+
+        const newBalance =
+            Array.isArray(data)
+                ? data[0]
+                : data;
+
+
+        currentWallet.balance =
+            Number(
+                newBalance || 0
+            );
+
+
+        /* -------------------------------------------------
+           ĐÓNG POPUP
+           ------------------------------------------------- */
+
+        closeWalletModal(
+            "depositModal"
+        );
+
+
+        /* -------------------------------------------------
+           CẬP NHẬT GIAO DIỆN
+           ------------------------------------------------- */
+
+        renderWallet();
+
+
+        /* -------------------------------------------------
+           THÔNG BÁO
+           ------------------------------------------------- */
+
+        alert(
+            "✓ Nạp tiền mô phỏng thành công!\n\n" +
+            "Số tiền: " +
+            formatMoney(amount) +
+            "\n" +
+            "Ngân hàng: " +
+            (bank || "Không xác định")
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi confirmDeposit:",
+            error
+        );
+
+        alert(
+            "Không thể thực hiện giao dịch."
+        );
+
+    }
+
 }
-async function confirmDeposit() { return sendWalletRequest('deposit'); }
-async function confirmWithdraw() { return sendWalletRequest('withdraw'); }
+
+
+/* =========================================================
+   RÚT TIỀN
+   ---------------------------------------------------------
+   Đây là RÚT TIỀN MÔ PHỎNG.
+
+   Không chuyển tiền thật về ngân hàng.
+
+   Khi xác nhận:
+   - kiểm tra số dư
+   - gọi RPC withdraw_iuh_wallet
+   - trừ tiền trong database
+   - lưu lịch sử giao dịch
+   ========================================================= */
+
+async function confirmWithdraw() {
+
+    if (!currentUser) {
+
+        alert(
+            "Vui lòng đăng nhập trước."
+        );
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       LẤY DỮ LIỆU FORM
+       ----------------------------------------------------- */
+
+    const amount =
+        Number(
+            document.getElementById(
+                "withdrawAmount"
+            )?.value
+        );
+
+
+    const bank =
+        document.getElementById(
+            "withdrawBank"
+        )?.value || "";
+
+
+    const account =
+        document.getElementById(
+            "withdrawAccount"
+        )?.value
+            ?.trim() || "";
+
+
+    /* -----------------------------------------------------
+       KIỂM TRA TÀI KHOẢN NGÂN HÀNG
+       ----------------------------------------------------- */
+
+    if (!account) {
+
+        alert(
+            "Vui lòng nhập số tài khoản."
+        );
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       KIỂM TRA SỐ TIỀN
+       ----------------------------------------------------- */
+
+    if (
+        !amount ||
+        amount < 1000
+    ) {
+
+        alert(
+            "Số tiền rút tối thiểu là 1.000đ."
+        );
+
+        return;
+    }
+
+
+    if (!Number.isFinite(amount)) {
+
+        alert(
+            "Số tiền không hợp lệ."
+        );
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       KIỂM TRA SỐ DƯ
+       ----------------------------------------------------- */
+
+    const balance =
+        Number(
+            currentWallet?.balance || 0
+        );
+
+
+    if (amount > balance) {
+
+        alert(
+            "Số dư khả dụng không đủ."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .rpc(
+                "withdraw_iuh_wallet",
+                {
+                    p_amount: amount,
+                    p_bank: bank,
+                    p_account: account
+                }
+            );
+
+
+        if (error) {
+
+            console.error(
+                "Lỗi rút tiền:",
+                error
+            );
+
+            alert(
+                "Rút tiền thất bại.\n\n" +
+                error.message
+            );
+
+            return;
+        }
+
+
+        /*
+         * RPC trả về số dư mới.
+         */
+
+        const newBalance =
+            Array.isArray(data)
+                ? data[0]
+                : data;
+
+
+        currentWallet.balance =
+            Number(
+                newBalance || 0
+            );
+
+
+        /* -------------------------------------------------
+           ĐÓNG POPUP
+           ------------------------------------------------- */
+
+        closeWalletModal(
+            "withdrawModal"
+        );
+
+
+        /* -------------------------------------------------
+           CẬP NHẬT GIAO DIỆN
+           ------------------------------------------------- */
+
+        renderWallet();
+
+
+        /* -------------------------------------------------
+           THÔNG BÁO
+           ------------------------------------------------- */
+
+        alert(
+            "✓ Rút tiền mô phỏng thành công!\n\n" +
+            "Số tiền: " +
+            formatMoney(amount) +
+            "\n" +
+            "Ngân hàng: " +
+            (bank || "Không xác định") +
+            "\n" +
+            "Số tài khoản: " +
+            account
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi confirmWithdraw:",
+            error
+        );
+
+        alert(
+            "Không thể thực hiện giao dịch."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MỞ POPUP NẠP TIỀN
+   ========================================================= */
 
 function openDepositModal() {
 
@@ -1206,7 +1534,7 @@ async function loadTransactions() {
                                     ${sign}
 
                                     ${formatMoney(
-                                        Math.abs(Number(transaction.amount))
+                                        transaction.amount
                                     )}
 
                                 </div>
@@ -1456,9 +1784,8 @@ document.addEventListener(
          */
 
 
-        const {data:{user},error:walletAuthError}=await supabaseClient.auth.getUser();
-        currentUser=walletAuthError?null:user;
         if (!currentUser) {
+
             console.warn(
                 "Ví IUH: chưa đăng nhập."
             );
@@ -1503,8 +1830,79 @@ document.addEventListener(
    THEO DÕI ĐĂNG NHẬP / ĐĂNG XUẤT
    ========================================================= */
 
-supabaseClient.auth.onAuthStateChange(function(event,session) {
-  currentUser=session?.user||null;
-  if(event==='SIGNED_OUT') {currentWallet=null; window.location.href='dangnhap.html'; return;}
-  if(currentUser) setTimeout(()=>refreshWallet(),0);
-});
+supabaseClient.auth.onAuthStateChange(
+    async function(event) {
+
+        /* -------------------------------------------------
+           ĐĂNG NHẬP
+           ------------------------------------------------- */
+
+        if (
+            event === "SIGNED_IN" ||
+            event === "TOKEN_REFRESHED"
+        ) {
+
+            /*
+             * Không gọi lại toàn bộ phần header.
+             * Chỉ cập nhật biến user nếu cần.
+             */
+
+            try {
+
+                const {
+                    data
+                } =
+                    await supabaseClient
+                        .auth
+                        .getSession();
+
+
+                currentUser =
+                    data?.session?.user ||
+                    currentUser;
+
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Lỗi cập nhật user cho ví:",
+                    error
+                );
+
+            }
+
+
+            if (currentUser) {
+
+                const success =
+                    await loadWallet();
+
+
+                if (success) {
+
+                    renderWallet();
+
+                }
+
+            }
+
+        }
+
+
+        /* -------------------------------------------------
+           ĐĂNG XUẤT
+           ------------------------------------------------- */
+
+        if (
+            event === "SIGNED_OUT"
+        ) {
+
+            currentUser = null;
+
+            currentWallet = null;
+
+        }
+
+    }
+);
