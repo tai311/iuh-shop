@@ -1048,102 +1048,98 @@ async function loadOrdersFromDatabase() {
 
 function classifyOrders() {
 
-    const userId =
-        currentUser?.id;
-
+    const userId = currentUser?.id;
 
     if (!userId) {
-
         purchaseOrders = [];
-
         saleOrders = [];
-
         historyOrders = [];
-
         return;
-
     }
-
 
     /* =========================
        ĐƠN MUA
     ========================= */
 
-    purchaseOrders =
-        allOrders.filter(
-            order =>
-                String(
-                    order.buyer_id
-                ) ===
-                String(userId)
-        );
+    purchaseOrders = allOrders.filter(order => {
+        return String(
+            order.buyer_id ||
+            order.buyerId ||
+            ""
+        ) === String(userId);
+    });
 
 
     /* =========================
        ĐƠN BÁN
+       Kiểm tra nhiều trường hợp
     ========================= */
 
-    saleOrders =
-        allOrders.filter(
-            order =>
+    saleOrders = allOrders.filter(order => {
 
-                order._items.some(
-                    item =>
-                        String(
-                            getSellerId(item)
-                        ) ===
-                        String(userId)
-                )
+        const items = Array.isArray(order._items)
+            ? order._items
+            : [];
 
-        );
+        return items.some(item => {
+
+            const sellerId =
+                item.seller_id ||
+                item.sellerId ||
+                item.seller ||
+                item.product_seller_id ||
+                item.productSellerId ||
+                null;
+
+            return String(sellerId) === String(userId);
+        });
+
+    });
 
 
     /* =========================
        LỊCH SỬ
     ========================= */
 
-    historyOrders =
-    allOrders.filter(
-        order => {
+    historyOrders = allOrders.filter(order => {
 
-            const isBuyer =
-                String(
-                    order.buyer_id ||
-                    order.buyerId ||
-                    ""
-                ) ===
-                String(userId);
+        const isBuyer =
+            String(
+                order.buyer_id ||
+                order.buyerId ||
+                ""
+            ) === String(userId);
+
+        const isSeller =
+            Array.isArray(order._items) &&
+            order._items.some(item => {
+
+                const sellerId =
+                    item.seller_id ||
+                    item.sellerId ||
+                    item.seller ||
+                    item.product_seller_id ||
+                    item.productSellerId ||
+                    null;
+
+                return String(sellerId) === String(userId);
+            });
+
+        return (
+            (order._status === "completed" ||
+             order._status === "cancelled") &&
+            (isBuyer || isSeller)
+        );
+    });
 
 
-            const isSeller =
-                order._items.some(
-                    item => {
-
-                        return String(
-                            getSellerId(item) ||
-                            ""
-                        ) ===
-                        String(userId);
-
-                    }
-                );
-
-
-            return (
-                (
-                    order._status ===
-                    "completed" ||
-
-                    order._status ===
-                    "cancelled"
-                )
-                &&
-                (
-                    isBuyer ||
-                    isSeller
-                )
-            );
-
+    console.log(
+        "IUH SHOP: classifyOrders:",
+        {
+            userId,
+            total: allOrders.length,
+            purchase: purchaseOrders.length,
+            sale: saleOrders.length
         }
     );
 }
