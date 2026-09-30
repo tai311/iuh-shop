@@ -1521,7 +1521,7 @@ function renderPurchaseCard(order) {
 
                 ${renderStatus(
                     order._status
-                )}<span class="order-payment-state">${escapeHtml(order.needs_payment_review ? "Cần đối soát đơn cũ" : order.payment_status === "paid" ? "Đã thanh toán" : order.payment_status === "refunded" ? "Đã hoàn tiền" : order.payment_status === "refund_pending" ? "Chờ hoàn tiền ngân hàng" : order.payment_method === "cash" ? "Thanh toán khi nhận hàng" : "Chờ đối soát chuyển khoản")}</span>
+                )}<span class="order-payment-state">${escapeHtml(order.needs_payment_review ? "Cần đối soát đơn cũ" : order.payment_method === "trial" ? "Miễn phí (chạy thử)" : order.payment_status === "paid" ? "Đã thanh toán" : order.payment_status === "refunded" ? "Đã hoàn tiền" : order.payment_status === "refund_pending" ? "Chờ hoàn tiền ngân hàng" : order.payment_method === "cash" ? "Thanh toán khi nhận hàng" : "Chờ đối soát chuyển khoản")}</span>
 
             </div>
 
@@ -1619,8 +1619,6 @@ function renderPurchaseCard(order) {
 
 
                 <div class="order-actions">
-                    ${order.payment_method==='qr'&&order.payment_status==='unpaid'&&order._status!=='cancelled'&&!order.needs_payment_review?'<button type="button" class="order-btn" data-payos-order="'+escapeHtml(order._databaseId)+'">Thanh toán / kiểm tra payOS</button>':''}
-
                     ${
                         canCancelOrder(order)
                         ? `
@@ -1811,7 +1809,7 @@ function renderSaleCard(order) {
 
                 ${renderStatus(
                     order._status
-                )}<span class="order-payment-state">${escapeHtml(order.needs_payment_review ? "Cần đối soát đơn cũ" : order.payment_status === "paid" ? "Đã thanh toán" : order.payment_status === "refunded" ? "Đã hoàn tiền" : order.payment_status === "refund_pending" ? "Chờ hoàn tiền ngân hàng" : order.payment_method === "cash" ? "Thanh toán khi nhận hàng" : "Chờ đối soát chuyển khoản")}</span>
+                )}<span class="order-payment-state">${escapeHtml(order.needs_payment_review ? "Cần đối soát đơn cũ" : order.payment_method === "trial" ? "Miễn phí (chạy thử)" : order.payment_status === "paid" ? "Đã thanh toán" : order.payment_status === "refunded" ? "Đã hoàn tiền" : order.payment_status === "refund_pending" ? "Chờ hoàn tiền ngân hàng" : order.payment_method === "cash" ? "Thanh toán khi nhận hàng" : "Chờ đối soát chuyển khoản")}</span>
 
             </div>
 
@@ -2207,15 +2205,12 @@ async function cancelOrder(orderId) {
         const {
             data,
             error
-        } = await (async()=>{
-            if(order.payos_order_code&&order.payment_status==='unpaid')await window.IUHPayosOrders.request('cancel',orderId);
-            return db.rpc(
+        } = await db.rpc(
             "cancel_order",
             {
                 p_order_id:
                     Number(orderId)
             });
-        })();
 
 
         if (error) {

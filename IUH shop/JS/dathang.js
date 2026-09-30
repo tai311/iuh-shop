@@ -1506,7 +1506,7 @@ function updateOptionUI() {
 function updateQR() {
  if (qrCodeImage) qrCodeImage.hidden = true;
  if (confirmPaymentBtn) confirmPaymentBtn.hidden = true;
- if (paymentVerificationStatus) paymentVerificationStatus.textContent = 'Bấm Đặt hàng để tạo QR payOS riêng cho đơn này. Quét QR ngay trên IUH Shop; hệ thống tự xác nhận khi nhận đủ tiền.';
+ if (paymentVerificationStatus) paymentVerificationStatus.textContent = 'Đơn hàng được tạo miễn phí trong giai đoạn chạy thử.';
 }
 
 async function loadWallet() {
@@ -1716,59 +1716,9 @@ async function updatePaymentUI() {
         );
 
 
-    /*
-     * QR
-     */
-    if (
-        payment === "qr"
-    ) {
-
-        if (qrPaymentBox)
-            qrPaymentBox.classList.remove(
-                "hidden"
-            );
-
-
-        updateQR();
-
-
-        if (checkoutButton) {
-
-            checkoutButton.disabled =
-                isSubmitting;
-        }
-
-
-        return;
-    }
-
-
-    /*
-     * VÍ IUH
-     */
-    if (
-        payment === "iuh_wallet"
-    ) {
-
-        if (walletPaymentBox)
-            walletPaymentBox.classList.remove(
-                "hidden"
-            );
-
-
-        const walletOK =
-            await loadWallet();
-
-
-        if (checkoutButton) {
-
-            checkoutButton.disabled =
-                !walletOK ||
-                walletBalance <
-                getTotal();
-        }
-
-
+    if (payment === "trial") {
+        if (checkoutButton) checkoutButton.disabled = isSubmitting;
+        if (paymentVerificationStatus) paymentVerificationStatus.textContent = "Đơn hàng được tạo miễn phí trong giai đoạn chạy thử.";
         return;
     }
 
@@ -2120,8 +2070,8 @@ async function submitOrder() {
    if(!data?.success) throw new Error(data?.message||'Không thể tạo đơn hàng.');
    checkoutSucceeded=true;
    sessionStorage.removeItem(storageKey);
-   showToast(data.payment_status==='paid'?'Đặt hàng và thanh toán thành công.':order.payment_method==='qr'?'Đã tạo đơn. Đang mở mã QR payOS…':'Đặt hàng thành công.');
-   setTimeout(()=>{window.location.href='donhang.html'+(order.payment_method==='qr'?'?payos_order='+encodeURIComponent(data.order_id):'');},1200);
+    showToast('Đặt hàng thử nghiệm thành công. Không có khoản tiền nào được thu.');
+    setTimeout(()=>{window.location.href='donhang.html';},1200);
  } catch(error) {
    console.error('Lỗi đặt hàng:',error);
    showToast(error.message||'Chưa xác nhận được kết quả. Bấm lại để kiểm tra cùng yêu cầu, không tạo trùng đơn.');

@@ -29,7 +29,7 @@
         <link rel="stylesheet" href="../CSS/service-package.css">
     <link
         rel="stylesheet"
-        href="../CSS/taikhoan.css?v=20260927-payos-embedded"
+        href="../CSS/taikhoan.css?v=20260930-trial-mode"
     >
     <link rel="stylesheet" href="../CSS/mobile-responsive.css">
 
@@ -1276,16 +1276,11 @@
 
             <div class="upgrade-step-heading payment-heading">
                 <span>02</span>
-                <div><strong>Thông tin thanh toán</strong><small>Giao dịch được ghi nhận an toàn trên IUH SHOP.</small></div>
+                <div><strong>Chế độ chạy thử</strong><small>Không thu tiền thật trong giai đoạn thử nghiệm.</small></div>
             </div>
 
-            <div class="payment-methods" role="radiogroup" aria-label="Phương thức thanh toán">
-                <button type="button" class="payment-method selected" data-method="wallet" role="radio" aria-checked="true"><i class="fa-solid fa-wallet"></i><span><strong>Ví IUH SHOP</strong><small>Thanh toán và kích hoạt ngay</small></span><i class="fa-solid fa-circle-check method-check"></i></button>
-                <button type="button" class="payment-method" data-method="bank" role="radio" aria-checked="false"><i class="fa-solid fa-building-columns"></i><span><strong>Chuyển khoản ngân hàng</strong><small>Quét QR, tự động xác nhận thanh toán</small></span><i class="fa-regular fa-circle method-check"></i></button>
-            </div>
-
-            <div id="upgradeBankInfo" class="upgrade-bank-info" hidden>
-                <div><strong>Chuyển khoản qua payOS</strong><span>Hệ thống tạo trang thanh toán có mã QR và đúng số tiền của gói.</span><span>Gói tự kích hoạt khi hệ thống xác minh đã nhận đủ tiền. Phương thức này không trừ Ví IUH.</span></div>
+            <div class="upgrade-bank-info">
+                <div><strong>Kích hoạt miễn phí</strong><span>Gói dùng thử không trừ Ví IUH và không tạo giao dịch tiền thật.</span></div>
             </div>
 
             <div class="upgrade-order-summary">
@@ -1294,22 +1289,15 @@
             </div>
             <p id="upgradePaymentMessage" class="upgrade-payment-message" role="status"></p>
             <button type="button" id="confirmUpgradeButton" class="upgrade-confirm-button"><i class="fa-solid fa-lock"></i> Xác nhận thanh toán <span id="upgradeConfirmAmount">19.000đ</span></button>
-            <p class="upgrade-secure-note"><i class="fa-solid fa-shield-halved"></i> Thông tin thanh toán được bảo mật bởi IUH SHOP</p>
+            <p class="upgrade-secure-note"><i class="fa-solid fa-flask"></i> Chế độ miễn phí đang bật trong thời gian chạy thử</p>
         </div>
 
         <div id="upgradeSuccessView" class="upgrade-success-view" hidden>
             <div class="upgrade-success-icon"><i class="fa-solid fa-check"></i></div>
-            <span class="upgrade-eyebrow" id="upgradeSuccessEyebrow">THANH TOÁN THÀNH CÔNG</span>
-            <h3 id="upgradeSuccessHeading">Gói dịch vụ đã được kích hoạt</h3>
+            <span class="upgrade-eyebrow" id="upgradeSuccessEyebrow">KÍCH HOẠT DÙNG THỬ</span>
+            <h3 id="upgradeSuccessHeading">Gói dùng thử đã được kích hoạt</h3>
             <p id="upgradeSuccessText">Bạn đã nâng cấp thành công Gói Cá nhân.</p>
             <div class="upgrade-success-details"><span>Mã giao dịch</span><strong id="upgradeTransactionCode">—</strong><span>Hiệu lực đến</span><strong id="upgradeExpiryDate">—</strong></div>
-            <div id="payosPackageActions" hidden>
-                <p id="payosPaymentStatus" role="status" aria-live="polite"></p>
-                <div id="payosEmbeddedCheckout" class="payos-embedded-checkout" hidden></div>
-                <button type="button" id="payosReloadCheckout" class="upgrade-confirm-button" hidden>Tải lại mã QR</button>
-                <button type="button" id="payosCheckPayment" class="upgrade-confirm-button">Kiểm tra thanh toán</button>
-                <a id="payosCheckoutLink" class="payos-checkout-fallback" target="_blank" rel="noopener noreferrer" hidden>Mở tab riêng nếu khung QR không hiển thị</a>
-            </div>
             <button type="button" id="finishUpgradeButton" class="upgrade-confirm-button">Đóng</button>
         </div>
     </div>
@@ -1460,7 +1448,7 @@
 <script src="../JS/vendor/purify.min.js"></script>
 <script src="../JS/iuh-core.js"></script>
     <script src="../JS/iuh-chat-notification.js"></script>
-    <script src="../JS/service-package.js?v=20260927-payos-embedded"></script>
+    <script src="../JS/service-package.js?v=20260930-trial-mode"></script>
     <script
         src="../JS/taikhoan.js"
     ></script>

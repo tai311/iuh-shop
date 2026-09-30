@@ -692,7 +692,7 @@
                         </h2>
 
                         <p>
-                            Chọn phương thức thanh toán phù hợp
+                            Chế độ thanh toán miễn phí đang bật khi chạy thử
                         </p>
 
                     </div>
@@ -704,14 +704,12 @@
                 <div class="choice-group">
 
 
-                    <!-- QR -->
-
                     <label class="option-box selected">
 
                         <input
                             type="radio"
                             name="paymentMethod"
-                            value="qr"
+                            value="trial"
                             checked
                         >
 
@@ -722,58 +720,23 @@
                         <div class="option-content">
 
                             <strong>
-                                Thanh toán qua QR Code
+                                Thanh toán thử miễn phí
                             </strong>
 
                             <small>
-                                Tạo QR riêng cho đơn, tự động xác nhận thanh toán
+                                Tạo đơn và kiểm thử quy trình mà không thu tiền thật
                             </small>
 
                         </div>
 
 
                         <span class="payment-badge">
-                            QR
+                            0đ
                         </span>
 
 
                     </label>
 
-
-
-                    <!-- VÍ IUH -->
-
-                    <label class="option-box">
-
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="iuh_wallet"
-                        >
-
-
-                        <div class="option-radio"></div>
-
-
-                        <div class="option-content">
-
-                            <strong>
-                                Thanh toán bằng Ví IUH
-                            </strong>
-
-                            <small>
-                                Sử dụng số dư trong Ví IUH để thanh toán
-                            </small>
-
-                        </div>
-
-
-                        <span class="payment-badge wallet-badge">
-                            IUH
-                        </span>
-
-
-                    </label>
 
 
                 </div>
@@ -1397,7 +1360,7 @@
 <script src="../JS/vendor/purify.min.js"></script>
 <script src="../JS/iuh-core.js"></script>
 <script src="../JS/iuh-chat-notification.js"></script>
-<script src="../JS/dathang.js?v=20260927-payos-orders"></script>
+<script src="../JS/dathang.js?v=20260930-trial-mode"></script>
 <script src="../JS/vedau.js"></script>
 <!-- NÚT VỀ ĐẦU TRANG -->
 <button

@@ -93,5 +93,33 @@ test('Payments, packages, orders and permissions preserve money and ownership',a
    await assert.rejects(q('select email from public.users'));
    await assert.rejects(q('select * from public.service_package_payments'));
   });
+    await t.test('free trial activates packages and orders without real money movement',async()=>{
+    await as(admin);
+     const buyerBalance=Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[buyer]));
+     const sellerBalance=Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[seller]));
+     const adminBalance=Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[admin]));
+     const transactionCount=Number(await scalar('select count(*) from public.wallet_transactions'));
+     await as(buyer);
+     const packageReceipt=await buy('personal','trial','pkg-trial-000001');
+     assert.equal(packageReceipt.status,'paid');assert.equal(packageReceipt.payment_method,'trial');
+     const trialOrder=await order('trial','order-trial-000001');
+     assert.equal(trialOrder.payment_status,'paid');
+     const orderId=trialOrder.order_id;
+     const orderRow=await q('select payment_method,payment_status,captured_amount,escrow_admin_id from public.orders where id=$1',[orderId]);
+    assert.deepEqual({...orderRow[0],captured_amount:Number(orderRow[0].captured_amount)},{payment_method:'trial',payment_status:'paid',captured_amount:0,escrow_admin_id:null});
+     await as(seller);for(const status of ['confirmed','shipping','delivered'])await q('select public.update_order_status($1,$2)',[orderId,status]);
+     await as(buyer);await q("select public.update_order_status($1,'completed')",[orderId]);
+     const finance=await (async()=>{await as(admin);return (await q('select * from public.admin_order_financials where order_id=$1',[orderId]))[0];})();
+     assert.equal(finance.payout_method,'trial');assert.equal(finance.payout_status,'trial');
+     assert.equal(Number(await scalar('select count(*) from public.order_bank_payouts where order_id=$1',[orderId])),0);
+     assert.equal(Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[buyer])),buyerBalance);
+     assert.equal(Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[seller])),sellerBalance);
+     assert.equal(Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[admin])),adminBalance);
+     assert.equal(Number(await scalar('select count(*) from public.wallet_transactions')),transactionCount);
+     await as(buyer);await assert.rejects(q('select public.set_iuh_trial_mode(false)'),/Admin/);
+     await as(admin);await q('select public.set_iuh_trial_mode(false)');
+     await as(buyer);await assert.rejects(buy('personal','trial','pkg-trial-disabled'));
+     await as(admin);await q('select public.set_iuh_trial_mode(true)');
+    });
  }finally{await db.close();}
 });
