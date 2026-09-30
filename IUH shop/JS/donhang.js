@@ -1361,6 +1361,18 @@ function renderProgress(status) {
 
 }
 
+/* =========================================================
+   KIỂM TRA NGƯỜI MUA ĐÃ XÁC NHẬN NHẬN HÀNG
+   ========================================================= */
+
+function isOrderReceived(orderId) {
+
+    return localStorage.getItem(
+        `iuh_order_received_${orderId}`
+    ) === "true";
+
+}
+
 
 /* =========================================================
    CÓ ĐƯỢC HỦY?
@@ -1465,9 +1477,11 @@ function renderPurchaseOrders() {
 
 /* =========================================================
    CARD ĐƠN MUA
-========================================================= */
+   ========================================================= */
 
-function renderPurchaseCard(order) {
+function renderPurchaseCard(
+    order
+) {
 
     const items =
         order._items;
@@ -1501,7 +1515,22 @@ function renderPurchaseCard(order) {
         );
 
 
+    /*
+       Chỉ hiện nút khi:
+
+       1. Người bán đã chuyển đơn sang completed
+       2. Người mua chưa xác nhận nhận hàng
+    */
+
+    const showReceivedButton =
+        order._status === "completed" &&
+        !isOrderReceived(
+            order._databaseId
+        );
+
+
     return `
+
         <article
             class="order-card"
             data-order-id="${escapeHtml(order._id)}"
@@ -1522,6 +1551,7 @@ function renderPurchaseCard(order) {
 
                 </div>
 
+
                 ${renderStatus(
                     order._status
                 )}
@@ -1534,24 +1564,32 @@ function renderPurchaseCard(order) {
                 ${
                     image
                     ? `
+
                         <img
                             class="order-product-image"
                             src="${escapeHtml(image)}"
                             alt="${escapeHtml(itemName)}"
                             onerror="this.style.display='none'"
                         >
+
                     `
                     : `
-                        <div class="order-product-image"
-                             style="
+
+                        <div
+                            class="order-product-image"
+                            style="
                                 display:flex;
                                 align-items:center;
                                 justify-content:center;
                                 color:#bbb;
                                 font-size:25px;
-                             ">
+                            "
+                        >
+
                             <i class="fa-solid fa-image"></i>
+
                         </div>
+
                     `
                 }
 
@@ -1562,23 +1600,28 @@ function renderPurchaseCard(order) {
                         ${escapeHtml(itemName)}
                     </h3>
 
+
                     <p>
                         Số lượng:
                         ${quantity}
                     </p>
+
 
                     <p>
                         Đơn giá:
                         ${formatMoney(price)}
                     </p>
 
+
                     ${
                         items.length > 1
                         ? `
+
                             <p>
                                 Và ${items.length - 1}
                                 sản phẩm khác
                             </p>
+
                         `
                         : ""
                     }
@@ -1604,6 +1647,64 @@ function renderPurchaseCard(order) {
             )}
 
 
+            ${
+                showReceivedButton
+                ? `
+
+                    <div
+                        style="
+                            margin-top:18px;
+                            padding:16px;
+                            border-radius:12px;
+                            background:#f8fafc;
+                            border:1px solid #e5e7eb;
+                        "
+                    >
+
+                        <div
+                            style="
+                                margin-bottom:10px;
+                                font-size:14px;
+                                color:#555;
+                            "
+                        >
+
+                            <strong>
+                                Đơn hàng đã được giao hoàn tất.
+                            </strong>
+
+                            <br>
+
+                            Vui lòng xác nhận bạn đã nhận được
+                            hàng để hoàn tất đơn hàng và giải ngân
+                            tiền cho người bán.
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="order-btn update"
+                            onclick="
+                                confirmReceivedOrder(
+                                    '${escapeHtml(order._databaseId)}'
+                                )
+                            "
+                        >
+
+                            <i class="fa-solid fa-box-open"></i>
+
+                            Đã nhận được hàng
+
+                        </button>
+
+                    </div>
+
+                `
+                : ""
+            }
+
+
             <div class="order-card-footer">
 
                 <div class="order-total">
@@ -1626,14 +1727,23 @@ function renderPurchaseCard(order) {
                     ${
                         canCancelOrder(order)
                         ? `
+
                             <button
                                 type="button"
                                 class="order-btn cancel"
-                                onclick="cancelOrder('${escapeHtml(order._databaseId)}')"
+                                onclick="
+                                    cancelOrder(
+                                        '${escapeHtml(order._databaseId)}'
+                                    )
+                                "
                             >
+
                                 <i class="fa-solid fa-xmark"></i>
+
                                 Hủy đơn
+
                             </button>
+
                         `
                         : ""
                     }
@@ -1642,10 +1752,17 @@ function renderPurchaseCard(order) {
                     <button
                         type="button"
                         class="order-btn"
-                        onclick="showOrderDetail('${escapeHtml(order._databaseId)}')"
+                        onclick="
+                            showOrderDetail(
+                                '${escapeHtml(order._databaseId)}'
+                            )
+                        "
                     >
+
                         <i class="fa-solid fa-eye"></i>
+
                         Chi tiết
+
                     </button>
 
                 </div>
@@ -1653,6 +1770,7 @@ function renderPurchaseCard(order) {
             </div>
 
         </article>
+
     `;
 
 }
@@ -2296,10 +2414,225 @@ async function cancelOrder(orderId) {
 
 }
 
+/* =========================================================
+   NGƯỜI MUA XÁC NHẬN ĐÃ NHẬN ĐƯỢC HÀNG
+
+   Chỉ tại bước này mới giải ngân tiền.
+   ========================================================= */
+
+async function confirmReceivedOrder(
+    orderId
+) {
+
+    const order =
+        allOrders.find(
+            item =>
+                String(
+                    item._databaseId
+                ) ===
+                String(orderId)
+        );
+
+
+    if (!order) {
+
+        alert(
+            "Không tìm thấy đơn hàng."
+        );
+
+        return;
+
+    }
+
+
+    /* =========================
+       KIỂM TRA NGƯỜI MUA
+       ========================= */
+
+    if (
+        String(
+            order.buyer_id
+        ) !==
+        String(
+            currentUser?.id
+        )
+    ) {
+
+        alert(
+            "Bạn không có quyền xác nhận đơn hàng này."
+        );
+
+        return;
+
+    }
+
+
+    /* =========================
+       KIỂM TRA TRẠNG THÁI
+       ========================= */
+
+    if (
+        order._status !==
+        "completed"
+    ) {
+
+        alert(
+            "Đơn hàng chưa ở trạng thái Hoàn tất."
+        );
+
+        return;
+
+    }
+
+
+    /* =========================
+       CHỐNG XÁC NHẬN 2 LẦN
+       ========================= */
+
+    if (
+        isOrderReceived(
+            orderId
+        )
+    ) {
+
+        alert(
+            "Đơn hàng này đã được xác nhận nhận hàng."
+        );
+
+        return;
+
+    }
+
+
+    /* =========================
+       XÁC NHẬN
+       ========================= */
+
+    const confirmed =
+        confirm(
+            "Bạn xác nhận đã nhận được hàng?\n\n" +
+            "Sau khi xác nhận, tiền sẽ được giải ngân " +
+            "vào Ví IUH của người bán."
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        /* =========================
+           GIẢI NGÂN
+           ========================= */
+
+        const {
+            data: settlementData,
+            error: settlementError
+        } = await db.rpc(
+            "settle_online_order",
+            {
+                p_order_id:
+                    Number(orderId)
+            }
+        );
+
+
+        if (settlementError) {
+
+            console.error(
+                "Lỗi giải ngân:",
+                settlementError
+            );
+
+            alert(
+                "Không thể giải ngân tiền.\n\n" +
+                settlementError.message
+            );
+
+            return;
+
+        }
+
+
+        /* =========================
+           KIỂM TRA KẾT QUẢ
+           ========================= */
+
+        if (
+            settlementData?.settled !== true
+        ) {
+
+            console.error(
+                "Kết quả giải ngân:",
+                settlementData
+            );
+
+            alert(
+                "Không thể hoàn tất giải ngân.\n\n" +
+                "Vui lòng thử lại."
+            );
+
+            return;
+
+        }
+
+
+        /* =========================
+           GHI NHỚ ĐÃ XÁC NHẬN
+           ========================= */
+
+        localStorage.setItem(
+            `iuh_order_received_${orderId}`,
+            "true"
+        );
+
+
+        /* =========================
+           THÔNG BÁO
+           ========================= */
+
+        alert(
+            "✓ Đã xác nhận nhận hàng!\n\n" +
+            "Tiền đã được giải ngân vào Ví IUH của người bán."
+        );
+
+
+        /* =========================
+           TẢI LẠI DỮ LIỆU
+           ========================= */
+
+        await refreshPageData();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi xác nhận nhận hàng:",
+            error
+        );
+
+        alert(
+            "Có lỗi xảy ra khi xác nhận nhận hàng."
+        );
+
+    }
+
+}
+
 
 /* =========================================================
    CẬP NHẬT TRẠNG THÁI - DATABASE
-========================================================= */
+
+   LƯU Ý:
+   - Người bán cập nhật "Hoàn tất"
+     KHÔNG được giải ngân tiền.
+   - Tiền chỉ được giải ngân khi
+     người mua xác nhận "Đã nhận được hàng".
+   ========================================================= */
 
 async function updateOrderStatus(
     orderId
@@ -2322,6 +2655,7 @@ async function updateOrderStatus(
         );
 
         return;
+
     }
 
 
@@ -2332,7 +2666,9 @@ async function updateOrderStatus(
 
 
     if (!select) {
+
         return;
+
     }
 
 
@@ -2352,6 +2688,10 @@ async function updateOrderStatus(
         );
 
 
+    /* =========================
+       KHÔNG CHO QUAY LẠI
+       ========================= */
+
     if (
         newIndex <
         currentIndex
@@ -2362,8 +2702,13 @@ async function updateOrderStatus(
         );
 
         return;
+
     }
 
+
+    /* =========================
+       HOÀN TẤT PHẢI SAU ĐÃ GIAO
+       ========================= */
 
     if (
         newStatus === "completed" &&
@@ -2376,8 +2721,13 @@ async function updateOrderStatus(
         );
 
         return;
+
     }
 
+
+    /* =========================
+       KHÔNG CẬP NHẬT TRÙNG
+       ========================= */
 
     if (
         newStatus ===
@@ -2389,10 +2739,15 @@ async function updateOrderStatus(
         );
 
         return;
+
     }
 
 
     try {
+
+        /* =========================
+           CẬP NHẬT TRẠNG THÁI
+           ========================= */
 
         const {
             error
@@ -2421,60 +2776,45 @@ async function updateOrderStatus(
             );
 
             return;
+
         }
 
-        /* =========================================
-   GIẢI NGÂN ONLINE
-   ADMIN -> SELLER
-========================================= */
 
-if (newStatus === "completed") {
+        /* =================================================
+           QUAN TRỌNG:
 
-    const {
-        data: settlementData,
-        error: settlementError
-    } = await db.rpc(
-        "settle_online_order",
-        {
-            p_order_id:
-                Number(orderId)
+           KHÔNG GỌI settle_online_order Ở ĐÂY.
+
+           Khi người bán chuyển sang "Hoàn tất",
+           chỉ cập nhật trạng thái đơn.
+
+           TIỀN CHƯA ĐƯỢC GIẢI NGÂN.
+           ================================================= */
+
+
+        if (
+            newStatus === "completed"
+        ) {
+
+            alert(
+                "✓ Đã cập nhật đơn hàng thành Hoàn tất.\n\n" +
+                "Người mua sẽ xác nhận Đã nhận được hàng " +
+                "trước khi tiền được giải ngân vào Ví IUH."
+            );
+
         }
-    );
+        else {
+
+            alert(
+                "✓ Đã cập nhật trạng thái đơn hàng."
+            );
+
+        }
 
 
-    if (settlementError) {
-
-        console.error(
-            "Lỗi giải ngân:",
-            settlementError
-        );
-
-        alert(
-            "Đơn đã hoàn tất nhưng giải ngân thất bại:\n\n" +
-            settlementError.message
-        );
-
-        return;
-    }
-
-
-    if (
-        settlementData?.settled === true
-    ) {
-
-        alert(
-            "✓ Đơn hàng đã hoàn tất.\n\n" +
-            "Tiền đã được giải ngân vào Ví IUH của người bán."
-        );
-
-    }
-}
-
-
-        alert(
-            "✓ Đã cập nhật trạng thái đơn hàng."
-        );
-
+        /* =========================
+           TẢI LẠI DATABASE
+           ========================= */
 
         await refreshPageData();
 
@@ -2493,269 +2833,3 @@ if (newStatus === "completed") {
 
 }
 
-
-/* =========================================================
-   CHI TIẾT ĐƠN
-========================================================= */
-
-function showOrderDetail(
-    orderId
-) {
-
-    const order =
-        allOrders.find(
-            item =>
-                String(
-                    item._databaseId
-                ) ===
-                String(orderId)
-        );
-
-
-    if (!order) {
-
-        alert(
-            "Không tìm thấy đơn hàng."
-        );
-
-        return;
-    }
-
-
-    const items =
-        order._items
-            .map(
-                item =>
-                    `${getItemName(item)} × ${getItemQuantity(item)}`
-            )
-            .join("\n");
-
-
-    alert(
-
-        "ĐƠN HÀNG #" +
-        order._id +
-
-        "\n\n" +
-
-        "Sản phẩm:\n" +
-        items +
-
-        "\n\n" +
-
-        "Trạng thái: " +
-
-        (
-            ORDER_STATUS[
-                order._status
-            ]?.label ||
-            order._status
-        ) +
-
-        "\n\n" +
-
-        "Người nhận: " +
-        (
-            order.recipient_name ||
-            "—"
-        ) +
-
-        "\n" +
-
-        "SĐT: " +
-        (
-            order.recipient_phone ||
-            "—"
-        ) +
-
-        "\n" +
-
-        "Địa chỉ: " +
-        (
-            order.recipient_address ||
-            "—"
-        ) +
-
-        "\n\n" +
-
-        "Tổng tiền: " +
-        formatMoney(
-            order._total
-        )
-
-    );
-
-}
-
-
-/* =========================================================
-   FILTER
-========================================================= */
-
-function setupFilters() {
-
-    const purchaseFilter =
-        document.getElementById(
-            "purchaseFilter"
-        );
-
-
-    const saleFilter =
-        document.getElementById(
-            "saleFilter"
-        );
-
-
-    if (purchaseFilter) {
-
-        purchaseFilter.addEventListener(
-            "change",
-            renderPurchaseOrders
-        );
-
-    }
-
-
-    if (saleFilter) {
-
-        saleFilter.addEventListener(
-            "change",
-            renderSaleOrders
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   REFRESH
-========================================================= */
-
-async function refreshPageData() {
-
-    allOrders =
-        await loadOrdersFromDatabase();
-
-
-    classifyOrders();
-
-
-    renderPurchaseOrders();
-
-    renderSaleOrders();
-
-    renderHistory();
-
-}
-
-
-/* =========================================================
-   KHỞI ĐỘNG
-========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async function() {
-
-        currentUser =
-            await getCurrentUser();
-
-
-        if (!currentUser) {
-
-            const purchaseList =
-                document.getElementById(
-                    "purchaseOrderList"
-                );
-
-
-            const saleList =
-                document.getElementById(
-                    "saleOrderList"
-                );
-
-
-            if (purchaseList) {
-
-                purchaseList.innerHTML =
-                    renderEmpty(
-                        "fa-right-to-bracket",
-                        "Vui lòng đăng nhập",
-                        "Bạn cần đăng nhập để kiểm tra đơn hàng."
-                    );
-
-            }
-
-
-            if (saleList) {
-
-                saleList.innerHTML =
-                    renderEmpty(
-                        "fa-right-to-bracket",
-                        "Vui lòng đăng nhập",
-                        "Bạn cần đăng nhập để quản lý đơn bán."
-                    );
-
-            }
-
-
-            return;
-
-        }
-
-
-        setupTabs();
-
-        setupFilters();
-
-        await refreshPageData();
-
-    }
-);
-
-
-/* =========================================================
-   THEO DÕI AUTH
-========================================================= */
-
-db.auth.onAuthStateChange(
-    function(
-        event,
-        session
-    ) {
-
-        if (
-            event ===
-            "SIGNED_IN"
-        ) {
-
-            currentUser =
-                session?.user ||
-                null;
-
-            refreshPageData();
-
-        }
-
-
-        if (
-            event ===
-            "SIGNED_OUT"
-        ) {
-
-            currentUser =
-                null;
-
-            allOrders = [];
-
-            purchaseOrders = [];
-
-            saleOrders = [];
-
-            historyOrders = [];
-
-        }
-
-    }
-);
