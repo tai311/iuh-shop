@@ -2833,3 +2833,152 @@ async function updateOrderStatus(
 
 }
 
+/* =========================================================
+   KHỞI ĐỘNG + TẢI ĐƠN HÀNG
+   FIX: currentUser + loadOrders + classify + render
+========================================================= */
+
+async function refreshPageData() {
+    try {
+        console.log("IUH SHOP: ===== BẮT ĐẦU TẢI ĐƠN HÀNG =====");
+
+        /* 1. Lấy user đang đăng nhập */
+        currentUser = await getCurrentUser();
+
+        console.log(
+            "IUH SHOP: currentUser =",
+            currentUser?.id || null
+        );
+
+        /* Nếu chưa đăng nhập */
+        if (!currentUser) {
+            allOrders = [];
+            purchaseOrders = [];
+            saleOrders = [];
+            historyOrders = [];
+
+            renderPurchaseOrders();
+            renderSaleOrders();
+            renderHistory();
+
+            console.log(
+                "IUH SHOP: Chưa đăng nhập."
+            );
+
+            return;
+        }
+
+        /* 2. Lấy đơn từ Database */
+        allOrders = await loadOrdersFromDatabase();
+
+        console.log(
+            "IUH SHOP: Tổng số đơn lấy được =",
+            allOrders.length
+        );
+
+        /* 3. Phân loại Đơn mua / Đơn bán */
+        classifyOrders();
+
+        console.log(
+            "IUH SHOP: Đơn mua =",
+            purchaseOrders.length
+        );
+
+        console.log(
+            "IUH SHOP: Đơn bán =",
+            saleOrders.length
+        );
+
+        /* 4. Render giao diện */
+        renderPurchaseOrders();
+        renderSaleOrders();
+        renderHistory();
+
+        console.log(
+            "IUH SHOP: ===== TẢI ĐƠN HÀNG XONG ====="
+        );
+
+    } catch (error) {
+        console.error(
+            "IUH SHOP: Lỗi refreshPageData:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   KHỞI ĐỘNG TRANG ĐƠN HÀNG
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
+
+        console.log(
+            "IUH SHOP: Trang đơn hàng đã sẵn sàng."
+        );
+
+        /* Tab Đơn mua / Đơn bán */
+        setupTabs();
+
+        /* Bộ lọc Đơn mua */
+        const purchaseFilter =
+            document.getElementById("purchaseFilter");
+
+        if (purchaseFilter) {
+            purchaseFilter.addEventListener(
+                "change",
+                function () {
+                    renderPurchaseOrders();
+                }
+            );
+        }
+
+        /* Bộ lọc Đơn bán */
+        const saleFilter =
+            document.getElementById("saleFilter");
+
+        if (saleFilter) {
+            saleFilter.addEventListener(
+                "change",
+                function () {
+                    renderSaleOrders();
+                }
+            );
+        }
+
+        /* TẢI ĐƠN */
+        await refreshPageData();
+    }
+);
+
+
+/* =========================================================
+   TỰ ĐỘNG TẢI LẠI KHI ĐĂNG NHẬP / ĐĂNG XUẤT
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+    async function (event, session) {
+
+        console.log(
+            "IUH SHOP: Auth event =",
+            event
+        );
+
+        if (
+            event === "SIGNED_IN" ||
+            event === "INITIAL_SESSION" ||
+            event === "SIGNED_OUT" ||
+            event === "TOKEN_REFRESHED"
+        ) {
+            /* Đợi Supabase ổn định session */
+            setTimeout(
+                async function () {
+                    await refreshPageData();
+                },
+                100
+            );
+        }
+    }
+);
