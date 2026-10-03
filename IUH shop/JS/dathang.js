@@ -784,16 +784,18 @@ async function loadBuyNow() {
                 db
                     .from("products")
                     .select(`
-                        id,
-                        seller_id,
-                        name,
-                        category,
-                        price,
-                        quantity,
-                        description,
-                        image_urls,
-                        status
-                    `)
+    id,
+    seller_id,
+    name,
+    category,
+    price,
+    quantity,
+    description,
+    image_urls,
+    status,
+    is_consignment,
+    consignment_request_id
+`)
                     .eq(
                         "id",
                         productId
@@ -828,44 +830,64 @@ async function loadBuyNow() {
         ) || 0;
 
 
-    checkoutItems = [
+    /* =========================================================
+   XÁC ĐỊNH SẢN PHẨM CÓ PHẢI KÝ GỬI KHÔNG
+========================================================= */
 
-        {
+const markedProducts =
+    await markConsignmentProducts([
+        product
+    ]);
 
-            id:
-                product.id,
+const checkoutProduct =
+    markedProducts?.[0] || product;
 
-            cart_item_id:
-                null,
 
-            seller_id:
-                product.seller_id,
+/* =========================================================
+   TẠO ITEM MUA NGAY
+========================================================= */
 
-            name:
-                product.name,
+checkoutItems = [
+    {
+        id:
+            checkoutProduct.id,
 
-            category:
-                product.category,
+        cart_item_id:
+            null,
 
-            price:
-                Number(
-                    product.price
-                ) || 0,
+        seller_id:
+            checkoutProduct.seller_id,
 
-            stock:
-                stock,
+        name:
+            checkoutProduct.name,
 
-            image_urls:
-                product.image_urls ||
-                [],
+        category:
+            checkoutProduct.category,
 
-            quantityInCart:
-                Math.min(
-                    quantity,
-                    stock
-                )
-        }
-    ];
+        price:
+            Number(
+                checkoutProduct.price
+            ) || 0,
+
+        stock:
+            stock,
+
+        image_urls:
+            checkoutProduct.image_urls || [],
+
+        is_consignment:
+            checkoutProduct.is_consignment === true,
+
+        consignment_request_id:
+            checkoutProduct.consignment_request_id || null,
+
+        quantityInCart:
+            Math.min(
+                quantity,
+                stock
+            )
+    }
+];
 
 
     renderItems();
@@ -941,16 +963,18 @@ async function loadCart() {
                 db
                     .from("products")
                     .select(`
-                        id,
-                        seller_id,
-                        name,
-                        category,
-                        price,
-                        quantity,
-                        description,
-                        image_urls,
-                        status
-                    `)
+    id,
+    seller_id,
+    name,
+    category,
+    price,
+    quantity,
+    description,
+    image_urls,
+    status,
+    is_consignment,
+    consignment_request_id
+`)
                     .in(
                         "id",
                         productIds
@@ -961,6 +985,14 @@ async function loadCart() {
     if (productError)
         throw productError;
 
+    /* =========================================================
+   ĐÁNH DẤU SẢN PHẨM KÝ GỬI
+========================================================= */
+
+const markedProducts =
+    await markConsignmentProducts(
+        products || []
+    );
 
     checkoutItems =
         cartRows
@@ -968,16 +1000,11 @@ async function loadCart() {
                 row => {
 
                     const product =
-                        products?.find(
-                            p =>
-                                String(
-                                    p.id
-                                ) ===
-                                String(
-                                    row.product_id
-                                )
-                        );
-
+                       markedProducts?.find(
+    p =>
+        String(p.id) ===
+        String(row.product_id)
+)
 
                     if (!product)
                         return null;
@@ -1048,6 +1075,13 @@ async function loadCart() {
                             product.image_urls ||
                             [],
 
+                            is_consignment:
+    product.is_consignment === true,
+
+consignment_request_id:
+    product.consignment_request_id ||
+    null,
+
                         quantityInCart:
                             quantity
                     };
@@ -1067,6 +1101,73 @@ async function loadCart() {
     renderItems();
 }
 
+async function markConsignmentProducts(products) {
+    if (!products || !products.length) {
+        return products;
+    }
+
+    const productIds = products.map(
+        product => product.id
+    );
+
+    const {
+        data: consignmentRows,
+        error
+    } = await supabaseRequest(
+        () =>
+            db
+                .from("consignment_requests")
+                .select(`
+                    id,
+                    product_id,
+                    status
+                `)
+                .in(
+                    "product_id",
+                    productIds
+                )
+    );
+
+    if (error) {
+        console.error(
+            "Lỗi kiểm tra sản phẩm ký gửi:",
+            error
+        );
+
+        return products;
+    }
+
+    const consignmentMap =
+        new Map(
+            (consignmentRows || []).map(
+                row => [
+                    String(row.product_id),
+                    row
+                ]
+            )
+        );
+
+    return products.map(product => {
+        const consignment =
+            consignmentMap.get(
+                String(product.id)
+            );
+
+        return {
+            ...product,
+
+            is_consignment:
+                product.is_consignment === true ||
+                !!product.consignment_request_id ||
+                !!consignment,
+
+            consignment_request_id:
+                product.consignment_request_id ||
+                consignment?.id ||
+                null
+        };
+    });
+}
 
 /* =========================================================
    17. LOAD CHECKOUT
@@ -1344,17 +1445,50 @@ const PLATFORM_FEE_RATE = 0.05;
 /* =========================================================
    PHÍ TRUNG GIAN
 ========================================================= */
-
 function getShippingFee() {
 
-    const shipping =
-        document.querySelector(
-            'input[name="shippingMethod"]:checked'
+    /*
+     * ĐƠN KÝ GỬI:
+     * IUH SHOP chịu trách nhiệm vận chuyển
+     * và không thu phí vận chuyển.
+     */
+
+    const isConsignmentOrder =
+        checkoutItems.length > 0 &&
+        checkoutItems.every(
+            item =>
+                item.is_consignment === true ||
+                item.consignment_request_id
         );
 
-    return shipping?.value === "mid"
-        ? 5000
-        : 0;
+    if (isConsignmentOrder) {
+
+        return 0;
+
+    }
+
+
+    /*
+     * ĐƠN THƯỜNG:
+     * Giữ nguyên cách tính phí vận chuyển cũ.
+     */
+
+    const shippingMethod =
+        document.querySelector(
+            'input[name="shippingMethod"]:checked'
+        )?.value;
+
+
+    if (
+        shippingMethod === "mid"
+    ) {
+
+        return 5000;
+
+    }
+
+
+    return 0;
 }
 
 
@@ -2248,10 +2382,22 @@ function buildOrder() {
             .trim() || "";
 
 
-    const shippingMethod =
-        document.querySelector(
-            'input[name="shippingMethod"]:checked'
-        )?.value || "";
+    const isConsignmentOrder =
+    checkoutItems.length > 0 &&
+    checkoutItems.every(
+        item =>
+            item.is_consignment === true ||
+            item.consignment_request_id
+    );
+
+const shippingMethod =
+    isConsignmentOrder
+        ? "iuh_shop"
+        : (
+            document.querySelector(
+                'input[name="shippingMethod"]:checked'
+            )?.value || ""
+        );
 
 
     const paymentMethod =
@@ -2876,8 +3022,72 @@ async function initCheckout() {
 
     await loadCheckoutItems();
 
+/* =========================================================
+   ĐƠN KÝ GỬI
+   IUH SHOP TỰ VẬN CHUYỂN + MIỄN PHÍ
+========================================================= */
+
+const isConsignmentCheckout =
+    checkoutItems.length > 0 &&
+    checkoutItems.every(
+        item =>
+            item.is_consignment === true ||
+            !!item.consignment_request_id
+    );
+
+if (isConsignmentCheckout) {
+
+    console.log(
+        "IUH SHOP: Đây là đơn ký gửi."
+    );
+
+    const shippingContainer =
+        document.getElementById(
+            "shippingMethodGroup"
+        );
+
+    if (shippingContainer) {
+
+        /* Xóa các lựa chọn giao hàng cũ */
+        shippingContainer.innerHTML = "";
+
+        /* Chỉ hiển thị IUH SHOP vận chuyển */
+        const notice =
+            document.createElement("div");
+
+        notice.className =
+            "option-box selected consignment-shipping-notice";
+
+        notice.innerHTML = `
+            <div class="option-radio">
+                <span></span>
+            </div>
+
+            <div class="option-content">
+                <strong>
+                    🚚 IUH SHOP vận chuyển
+                </strong>
+
+                <small>
+                    IUH SHOP chịu trách nhiệm vận chuyển sản phẩm ký gửi.
+                </small>
+            </div>
+
+            <strong class="option-price free">
+                Miễn phí
+            </strong>
+        `;
+
+        shippingContainer.appendChild(
+            notice
+        );
+    }
 
     updateSummary();
+}
+
+updateSummary();
+
 
 
     /*

@@ -567,7 +567,7 @@ document.addEventListener(
 
 
 
-const CONSIGNMENT_FEE_RATE = 0.10;
+const CONSIGNMENT_FEE_RATE = 0.15;
 
 
 // ========================================
@@ -780,12 +780,6 @@ async function submitConsignment(event) {
         ).value.trim();
 
 
-    const deliveryMethod =
-        document.querySelector(
-            'input[name="deliveryMethod"]:checked'
-        )?.value;
-
-
     const agreeTerms =
         document.getElementById(
             "agreeTerms"
@@ -800,8 +794,7 @@ async function submitConsignment(event) {
         !category ||
         !condition ||
         !price ||
-        !description ||
-        !deliveryMethod) {
+        !description) {
 
         alert(
             "Vui lòng nhập đầy đủ thông tin sản phẩm."
@@ -951,9 +944,9 @@ for (let i = 0; i < files.length; i++) {
 
                 seller_receive:
                     sellerReceive,
-
+                
                 delivery_method:
-                    deliveryMethod,
+    "iuh",
 
                 image_names:
                      imageUrls,
