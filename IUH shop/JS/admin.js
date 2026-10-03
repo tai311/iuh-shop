@@ -451,6 +451,14 @@ const pageTitles = {
 
 
 function openPage(page) {
+    if(page === "orders") {
+        page = "requests";
+        window.IUHAdminRequests?.openOrders();
+    } else if(page === "packages") {
+        page = "requests";
+        window.IUHAdminRequests?.openPackages();
+    } else
+    if(page === "requests") window.IUHAdminRequests?.load();
 
     document
         .querySelectorAll(".admin-page")
@@ -3400,6 +3408,7 @@ document.addEventListener(
 ========================================================= */
 
 async function loadOrders() {
+    if(window.IUHAdminRequests) return window.IUHAdminRequests.openOrders();
 
     const list =
         $("ordersList");
@@ -4026,14 +4035,7 @@ function createOrderCard(
                     >
 
                         ${
-                            [
-                                "pending",
-                                "confirmed",
-                                "shipping",
-                                "delivered",
-                                "completed",
-                                "cancelled"
-                            ]
+                            (order.payment_method === "trial" ? [order.status, ...(order.status === "pending" ? ["confirmed"] : ["shipping", "delivered"].includes(order.status) ? ["completed"] : [])] : ["pending", "confirmed", "shipping", "delivered", "completed", "cancelled"])
                             .map(
                                 status => `
                                     <option
@@ -4045,9 +4047,7 @@ function createOrderCard(
                                                 : ""
                                         }
                                     >
-                                        ${orderStatusText(
-                                            status
-                                        )}
+                                        ${order.payment_method === "trial" && status !== order.status ? (status === "confirmed" ? "Xác nhận thanh toán" : "Xác nhận giao hàng thành công") : orderStatusText(status)}
                                     </option>
                                 `
                             )

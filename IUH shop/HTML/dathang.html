@@ -13,6 +13,7 @@
     >
     <link rel="stylesheet" href="../CSS/dathang.css">
     <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+    <link rel="stylesheet" href="../CSS/mobile-navigation.css">
 </head>
 
 <body>
@@ -468,6 +469,20 @@
 
 
                 <div class="checkout-form">
+<div class="field full">
+
+                        <label for="recipientAddress">
+
+                            Địa điểm nhận hàng
+
+                            <span>*</span>
+
+                        </label>
+
+
+                        <select id="recipientAddress" required aria-label="Địa điểm nhận hàng"><option value="">Chọn địa điểm nhận hàng</option><option value="Cơ sở chính Nguyễn Văn Bảo">Cơ sở chính Nguyễn Văn Bảo</option><option value="Cơ sở Nguyễn Văn Dung">Cơ sở Nguyễn Văn Dung</option><option value="Cơ sở Phạm Văn Chiêu">Cơ sở Phạm Văn Chiêu</option><option value="Sân vận động Đạt Đức">Sân vận động Đạt Đức</option></select>
+
+                    </div>
 
 
                     <div class="field">
@@ -514,24 +529,7 @@
 
 
 
-                    <div class="field full">
-
-                        <label for="recipientAddress">
-
-                            Địa chỉ nhận hàng
-
-                            <span>*</span>
-
-                        </label>
-
-
-                        <textarea
-                            id="recipientAddress"
-                            placeholder="Nhập địa chỉ nhận hàng..."
-                            autocomplete="street-address"
-                        ></textarea>
-
-                    </div>
+                    
 
 
 
@@ -705,7 +703,7 @@
 
                     <!-- QR -->
 
-                    <label class="option-box selected">
+                    <label class="option-box selected" data-payment-method="qr">
 
                         <input
                             type="radio"
@@ -725,7 +723,7 @@
                             </strong>
 
                             <small>
-                                Quét mã QR để thanh toán nhanh chóng
+                                Xác nhận thanh toán để gửi đơn đến quản trị viên
                             </small>
 
                         </div>
@@ -742,7 +740,7 @@
 
                     <!-- VÍ IUH -->
 
-                    <label class="option-box">
+                    <label class="option-box" data-payment-method="iuh_wallet" hidden>
 
                         <input
                             type="radio"
@@ -779,13 +777,13 @@
 
 
 
+
                 <!-- =================================================
                      QR PAYMENT
                 ================================================== -->
 
                 <div
-                    id="qrPaymentBox"
-                    class="payment-detail-box"
+                    id="qrPaymentBox" class="payment-detail-box hidden"
                 >
 
 
@@ -794,11 +792,11 @@
                         <div>
 
                             <strong>
-                                Quét mã QR để thanh toán
+                                Thanh toán bằng QR
                             </strong>
 
                             <p>
-                                Sử dụng ứng dụng ngân hàng để quét mã
+                                Đơn sẽ được gửi đến admin để đối soát sau khi bạn đặt hàng.
                             </p>
 
                         </div>
@@ -813,70 +811,10 @@
 
 
                     <div class="qr-content">
-
-
-                        <div class="qr-image-wrapper">
-
-                            <img
-                                id="qrCodeImage"
-                                src="..//Images/qrtt.png"
-                                alt="Mã QR thanh toán IUH SHOP"
-                            >
-
-                        </div>
-
-
-
-                        <div class="qr-instruction">
-
-
-                            <div>
-
-                                <span>1</span>
-
-                                <p>
-                                    Mở ứng dụng ngân hàng
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <span>2</span>
-
-                                <p>
-                                    Quét mã QR
-                                </p>
-
-                            </div>
-
-
-                            <div>
-
-                                <span>3</span>
-
-                                <p>
-                                    Kiểm tra số tiền và thanh toán
-                                </p>
-
-                            </div>
-
-
-                        </div>
-
-
+                        <p class="qr-payment-note">
+                            Trong thời gian chạy thử, bạn chỉ cần bấm xác nhận thanh toán, không cần quét mã hoặc chuyển khoản. Đơn sẽ được gửi đến admin để xác nhận.
+                        </p>
                     </div>
-
-
-
-                    <button
-                        type="button"
-                        id="confirmPaymentBtn"
-                        class="confirm-payment-button"
-                    >
-                        Tôi đã thanh toán
-                    </button>
 
 
 
@@ -1228,7 +1166,7 @@
                 >
 
                     <span>
-                        Xác nhận đặt hàng
+                        Xác nhận thanh toán
                     </span>
 
                     <span>
@@ -1393,6 +1331,7 @@
 
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/mobile-navigation.js"></script>
 <script src="../JS/iuh-chat-notification.js"></script>
 <script src="../JS/dathang.js"></script>
 <script src="../JS/vedau.js"></script>

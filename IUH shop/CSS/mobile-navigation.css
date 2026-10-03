@@ -1,0 +1,247 @@
+/* Shared mobile header and navigation layout. */
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+img,
+svg,
+video {
+    max-width: 100%;
+}
+
+.mobile-nav-toggle {
+    display: none;
+}
+
+.navigation[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 760px) {
+    .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .top-bar {
+        height: auto;
+        padding: 8px 0;
+    }
+
+    .top-bar-container {
+        width: 100%;
+        height: auto;
+        padding: 0 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .welcome-text,
+    .welcome-text1 {
+        display: none;
+    }
+
+    .top-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 38px 38px minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+    }
+
+    .global-search,
+    .search-box {
+        grid-column: 1 / -1;
+        width: 100%;
+        max-width: none;
+        flex: none;
+        order: 0;
+    }
+
+    .global-search-input-wrap {
+        width: 100%;
+        height: 40px;
+    }
+
+    .global-search-input,
+    .search-box input {
+        min-width: 0;
+        font-size: 14px;
+    }
+
+    .top-message-icon,
+    .top-cart-icon {
+        width: 38px;
+        height: 38px;
+        justify-self: center;
+    }
+
+    .account-area {
+        width: 100%;
+        min-width: 0;
+        justify-content: flex-end;
+    }
+
+    .guest-account {
+        width: 100%;
+        justify-content: flex-end;
+        gap: 7px;
+        white-space: nowrap;
+    }
+
+    .top-link {
+        font-size: 12px;
+    }
+
+    .user-account {
+        max-width: 100%;
+    }
+
+    .header-user-name {
+        max-width: 100px;
+    }
+
+    .main-nav {
+        overflow: visible;
+    }
+
+    .nav-container {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 46px;
+        width: 100%;
+        min-width: 0;
+        min-height: 68px;
+        padding: 8px 14px;
+        gap: 8px;
+    }
+
+    .brand {
+        grid-column: 1;
+        min-width: 0;
+        margin: 0;
+        gap: 4px;
+    }
+
+    .brand-logo {
+        width: 46px;
+        flex: 0 0 46px;
+    }
+
+    .brand-name {
+        font-size: 19px;
+        line-height: 1.15;
+    }
+
+    .brand-slogan {
+        display: none;
+    }
+
+    .mobile-nav-toggle {
+        grid-column: 2;
+        grid-row: 1;
+        width: 46px;
+        height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dce3ef;
+        border-radius: 8px;
+        background: #fff;
+        color: #193f9e;
+        cursor: pointer;
+    }
+
+    .mobile-nav-toggle svg {
+        width: 25px;
+        height: 25px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+    }
+
+    .mobile-nav-toggle:focus-visible,
+    .navigation a:focus-visible,
+    .navigation button:focus-visible {
+        outline: 3px solid #f5ca2e;
+        outline-offset: 2px;
+    }
+
+    .navigation {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        width: 100%;
+        height: auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 6px 0 0;
+        gap: 0;
+        border-top: 1px solid #e5e9f1;
+    }
+
+    .navigation[hidden] {
+        display: none !important;
+    }
+
+    .nav-item {
+        width: 100%;
+        height: auto;
+        min-height: 46px;
+        justify-content: flex-start;
+        padding: 0 14px;
+        font-size: 14px;
+    }
+
+    .account-nav-wrapper {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .account-nav {
+        flex: 1 1 auto;
+    }
+
+    .account-arrow-button {
+        min-width: 46px;
+        min-height: 46px;
+    }
+
+    .account-shortcuts {
+        z-index: 1001;
+    }
+}
+
+@media (max-width: 360px) {
+    .top-actions {
+        grid-template-columns: 34px 34px minmax(0, 1fr);
+        gap: 6px;
+    }
+
+    .top-message-icon,
+    .top-cart-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .nav-container {
+        padding-inline: 10px;
+    }
+
+    .brand-logo {
+        width: 40px;
+        flex-basis: 40px;
+    }
+
+    .brand-name {
+        font-size: 17px;
+    }
+}

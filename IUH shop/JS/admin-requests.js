@@ -4,7 +4,7 @@
  const nav=document.querySelector('.admin-sidebar nav'),main=document.querySelector('main');
  if(!nav||!main)return;
  const kinds={orders:'Đơn hàng',packages:'Gói dịch vụ',wallet_requests:'Nạp / rút ví',bank_refund_requests:'Hoàn tiền',contact_requests:'Hỗ trợ',product_reports:'Báo cáo sản phẩm',user_reports:'Báo cáo người dùng',verification:'Xác minh sinh viên',donations:'Ủng hộ'};
- const labels={pending:'Chờ xử lý',confirmed:'Đã xác nhận',shipping:'Đang giao',delivered:'Đã giao',completed:'Hoàn tất',cancelled:'Đã hủy',paid:'Đã thanh toán',unpaid:'Chưa thanh toán',refunded:'Đã hoàn tiền',refund_pending:'Chờ hoàn tiền',approved:'Đã duyệt',rejected:'Từ chối',reviewing:'Đang hỗ trợ',resolved:'Đã giải quyết',none:'Chưa xác minh',cash:'Tiền mặt',qr:'Chuyển khoản QR',iuh_wallet:'Ví IUH',wallet:'Ví IUH',bank:'Ngân hàng',bank_transfer:'Chuyển khoản',deposit:'Nạp ví',withdraw:'Rút ví',personal:'Cá nhân',group:'Nhóm',meet:'Gặp trực tiếp',delivery:'Giao hàng'};
+ const labels={pending:'Chờ xử lý',confirmed:'Đã xác nhận',shipping:'Đang giao',delivered:'Đã giao',completed:'Hoàn tất',cancelled:'Đã hủy',paid:'Đã thanh toán',unpaid:'Chưa thanh toán',refunded:'Đã hoàn tiền',refund_pending:'Chờ hoàn tiền',revoked:'Đã thu hồi',approved:'Đã duyệt',rejected:'Từ chối',reviewing:'Đang hỗ trợ',resolved:'Đã giải quyết',none:'Chưa xác minh',cash:'Tiền mặt',qr:'Chuyển khoản QR',iuh_wallet:'Ví IUH',wallet:'Ví IUH',bank:'Ngân hàng',bank_transfer:'Chuyển khoản',trial:'Dùng thử miễn phí',deposit:'Nạp ví',withdraw:'Rút ví',personal:'Cá nhân',group:'Nhóm',meet:'Gặp trực tiếp',delivery:'Giao hàng'};
  const states={orders:['pending','confirmed','shipping','delivered','completed','cancelled'],packages:['pending','paid','cancelled'],wallet_requests:['pending','approved','rejected'],bank_refund_requests:['pending','completed'],donations:['pending','completed','rejected'],verification:['pending','approved'],contact_requests:['pending','reviewing','resolved','rejected'],product_reports:['pending','reviewing','resolved','rejected'],user_reports:['pending','reviewing','resolved','rejected']};
  const money=v=>v==null?'—':Number(v).toLocaleString('vi-VN')+' ₫',date=v=>v?new Date(v).toLocaleString('vi-VN'):'—',label=v=>labels[v]||v||'—';
  const payoutLabel=v=>({not_ready:'Chưa đủ điều kiện chuyển',pending:'Chờ chuyển ngân hàng',paid:'Đã chuyển ngân hàng',wallet_credited:'Đã cộng Ví IUH',review:'Cần đối soát',cash:'Người mua trả trực tiếp'})[v]||'Chưa phân bổ';
@@ -46,30 +46,44 @@
  function actionForm(r,k){
   if(['packages','orders'].includes(k)&&r.payos_order_code)return '<p class="ops-hint">Thanh toán payOS được xác minh tự động. Nếu cần đối soát, tra mã payOS và chứng từ bên trên; không xác nhận thu tiền lần nữa.</p>';
   const support=['contact_requests','product_reports','user_reports'].includes(k);
-  const actionable=support||(!r.needs_payment_review&&(k==='orders'?r.payment_status==='unpaid'&&r.payment_method==='qr'&&!['cancelled','completed'].includes(r.status):(r.status||r.verification_status)==='pending'));
+  const actionable=support||(!r.needs_payment_review&&(k==='orders'?r.payment_status==='unpaid'&&['qr','trial'].includes(r.payment_method)&&!['cancelled','completed'].includes(r.status):(r.status||r.verification_status)==='pending'));
   if(!actionable)return '<p class="ops-hint">Hồ sơ này không có thao tác đối soát đang chờ.</p>';
   if(k==='verification')return '<form id="opsAction"><p>Kiểm tra ảnh thẻ trước khi duyệt xác minh.</p><button name="decision" value="approve">Duyệt xác minh</button><p id="opsActionStatus" role="status"></p></form>';
-  return `<form id="opsAction" class="ops-action"><h3>${support?'Xử lý hỗ trợ':'Đối soát giao dịch'}</h3>${support?'<label>Trạng thái phản hồi<select id="opsResolution">'+states[k].map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${label(s)}</option>`).join('')+'</select></label>':'<p>Chỉ xác nhận sau khi kiểm tra giao dịch ngân hàng thực tế. Rút / hoàn tiền: nhập mã chuyển tiền đi thành công.</p><label>Mã giao dịch ngân hàng<input id="opsReference" maxlength="200" autocomplete="off"></label>'}<label>Ghi chú / phản hồi<textarea id="opsNote" maxlength="2000" rows="3">${e(r.admin_note||'')}</textarea></label><label class="ops-check"><input type="checkbox" required>Tôi đã kiểm tra hồ sơ và thông tin xử lý.</label><div><button name="decision" value="approve">${support?'Lưu phản hồi':'Xác nhận giao dịch'}</button> ${['packages','wallet_requests','donations'].includes(k)?'<button name="decision" value="reject" class="ops-secondary">Từ chối</button>':''}</div><p id="opsActionStatus" role="status"></p></form>`;
+    const bankReference=k==='packages'?r.payment_method==='bank':r.payment_method!=='trial';
+    return `<form id="opsAction" class="ops-action"><h3>${support?'Xử lý hỗ trợ':'Đối soát giao dịch'}</h3>${support?'<label>Trạng thái phản hồi<select id="opsResolution">'+states[k].map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${label(s)}</option>`).join('')+'</select></label>':bankReference?'<p>Chỉ xác nhận sau khi kiểm tra giao dịch ngân hàng thực tế. Nhập mã chứng từ đã đối soát.</p><label>Mã giao dịch ngân hàng<input id="opsReference" maxlength="200" autocomplete="off"></label>':r.payment_method==='trial'&&k==='packages'?'<p>Admin duyệt sẽ kích hoạt gói; hủy sẽ đóng yêu cầu. Không thu tiền trong giai đoạn chạy thử.</p>':r.payment_method==='trial'?'<p>Đơn chạy thử miễn phí, không cần chuyển khoản. Duyệt thanh toán sẽ tự chuyển đơn sang đang giao.</p>':'<p>Khoản tiền đã được giữ trong ví. Duyệt sẽ kích hoạt gói và phân bổ khoản tiền cho admin.</p>'}<label>Ghi chú / phản hồi<textarea id="opsNote" maxlength="2000" rows="3">${e(r.admin_note||'')}</textarea></label><label class="ops-check"><input type="checkbox" required>Tôi đã kiểm tra hồ sơ và thông tin xử lý.</label><div><button name="decision" value="approve">${support?'Lưu phản hồi':k==='packages'?'Duyệt gói':'Xác nhận giao dịch'}</button> ${['packages','wallet_requests','donations'].includes(k)?'<button name="decision" value="reject" class="ops-secondary">Từ chối</button>':''}</div><p id="opsActionStatus" role="status"></p></form>`;
+ }
+ function packageRevokeForm(r){
+   if(r.status!=='paid'||r.package_status!=='active'||!r.package_id)return '';
+    return `<form id="opsRevokePackageForm" class="ops-action"><h3>Thu hồi gói đã duyệt</h3><p>Gói sẽ bị vô hiệu hóa. Việc hoàn tiền (nếu cần) phải được xử lý riêng.</p><label>Lý do thu hồi<textarea id="opsRevokeReason" required minlength="5" maxlength="500" rows="3"></textarea></label><label class="ops-check"><input type="checkbox" required>Tôi đã kiểm tra và xác nhận thu hồi gói này.</label><button type="submit">Thu hồi gói</button><p role="status"></p></form>`;
+ }
+ function orderCancelForm(r){
+    if(r.needs_payment_review||!['pending','confirmed'].includes(r.status)||r.settled_at)return '';
+    return `<form id="opsCancelOrderForm" class="ops-action"><h3>Hủy đơn hàng</h3><p>Đơn sẽ trả tồn kho. Khoản đã thu sẽ được hoàn hoặc tạo yêu cầu hoàn ngân hàng.</p><label>Lý do hủy<textarea id="opsCancelReason" required minlength="5" maxlength="500" rows="3"></textarea></label><label class="ops-check"><input type="checkbox" required>Tôi đã kiểm tra thanh toán và xác nhận hủy đơn.</label><button type="submit" class="ops-secondary">Hủy đơn</button><p role="status"></p></form>`;
  }
  async function openDetail(id,k=kind){
   const token=++detailRequest;selected=null;$('opsDetailTitle').textContent=kinds[k]+' · '+id;$('opsDetail').textContent='Đang tải chi tiết…';if(!dialog.open)dialog.showModal();
   try{
    await requireAdmin();if(token!==detailRequest)return;const {data,error}=await db.rpc('admin_operation_detail',{p_kind:k,p_id:id});if(token!==detailRequest)return;if(error)throw error;
    const r=data.record;
-   if(k==='packages'){const extra=await db.from('service_package_payments').select('payos_order_code,payos_status,payos_reference,payos_received_amount,payos_note').eq('id',id).single();if(token!==detailRequest)return;if(extra.error)throw extra.error;Object.assign(r,extra.data);}
+   if(k==='packages'){
+    const extra=await db.from('service_package_payments').select('payos_order_code,payos_status,payos_reference,payos_received_amount,payos_note').eq('id',id).single();if(token!==detailRequest)return;if(extra.error)throw extra.error;Object.assign(r,extra.data);
+    if(r.package_id){const pkg=await db.from('service_packages').select('status').eq('id',r.package_id).single();if(token!==detailRequest)return;if(pkg.error)throw pkg.error;r.package_status=pkg.data.status;const actions=await db.from('service_package_admin_actions').select('action,reason,actor_id,created_at').eq('package_id',r.package_id).order('created_at',{ascending:false});if(token!==detailRequest)return;if(actions.error)throw actions.error;r.admin_actions=actions.data||[];}
+   }
    selected={id,k,row:r};
-   $('opsDetail').innerHTML=`<div class="ops-detail-status">${badge(r.status||r.verification_status)} ${r.payment_status?badge(r.payment_status):''}</div>${r.needs_payment_review?'<p class="ops-warning">Cần kiểm tra chứng từ và trạng thái giao dịch. Không thu hoặc hoàn tiền lần nữa khi chưa đối soát.</p>':''}<p class="ops-hint">Thông tin riêng tư chỉ phục vụ giao nhận, đối soát và hỗ trợ. Không chia sẻ ra ngoài.</p><h3>Người liên quan</h3><div class="ops-people">${data.people.map(p=>`<div><small>${e(p.role)}</small><strong>${e(p.fullname||'Chưa có tên')}</strong><small>${e(p.user_id)}</small></div>`).join('')||'<p>Không có tài khoản liên kết.</p>'}</div><dl class="ops-facts">${Object.entries(fields).filter(([key])=>r[key]!=null&&r[key]!=='').map(([key,title])=>`<div><dt>${title}</dt><dd>${e(key.endsWith('_at')?date(r[key]):['shipping_fee','subtotal','total_amount','amount','price','captured_amount'].includes(key)?money(r[key]):label(r[key]))}</dd></div>`).join('')}</dl>
+   $('opsDetail').innerHTML=`<div class="ops-detail-status">${badge(r.status||r.verification_status)} ${r.payment_status?badge(r.payment_status):''} ${r.package_status?badge(r.package_status):''}</div>${r.needs_payment_review?'<p class="ops-warning">Cần kiểm tra chứng từ và trạng thái giao dịch. Không thu hoặc hoàn tiền lần nữa khi chưa đối soát.</p>':''}<p class="ops-hint">Thông tin riêng tư chỉ phục vụ giao nhận, đối soát và hỗ trợ. Không chia sẻ ra ngoài.</p><h3>Người liên quan</h3><div class="ops-people">${data.people.map(p=>`<div><small>${e(p.role)}</small><strong>${e(p.fullname||'Chưa có tên')}</strong><small>${e(p.user_id)}</small></div>`).join('')||'<p>Không có tài khoản liên kết.</p>'}</div><dl class="ops-facts">${Object.entries(fields).filter(([key])=>r[key]!=null&&r[key]!=='').map(([key,title])=>`<div><dt>${title}</dt><dd>${e(key.endsWith('_at')?date(r[key]):['shipping_fee','subtotal','total_amount','amount','price','captured_amount'].includes(key)?money(r[key]):label(r[key]))}</dd></div>`).join('')}</dl>
+   ${(r.admin_actions||[]).length?'<h3>Lịch sử admin gói</h3>'+r.admin_actions.map(a=>`<article class="ops-item"><strong>${e(label(a.action))}</strong><p>${e(a.reason)}</p><small>${e(date(a.created_at))} · ${e(a.actor_id)}</small></article>`).join(''):''}
    ${data.items.length?'<h3>Sản phẩm & người bán</h3>'+data.items.map(i=>`<article class="ops-item"><strong>${e(i.product_name)}</strong><p>${e(i.seller_name||'Không có tên người bán')} · ${e(i.seller_id||'—')}</p><p>${e(i.quantity)} × ${money(i.price)} = ${money(i.subtotal)}</p></article>`).join(''):''}
    ${financePanel(data.finance)}
    ${(data.payouts||[]).length?'<h3>Người hưởng tiền bán hàng</h3>'+data.payouts.map(p=>`<article class="ops-item"><strong>${e(p.fullname||p.user_id)}</strong><small>${e(p.user_id)}</small><p>${money(p.amount)} · ${p.payout_status?e(payoutLabel(p.payout_status)):r.settled_at?'Đã phân bổ vào ví':'Dự kiến khi hoàn tất đơn'}</p>${p.bank_reference?'<p>Chứng từ chuyển: '+e(p.bank_reference)+' · '+e(date(p.paid_at))+'</p>':''}${p.payout_id&&p.payout_status==='pending'&&!r.needs_payment_review&&r.status==='completed'&&r.payment_status==='paid'?'<form class="ops-payout-form" data-payout="'+e(p.payout_id)+'"><label>Mã chuyển khoản đã thành công<input name="reference" required minlength="4" maxlength="200" autocomplete="off"></label><label class="ops-check"><input type="checkbox" required>Tôi đã chuyển đúng số tiền cho người bán này.</label><button type="submit">Ghi nhận đã chuyển '+money(p.amount)+'</button><p role="status"></p></form>':''}</article>`).join(''):''}
-   ${r.settled_at&&!r.payos_order_code?'<p class="ops-hint">Đã phân bổ vào số dư ví trên hệ thống. Việc chuyển khoản ra ngân hàng được theo dõi riêng trong mục Nạp / rút ví.</p>':''}
+   ${r.settled_at&&!r.payos_order_code&&r.payment_method!=='trial'?'<p class="ops-hint">Đã phân bổ vào số dư ví trên hệ thống. Việc chuyển khoản ra ngân hàng được theo dõi riêng trong mục Nạp / rút ví.</p>':''}
    ${(data.receipts||[]).length?'<h3>Chứng từ đã đối soát</h3>'+data.receipts.map(b=>`<article class="ops-item"><strong>${e(b.reference)}</strong><small>${e(date(b.created_at))} · ${e(b.reviewed_by||'Admin')}</small></article>`).join(''):''}
    ${data.history.length?'<h3>Lịch sử đơn hàng</h3><ol class="ops-timeline">'+data.history.map(h=>`<li>${badge(h.status)} <small>${e(date(h.created_at))} · ${e(h.actor_name||h.changed_by||'Hệ thống')}</small><p>${e(h.note||'')}</p></li>`).join('')+'</ol>':''}
-   ${r.student_card_url?'<button type="button" id="opsViewCard">Xem ảnh thẻ sinh viên</button><div id="opsCard"></div>':''}${actionForm(r,k)}`;
+   ${r.student_card_url?'<button type="button" id="opsViewCard">Xem ảnh thẻ sinh viên</button><div id="opsCard"></div>':''}${actionForm(r,k)}${k==='packages'?packageRevokeForm(r):''}`;
    if(k==='orders'&&!r.needs_payment_review&&(r.payment_method==='cash'||r.payment_status==='paid')){
-    const next={pending:'confirmed',confirmed:'shipping',shipping:'delivered',delivered:'completed'}[r.status];
-    if(next){const form=document.createElement('form');form.id='opsOrderAction';form.className='ops-action';form.dataset.next=next;form.innerHTML=`<h3>Cập nhật tiến độ đơn</h3><p>Chuyển từ ${e(label(r.status))} sang ${e(label(next))}.${next==='completed'?(r.payos_order_code?' Khi hoàn tất, hệ thống tạo khoản chờ chuyển ngân hàng cho người bán.':' Đơn thanh toán online sẽ được phân bổ tiền vào ví khi hoàn tất.'):''}</p><label class="ops-check"><input type="checkbox" required>Tôi đã xác minh tiến độ giao nhận thực tế.</label><button name="decision" value="advance">${e(label(next))}</button><p role="status"></p>`;form.addEventListener('submit',save);$('opsDetail').append(form);}
+    const next=r.payment_method==='trial'?({pending:'confirmed',shipping:'completed',delivered:'completed'}[r.status]):({pending:'confirmed',confirmed:'shipping',shipping:'delivered',delivered:'completed'}[r.status]);
+    if(next){const form=document.createElement('form');form.id='opsOrderAction';form.className='ops-action';form.dataset.next=next;form.innerHTML=`<h3>Cập nhật tiến độ đơn</h3><p>Chuyển từ ${e(label(r.status))} sang ${e(label(next))}.${next==='completed'&&r.payment_method!=='trial'?(r.payos_order_code?' Khi hoàn tất, hệ thống tạo khoản chờ chuyển ngân hàng cho người bán.':' Đơn thanh toán online sẽ được phân bổ tiền vào ví khi hoàn tất.'):''}</p><label class="ops-check"><input type="checkbox" required>Tôi đã xác minh tiến độ giao nhận thực tế.</label><button name="decision" value="advance">${r.payment_method==='trial'?'Xác nhận giao hàng thành công':e(label(next))}</button><p role="status"></p>`;form.addEventListener('submit',save);$('opsDetail').append(form);}
    }
+   if(k==='orders'){const markup=orderCancelForm(r);if(markup){const wrapper=document.createElement('div');wrapper.innerHTML=markup;const form=wrapper.firstElementChild;$('opsDetail').append(form);form.addEventListener('submit',cancelAdminOrder);}}
    if(r.payos_order_code){const panel=document.createElement('section');panel.className='ops-item';panel.innerHTML=`<h3>Đối soát payOS</h3><p>Mã payOS: ${e(r.payos_order_code)}</p><p>Trạng thái: ${e(({creating:'Đang tạo QR',pending:'Chờ thanh toán',paid:'Đã thanh toán',review:'Cần đối soát',cancelled:'Đã hủy',expired:'Hết hạn'})[r.payos_status]||r.payos_status)}</p><p>Đã nhận: ${money(r.payos_received_amount)}</p><p>Chứng từ: ${e(r.payos_reference||'—')}</p><p>${e(r.payos_note||'')}</p>`;$('opsDetail').prepend(panel);}
    $('opsDetail').querySelectorAll('.ops-payout-form').forEach(form=>form.addEventListener('submit',async event=>{
     event.preventDefault();if(busy||!form.reportValidity())return;const entry=selected,reference=form.elements.reference.value.trim(),feedback=form.querySelector('[role=status]');
@@ -84,14 +98,41 @@
     });$('opsDetail').prepend(b);
    }
    $('opsAction')?.addEventListener('submit',save);
+   $('opsRevokePackageForm')?.addEventListener('submit',revokePackage);
    $('opsViewCard')?.addEventListener('click',async()=>{const b=$('opsViewCard');b.disabled=true;try{const url=await IUHCore.privateImageURL(r.student_card_url,r.student_card_url.includes('/student-verifications/')?'student-verifications':'student-cards');if(token!==detailRequest)return;const img=document.createElement('img');img.src=url;img.alt='Thẻ sinh viên cần xác minh';$('opsCard').replaceChildren(img);}catch{if(token===detailRequest){b.textContent='Không tải được ảnh. Nhấn để thử lại';b.disabled=false;}}});
   }catch(err){if(token===detailRequest)$('opsDetail').textContent=err.message||'Không tải được chi tiết.';}
+ }
+ async function cancelAdminOrder(event){
+  event.preventDefault();const form=event.currentTarget;if(busy||!selected||!form.reportValidity())return;
+  const entry=selected,{row:r,id}=entry,reason=$('opsCancelReason').value.trim(),feedback=form.querySelector('[role=status]');busy=true;form.querySelector('button').disabled=true;feedback.textContent='Đang kiểm tra thanh toán và hủy đơn…';
+  try{
+   await requireAdmin();if(selected!==entry)return;
+   if(r.payos_order_code&&r.payment_status==='unpaid'&&!['cancelled','expired'].includes(r.payos_status)){
+    const result=await db.functions.invoke('payos-order',{timeout:45000,body:{action:'cancel',orderId:Number(id)}});
+    if(result.error||result.data?.error)throw new Error(result.data?.error||'Chưa hủy được link payOS. Đơn vẫn được giữ.');
+    if(result.data.payment_status!=='unpaid'||!['cancelled','expired'].includes(result.data.payos_status))throw new Error('payOS chưa xác nhận hủy link. Đơn vẫn được giữ.');
+   }
+   const {data,error}=await db.rpc('admin_cancel_order',{p_order_id:Number(id),p_reason:reason});if(error||data?.success===false)throw error||new Error(data.message||'Không hủy được đơn.');
+   if(selected===entry){await openDetail(id,'orders');await load();}
+  }catch(error){if(selected===entry)feedback.textContent=error.message||'Không hủy được đơn. Hãy thử lại.';}
+  finally{busy=false;form.querySelector('button').disabled=false;}
+ }
+ async function revokePackage(event){
+  event.preventDefault();const form=event.currentTarget;if(busy||!selected||!form.reportValidity())return;
+  const entry=selected,{row:r,id}=entry,reason=$('opsRevokeReason').value.trim(),feedback=form.querySelector('[role=status]');busy=true;form.querySelector('button').disabled=true;feedback.textContent='Đang thu hồi gói…';
+  try{
+   await requireAdmin();if(selected!==entry)return;
+   const {data,error}=await db.rpc('admin_revoke_service_package',{p_package_id:r.package_id,p_reason:reason});if(error||data?.success===false)throw error||new Error(data.message||'Không thu hồi được gói.');
+   if(selected===entry){await openDetail(id,'packages');await load();}
+  }catch(error){if(selected===entry)feedback.textContent=error.message||'Không thu hồi được gói. Hãy thử lại.';}
+  finally{busy=false;form.querySelector('button').disabled=false;}
  }
  async function save(event){
   event.preventDefault();if(busy||!selected)return;
   const entry=selected,{row:r,k,id}=entry,advance=event.currentTarget.id==='opsOrderAction',next=event.currentTarget.dataset.next,feedback=event.currentTarget.querySelector('[role=status]'),approve=event.submitter?.value!=='reject',reference=$('opsReference')?.value.trim()||null,note=$('opsNote')?.value.trim()||null;
   const financial=['packages','orders','wallet_requests','bank_refund_requests','donations'].includes(k);
-  if(financial&&approve&&!advance&&!reference){feedback.textContent='Nhập mã giao dịch ngân hàng đã kiểm tra.';return;}
+   const needsBankReference=k==='packages'?r.payment_method==='bank':financial&&k!=='orders'||k==='orders'&&r.payment_method==='qr';
+   if(needsBankReference&&approve&&!advance&&!reference){feedback.textContent='Nhập mã giao dịch ngân hàng đã kiểm tra.';return;}
   if(!approve&&!note){feedback.textContent='Nhập lý do từ chối để người dùng biết.';return;}
   const resolution=$('opsResolution')?.value;busy=true;dialog.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=true);feedback.textContent='Đang xử lý…';
   try{
@@ -114,5 +155,5 @@
  page.addEventListener('click',event=>{const tab=event.target.closest('[data-kind]');if(tab){kind=tab.dataset.kind;pageNumber=1;filters.status='';filters.payment='';controls();load();}const b=event.target.closest('[data-detail]');if(b&&authorized)openDetail(b.dataset.detail);});
  $('opsFilters').addEventListener('submit',event=>{event.preventDefault();filters={status:$('opsState').value,payment:['orders','packages'].includes(kind)?$('opsPayment').value:'',search:$('opsSearch').value.trim(),attention:$('opsAttention').checked};pageNumber=1;load();});
  $('opsPrev').addEventListener('click',()=>{pageNumber--;load();});$('opsNext').addEventListener('click',()=>{pageNumber++;load();});$('opsReload').addEventListener('click',load);
- controls();window.IUHAdminRequests={load,openOrders:()=>{kind='orders';filters.status='';filters.payment='';pageNumber=1;controls();load();}};
+ controls();window.IUHAdminRequests={load,openOrders:()=>{kind='orders';filters.status='';filters.payment='';pageNumber=1;controls();load();},openPackages:()=>{kind='packages';filters.status='';filters.payment='';pageNumber=1;controls();load();}};
 })();

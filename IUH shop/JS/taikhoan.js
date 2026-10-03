@@ -837,6 +837,11 @@ document.addEventListener(
 ========================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
+    if (window.IUHServicePackage?.setupModal) {
+        window.IUHServicePackage.setupModal(supabaseClient);
+        return;
+    }
+
     const modal = document.getElementById("upgradeModal");
     const openButton = document.getElementById("openUpgradeModalButton");
     const closeButton = document.getElementById("closeUpgradeModalButton");

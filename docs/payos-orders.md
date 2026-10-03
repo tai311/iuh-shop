@@ -3,6 +3,7 @@
 ## Cách sử dụng
 
 - Người mua chọn QR khi đặt hàng. Sau khi đơn được lưu, trang Đơn hàng vẽ trực tiếp dữ liệu `qrCode` do payOS cấp ngay trong IUH Shop, không nhúng iframe. Có thể tải ảnh QR, đóng và mở lại bằng nút Thanh toán / kiểm tra payOS của cùng đơn.
+- Checkout chỉ cần bấm xác nhận một lần: hệ thống tạo đơn, mở QR PayOS riêng theo mã đơn và đưa đơn vào danh sách chờ xử lý. Không dùng nút “tôi đã thanh toán” hoặc QR tĩnh để đánh dấu đã trả.
 - Webhook HMAC dùng chung cho mua gói và mua hàng, tra API payOS trước khi ghi nhận. Giá và số tiền lấy từ đơn do database tính; callback từ iframe không xác nhận đã trả tiền.
 - Admin → Đối soát & hỗ trợ → Đơn hàng hiển thị tiền khách trả, phí sàn, vận chuyển, tiền người bán nhận và trạng thái chuyển. Bật Chỉ cần theo dõi để vẫn thấy đơn hoàn tất nhưng chưa chuyển tiền.
 - Trong chi tiết, đơn payOS chưa thu có nút kiểm tra lại payOS. Khi đơn đã thanh toán và hoàn tất, hệ thống tạo khoản chờ chuyển ngân hàng cho đúng người hưởng. Sau khi tự chuyển tiền thành công, admin nhập mã chứng từ và xác nhận. Nút này chỉ ghi nhận việc đã chuyển, không gửi lệnh chuyển ngân hàng.
@@ -18,6 +19,7 @@ Chỉ các đơn đã gắn payOS dùng cơ chế chuyển ngân hàng mới. Đ
 - Người bán không được xác nhận tiền đã thu hay đánh dấu đã chuyển ngân hàng; RPC chi tiền kiểm tra tài khoản admin trong database. Người bán chỉ đọc khoản của mình; thông tin đối soát tổng chỉ admin được đọc.
 - Mã ngân hàng dùng chung sổ chứng từ: không sử dụng cùng mã cho thu tiền, hoàn tiền và trả người bán. Lặp webhook hoặc lặp xác nhận không thu/chi lại.
 - Chưa trả tiền: hủy link payOS trước rồi mới hủy đơn, hoàn lại tồn kho. Đã trả tiền: hủy đơn theo điều kiện hiện có, tạo yêu cầu hoàn ngân hàng; không trả tiền người bán.
+- Admin hủy đơn chưa thanh toán cũng phải hủy link payOS và xác nhận trạng thái provider trước; giao dịch đã thu tạo yêu cầu hoàn tiền ngân hàng, không tự giả lập hoàn tất.
 - Tiền thừa, nhận sau khi đã hủy, trùng chứng từ hoặc lỗi ghi nhận chuyển sang review; không tự ghi là thanh toán thành công.
 - Link hết hạn không tự tạo đơn/QR mới và không tự khôi phục tồn kho: khách hủy đơn rồi đặt lại. Hoàn tiền và chuyển người bán vẫn do admin thực hiện ở ngân hàng.
 - Phải có webhook ACTIVE trước khi phát hành QR đơn hàng. Không đưa khóa payOS vào trình duyệt.

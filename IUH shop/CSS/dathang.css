@@ -2720,3 +2720,6 @@ body {
 .summary-total strong {
     font-size: 23px;
 }
+/* Campus pickup selector */
+.field select { width: 100%; padding: 14px; border: 1px solid #d1d5db; border-radius: 10px; background: #fff; color: #172554; font: inherit; }
+.field select:focus { outline: 2px solid #2563eb; outline-offset: 2px; }

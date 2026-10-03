@@ -10,6 +10,7 @@ test('payOS orders separate 5% fee, shipping and bank payouts without crediting 
  try{
   for(const [id,role] of [[admin,'admin'],[buyer,'user'],[seller,'user'],[other,'user']]){await q('insert into auth.users(id,email) values($1,$2)',[id,id+'@test.invalid']);await q('update public.users set role=$2 where user_id=$1',[id,role]);}
   await q("insert into public.products(id,seller_id,name,category,quantity,price) values(1,$1,'Book','books',10,100000)",[seller]);
+    await as(admin);await q('select public.set_iuh_trial_mode(false)');
   const created=await order('payos-order-one','mid');
   await assert.rejects(q('select public.payos_prepare_order($1,$2)',[created.order_id,buyer]),/permission denied/);
   const o=await prepare(created.order_id);

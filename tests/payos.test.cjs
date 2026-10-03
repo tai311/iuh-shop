@@ -17,6 +17,7 @@ test('payOS settlement is service-only, exact-amount, atomic and replay safe',as
  const sync=(p,state='PAID',amount=19000,received=19000,ref='PAYOS-BANK-001')=>scalar('select public.payos_sync_package($1,$2,$3,$4,$5,$6)',[p.payos_order_code,'link_'+p.payos_order_code,state,amount,received,ref]);
  try{
   for(const [id,role] of [[admin,'admin'],[buyer,'user']]){await q('insert into auth.users(id,email) values($1,$2)',[id,id+'@test.invalid']);await q('update public.users set role=$2 where user_id=$1',[id,role]);}
+    await as(admin);await q('select public.set_iuh_trial_mode(false)');
   await purchase('payos-test-00001');
   await assert.rejects(q('select public.payos_prepare_package($1,$2)',['payos-test-00001',buyer]),/permission denied/);
   const p=await prepare('payos-test-00001');const duplicate=await scalar('select public.payos_prepare_package($1,$2)',['payos-test-00001',buyer]);assert.equal(p.payos_order_code,duplicate.payos_order_code);

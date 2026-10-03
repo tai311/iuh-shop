@@ -3,10 +3,10 @@ const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'../IUH shop');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const flush=()=>new Promise(resolve=>setTimeout(resolve,15));
-function fixture(rpc){
+function fixture(rpc,payos=async()=>({data:{}})){
  const dom=new JSDOM(read('HTML/taikhoan.html'),{url:'https://shop.invalid/HTML/taikhoan.html',runScripts:'outside-only'});
  const w=dom.window;w.alert=()=>{};w.confirm=()=>true;
- const client={auth:{getUser:async()=>({data:{user:{id:'user-a'}}})},rpc,functions:{invoke:async(name,options)=>{assert.equal(name,'payos-package');return rpc(name,options.body);}}};
+ const client={auth:{getUser:async()=>({data:{user:{id:'user-a'}}})},rpc,functions:{invoke:async(name,options)=>{assert.equal(name,'payos-package');return payos(options.body);}}};
  w.supabase={createClient:()=>client};
  w.eval(read('JS/vendor/purify.min.js'));w.eval(read('JS/iuh-core.js'));w.eval(read('JS/service-package.js'));
  w.IUHServicePackage.setupModal(client);
@@ -20,27 +20,41 @@ test('Security helpers escape markup and remove active HTML',()=>{
   assert.equal(f.w.IUHSecurity.escapeHTML('<img>'),'&lt;img&gt;');
  }finally{f.dom.window.close();}
 });
-test('Package modal activates a free trial once without charging the wallet',async()=>{
+test('Order checkout has no fake QR confirmation and opens the created PayOS order',()=>{
+ const html=read('HTML/dathang.html'),script=read('JS/dathang.js');
+ assert.doesNotMatch(html,/confirmPaymentBtn|qrtt\.png/);
+ assert.doesNotMatch(html,/value="trial"/);
+ assert.match(html,/value="qr"\s+checked/);
+ assert.match(script,/get_iuh_trial_mode/);
+ assert.match(script,/trialMode && paymentMethod !== "qr"/);
+ assert.doesNotMatch(script,/qrPaymentConfirmed|pay_order_to_admin|function updateQR/);
+ assert.match(script,/donhang\.html\?payos_order=/);
+ assert.match(script,/sessionStorage\.removeItem\(storageKey\)/);
+});
+test('Package modal creates a PayOS link for the pending package request',async()=>{
  let calls=0,release;
  const f=fixture(async(name,args)=>{
+  if(name==='get_iuh_trial_mode')return {data:false};
     if(name==='get_my_service_package')return {data:{package:null,members:[],pending_requests:[]}};
-    if(name==='purchase_service_package'){assert.equal(args.p_payment_method,'trial');calls++;await new Promise(r=>release=r);return {data:{status:'paid',plan_type:'personal',transaction_code:args.p_transaction_code,price:19000,payment_method:'trial',expires_at:new Date(Date.now()+30*86400000).toISOString()}};}
+    if(name==='purchase_service_package'){assert.equal(args.p_payment_method,'bank');calls++;await new Promise(r=>release=r);return {data:{status:'pending',plan_type:'personal',transaction_code:args.p_transaction_code,price:19000,payment_method:'bank'}};}
   throw Error(name);
- });
+ },async body=>({data:{status:'pending',transaction_code:body.transaction,price:19000,payment_method:'bank',payos_order_code:2609270000001,payos_status:'pending',checkout_url:'https://pay.payos.vn/web/package_fixture_123'}}));
  try{
   f.el('openUpgradeModalButton').click();await flush();assert.equal(f.el('confirmUpgradeButton').disabled,false);
     f.el('confirmUpgradeButton').click();f.el('confirmUpgradeButton').click();
   await flush();assert.equal(calls,1);assert.equal(f.el('confirmUpgradeButton').disabled,true);
-    release();await flush();assert.match(f.el('upgradeSuccessHeading').textContent,/dùng thử đã được kích hoạt/);assert.match(f.el('upgradeSuccessText').textContent,/miễn phí/);
-  assert.equal(f.w.localStorage.length,0);
+    release();await flush();assert.match(f.el('upgradeSuccessHeading').textContent,/hoàn tất thanh toán/i);assert.match(f.el('upgradeSuccessText').textContent,/webhook xác minh/i);
+  assert.equal(f.el('upgradePayosCheckoutLink').href,'https://pay.payos.vn/web/package_fixture_123');assert.equal(f.el('checkUpgradePaymentButton').hidden,false);assert.equal(f.el('cancelUpgradePaymentButton').hidden,false);
+  assert.equal(f.w.localStorage.length,1);
  }finally{f.dom.window.close();}
 });
 test('A server rejection unlocks package retry without retaining a completed attempt',async()=>{
- const f=fixture(async name=>name==='get_my_service_package'?{data:{package:null,members:[],pending_requests:[]}}:{error:{code:'P0001',message:'Số dư không đủ'}});
+ const f=fixture(async(name)=>name==='get_iuh_trial_mode'?{data:false}:name==='get_my_service_package'?{data:{package:null,members:[],pending_requests:[]}}:{error:{code:'P0001',message:'Số dư không đủ'}});
  try{f.el('openUpgradeModalButton').click();await flush();f.el('confirmUpgradeButton').click();await flush();assert.equal(f.el('confirmUpgradeButton').disabled,false);assert.match(f.el('upgradePaymentMessage').textContent,/Số dư/);assert.equal(f.w.localStorage.length,0);}finally{f.dom.window.close();}
 });
 test('A lost payment response preserves its transaction key for a safe retry',async()=>{
  const keys=[];const f=fixture(async(name,args)=>{
+  if(name==='get_iuh_trial_mode')return {data:false};
   if(name==='get_my_service_package')return {data:{package:null,members:[],pending_requests:[]}};
   keys.push(args.p_transaction_code);return {error:{message:'Connection interrupted'}};
  });
@@ -51,15 +65,30 @@ test('Signup and chat regression scenarios',()=>{
  for(const file of ['test-social.cjs','test-chat.cjs'])execFileSync(process.execPath,[path.resolve(__dirname,'../audit',file)],{stdio:'pipe'});
 });
 
-test('Trial checkout exposes no PayOS links or provider scripts',async()=>{
- let invoked=0;
- const f=fixture(async name=>{if(name==='get_my_service_package')return {data:{package:null,members:[],pending_requests:[]}};invoked++;return {data:{status:'paid',plan_type:'personal',transaction_code:'IUH-test-trial',price:19000,payment_method:'trial',expires_at:new Date(Date.now()+30*86400000).toISOString()}};});
+test('Package QR choice sends a pending admin request without a free option or PayOS call',async()=>{
+ let invoked=0,payosCalls=0;
+ const f=fixture(async(name,args)=>{
+  if(name==='get_iuh_trial_mode')return {data:true};
+  if(name==='get_my_service_package')return {data:{package:null,members:[],pending_requests:[]}};
+  invoked++;assert.equal(args.p_payment_method,'trial');return {data:{status:'pending',plan_type:'personal',transaction_code:args.p_transaction_code,price:19000,payment_method:'trial',expires_at:null}};
+ },async()=>{payosCalls++;throw Error('PayOS must not run in trial mode');});
  try{
   f.el('openUpgradeModalButton').click();await flush();
-  assert.equal(f.w.document.querySelectorAll('script[src*="payos"],a[href*="pay.payos.vn"]').length,0);
-  assert.equal(f.w.document.querySelectorAll('.payment-method').length,0);
-  f.el('confirmUpgradeButton').click();await flush();assert.equal(invoked,1);
-  const pages=read('HTML/taikhoan.html')+read('HTML/dathang.html')+read('HTML/donhang.html');
-  assert.doesNotMatch(pages,/pay\.payos\.vn|payos-orders\.js|payos-initialize/);
+  const methods=[...f.w.document.querySelectorAll('.payment-method')];
+  assert.equal(methods.filter(button=>!button.hidden).length,1);
+  assert.equal(methods.find(button=>button.dataset.method==='trial'),undefined);
+  assert.equal(methods.find(button=>button.dataset.method==='wallet').hidden,true);
+  assert.equal(methods.find(button=>button.dataset.method==='bank').hidden,false);
+  assert.equal(methods.find(button=>button.dataset.method==='bank').getAttribute('aria-checked'),'true');
+  assert.match(f.el('confirmUpgradeButton').textContent,/Xác nhận thanh toán/i);
+  assert.match(f.el('upgradeTotal').textContent,/0đ/);
+  assert.match(f.el('upgradeConfirmAmount').textContent,/0đ/);
+  assert.doesNotMatch(f.w.document.querySelector('.service-plan-grid').textContent,/19\.000đ|29\.000đ/);
+  f.el('confirmUpgradeButton').click();await flush();assert.equal(invoked,1);assert.equal(payosCalls,0);
+  assert.match(f.el('upgradeSuccessHeading').textContent,/Yêu cầu đã được gửi/i);
+  assert.match(f.el('upgradeSuccessText').textContent,/chờ admin duyệt/i);
+  assert.equal(f.el('upgradeExpiryDate').textContent,'Chưa kích hoạt');
+  assert.equal(f.el('upgradePayosCheckoutLink').hidden,true);
+  assert.equal(f.w.localStorage.length,0);
  }finally{f.dom.window.close();}
 });

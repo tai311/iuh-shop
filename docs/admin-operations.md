@@ -8,6 +8,8 @@
 - Chi tiết đơn hiển thị người mua, người nhận hàng, người bán từng sản phẩm, người hưởng tiền (bao gồm chủ ký gửi), thời điểm phân bổ ví và lịch sử trạng thái. Phân bổ vào ví không đồng nghĩa đã chuyển tiền ra ngân hàng.
 - Chứng từ ngân hàng đã đối soát được hiển thị cùng người duyệt và thời điểm ghi nhận. Thao tác thu/chi vẫn sử dụng các RPC kiểm tra quyền và chống ghi nhận trùng có sẵn; chưa tích hợp webhook payOS.
 - Đơn đã đối soát hoặc tiền mặt có thể chuyển sang trạng thái kế tiếp; hoàn tất đơn online chạy cơ chế phân bổ tiền có sẵn. Đơn cũ `needs_payment_review` chỉ xem, không đối soát hoặc chuyển tiếp qua màn hình này.
+- Gói trả bằng Ví IUH giữ tiền chờ duyệt; duyệt mới kích hoạt và phân bổ, từ chối hoàn tiền vào ví. Gói PayOS tự kích hoạt sau webhook đã xác minh. Gói đang hoạt động có thể thu hồi kèm lý do; sự kiện thu hồi được lưu lại và không tự tạo giao dịch hoàn tiền.
+- Đơn chờ xử lý có thể bị admin hủy với lý do. Link PayOS chưa trả phải được hủy/đối soát trước; đơn đã thu tiền tạo yêu cầu hoàn tiền theo luồng hiện có.
 - Phản hồi hỗ trợ có trạng thái chờ/đang xử lý/giải quyết/từ chối. Cập nhật kiểm tra trạng thái cũ để tránh ghi đè khi admin khác đã xử lý.
 
 ## Quyền và dữ liệu

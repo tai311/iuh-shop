@@ -587,6 +587,8 @@ document.addEventListener(
 
 let currentUser = null;
 
+let trialMode = true;
+
 let allOrders = [];
 
 let purchaseOrders = [];
@@ -945,6 +947,12 @@ function normalizeOrder(order) {
         _status:
             getOrderStatus(order),
 
+        _paymentMethod:
+            order.payment_method || "",
+
+        _paymentStatus:
+            order.payment_status || "unpaid",
+
         _items:
             items,
 
@@ -966,6 +974,13 @@ function normalizeOrder(order) {
 async function loadOrdersFromDatabase() {
 
     try {
+
+        try {
+            const mode = await db.rpc("get_iuh_trial_mode");
+            trialMode = mode.error ? true : mode.data === true;
+        } catch (_) {
+            trialMode = true;
+        }
 
         console.log(
             "IUH SHOP: Đang tải đơn hàng từ Database..."
@@ -1251,12 +1266,31 @@ function renderStatus(status) {
 
 }
 
+function renderPaymentStatus(order) {
+    if (order._paymentMethod === "trial") {
+        return '<span class="order-payment-status">' + (order._status === 'cancelled' ? 'Đã hủy · miễn phí' : order._paymentStatus === 'paid' ? 'Admin đã xác nhận · miễn phí' : 'Chờ admin xác nhận thanh toán · miễn phí') + '</span>';
+    }
+
+    if (order._paymentMethod === "cash") {
+        return '<span class="order-payment-status">Thanh toán khi nhận hàng</span>';
+    }
+
+    const labels = {
+        paid: "Đã thanh toán",
+        unpaid: order.payos_status === "review" ? "Cần admin đối soát" : "Chờ thanh toán",
+        refund_pending: "Chờ hoàn tiền",
+        refunded: "Đã hoàn tiền"
+    };
+
+    return `<span class="order-payment-status">${escapeHtml(labels[order._paymentStatus] || "Chưa rõ thanh toán")}</span>`;
+}
+
 
 /* =========================================================
    PROGRESS
 ========================================================= */
 
-function renderProgress(status) {
+function renderProgress(status, paymentMethod) {
 
     if (
         status === "cancelled"
@@ -1279,8 +1313,9 @@ function renderProgress(status) {
     }
 
 
+    const steps = paymentMethod === "trial" ? ["pending", "shipping", "completed"] : STATUS_ORDER;
     const currentIndex =
-        STATUS_ORDER.indexOf(
+        steps.indexOf(
             status
         );
 
@@ -1290,7 +1325,7 @@ function renderProgress(status) {
 
             <div class="progress-track">
 
-                ${STATUS_ORDER
+                ${steps
                     .map(
                         (
                             itemStatus,
@@ -1522,9 +1557,10 @@ function renderPurchaseCard(order) {
 
                 </div>
 
-                ${renderStatus(
-                    order._status
-                )}
+                <div class="order-card-state">
+                    ${renderStatus(order._status)}
+                    ${renderPaymentStatus(order)}
+                </div>
 
             </div>
 
@@ -1600,7 +1636,7 @@ function renderPurchaseCard(order) {
 
 
             ${renderProgress(
-                order._status
+                order._status, order._paymentMethod
             )}
 
 
@@ -1622,6 +1658,17 @@ function renderPurchaseCard(order) {
 
 
                 <div class="order-actions">
+
+                    ${!trialMode && order._paymentMethod === "qr" && order._paymentStatus === "unpaid" && order._status !== "cancelled" ? `
+                        <button
+                            type="button"
+                            class="order-btn"
+                            data-payos-order="${escapeHtml(order._databaseId)}"
+                        >
+                            <i class="fa-solid fa-qrcode"></i>
+                            Thanh toán QR
+                        </button>
+                    ` : ""}
 
                     ${
                         canCancelOrder(order)
@@ -1886,7 +1933,7 @@ function renderSaleCard(order) {
 
 
             ${renderProgress(
-                order._status
+                order._status, order._paymentMethod
             )}
 
 
@@ -2201,6 +2248,26 @@ async function cancelOrder(orderId) {
 
     try {
 
+        if (
+            order._paymentMethod === "qr" &&
+            order._paymentStatus === "unpaid" &&
+            order.payos_order_code &&
+            !["cancelled", "expired"].includes(order.payos_status)
+        ) {
+            const { data: payment, error: paymentError } = await db.functions.invoke("payos-order", {
+                timeout: 45000,
+                body: { action: "cancel", orderId: Number(orderId) }
+            });
+
+            if (paymentError || payment?.error) {
+                throw new Error(payment?.error || paymentError?.message || "Chưa hủy được link thanh toán payOS.");
+            }
+
+            if (payment.payment_status !== "unpaid" || !["cancelled", "expired"].includes(payment.payos_status)) {
+                throw new Error("payOS chưa xác nhận hủy link. Đơn chưa bị hủy.");
+            }
+        }
+
         /* =========================
            GỌI DATABASE RPC
         ========================= */
@@ -2251,9 +2318,9 @@ async function cancelOrder(orderId) {
            THÔNG BÁO
         ========================= */
 
-        if (
-            data.refunded === true
-        ) {
+        if (data.refund_pending === true) {
+            alert("Đơn đã hủy. Yêu cầu hoàn tiền đang chờ admin xử lý.");
+        } else if (data.refunded === true) {
 
             alert(
                 "Đã hủy đơn hàng.\n\n" +

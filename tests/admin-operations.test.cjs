@@ -8,6 +8,7 @@ test('Admin operations: role boundary, private detail, filters and pagination',a
  try{
   for(const [id,role,name] of [[admin,'admin','Admin'],[buyer,'user','An'],[seller,'user','Bình']]){await q('insert into auth.users(id,email) values($1,$2)',[id,id+'@test.invalid']);await q('update public.users set role=$2,fullname=$3 where user_id=$1',[id,role,name]);}
   await q("insert into public.products(id,seller_id,name,category,quantity,price) values(1,$1,'Book','books',30,100000)",[seller]);
+    await as(admin);await q('select public.set_iuh_trial_mode(false)');
   await as(buyer);
   for(let i=0;i<23;i++)await q("select public.create_order('Recipient','0901234567','PRIVATE ADDRESS','', 'meet',0,'qr',1,105000,'[{\"product_id\":1,\"quantity\":1,\"price\":1}]','{}',$1)",['ops-order-'+i]);
   await assert.rejects(q('select public.admin_operations_list()'),/quản trị viên/);
@@ -44,5 +45,32 @@ test('Admin UI rejects ordinary users, escapes content and discards stale respon
   assert.equal($('opsOrderAction'),null);$('opsAction').dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();assert.match($('opsActionStatus').textContent,/Nhập mã giao dịch/);assert.equal(detailCalls,1);
   $('opsClose').click();assert.equal($('opsDetail').textContent,'');
   const third=w.IUHAdminRequests.load();await tick();onAuth('SIGNED_OUT');pending[2].resolve(result('STALE'));await third;assert.equal($('opsList').textContent,'');assert.equal($('opsDetail').textContent,'');
+ }finally{w.close();}
+});
+
+test('Admin UI can revoke an active package and cancel an eligible order with reasons',async()=>{
+ const {JSDOM}=require('jsdom');const dom=new JSDOM('<aside class="admin-sidebar"><nav></nav></aside><main></main>',{runScripts:'outside-only',url:'http://localhost/HTML/admin.html'}),w=dom.window;
+ let kind='orders',revoked=false,cancelled=false;
+ const orderRow={id:'21',order_code:'IUH-21',status:'pending',payment_status:'unpaid',payment_method:'qr',total_amount:105000,needs_payment_review:false};
+ const packageRow={id:'31',transaction_code:'pkg-admin-review-001',status:'paid',payment_status:'paid',payment_method:'bank',package_id:'package-31',price:19000};
+ const db={
+  auth:{getUser:async()=>({data:{user:{id:'admin'}}}),onAuthStateChange:()=>{}},
+  from(table){let value;return{select(){return this;},eq(column){value=column==='id'?'package-31':value;return this;},single:async()=>({data:table==='users'?{role:'admin'}:table==='service_package_payments'?{}:{status:revoked?'cancelled':'active'}}),order:async()=>({data:revoked?[{action:'revoked',reason:'Đối soát phát hiện vi phạm',actor_id:'admin',created_at:new Date().toISOString()}]:[],error:null})};},
+  rpc:async(name,args)=>{
+   if(name==='admin_operations_list')return{data:{rows:[kind==='packages'?{id:'31',code:'pkg-admin-review-001',status:'paid',payment_status:'paid',payment_method:'bank',amount:19000}:{id:'21',code:'IUH-21',status:'pending',payment_status:'unpaid',payment_method:'qr',amount:105000}],total:1,counts:{}}};
+   if(name==='admin_operation_detail')return{data:{record:args.p_kind==='packages'?{...packageRow}:{...orderRow},people:[],items:[],history:[]}};
+   if(name==='admin_revoke_service_package'){revoked=true;return{data:{success:true}};}
+   if(name==='admin_cancel_order'){cancelled=true;return{data:{success:true}};}
+   throw Error(name);
+  }
+ };
+ w.IUHCore={getClient:()=>db};w.IUHSecurity={escapeHTML:s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')};
+ w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};w.eval(fs.readFileSync('IUH shop/JS/admin-requests.js','utf8'));
+ const tick=()=>new Promise(resolve=>setTimeout(resolve,5)),page=w.document.getElementById('page-requests');
+ try{
+  page.querySelector('[data-kind="packages"]').click();await tick();page.querySelector('[data-detail]').click();await tick();await tick();
+  const revoke= w.document.getElementById('opsRevokePackageForm');assert.ok(revoke);revoke.querySelector('textarea').value='Đối soát phát hiện vi phạm';revoke.querySelector('input[type=checkbox]').checked=true;revoke.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();await tick();assert.equal(revoked,true);
+  w.document.getElementById('opsClose').click();kind='orders';page.querySelector('[data-kind="orders"]').click();await tick();page.querySelector('[data-detail]').click();await tick();await tick();
+  const cancel=w.document.getElementById('opsCancelOrderForm');assert.ok(cancel);cancel.querySelector('textarea').value='Đơn bị tạo trùng';cancel.querySelector('input[type=checkbox]').checked=true;cancel.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();await tick();assert.equal(cancelled,true);
  }finally{w.close();}
 });

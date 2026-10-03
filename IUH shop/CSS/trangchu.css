@@ -733,7 +733,8 @@ body {
 
     width: min(1440px, 94%);
 
-    height: 420px;
+    height: auto;
+    aspect-ratio: 2.5 / 1;
 
     margin: 0 auto;
 
@@ -781,7 +782,13 @@ body {
 
     display: block;
 
-    object-fit: cover;
+    object-fit: contain;
+}
+
+@media (max-width: 760px) {
+    .hero-slider {
+        padding-top: 16px;
+    }
 }
 
 /* =====================================================

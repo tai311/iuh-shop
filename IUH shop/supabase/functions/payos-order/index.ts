@@ -12,7 +12,7 @@ Deno.serve(async req=>{
   if(!o)throw new Error('Không tìm thấy đơn hàng.');
   if(o.buyer_id!==auth.id){
    const admins=await database('users?select=role&user_id=eq.'+auth.id);
-   if(input.action!=='status'||admins[0]?.role!=='admin')throw new Error('Không có quyền kiểm tra đơn hàng.');
+    if(!['status','cancel'].includes(input.action)||admins[0]?.role!=='admin')throw new Error('Không có quyền kiểm tra đơn hàng.');
   }
   if(o.payment_method!=='qr')throw new Error('Đơn không thanh toán chuyển khoản.');
   if(o.payment_status!=='unpaid'||o.status==='cancelled'||o.needs_payment_review)return response(orderReceipt(o),200,origin);

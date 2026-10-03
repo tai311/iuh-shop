@@ -41,7 +41,11 @@
  }
  async function check(action='status'){
   if(busy||!dialog.open)return;const v=version,id=orderId;busy=true;$('[data-check]').disabled=true;
-  try{const data=await request(action,id);if(v===version&&dialog.open)render(data,v);}
+    try{
+     const mode=await db.rpc('get_iuh_trial_mode');
+     if(mode.error||mode.data===true){if(v===version&&dialog.open){clearTimeout(timer);clearFrame();$('[data-fallback]').hidden=true;$('[data-check]').hidden=true;$('[data-status]').textContent=mode.error?'Không xác định được chế độ thanh toán. Đã khóa PayOS để an toàn.':'PayOS đang tắt trong chế độ chạy thử miễn phí.';}return;}
+     const data=await request(action,id);if(v===version&&dialog.open)render(data,v);
+    }
   catch(error){if(v===version){$('[data-status]').textContent=error.message;clearTimeout(timer);}}
   finally{if(v===version){busy=false;$('[data-check]').disabled=false;}}
  }

@@ -20,12 +20,18 @@ Trang khách quay về cố định: `https://iuh-shop.vercel.app/HTML/taikhoan.
 
 ## Luồng
 
-1. Tài khoản → Nâng cấp gói → Chuyển khoản ngân hàng → Tạo mã QR payOS.
-2. Backend tạo yêu cầu với giá lấy từ DB, cấp một orderCode duy nhất, giữ cùng mã khi retry. Giao diện nhúng QR payOS ngay trong cửa sổ mua gói bằng SDK chính thức tải từ CDN payOS; khách không cần chuyển tab. Nếu khung không tải, có nút tải lại cùng QR và liên kết mở tab riêng dự phòng.
+1. Tài khoản → Nâng cấp gói → Chuyển khoản ngân hàng → tạo link/QR PayOS theo đúng mã giao dịch. UI không dùng QR ngân hàng tĩnh.
+2. Backend tạo yêu cầu với giá lấy từ DB, cấp một orderCode duy nhất, giữ cùng mã khi retry. Modal trả link thanh toán đã được PayOS cấp; khách mở link để thanh toán, sau đó có thể kiểm tra hoặc hủy cùng giao dịch. Không dùng QR tĩnh hay tự dựng nội dung chuyển khoản.
 3. Webhook xác minh chữ ký rồi truy vấn lại giao dịch qua API payOS. Đồng bộ kiểm tra mã link, số tiền, trạng thái và số đã nhận trước khi kích hoạt.
 4. DB ghi chứng từ, gia hạn và bút toán trong cùng giao dịch. Không trừ/cộng ví người mua khi trả bằng ngân hàng. Bút toán doanh thu admin dùng cơ chế hiện có.
-5. Khi cửa sổ đang mở, giao diện đọc trạng thái DB mỗi 10 giây; nút Kiểm tra thanh toán và callback của khung nhúng chỉ yêu cầu backend đối chiếu API. Callback không tự kích hoạt gói. Đóng cửa sổ dọn iframe/listener; kết quả SDK tải chậm không mở lại giao dịch đã đóng. Đóng trang không ngăn webhook hoạt động.
+5. Nút Kiểm tra thanh toán yêu cầu backend đối chiếu API PayOS; giao diện không tự kích hoạt gói từ callback trình duyệt. Đóng modal không hủy giao dịch; webhook tiếp tục hoạt động.
 6. Hủy link qua payOS trước khi hủy yêu cầu trên hệ thống. Không cho RPC thủ công thay đổi giao dịch đã gắn payOS. Trạng thái PAID đã ghi nhận không bị ghi đè bởi thông báo hủy/chờ cũ.
+
+Ví IUH ở luồng gói dịch vụ được trừ khỏi số dư người mua và giữ trong `pending`; admin duyệt mới phân bổ tiền và kích hoạt gói. Admin từ chối sẽ trả tiền giữ về ví. Chuyển khoản payOS được tự kích hoạt sau webhook xác minh; không cần admin xác nhận lần hai.
+
+Migration `20261003100000_payment_review_admin_controls.sql` bổ sung giữ/hoàn tiền ví gói, quyền thu hồi gói có audit và hủy đơn an toàn. Cần áp dụng migration và deploy lại `payos-package`, `payos-order`, `payos-webhook` cùng frontend khi triển khai.
+
+Migration này bật chế độ chạy thử miễn phí cho toàn bộ người dùng. Khi bật, frontend chỉ hiện phương thức trial và database từ chối trực tiếp `wallet`, `bank`, `qr`/link PayOS. Admin có thể tắt bằng RPC `set_iuh_trial_mode(false)` sau khi kết thúc chạy thử; giao diện sẽ hiện lại các phương thức trả tiền.
 
 ## Trường hợp cần hỗ trợ
 

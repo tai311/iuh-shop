@@ -41,7 +41,8 @@ let checkoutItems = [];
 
 let isBuyNow = false;
 
-let qrPaymentConfirmed = false;
+let trialMode = true;
+let trialModeAvailable = false;
 
 let walletBalance = 0;
 
@@ -62,9 +63,8 @@ let checkoutButton;
 let qrPaymentBox;
 let walletPaymentBox;
 let cashPaymentBox;
+let trialPaymentBox;
 
-let qrCodeImage;
-let confirmPaymentBtn;
 let paymentVerificationStatus;
 
 let walletBalanceEl;
@@ -108,11 +108,8 @@ function initDOM() {
     cashPaymentBox =
         document.getElementById("cashPaymentBox");
 
-    qrCodeImage =
-        document.getElementById("qrCodeImage");
-
-    confirmPaymentBtn =
-        document.getElementById("confirmPaymentBtn");
+    trialPaymentBox =
+        document.getElementById("trialPaymentBox");
 
     paymentVerificationStatus =
         document.getElementById(
@@ -1509,38 +1506,6 @@ function updateOptionUI() {
 
 
 /* =========================================================
-   23. QR
-   ========================================================= */
-
-function updateQR() {
-
-    if (
-        !qrCodeImage ||
-        !currentUser
-    ) {
-
-        return;
-    }
-
-
-    const total =
-        getTotal();
-
-
-    const content =
-        `IUH SHOP ${currentUser.id} ${total}`;
-
-
-    qrCodeImage.src =
-        "https://api.qrserver.com/v1/create-qr-code/" +
-        "?size=220x220&data=" +
-        encodeURIComponent(
-            content
-        );
-}
-
-
-/* =========================================================
    24. VÍ IUH
    ========================================================= */
 
@@ -1750,6 +1715,19 @@ async function updatePaymentUI() {
             "hidden"
         );
 
+    if (trialPaymentBox)
+        trialPaymentBox.classList.add("hidden");
+
+    if (trialMode && payment === "qr") {
+        if (qrPaymentBox)
+            qrPaymentBox.classList.remove("hidden");
+        if (paymentVerificationStatus)
+            paymentVerificationStatus.textContent = "Bấm xác nhận thanh toán để gửi đơn. Vui lòng chờ quản trị viên duyệt thanh toán.";
+        if (checkoutButton)
+            checkoutButton.disabled = false;
+        return;
+    }
+
 
     /*
      * QR
@@ -1764,14 +1742,12 @@ async function updatePaymentUI() {
             );
 
 
-        updateQR();
+        if (paymentVerificationStatus)
+            paymentVerificationStatus.textContent =
+                "Đơn sẽ được gửi đến admin. Thanh toán chỉ được xác nhận sau khi đối soát giao dịch thực tế.";
 
-
-        if (checkoutButton) {
-
-            checkoutButton.disabled =
-                !qrPaymentConfirmed;
-        }
+        if (checkoutButton)
+            checkoutButton.disabled = false;
 
 
         return;
@@ -1827,86 +1803,6 @@ async function updatePaymentUI() {
                 false;
         }
     }
-}
-
-
-/* =========================================================
-   27. XÁC NHẬN QR
-   ========================================================= */
-
-function setupQRPayment() {
-
-    if (!confirmPaymentBtn)
-        return;
-
-
-    confirmPaymentBtn.addEventListener(
-        "click",
-        function() {
-
-            if (
-                qrPaymentConfirmed
-            )
-                return;
-
-
-            confirmPaymentBtn.disabled =
-                true;
-
-
-            confirmPaymentBtn.textContent =
-                "Đang xác minh...";
-
-
-            if (
-                paymentVerificationStatus
-            ) {
-
-                paymentVerificationStatus.textContent =
-                    "Đang xác minh thanh toán...";
-            }
-
-
-            setTimeout(
-                function() {
-
-                    qrPaymentConfirmed =
-                        true;
-
-
-                    confirmPaymentBtn.textContent =
-                        "✓ Đã xác nhận thanh toán";
-
-
-                    if (
-                        paymentVerificationStatus
-                    ) {
-
-                        paymentVerificationStatus.textContent =
-                            "Đã xác nhận thanh toán.";
-
-                        paymentVerificationStatus.classList.add(
-                            "success"
-                        );
-                    }
-
-
-                    if (checkoutButton) {
-
-                        checkoutButton.disabled =
-                            false;
-                    }
-
-
-                    showToast(
-                        "Đã xác nhận thanh toán."
-                    );
-
-                },
-                1000
-            );
-        }
-    );
 }
 
 
@@ -2388,7 +2284,7 @@ function buildOrder() {
             getShippingFee(),
 
         payment_method:
-            paymentMethod,
+            trialMode && paymentMethod === "qr" ? "trial" : paymentMethod,
 
         subtotal:
     getBuyerSubtotal(),
@@ -2478,12 +2374,13 @@ async function submitOrder() {
         return;
     }
 
-    /* QR phải xác nhận trước */
-    if (
-        paymentMethod === "qr" &&
-        !qrPaymentConfirmed
-    ) {
-        showToast("Vui lòng xác nhận thanh toán QR.");
+    if (!trialModeAvailable) {
+        showToast("Máy chủ chưa bật trial mode. Admin cần áp dụng migration trước khi đặt đơn miễn phí.");
+        return;
+    }
+
+    if (trialMode && paymentMethod !== "qr") {
+        showToast("Vui lòng chọn thanh toán bằng QR để xác nhận đơn chạy thử.");
         return;
     }
 
@@ -2689,73 +2586,7 @@ async function submitOrder() {
             );
         }
 
-        /* =========================================
-   6. THANH TOÁN ONLINE -> VÍ ADMIN
-========================================= */
-
-if (
-    paymentMethod === "iuh_wallet" ||
-    paymentMethod === "qr"
-) {
-
-    const createdOrderId =
-        data?.order_id ||
-        data?.id;
-
-
-    if (!createdOrderId) {
-
-        throw new Error(
-            "Đơn đã được tạo nhưng không lấy được ID đơn hàng để thanh toán."
-        );
-    }
-
-
-    const {
-        data: paymentData,
-        error: paymentError
-    } =
-        await db.rpc(
-            "pay_order_to_admin",
-            {
-                p_order_id:
-                    Number(
-                        createdOrderId
-                    )
-            }
-        );
-
-
-    if (paymentError) {
-
-        console.error(
-            "Lỗi thanh toán online:",
-            paymentError
-        );
-
-        throw new Error(
-            paymentError.message ||
-            "Không thể xử lý thanh toán online."
-        );
-    }
-
-
-    if (
-        !paymentData?.success
-    ) {
-
-        throw new Error(
-            "Không thể chuyển tiền thanh toán vào Ví Admin."
-        );
-    }
-
-
-    console.log(
-        "IUH SHOP: Thanh toán online thành công:",
-        paymentData
-    );
-}
-
+        sessionStorage.removeItem(storageKey);
 
         /* =========================================
            6. THÀNH CÔNG
@@ -2769,14 +2600,21 @@ if (
                 );
 
             if (text)
-                text.textContent =
-                    "Đặt hàng thành công";
+                    text.textContent = paymentMethod === "iuh_wallet"
+                        ? "Đã thanh toán"
+                        : "Đã gửi đơn hàng";
         }
 
 
-        showToast(
-            "🎉 Đặt hàng thành công!"
-        );
+        const successMessage = trialMode && paymentMethod === "qr"
+            ? "Thanh toán đơn hàng thành công. Vui lòng chờ quản trị viên xác nhận thanh toán để bắt đầu giao hàng."
+            : paymentMethod === "iuh_wallet"
+                ? "Thanh toán thành công. Đơn hàng đang chờ admin xác nhận."
+                : paymentMethod === "qr"
+                    ? "Đơn đã tạo. Đang mở PayOS để thanh toán; trạng thái sẽ tự cập nhật sau khi ngân hàng xác nhận."
+                    : "Đã gửi đơn. Thanh toán khi nhận hàng; đơn đang chờ xác nhận.";
+
+        showToast(successMessage);
 
 
         console.log(
@@ -2795,14 +2633,16 @@ if (
         }
 
 
-        /* =========================================
-           7. CHUYỂN SANG TRANG SẢN PHẨM
-        ========================================= */
+          /* =========================================
+              7. MỞ DANH SÁCH ĐƠN
+          ========================================= */
 
         setTimeout(() => {
 
             window.location.href =
-                "sanpham.html";
+                !trialMode && paymentMethod === "qr" && data.order_id
+                    ? `donhang.html?payos_order=${encodeURIComponent(data.order_id)}`
+                    : "donhang.html";
 
         }, 1500);
 
@@ -2868,22 +2708,6 @@ function setupRadioEvents() {
                 event.target.name ===
                 "paymentMethod"
             ) {
-
-                qrPaymentConfirmed =
-                    false;
-
-
-                if (
-                    confirmPaymentBtn
-                ) {
-
-                    confirmPaymentBtn.disabled =
-                        false;
-
-                    confirmPaymentBtn.textContent =
-                        "Xác nhận đã thanh toán";
-                }
-
 
                 if (
                     paymentVerificationStatus
@@ -3026,6 +2850,24 @@ async function initCheckout() {
     setupActiveMenu();
 
 
+    try {
+        const trialModeResult = await db.rpc("get_iuh_trial_mode");
+        trialModeAvailable = !trialModeResult.error;
+        trialMode = trialModeAvailable ? trialModeResult.data === true : true;
+    } catch (_) {
+        trialMode = true;
+        trialModeAvailable = false;
+    }
+    document.querySelectorAll("[data-payment-method]").forEach((option) => {
+        option.hidden = trialMode && option.dataset.paymentMethod !== "qr";
+        const input = option.querySelector('input[name="paymentMethod"]');
+        if (input) input.disabled = option.hidden;
+    });
+    if (trialMode) {
+        const qrMethod = document.querySelector('input[name="paymentMethod"][value="qr"]');
+        if (qrMethod) qrMethod.checked = true;
+    }
+
     /*
      * Checkout
      */
@@ -3041,20 +2883,21 @@ async function initCheckout() {
     /*
      * Tải Ví IUH ngay khi vào trang.
      */
-    await loadWallet();
-
-
-    updateQR();
+    if (!trialMode) await loadWallet();
 
 
     await updatePaymentUI();
+
+    if (!trialModeAvailable) {
+        if (paymentVerificationStatus)
+            paymentVerificationStatus.textContent = "Máy chủ chưa có chế độ trial. Admin cần áp dụng migration 20261003100000_payment_review_admin_controls.sql trước khi đặt đơn miễn phí.";
+        if (checkoutButton) checkoutButton.disabled = true;
+    }
 
 
     /*
      * Events
      */
-    setupQRPayment();
-
     setupRadioEvents();
 
     setupContinueShopping();

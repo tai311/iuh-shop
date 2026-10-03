@@ -31,12 +31,12 @@ test('Order gateway enforces ownership, server amount and verified webhook routi
   assert.equal((await call({action:'create',orderId:12},'other')).status,400);assert.equal(providerCalls,0);
   const createdResponse=await call({action:'create',orderId:12,amount:1});assert.equal(createdResponse.status,200);assert.equal((await createdResponse.json()).qr_code,'000201PAYOS-QR-TEST-DATA');assert.equal(created.amount,105000);assert.equal(created.orderCode,o.payos_order_code);
   assert.equal((await(await call({action:'create',orderId:12})).json()).qr_code,o.payos_qr_code);
-  assert.equal((await call({action:'cancel',orderId:12},'admin')).status,400);
-  state='PAID';const result=await (await call({action:'status',orderId:12},'admin')).json();assert.equal(result.payment_status,'paid');assert.equal(settlements,1);
+    const cancelled=await call({action:'cancel',orderId:12},'admin');assert.equal(cancelled.status,200);assert.equal((await cancelled.json()).payos_status,'cancelled');
+  assert.equal(settlements,1);state='PAID';const result=await (await call({action:'status',orderId:12},'admin')).json();assert.equal(result.payment_status,'paid');assert.equal(settlements,2);
   await import('../IUH shop/supabase/functions/payos-webhook/index.ts');const webhook=handler;
   const {sign}=await import('../IUH shop/supabase/functions/_shared/payos.mjs');const data={orderCode:o.payos_order_code,paymentLinkId:link,currency:'VND',code:'00',amount:105000};
   const send=signature=>webhook(new Request('https://edge.test',{method:'POST',body:JSON.stringify({success:true,code:'00',data,signature})}));
-  assert.equal((await send('bad')).status,401);assert.equal(settlements,1);
-  assert.equal((await send(await sign(data,'checksum-fixture'))).status,200);assert.equal(settlements,2);
+  assert.equal((await send('bad')).status,401);assert.equal(settlements,2);
+  assert.equal((await send(await sign(data,'checksum-fixture'))).status,200);assert.equal(settlements,3);
  }finally{global.fetch=originalFetch;global.Deno=originalDeno;}
 });

@@ -196,6 +196,36 @@
     cursor: pointer;
 }
 
+.upgrade-bank-info a {
+    width: fit-content;
+    color: #193f9e;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.upgrade-payos-actions {
+    display: flex !important;
+    grid-auto-flow: column;
+    flex-wrap: wrap;
+    gap: 8px !important;
+}
+
+.upgrade-payos-actions button {
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid #cbd6e8;
+    border-radius: 6px;
+    color: #193f9e;
+    background: #fff;
+    cursor: pointer;
+}
+
+#upgradePaymentStatus {
+    grid-column: 1 / -1;
+    margin: 0;
+    line-height: 1.5;
+}
+
 .upgrade-modal button:disabled { cursor: not-allowed; opacity: .65; }
 .upgrade-modal button:focus-visible,
 .upgrade-modal input:focus-visible { outline: 3px solid #3977d5; outline-offset: 3px; }

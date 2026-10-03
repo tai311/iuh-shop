@@ -53,35 +53,6 @@ select {
         width: 100%;
     }
 
-    .main-nav {
-        overflow-x: auto;
-        scrollbar-width: none;
-    }
-
-    .main-nav::-webkit-scrollbar {
-        display: none;
-    }
-
-    .nav-container {
-        min-width: max-content;
-    }
-
-    .brand {
-        margin-right: 12px;
-    }
-
-    .brand-logo {
-        width: 48px;
-    }
-
-    .brand-name {
-        font-size: 20px;
-    }
-
-    .navigation {
-        min-width: max-content;
-    }
-
     .account-arrow-button {
         width: 44px;
         height: 54px;
