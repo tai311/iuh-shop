@@ -8,11 +8,7 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+const supabaseClient = window.IUHCore.getClient();
 
 
 const DEFAULT_AVATAR =
@@ -451,6 +447,7 @@ const pageTitles = {
 
 
 function openPage(page) {
+    const requestedPage = page;
     if(page === "orders") {
         page = "requests";
         window.IUHAdminRequests?.openOrders();
@@ -482,7 +479,7 @@ function openPage(page) {
 
                 button.classList.toggle(
                     "active",
-                    button.dataset.page === page
+                    button.dataset.page === requestedPage
                 );
 
             }
@@ -490,7 +487,7 @@ function openPage(page) {
 
 
     $("pageTitle").textContent =
-        pageTitles[page] ||
+        pageTitles[requestedPage] ||
         "Tổng quan";
 
 
