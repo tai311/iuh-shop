@@ -81,9 +81,9 @@ test('Package QR choice sends a pending admin request without a free option or P
   assert.equal(methods.find(button=>button.dataset.method==='bank').hidden,false);
   assert.equal(methods.find(button=>button.dataset.method==='bank').getAttribute('aria-checked'),'true');
   assert.match(f.el('confirmUpgradeButton').textContent,/Xác nhận thanh toán/i);
-  assert.match(f.el('upgradeTotal').textContent,/0đ/);
-  assert.match(f.el('upgradeConfirmAmount').textContent,/0đ/);
-  assert.doesNotMatch(f.w.document.querySelector('.service-plan-grid').textContent,/19\.000đ|29\.000đ/);
+  assert.match(f.el('upgradeTotal').textContent,/19\.000đ/);
+  assert.match(f.el('upgradeConfirmAmount').textContent,/19\.000đ/);
+  assert.match(f.w.document.querySelector('.service-plan-grid').textContent,/19\.000đ|29\.000đ/);
   f.el('confirmUpgradeButton').click();await flush();assert.equal(invoked,1);assert.equal(payosCalls,0);
   assert.match(f.el('upgradeSuccessHeading').textContent,/Yêu cầu đã được gửi/i);
   assert.match(f.el('upgradeSuccessText').textContent,/chờ admin duyệt/i);

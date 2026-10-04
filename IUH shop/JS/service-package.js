@@ -133,12 +133,12 @@
             });
             byId("servicePackageGroupManager").hidden = selectedPlan !== "group";
             byId("upgradeSelectedPlan").textContent = plans[selectedPlan].name;
-            const amount = trialMode ? "0đ · dùng thử" : money(plans[selectedPlan].price);
+            const amount = money(plans[selectedPlan].price);
             byId("upgradeTotal").textContent = amount;
             planButtons.forEach((button) => {
                 const price = button.querySelector(".plan-card-top b");
                 const textNode = price && [...price.childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
-                if (textNode) textNode.textContent = trialMode ? "0đ" : money(plans[button.dataset.plan].price);
+                if (textNode) textNode.textContent = money(plans[button.dataset.plan].price);
             });
             if (successView.hidden) {
                 byId("upgradeBankInfo").hidden = selectedMethod !== "bank";
@@ -156,7 +156,7 @@
             byId("finishUpgradeButton").disabled = busy;
             confirmButton.disabled = busy || findingMember || !loaded || !trialModeAvailable || memberOnly() || (state.pending_requests.length > 0 && !attempt);
             const label = busy ? "Đang gửi yêu cầu..." : trialMode ? "Xác nhận thanh toán" : selectedMethod === "wallet" ? "Thanh toán & gửi duyệt" : "Tạo thanh toán PayOS";
-            confirmButton.innerHTML = '<i class="fa-solid ' + (busy ? 'fa-spinner fa-spin' : 'fa-check') + '"></i> ' + label + ' <span id="upgradeConfirmAmount">' + (trialMode ? "0đ" : money(plans[selectedPlan].price)) + '</span>';
+            confirmButton.innerHTML = '<i class="fa-solid ' + (busy ? 'fa-spinner fa-spin' : 'fa-check') + '"></i> ' + label + ' <span id="upgradeConfirmAmount">' + (money(plans[selectedPlan].price)) + '</span>';
             modal.setAttribute("aria-busy", String(busy));
         }
 
@@ -206,7 +206,7 @@
             } else if (cancelled) {
                 byId("upgradeSuccessText").textContent = "Gói chưa được kích hoạt từ yêu cầu này.";
             } else if (trial) {
-                byId("upgradeSuccessText").textContent = "Gói được kích hoạt miễn phí trong giai đoạn chạy thử. Không có khoản tiền nào được thu.";
+                byId("upgradeSuccessText").textContent = "Gói đã được kích hoạt; giá trị gói được ghi nhận vào doanh thu chạy thử.";
             } else {
                 byId("upgradeSuccessText").textContent = "Gói dịch vụ đã được hệ thống xác nhận.";
             }

@@ -23,6 +23,9 @@ function fixture({ many = false, fail = false } = {}) {
             row(8, 1, 'sale', 'Phí đơn COD', 500)],
         orders: [{ id: 41, payment_method: 'trial', status: 'completed', payment_status: 'paid', total_amount: 183750 },
             { id: 42, payment_method: 'trial', status: 'pending', payment_status: 'unpaid', total_amount: 31500 }],
+        trial_financial_entries: [{ id: 1, kind: 'platform', amount: 8750, title: 'Phí sàn · Trial order', created_at: '2026-10-04' },
+            { id: 2, kind: 'seller', amount: 175000, title: 'Tiền bán hàng', created_at: '2026-10-04' },
+            { id: 3, kind: 'package', amount: 19000, title: 'Gói dịch vụ · Trial package', created_at: '2026-10-04' }],
         advertisements: []
     };
     if (many) tables.wallet_transactions.push(...Array.from({ length: 1100 }, (_, i) => row(100 + i, 1, 'fee', 'Thu phí sàn', 1)));
@@ -57,20 +60,20 @@ function fixture({ many = false, fail = false } = {}) {
 test('Finance includes settled fees across admin wallets but excludes escrow, seller sales and refunds', async () => {
     const f = fixture();
     const result = await f.context.loadAdminRevenue();
-    assert.equal(result.total, 25000);
-    assert.equal(result.package, 19000);
-    assert.equal(result.platform, 3000);
+    assert.equal(result.total, 52750);
+    assert.equal(result.package, 38000);
+    assert.equal(result.platform, 11750);
     assert.equal(result.boost, 3000);
-    assert.equal(result.transactions.length, 5);
+    assert.equal(result.transactions.length, 7);
     await f.context.loadFinance();
-    assert.equal(f.nodes.financeTotal.textContent, '25000đ');
+    assert.equal(f.nodes.financeTotal.textContent, '52750đ');
     assert.match(f.nodes.financeList.innerHTML, /Phí dịch vụ đã hoàn tất/);
     assert.doesNotMatch(f.nodes.financeList.innerHTML, /Tiền giữ hộ|Tiền bán hàng|Hoàn tiền/);
-    assert.match(f.nodes.financeTrialSummary.textContent, /hoàn thành: 1.*183750đ.*Thu thực tế 0đ/);
+    assert.match(f.nodes.financeTrialSummary.textContent, /hoàn thành: 1.*183750đ.*đã được cộng vào báo cáo/);
 });
 test('Finance reads beyond the first 1000 ledger entries without double counting', async () => {
     const f = fixture({ many: true });
-    assert.equal((await f.context.loadAdminRevenue()).total, 26100);
+    assert.equal((await f.context.loadAdminRevenue()).total, 53850);
     assert.ok(f.requests.some(r => r.table === 'wallet_transactions' && r.start === 1000));
 });
 test('Finance displays a load error instead of claiming zero revenue', async () => {

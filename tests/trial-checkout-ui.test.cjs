@@ -26,14 +26,14 @@ test('QR is the visible choice and trial checkout records a safe order without o
   assert.match(source,/!trialMode && paymentMethod === "qr" && data.order_id/);
  }finally{w.close();}
 });
-test('Admin approves a free order without bank reference, then completes delivery in one action',async()=>{
+test('Admin approves trial payment, waits for seller delivery, then completes the order',async()=>{
  const dom=new JSDOM('<aside class="admin-sidebar"><nav></nav></aside><main></main>',{runScripts:'outside-only',url:'http://localhost/HTML/admin.html'}),w=dom.window;
  const row={id:'21',status:'pending',payment_status:'unpaid',payment_method:'trial'},calls=[];
  const db={auth:{getUser:async()=>({data:{user:{id:'admin'}}}),onAuthStateChange(){}},from:()=>({select(){return this;},eq(){return this;},single:async()=>({data:{role:'admin'}})}),rpc:async(name,args)=>{
   if(name==='admin_operations_list')return{data:{rows:[{...row,code:'FREE-21'}],total:1,counts:{orders:1}}};
   if(name==='admin_operation_detail')return{data:{record:{...row},people:[],items:[],history:[]}};
   calls.push({name,args});
-  if(name==='admin_confirm_order_payment'){row.status='shipping';row.payment_status='paid';}
+  if(name==='admin_confirm_order_payment'){row.status='confirmed';row.payment_status='paid';row.payment_approved_at='2026-10-04';}
   else if(name==='update_order_status')row.status=args.p_new_status;
   else throw Error(name);
   return{data:{success:true}};
@@ -45,10 +45,14 @@ test('Admin approves a free order without bank reference, then completes deliver
  try{
   await w.IUHAdminRequests.load();w.document.querySelector('[data-detail]').click();await tick();
   assert.equal(w.document.getElementById('opsReference'),null);
-  let form=w.document.getElementById('opsAction');assert.match(form.textContent,/miễn phí/);
+  let form=w.document.getElementById('opsAction');assert.match(form.textContent,/người bán/);
   form.querySelector('input[type=checkbox]').checked=true;form.dispatchEvent(new w.Event('submit',{cancelable:true,bubbles:true}));await tick();
   assert.equal(calls[0].name,'admin_confirm_order_payment');assert.equal(calls[0].args.p_reference,null);
-  form=w.document.getElementById('opsOrderAction');assert.equal(form.dataset.next,'completed');assert.match(form.textContent,/Xác nhận giao hàng thành công/);
+  assert.equal(w.document.getElementById('opsOrderAction'),null);
+  row.status='shipping';w.document.querySelector('[data-detail]').click();await tick();
+  assert.equal(w.document.getElementById('opsOrderAction'),null);
+  row.status='delivered';w.document.querySelector('[data-detail]').click();await tick();
+  form=w.document.getElementById('opsOrderAction');assert.equal(form.dataset.next,'completed');assert.match(form.textContent,/Xác nhận đơn hàng hoàn thành/);
   form.querySelector('input[type=checkbox]').checked=true;form.dispatchEvent(new w.Event('submit',{cancelable:true,bubbles:true}));await tick();
   assert.equal(calls[1].args.p_new_status,'completed');assert.equal(w.document.getElementById('opsOrderAction'),null);
  }finally{w.close();}

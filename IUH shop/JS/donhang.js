@@ -594,6 +594,7 @@ let allOrders = [];
 let purchaseOrders = [];
 
 let saleOrders = [];
+const orderActionsInFlight = new Set();
 
 let historyOrders = [];
 
@@ -605,13 +606,13 @@ let historyOrders = [];
 const ORDER_STATUS = {
 
     pending: {
-        label: "Chờ xác nhận",
+        label: "Chờ admin duyệt thanh toán",
         className: "status-pending",
         icon: "fa-clock"
     },
 
     confirmed: {
-        label: "Đã xác nhận",
+        label: "Chờ người bán nhận đơn",
         className: "status-confirmed",
         icon: "fa-circle-check"
     },
@@ -623,7 +624,7 @@ const ORDER_STATUS = {
     },
 
     delivered: {
-        label: "Đã giao",
+        label: "Đã giao · Chờ admin hoàn tất",
         className: "status-delivered",
         icon: "fa-box-open"
     },
@@ -1264,7 +1265,7 @@ function renderStatus(status) {
 
 function renderPaymentStatus(order) {
     if (order._paymentMethod === "trial") {
-        return '<span class="order-payment-status">' + (order._status === 'cancelled' ? 'Đã hủy · miễn phí' : order._paymentStatus === 'paid' ? 'Admin đã xác nhận · miễn phí' : 'Chờ admin xác nhận thanh toán · miễn phí') + '</span>';
+        return '<span class="order-payment-status">' + (order._status === 'cancelled' ? 'Đã hủy' : order.payment_approved_at ? 'Admin đã xác nhận thanh toán · Chạy thử' : 'Chờ admin xác nhận thanh toán · Chạy thử') + '</span>';
     }
 
     if (order._paymentMethod === "cash") {
@@ -1309,7 +1310,7 @@ function renderProgress(status, paymentMethod) {
     }
 
 
-    const steps = paymentMethod === "trial" ? ["pending", "shipping", "completed"] : STATUS_ORDER;
+    const steps = STATUS_ORDER;
     const currentIndex =
         steps.indexOf(
             status
@@ -1397,11 +1398,7 @@ function renderProgress(status, paymentMethod) {
    ========================================================= */
 
 function isOrderReceived(orderId) {
-
-    return localStorage.getItem(
-        `iuh_order_received_${orderId}`
-    ) === "true";
-
+    return Boolean(allOrders.find(order => String(order._databaseId) === String(orderId))?.buyer_confirmed_at);
 }
 
 
@@ -1706,9 +1703,7 @@ function renderPurchaseCard(
 
                             <br>
 
-                            Vui lòng xác nhận bạn đã nhận được
-                            hàng để hoàn tất đơn hàng và giải ngân
-                            tiền cho người bán.
+                            Admin đã xác nhận hoàn thành và ghi nhận tài chính. Vui lòng xác nhận bạn đã nhận được hàng.
 
                         </div>
 
@@ -1881,7 +1876,7 @@ function renderSaleOrders() {
             renderEmpty(
                 "fa-store",
                 "Chưa có đơn bán",
-                "Các đơn hàng từ sản phẩm bạn đăng sẽ xuất hiện ở đây."
+                "Đơn hàng sẽ xuất hiện sau khi admin xác nhận thanh toán."
             );
 
         return;
@@ -1942,12 +1937,7 @@ function renderSaleCard(order) {
         getItemPrice(item);
 
 
-    const canUpdate =
-        order._status !==
-            "completed" &&
-
-        order._status !==
-            "cancelled";
+    const canUpdate = Boolean(order.payment_approved_at) && order._paymentStatus === "paid" && ["confirmed", "shipping"].includes(order._status);
 
 
     return `
@@ -2056,7 +2046,7 @@ function renderSaleCard(order) {
                     <div class="seller-control">
 
                         <div class="seller-control-title">
-                            Cập nhật trạng thái đơn hàng
+                            Xác nhận nhận đơn / đã giao hàng
                         </div>
 
                         <div class="seller-control-row">
@@ -2130,50 +2120,9 @@ function renderSaleCard(order) {
    OPTION STATUS
 ========================================================= */
 
-function renderStatusOptions(
-    currentStatus
-) {
-
-    const currentIndex =
-        STATUS_ORDER.indexOf(
-            currentStatus
-        );
-
-
-    return STATUS_ORDER
-        .map(
-            (
-                status,
-                index
-            ) => {
-
-                if (
-                    index <
-                    currentIndex
-                ) {
-
-                    return "";
-
-                }
-
-
-                return `
-                    <option
-                        value="${status}"
-                        ${
-                            status === currentStatus
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        ${ORDER_STATUS[status].label}
-                    </option>
-                `;
-
-            }
-        )
-        .join("");
-
+function renderStatusOptions(currentStatus) {
+    const next = { confirmed: 'shipping', shipping: 'delivered' }[currentStatus];
+    return next ? '<option value="' + next + '">' + (next === 'shipping' ? 'Xác nhận nhận đơn' : 'Xác nhận đã giao hàng') + '</option>' : '';
 }
 
 
@@ -2482,207 +2431,21 @@ async function cancelOrder(orderId) {
    Chỉ tại bước này mới giải ngân tiền.
    ========================================================= */
 
-async function confirmReceivedOrder(
-    orderId
-) {
-
-    const order =
-        allOrders.find(
-            item =>
-                String(
-                    item._databaseId
-                ) ===
-                String(orderId)
-        );
-
-
-    if (!order) {
-
-        alert(
-            "Không tìm thấy đơn hàng."
-        );
-
-        return;
-
+async function confirmReceivedOrder(orderId) {
+    const order = allOrders.find(item => String(item._databaseId) === String(orderId));
+    if (!order || String(order.buyer_id) !== String(currentUser?.id) || order._status !== 'completed') {
+        alert('Chỉ người mua được xác nhận nhận hàng sau khi admin hoàn tất đơn.'); return;
     }
-
-
-    /* =========================
-       KIỂM TRA NGƯỜI MUA
-       ========================= */
-
-    if (
-        String(
-            order.buyer_id
-        ) !==
-        String(
-            currentUser?.id
-        )
-    ) {
-
-        alert(
-            "Bạn không có quyền xác nhận đơn hàng này."
-        );
-
-        return;
-
-    }
-
-
-    /* =========================
-       KIỂM TRA TRẠNG THÁI
-       ========================= */
-
-    if (
-        order._status !==
-        "completed"
-    ) {
-
-        alert(
-            "Đơn hàng chưa ở trạng thái Hoàn tất."
-        );
-
-        return;
-
-    }
-
-
-    /* =========================
-       CHỐNG XÁC NHẬN 2 LẦN
-       ========================= */
-
-    if (
-        isOrderReceived(
-            orderId
-        )
-    ) {
-
-        alert(
-            "Đơn hàng này đã được xác nhận nhận hàng."
-        );
-
-        return;
-
-    }
-
-
-    /* =========================
-       XÁC NHẬN
-       ========================= */
-
-    const confirmed =
-        confirm(
-            "Bạn xác nhận đã nhận được hàng?\n\n" +
-            "Sau khi xác nhận, tiền sẽ được giải ngân " +
-            "vào Ví IUH của người bán."
-        );
-
-
-    if (!confirmed) {
-
-        return;
-
-    }
-
-
+    if (order.buyer_confirmed_at || orderActionsInFlight.has(String(orderId))) return;
+    if (!confirm('Bạn xác nhận đã nhận được hàng?')) return;
+    orderActionsInFlight.add(String(orderId));
     try {
-
-        /* =========================
-           GIẢI NGÂN
-           ========================= */
-
-        const {
-            data: settlementData,
-            error: settlementError
-        } = await db.rpc(
-            "settle_online_order",
-            {
-                p_order_id:
-                    Number(orderId)
-            }
-        );
-
-
-        if (settlementError) {
-
-            console.error(
-                "Lỗi giải ngân:",
-                settlementError
-            );
-
-            alert(
-                "Không thể giải ngân tiền.\n\n" +
-                settlementError.message
-            );
-
-            return;
-
-        }
-
-
-        /* =========================
-           KIỂM TRA KẾT QUẢ
-           ========================= */
-
-        if (
-            settlementData?.settled !== true
-        ) {
-
-            console.error(
-                "Kết quả giải ngân:",
-                settlementData
-            );
-
-            alert(
-                "Không thể hoàn tất giải ngân.\n\n" +
-                "Vui lòng thử lại."
-            );
-
-            return;
-
-        }
-
-
-        /* =========================
-           GHI NHỚ ĐÃ XÁC NHẬN
-           ========================= */
-
-        localStorage.setItem(
-            `iuh_order_received_${orderId}`,
-            "true"
-        );
-
-
-        /* =========================
-           THÔNG BÁO
-           ========================= */
-
-        alert(
-            "✓ Đã xác nhận nhận hàng!\n\n" +
-            "Tiền đã được giải ngân vào Ví IUH của người bán."
-        );
-
-
-        /* =========================
-           TẢI LẠI DỮ LIỆU
-           ========================= */
-
+        const { data, error } = await db.rpc('confirm_order_received', { p_order_id: Number(orderId) });
+        if (error || !data?.success) throw error || new Error('Chưa lưu được xác nhận.');
+        alert('Đã ghi nhận xác nhận nhận hàng của bạn.');
         await refreshPageData();
-
-    }
-    catch (error) {
-
-        console.error(
-            "Lỗi xác nhận nhận hàng:",
-            error
-        );
-
-        alert(
-            "Có lỗi xảy ra khi xác nhận nhận hàng."
-        );
-
-    }
-
+    } catch (error) { alert(error.message || 'Không thể xác nhận nhận hàng.'); }
+    finally { orderActionsInFlight.delete(String(orderId)); }
 }
 
 
@@ -2696,203 +2459,22 @@ async function confirmReceivedOrder(
      người mua xác nhận "Đã nhận được hàng".
    ========================================================= */
 
-async function updateOrderStatus(
-    orderId
-) {
-
-    const order =
-        allOrders.find(
-            item =>
-                String(
-                    item._databaseId
-                ) ===
-                String(orderId)
-        );
-
-
-    if (!order) {
-
-        alert(
-            "Không tìm thấy đơn hàng."
-        );
-
-        return;
-
+async function updateOrderStatus(orderId) {
+    const order = saleOrders.find(item => String(item._databaseId) === String(orderId));
+    const next = document.getElementById('status-' + orderId)?.value;
+    const expected = { confirmed: 'shipping', shipping: 'delivered' }[order?._status];
+    if (!order || !order.payment_approved_at || !expected || next !== expected) {
+        alert('Đơn phải được admin duyệt thanh toán trước. Người bán chỉ xác nhận nhận đơn và đã giao hàng.'); return;
     }
-
-
-    const select =
-        document.getElementById(
-            `status-${orderId}`
-        );
-
-
-    if (!select) {
-
-        return;
-
-    }
-
-
-    const newStatus =
-        select.value;
-
-
-    const currentIndex =
-        STATUS_ORDER.indexOf(
-            order._status
-        );
-
-
-    const newIndex =
-        STATUS_ORDER.indexOf(
-            newStatus
-        );
-
-
-    /* =========================
-       KHÔNG CHO QUAY LẠI
-       ========================= */
-
-    if (
-        newIndex <
-        currentIndex
-    ) {
-
-        alert(
-            "Không thể quay lại trạng thái trước đó."
-        );
-
-        return;
-
-    }
-
-
-    /* =========================
-       HOÀN TẤT PHẢI SAU ĐÃ GIAO
-       ========================= */
-
-    if (
-        newStatus === "completed" &&
-        order._status !== "delivered" &&
-        order._status !== "completed"
-    ) {
-
-        alert(
-            "Đơn hàng phải ở trạng thái Đã giao trước khi hoàn tất."
-        );
-
-        return;
-
-    }
-
-
-    /* =========================
-       KHÔNG CẬP NHẬT TRÙNG
-       ========================= */
-
-    if (
-        newStatus ===
-        order._status
-    ) {
-
-        alert(
-            "Đơn hàng đang ở trạng thái này."
-        );
-
-        return;
-
-    }
-
-
+    if (orderActionsInFlight.has(String(orderId))) return;
+    orderActionsInFlight.add(String(orderId));
     try {
-
-        /* =========================
-           CẬP NHẬT TRẠNG THÁI
-           ========================= */
-
-        const {
-            error
-        } = await db.rpc(
-            "update_order_status",
-            {
-                p_order_id:
-                    Number(orderId),
-
-                p_new_status:
-                    newStatus
-            }
-        );
-
-
-        if (error) {
-
-            console.error(
-                "Lỗi cập nhật trạng thái:",
-                error
-            );
-
-            alert(
-                error.message ||
-                "Không thể cập nhật trạng thái."
-            );
-
-            return;
-
-        }
-
-
-        /* =================================================
-           QUAN TRỌNG:
-
-           KHÔNG GỌI settle_online_order Ở ĐÂY.
-
-           Khi người bán chuyển sang "Hoàn tất",
-           chỉ cập nhật trạng thái đơn.
-
-           TIỀN CHƯA ĐƯỢC GIẢI NGÂN.
-           ================================================= */
-
-
-        if (
-            newStatus === "completed"
-        ) {
-
-            alert(
-                "✓ Đã cập nhật đơn hàng thành Hoàn tất.\n\n" +
-                "Người mua sẽ xác nhận Đã nhận được hàng " +
-                "trước khi tiền được giải ngân vào Ví IUH."
-            );
-
-        }
-        else {
-
-            alert(
-                "✓ Đã cập nhật trạng thái đơn hàng."
-            );
-
-        }
-
-
-        /* =========================
-           TẢI LẠI DATABASE
-           ========================= */
-
+        const { error } = await db.rpc('update_order_status', { p_order_id: Number(orderId), p_new_status: next });
+        if (error) throw error;
+        alert(next === 'delivered' ? 'Đã báo giao hàng. Đơn đang chờ admin xác nhận hoàn tất.' : 'Đã nhận đơn. Hãy xác nhận đã giao sau khi giao hàng.');
         await refreshPageData();
-
-    }
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-        alert(
-            "Có lỗi xảy ra khi cập nhật đơn hàng."
-        );
-
-    }
-
+    } catch (error) { alert(error.message || 'Không cập nhật được đơn hàng.'); }
+    finally { orderActionsInFlight.delete(String(orderId)); }
 }
 
 /* =========================================================
@@ -3012,8 +2594,18 @@ document.addEventListener(
 
         /* TẢI ĐƠN */
         await refreshPageData();
+        if (window.location.hash === '#sale') document.querySelector('[data-tab="sale"]')?.click();
     }
 );
+
+// Refresh handoffs from the other participants while this page is visible.
+let orderRefreshBusy = false;
+const orderRefreshTimer = setInterval(async () => {
+    if (document.hidden || orderRefreshBusy || orderActionsInFlight.size) return;
+    orderRefreshBusy = true;
+    try { await refreshPageData(); } finally { orderRefreshBusy = false; }
+}, 30000);
+window.addEventListener('pagehide', () => clearInterval(orderRefreshTimer));
 
 
 /* =========================================================

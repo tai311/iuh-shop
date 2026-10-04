@@ -26,9 +26,9 @@ test('payOS orders separate 5% fee, shipping and bank payouts without crediting 
   await as(admin);assert.equal(Number(await scalar('select pending from public.iuh_wallets where user_id=$1',[admin])),110000);
   let detail=await scalar("select public.admin_operation_detail('orders',$1)",[String(o.id)]);
   assert.equal(detail.finance.platform_fee,5000);assert.equal(detail.finance.shipping_fee,5000);assert.equal(detail.finance.seller_net,100000);assert.equal(detail.finance.payout_status,'not_ready');
-  await as(seller);for(const status of ['confirmed','shipping','delivered'])await q('select public.update_order_status($1,$2)',[o.id,status]);
+  await as(admin);await q('select public.admin_confirm_order_payment($1,null)',[o.id]);await as(seller);for(const status of ['shipping','delivered'])await q('select public.update_order_status($1,$2)',[o.id,status]);
   await assert.rejects(q("select public.update_order_status($1,'completed')",[o.id]));
-  await as(buyer);await q("select public.update_order_status($1,'completed')",[o.id]);await q('select public.settle_online_order($1)',[o.id]);
+  await as(admin);await q("select public.update_order_status($1,'completed')",[o.id]);await q('select public.settle_online_order($1)',[o.id]);
   await as(admin);detail=await scalar("select public.admin_operation_detail('orders',$1)",[String(o.id)]);
   assert.equal(detail.finance.payout_status,'pending');assert.equal(detail.finance.remaining_payout,100000);assert.equal(detail.payouts.length,1);assert.ok(detail.payouts[0].payout_id);
   assert.equal(Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[admin])),10000);assert.equal(Number(await scalar('select pending from public.iuh_wallets where user_id=$1',[admin])),100000);

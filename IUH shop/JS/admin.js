@@ -835,6 +835,12 @@ async function loadAdminRevenue() {
                     .order("created_at", { ascending: false }).order("id"));
             }
         }
+        const trialEntries = await readAll(() => supabaseClient.from("trial_financial_entries")
+            .select("id,kind,amount,title,created_at").in("kind", ["platform", "shipping", "package"]).order("id"));
+        walletTransactions.push(...trialEntries.map(entry => ({
+            ...entry, id: "trial-" + entry.id, type: "fee", source: "trial",
+            description: "Ghi nhận chạy thử", title: entry.title + " · Chạy thử"
+        })));
         // Trial orders complete the workflow without collecting real money.
         const trialOrders = await readAll(() => supabaseClient.from("orders")
             .select("id,total_amount").eq("payment_method", "trial")
@@ -6923,7 +6929,7 @@ async function loadFinance() {
     }
     const trials = revenue.trialOrders || [];
     if ($("financeTrialSummary")) {
-        $("financeTrialSummary").textContent = "Đơn dùng thử đã hoàn thành: " + trials.length + " · Giá trị đơn: " + formatMoney(trials.reduce((total, order) => total + Number(order.total_amount || 0), 0)) + ". Thu thực tế 0đ; không cộng vào tổng thu.";
+        $("financeTrialSummary").textContent = "Đơn dùng thử đã hoàn thành: " + trials.length + " · Giá trị đơn: " + formatMoney(trials.reduce((total, order) => total + Number(order.total_amount || 0), 0)) + ". Doanh thu và phí của các đơn này đã được cộng vào báo cáo, có nhãn Chạy thử.";
     }
 
     financeTransactions =
@@ -8983,6 +8989,8 @@ document.addEventListener(
         await loadDashboard();
 
         setupRealtime();
+
+        if (window.location.hash === '#orders') openPage('orders');
 
     }
 );

@@ -83,11 +83,11 @@ test('Payments, packages, orders and permissions preserve money and ownership',a
    assert.equal(await scalar('select payment_status from public.orders where id=$1',[a.order_id]),'refunded');
    assert.equal(Number(await scalar('select pending from public.iuh_wallets where user_id=$1',[admin])),0);
   });
-  await t.test('buyer completion releases 100k to seller and 5k fee exactly once',async()=>{
+  await t.test('admin completion releases 100k to seller and 5k fee exactly once',async()=>{
    await as(buyer);const a=await order('iuh_wallet','order-wallet');
-   await as(seller);for(const status of ['confirmed','shipping','delivered'])await q('select public.update_order_status($1,$2)',[a.order_id,status]);
+   await as(admin);await q('select public.admin_confirm_order_payment($1,null)',[a.order_id]);await as(seller);for(const status of ['shipping','delivered'])await q('select public.update_order_status($1,$2)',[a.order_id,status]);
    await assert.rejects(q("select public.update_order_status($1,'completed')",[a.order_id]));
-   await as(buyer);await q("select public.update_order_status($1,'completed')",[a.order_id]);await q('select public.settle_online_order($1)',[a.order_id]);
+   await as(admin);await q("select public.update_order_status($1,'completed')",[a.order_id]);await q('select public.settle_online_order($1)',[a.order_id]);
    await as(seller);assert.equal(Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[seller])),100000);
    await as(admin);assert.equal(Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[admin])),72000);assert.equal(Number(await scalar('select pending from public.iuh_wallets where user_id=$1',[admin])),0);
   });
@@ -155,14 +155,14 @@ test('Payments, packages, orders and permissions preserve money and ownership',a
      const orderRow=await q('select payment_method,payment_status,captured_amount,escrow_admin_id from public.orders where id=$1',[orderId]);
     assert.deepEqual({...orderRow[0],captured_amount:Number(orderRow[0].captured_amount)},{payment_method:'trial',payment_status:'unpaid',captured_amount:0,escrow_admin_id:null});
     await as(admin);const adminOrder=await scalar("select public.admin_operation_detail('orders',$1)",[orderId]);assert.equal(adminOrder.record.status,'pending');assert.equal(adminOrder.record.payment_method,'trial');await q("select public.update_order_status($1,'confirmed')",[orderId]);
-    assert.equal(await scalar('select status from public.orders where id=$1',[orderId]),'shipping');
+    assert.equal(await scalar('select status from public.orders where id=$1',[orderId]),'confirmed');
     await q('select public.admin_confirm_order_payment($1,null)',[orderId]);
     await as(seller);await assert.rejects(q("select public.update_order_status($1,'completed')",[orderId]));
     await as(buyer);await assert.rejects(q("select public.update_order_status($1,'completed')",[orderId]));
-    await as(admin);await q("select public.update_order_status($1,'completed')",[orderId]);
+    await as(seller);await q("select public.update_order_status($1,'shipping')",[orderId]);await q("select public.update_order_status($1,'delivered')",[orderId]);await as(admin);await q("select public.update_order_status($1,'completed')",[orderId]);
     await q("select public.update_order_status($1,'completed')",[orderId]);
      const finance=await (async()=>{await as(admin);return (await q('select * from public.admin_order_financials where order_id=$1',[orderId]))[0];})();
-     assert.equal(finance.payout_method,'trial');assert.equal(finance.payout_status,'trial');
+     assert.equal(finance.payout_method,'trial');assert.equal(finance.payout_status,'trial_recorded');
      assert.equal(Number(await scalar('select count(*) from public.order_bank_payouts where order_id=$1',[orderId])),0);
      assert.equal(Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[buyer])),buyerBalance);
      assert.equal(Number(await scalar('select balance from public.iuh_wallets where user_id=$1',[seller])),sellerBalance);

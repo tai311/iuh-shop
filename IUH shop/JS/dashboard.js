@@ -722,19 +722,7 @@ function normalizeStatus(order) {
 
 
 function isCompleted(order) {
-
-    const status =
-        normalizeStatus(order);
-
-
-    return (
-        status === "completed" ||
-        status === "delivered" ||
-        status === "hoàn thành" ||
-        status === "hoan thanh" ||
-        status === "đã giao" ||
-        status === "da giao"
-    );
+    return normalizeStatus(order) === 'completed';
 }
 
 
@@ -798,6 +786,7 @@ function isOnlinePayment(order) {
 
     return (
         method === "qr" ||
+        method === "trial" ||
         method === "iuh_wallet" ||
         method === "wallet" ||
         method.includes("qr") ||
