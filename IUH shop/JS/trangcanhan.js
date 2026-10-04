@@ -664,7 +664,7 @@ async function loadProfileUser(userId) {
         error
     } = await supabaseClient
 
-        .from("users")
+        .from("public_profiles")
 
         .select(`
             user_id,
@@ -673,7 +673,6 @@ async function loadProfileUser(userId) {
             role,
             student_verified,
             faculty,
-            student_id,
             bio
         `)
 

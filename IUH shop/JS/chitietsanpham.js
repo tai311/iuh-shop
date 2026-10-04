@@ -563,11 +563,10 @@ async function loadSeller(sellerId) {
             data: seller,
             error
         } = await supabaseClient
-            .from("users")
+            .from("public_profiles")
             .select(`
                 user_id,
                 fullname,
-                email,
                 avatar_url,
                 student_verified,
                 role
@@ -622,7 +621,6 @@ currentSeller = seller;
 
 const fullname =
     seller.fullname?.trim() ||
-    seller.email?.split("@")[0] ||
     "Không xác định";
 
 if (sellerName) {

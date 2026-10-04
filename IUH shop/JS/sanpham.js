@@ -201,7 +201,7 @@ async function loadProducts() {
                 error: userError
             } = await supabaseClient
 
-                .from("users")
+                .from("public_profiles")
 
                 .select(`
                     user_id,
