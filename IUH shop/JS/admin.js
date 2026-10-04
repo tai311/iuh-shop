@@ -811,99 +811,34 @@ async function loadAdminRevenue() {
 
     try {
 
-        /* =========================================
-           LẤY ADMIN
-        ========================================= */
-
-        const {
-            data: admins,
-            error: adminError
-        } =
-            await supabaseClient
-                .from("users")
-                .select("user_id")
-                .eq(
-                    "role",
-                    "admin"
-                )
-                .limit(1);
-
-
-        if (adminError) {
-            throw adminError;
+        // Page through the ledger so totals do not stop at the API row limit.
+        async function readAll(query) {
+            const rows = [];
+            for (let offset = 0; ; offset += 500) {
+                const { data, error } = await query().range(offset, offset + 499);
+                if (error) throw error;
+                rows.push(...(data || []));
+                if (!data || data.length < 500) return rows;
+            }
         }
-
-
+        const admins = await readAll(() => supabaseClient.from("users")
+            .select("user_id").eq("role", "admin").order("user_id"));
         let walletTransactions = [];
-
-
-        /* =========================================
-           LẤY GIAO DỊCH VÍ ADMIN
-        ========================================= */
-
-        if (admins?.length) {
-
-            const {
-                data: wallet,
-                error: walletError
-            } =
-                await supabaseClient
-                    .from("iuh_wallets")
-                    .select("id")
-                    .eq(
-                        "user_id",
-                        admins[0].user_id
-                    )
-                    .maybeSingle();
-
-
-            if (walletError) {
-                throw walletError;
-            }
-
-
-            if (wallet) {
-
-                const {
-                    data,
-                    error
-                } =
-                    await supabaseClient
-                        .from("wallet_transactions")
-                        .select(`
-                            id,
-                            type,
-                            title,
-                            amount,
-                            description,
-                            created_at
-                        `)
-                        .eq(
-                            "wallet_id",
-                            wallet.id
-                        )
-                        .eq(
-                            "type",
-                            "fee"
-                        )
-                        .order(
-                            "created_at",
-                            {
-                                ascending: false
-                            }
-                        );
-
-
-                if (error) {
-                    throw error;
-                }
-
-
-                walletTransactions =
-                    data || [];
+        if (admins.length) {
+            const wallets = await readAll(() => supabaseClient.from("iuh_wallets")
+                .select("id").in("user_id", admins.map(admin => admin.user_id)).order("id"));
+            if (wallets.length) {
+                walletTransactions = await readAll(() => supabaseClient.from("wallet_transactions")
+                    .select("id,type,title,amount,description,created_at")
+                    .in("wallet_id", wallets.map(wallet => wallet.id))
+                    .or("type.eq.fee,and(type.eq.sale,title.in.(Phí dịch vụ đã hoàn tất,Phí đẩy tin,Phí đơn COD))")
+                    .order("created_at", { ascending: false }).order("id"));
             }
         }
-
+        // Trial orders complete the workflow without collecting real money.
+        const trialOrders = await readAll(() => supabaseClient.from("orders")
+            .select("id,total_amount").eq("payment_method", "trial")
+            .eq("status", "completed").eq("payment_status", "paid").order("id"));
 
         /* =========================================
            LẤY DOANH THU QUẢNG CÁO
@@ -1173,7 +1108,8 @@ async function loadAdminRevenue() {
             advertising:
                 advertisingRevenue,
 
-            transactions
+            transactions,
+            trialOrders
 
         };
 
@@ -1202,7 +1138,8 @@ async function loadAdminRevenue() {
 
             advertising: 0,
 
-            transactions: []
+            transactions: [],
+            error
 
         };
 
@@ -5369,8 +5306,7 @@ function updatePackageOverview() {
 
 
             if (
-                text.includes("gói") ||
-                text.includes("dịch vụ")
+                text.includes("gói")
             ) {
 
                 packageRevenue +=
@@ -6977,6 +6913,18 @@ async function loadFinance() {
     const revenue =
         await loadAdminRevenue();
 
+
+    if (revenue.error) {
+        financeTransactions = [];
+        $("financeTotal").textContent = "—";
+        if ($("financeTrialSummary")) $("financeTrialSummary").textContent = "";
+        list.innerHTML = '<div class="empty-box">Không tải được dữ liệu tài chính. Vui lòng mở lại mục Tài chính để thử lại.</div>';
+        return;
+    }
+    const trials = revenue.trialOrders || [];
+    if ($("financeTrialSummary")) {
+        $("financeTrialSummary").textContent = "Đơn dùng thử đã hoàn thành: " + trials.length + " · Giá trị đơn: " + formatMoney(trials.reduce((total, order) => total + Number(order.total_amount || 0), 0)) + ". Thu thực tế 0đ; không cộng vào tổng thu.";
+    }
 
     financeTransactions =
         revenue.transactions || [];
