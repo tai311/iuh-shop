@@ -1483,7 +1483,9 @@ function getShippingFee() {
         shippingMethod === "mid"
     ) {
 
-        return 5000;
+        return 5000 * new Set(checkoutItems
+            .filter(item => !item.is_consignment && !item.consignment_request_id)
+            .map(item => item.seller_id)).size;
 
     }
 
@@ -1522,30 +1524,14 @@ function getSellerSubtotal() {
 ========================================================= */
 
 function getPlatformFee() {
-
-    return Math.round(
-        getSellerSubtotal() *
-        PLATFORM_FEE_RATE
-    );
+    return getBuyerSubtotal() - getSellerSubtotal();
 }
-
-
-/* =========================================================
-   TIỀN HÀNG NGƯỜI MUA PHẢI TRẢ
-========================================================= */
 
 function getBuyerSubtotal() {
-
-    return (
-        getSellerSubtotal() +
-        getPlatformFee()
-    );
+    return checkoutItems.reduce((sum, item) => sum +
+        Math.round(Number(item.price || 0) * (item.is_consignment || item.consignment_request_id ? 1 : 1.05)) *
+        Number(item.quantityInCart || 0), 0);
 }
-
-
-/* =========================================================
-   TỔNG THANH TOÁN
-========================================================= */
 
 function getTotal() {
 
@@ -1556,6 +1542,18 @@ function getTotal() {
 }
 
 function updateSummary() {
+    const groups = new Set(checkoutItems.map(item => item.seller_id + ':' + !!(item.is_consignment || item.consignment_request_id)));
+    let note = document.getElementById('checkoutSplitNote');
+    if (!note && totalEl?.parentElement) {
+        note = document.createElement('p'); note.id = 'checkoutSplitNote';
+        note.style.cssText = 'font-size:13px;line-height:1.5;color:#52627a;margin:12px 0';
+        totalEl.parentElement.insertAdjacentElement('afterend', note);
+    }
+    if (note) {
+        note.hidden = groups.size < 2;
+        note.textContent = 'Giỏ hàng sẽ tách thành ' + groups.size + ' đơn để từng người bán xử lý. Phí giao trung gian: 5.000đ/đơn thường; gặp trực tiếp và đơn ký gửi miễn phí.';
+    }
+
 
     const sellerSubtotal =
         getSellerSubtotal();
@@ -2708,7 +2706,7 @@ async function submitOrder() {
             data,
             error
         } = await db.rpc(
-            "create_order",
+            "create_checkout_orders",
             requestArgs
         );
 
@@ -2760,7 +2758,14 @@ async function submitOrder() {
                     ? "Đơn đã tạo. Đang mở PayOS để thanh toán; trạng thái sẽ tự cập nhật sau khi ngân hàng xác nhận."
                     : "Đã gửi đơn. Thanh toán khi nhận hàng; đơn đang chờ xác nhận.";
 
-        showToast(successMessage);
+        const orderCount = Number(data.order_count || 1);
+        showToast(orderCount > 1
+            ? (trialMode
+                ? 'Đã tạo ' + orderCount + ' đơn theo người bán. Admin sẽ xác nhận thanh toán từng đơn.'
+                : paymentMethod === 'qr'
+                    ? 'Đã tạo ' + orderCount + ' đơn theo người bán. Mở từng đơn trong Đơn hàng để thanh toán.'
+                    : 'Đã tạo ' + orderCount + ' đơn theo người bán để xử lý riêng.')
+            : successMessage);
 
 
         console.log(
