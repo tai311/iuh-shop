@@ -8,7 +8,7 @@ const financeSource = source.slice(source.indexOf('async function loadFinance()'
 // Strip the trailing comment opener before evaluating the finance function.
 const financeFunction = financeSource.slice(0, financeSource.lastIndexOf('/*'));
 
-function fixture({ many = false, fail = false } = {}) {
+function fixture({ many = false, fail = false, boostEntry = false } = {}) {
     const row = (id, wallet_id, type, title, amount) => ({ id, wallet_id, type, title, amount, created_at: '2026-10-04', description: '' });
     const tables = {
         users: [{ user_id: 'a', role: 'admin' }, { user_id: 'b', role: 'admin' }],
@@ -30,6 +30,7 @@ function fixture({ many = false, fail = false } = {}) {
         advertisements: []
     };
     if (many) tables.wallet_transactions.push(...Array.from({ length: 1100 }, (_, i) => row(100 + i, 1, 'fee', 'Thu phí sàn', 1)));
+    if (boostEntry) tables.trial_financial_entries.push({ id: 5, kind: 'boost', amount: 3000, title: 'Phí đẩy tin · Sản phẩm #41', created_at: '2026-10-04' });
     const requests = [];
     const db = { from(table) {
         let rows = tables[table].slice();
@@ -83,4 +84,15 @@ test('Finance displays a load error instead of claiming zero revenue', async () 
     await f.context.loadFinance();
     assert.equal(f.nodes.financeTotal.textContent, '—');
     assert.match(f.nodes.financeList.innerHTML, /Không tải được/);
+});
+
+test('Free boost ledger entries appear as boost revenue with no trial tag', async () => {
+    const f = fixture({ boostEntry: true });
+    const revenue = await f.context.loadAdminRevenue();
+    assert.equal(revenue.boost, 6000);
+    assert.equal(revenue.total, 105750);
+    const entry = revenue.transactions.find(r => r.title.includes('#41'));
+    assert.equal(entry.title, 'Phí đẩy tin · Sản phẩm #41');
+    await f.context.loadFinance();
+    assert.match(f.nodes.financeList.innerHTML, /Phí đẩy tin · Sản phẩm #41/);
 });
