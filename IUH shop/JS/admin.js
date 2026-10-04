@@ -836,10 +836,11 @@ async function loadAdminRevenue() {
             }
         }
         const trialEntries = await readAll(() => supabaseClient.from("trial_financial_entries")
-            .select("id,kind,amount,title,created_at").in("kind", ["platform", "shipping", "package"]).order("id"));
+            .select("id,kind,amount,title,created_at").in("kind", ["platform", "shipping", "package", "donation"]).order("id"));
         walletTransactions.push(...trialEntries.map(entry => ({
             ...entry, id: "trial-" + entry.id, type: "fee", source: "trial",
-            description: "Ghi nhận chạy thử", title: entry.title + " · Chạy thử"
+            description: entry.kind === "donation" ? "Donate" : "Ghi nhận chạy thử",
+            title: entry.kind === "donation" ? entry.title : entry.title + " · Chạy thử"
         })));
         // Trial orders complete the workflow without collecting real money.
         const trialOrders = await readAll(() => supabaseClient.from("orders")

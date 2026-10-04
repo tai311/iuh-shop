@@ -616,6 +616,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../JS/mobile-navigation.js"></script>
 <script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/iuh-core.js"></script>
 <script src="../JS/ok.js"></script>
 <script src="../JS/vedau.js"></script>
 <!-- NÚT VỀ ĐẦU TRANG -->
@@ -739,19 +740,11 @@
                  QR
             ========================================== -->
 
-            <div class="donate-qr-box">
-
-                <img
-                    id="donateQrCode"
-                    src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=IUH%20SHOP%20DONATE"
-                    alt="QR Donate IUH SHOP"
-                >
-
-            </div>
 
 
-            <div class="donate-qr-note">
-                QR mô phỏng giao dịch Donate
+
+            <div id="donateModeNote" class="donate-qr-note">
+                Chọn số tiền và xác nhận Donate.
             </div>
 
 
@@ -975,12 +968,10 @@
                 <div>
 
                     <h3>
-                        Xác nhận chuyển khoản
+                        Xác nhận Donate
                     </h3>
 
-                    <p>
-                        Đây là giao dịch mô phỏng.
-                    </p>
+                    <p id="donateConfirmNote">Kiểm tra thông tin Donate trước khi xác nhận.</p>
 
                 </div>
 
@@ -992,11 +983,11 @@
                 <div class="donate-bank-header">
 
                     <span>
-                        CHUYỂN KHOẢN MÔ PHỎNG
+                        THÔNG TIN DONATE
                     </span>
 
                     <span class="donate-bank-badge">
-                        QR
+                        Donate
                     </span>
 
                 </div>
@@ -1081,7 +1072,7 @@
                     class="donate-main-button"
                     type="button"
                 >
-                    XÁC NHẬN CHUYỂN KHOẢN
+                    XÁC NHẬN DONATE
                 </button>
 
             </div>
@@ -1153,5 +1144,6 @@
     </div>
 
 </div>
+<script src="../JS/donate.js"></script>
 </body>
 </html>
