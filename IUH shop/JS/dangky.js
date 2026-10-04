@@ -1,539 +1,118 @@
-/* =========================================
-   SUPABASE
-========================================= */
-
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
-
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
-
-
-/* =========================================
-   HIỆN / ẨN MẬT KHẨU
-========================================= */
+/* Student cards are private object paths, never public URLs. */
+const supabaseClient = window.IUHCore?.getClient() || window.supabase.createClient(
+    "https://xecxofmogvqysejjpxvl.supabase.co",
+    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC"
+);
+const registerForm = document.getElementById("registerForm");
+const studentCardInput = document.getElementById("studentCard");
+const studentCardPreview = document.getElementById("studentCardPreview");
+const cardExtensions = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+let registering = false;
+let accountCreated = false;
 
 function togglePassword(inputId, button) {
+    const input = document.getElementById(inputId);
+    input.type = input.type === "password" ? "text" : "password";
+    button.textContent = input.type === "password" ? "Hiện" : "Ẩn";
+}
 
-    const input =
-        document.getElementById(inputId);
+function validCard(file) {
+    return file && cardExtensions[file.type] && file.size > 0 && file.size <= 5 * 1024 * 1024;
+}
 
-    if (input.type === "password") {
-
-        input.type = "text";
-
-        button.textContent = "Ẩn";
-
-    } else {
-
-        input.type = "password";
-
-        button.textContent = "Hiện";
+studentCardInput.addEventListener("change", function () {
+    studentCardPreview.replaceChildren();
+    studentCardPreview.classList.remove("show");
+    const file = this.files?.[0];
+    if (!file) return;
+    if (!validCard(file)) {
+        this.value = "";
+        alert("Chọn ảnh JPG, PNG hoặc WebP tối đa 5MB.");
+        return;
     }
-}
-
-
-/* =========================================
-   FORM ĐĂNG KÝ
-========================================= */
-
-const registerForm =
-    document.getElementById("registerForm");
-const studentCardInput =
-    document.getElementById("studentCard");
-
-const studentCardPreview =
-    document.getElementById("studentCardPreview");
-
-const isGraduatedInput =
-    document.getElementById("isGraduated");
-
-/* =========================================
-   XEM TRƯỚC THẺ SINH VIÊN
-========================================= */
-
-if (studentCardInput) {
-
-    studentCardInput.addEventListener(
-        "change",
-        function () {
-
-            const file =
-                this.files?.[0];
-
-            if (!file) {
-                studentCardPreview.innerHTML = "";
-                studentCardPreview.classList.remove("show");
-                return;
-            }
-
-            if (!file.type.startsWith("image/")) {
-
-                this.value = "";
-
-                alert(
-                    "Vui lòng chọn file hình ảnh."
-                );
-
-                return;
-            }
-
-            if (file.size > 5 * 1024 * 1024) {
-
-                this.value = "";
-
-                alert(
-                    "Ảnh thẻ sinh viên không được vượt quá 5MB."
-                );
-
-                return;
-            }
-
-            const reader =
-                new FileReader();
-
-            reader.onload =
-                function (event) {
-
-                    studentCardPreview.innerHTML = `
-                        <img
-                            src="${event.target.result}"
-                            alt="Thẻ sinh viên"
-                        >
-                    `;
-
-                    studentCardPreview.classList.add(
-                        "show"
-                    );
-                };
-
-            reader.readAsDataURL(file);
-
-        }
-    );
-
-}
-
-
-registerForm.addEventListener(
-    "submit",
-    async function (event) {
-
-        event.preventDefault();
-
-
-        /* ==============================
-           LẤY DỮ LIỆU
-        ============================== */
-
-        const fullName =
-            document
-                .getElementById("fullName")
-                .value
-                .trim();
-
-
-        const studentId =
-            document
-                .getElementById("studentId")
-                .value
-                .trim();
-
-
-        const faculty =
-            document
-                .getElementById("faculty")
-                .value;
-
-
-        const email =
-            document
-                .getElementById("email")
-                .value
-                .trim();
-
-
-        const phone =
-            document
-                .getElementById("phone")
-                .value
-                .trim();
-
-        const studentCardFile =
-    document
-        .getElementById("studentCard")
-        .files?.[0];
-
-const isGraduated =
-    document
-        .getElementById("isGraduated")
-        .checked;
-
-
-        const password =
-            document
-                .getElementById("password")
-                .value;
-
-
-        const confirmPassword =
-            document
-                .getElementById("confirmPassword")
-                .value;
-
-
-        const agreeTerms =
-            document
-                .getElementById("agreeTerms")
-                .checked;
-
-
-        const message =
-            document.getElementById("formMessage");
-
-
-        const button =
-            registerForm.querySelector(
-                ".auth-button"
-            );
-
-
-        /* ==============================
-           XÓA THÔNG BÁO CŨ
-        ============================== */
-
-        message.textContent = "";
-
-
-        /* ==============================
-           KIỂM TRA MẬT KHẨU
-        ============================== */
-
-        if (password.length < 8) {
-
-            message.textContent =
-                "Mật khẩu phải có ít nhất 8 ký tự.";
-
-            message.style.color = "#d64545";
-
-            return;
-        }
-
-
-        /* ==============================
-           XÁC NHẬN MẬT KHẨU
-        ============================== */
-
-        if (password !== confirmPassword) {
-
-            message.textContent =
-                "Mật khẩu xác nhận không trùng khớp.";
-
-            message.style.color = "#d64545";
-
-            return;
-        }
-
-
-        /* ==============================
-           KIỂM TRA ĐIỀU KHOẢN
-        ============================== */
-
-        if (!agreeTerms) {
-
-            message.textContent =
-                "Vui lòng đồng ý với Điều khoản sử dụng.";
-
-            message.style.color = "#d64545";
-
-            return;
-        }
-
-        if (!studentCardFile) {
-
-    message.textContent =
-        "Vui lòng tải lên thẻ sinh viên.";
-
-    message.style.color =
-        "#d64545";
-
-    return;
-}
-
-
-if (studentCardFile.size > 5 * 1024 * 1024) {
-
-    message.textContent =
-        "Ảnh thẻ sinh viên không được vượt quá 5MB.";
-
-    message.style.color =
-        "#d64545";
-
-    return;
-}
-
-        /* ==============================
-           KHÓA BUTTON
-        ============================== */
-
-        button.disabled = true;
-
-        button.textContent =
-            "ĐANG TẠO TÀI KHOẢN...";
-
-
-        /* ==============================
-           ĐĂNG KÝ SUPABASE AUTH
-        ============================== */
-
-        const {
-            data,
-            error
-        } = await supabaseClient.auth.signUp({
-
-            email: email,
-
-            password: password,
-
-            options: {
-
-                data: {
-
-                    fullname: fullName,
-
-                    student_id: studentId,
-
-                    faculty: faculty,
-
-                    phone: phone
-                }
-            }
+    const reader = new FileReader();
+    reader.onload = event => {
+        if (studentCardInput.files?.[0] !== file) return;
+        const image = document.createElement("img");
+        image.src = event.target.result;
+        image.alt = "Thẻ sinh viên";
+        studentCardPreview.replaceChildren(image);
+        studentCardPreview.classList.add("show");
+    };
+    reader.readAsDataURL(file);
+});
+
+registerForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (registering || accountCreated) return;
+    const value = id => document.getElementById(id).value.trim();
+    const password = document.getElementById("password").value;
+    const file = studentCardInput.files?.[0];
+    const message = document.getElementById("formMessage");
+    const button = registerForm.querySelector(".auth-button");
+    const show = (text, failed = true) => {
+        message.textContent = text;
+        message.style.color = failed ? "#d64545" : "#193f9e";
+    };
+    show("");
+    if (password.length < 8) return show("Mật khẩu phải có ít nhất 8 ký tự.");
+    if (password !== document.getElementById("confirmPassword").value)
+        return show("Mật khẩu xác nhận không trùng khớp.");
+    if (!document.getElementById("agreeTerms").checked)
+        return show("Vui lòng đồng ý với Điều khoản sử dụng.");
+    if (!file) return show("Vui lòng tải lên thẻ sinh viên.");
+    if (!validCard(file)) return show("Chọn ảnh JPG, PNG hoặc WebP tối đa 5MB.");
+
+    registering = true;
+    button.disabled = true;
+    button.textContent = "ĐANG TẠO TÀI KHOẢN...";
+    let hasSession = false;
+    try {
+        const isGraduated = document.getElementById("isGraduated").checked;
+        const { data, error } = await supabaseClient.auth.signUp({
+            email: value("email"), password,
+            options: { data: {
+                fullname: value("fullName"), student_id: value("studentId"),
+                faculty: value("faculty"), phone: value("phone"), is_graduated: isGraduated
+            } }
         });
-
-
-        /* ==============================
-           XỬ LÝ LỖI
-        ============================== */
-
-        if (error) {
-
-            console.error(
-                "Lỗi đăng ký:",
-                error
-            );
-
-            message.textContent =
-                error.message;
-
-            message.style.color =
-                "#d64545";
-
-            button.disabled = false;
-
-            button.textContent =
-                "ĐĂNG KÝ";
-
+        if (error) throw error;
+        if (!data?.user) throw new Error("Không lấy được tài khoản vừa đăng ký. Vui lòng thử đăng nhập.");
+        accountCreated = true;
+        hasSession = Boolean(data.session);
+        if (!hasSession) {
+            show("Vui lòng kiểm tra email để xác nhận tài khoản, sau đó đăng nhập và gửi thẻ sinh viên tại mục Tài khoản → Xác thực sinh viên.", false);
             return;
         }
-
-        /* =========================================
-   UPLOAD THẺ SINH VIÊN
-========================================= */
-
-const newUser =
-    data?.user;
-
-if (!newUser) {
-
-    message.textContent =
-        "Không lấy được tài khoản vừa đăng ký.";
-
-    message.style.color =
-        "#d64545";
-
-    button.disabled = false;
-    button.textContent = "ĐĂNG KÝ";
-
-    return;
-}
-
-
-const fileExtension =
-    studentCardFile.name
-        .split(".")
-        .pop()
-        .toLowerCase();
-
-
-const filePath =
-    `${newUser.id}/${Date.now()}.${fileExtension}`;
-
-
-const {
-    error: uploadError
-} =
-    await supabaseClient
-        .storage
-        .from("student-cards")
-        .upload(
-            filePath,
-            studentCardFile,
-            {
-                cacheControl: "3600",
-                upsert: false
-            }
-        );
-
-
-if (uploadError) {
-
-    console.error(
-        "Lỗi upload thẻ sinh viên:",
-        uploadError
-    );
-
-    message.textContent =
-        "Tạo tài khoản thành công nhưng tải thẻ sinh viên thất bại.";
-
-    message.style.color =
-        "#d64545";
-
-    button.disabled = false;
-    button.textContent = "ĐĂNG KÝ";
-
-    return;
-}
-
-
-/* =========================================
-   LẤY URL ẢNH
-========================================= */
-
-const {
-    data: publicUrlData
-} =
-    supabaseClient
-        .storage
-        .from("student-cards")
-        .getPublicUrl(filePath);
-
-
-const studentCardUrl =
-    publicUrlData.publicUrl;
-
-/* =========================================
-   LƯU THÔNG TIN XÁC THỰC
-========================================= */
-
-const {
-    error: profileError
-} =
-    await supabaseClient
-        .from("users")
-        .update({
-            student_card_url:
-                studentCardUrl,
-
-            is_graduated:
-                isGraduated
-        })
-        .eq(
-            "user_id",
-            newUser.id
-        );
-
-
-if (profileError) {
-
-    console.error(
-        "Lỗi lưu thông tin sinh viên:",
-        profileError
-    );
-
-    message.textContent =
-        "Tài khoản đã tạo nhưng không lưu được thông tin thẻ.";
-
-    message.style.color =
-        "#d64545";
-
-    button.disabled = false;
-    button.textContent = "ĐĂNG KÝ";
-
-    return;
-}
-
-
-        /* ==============================
-           ĐĂNG KÝ THÀNH CÔNG
-        ============================== */
-
-        console.log(
-            "Đăng ký thành công:",
-            data
-        );
-
-
-        message.textContent =
-            "Đăng ký thành công! Đang chuyển sang trang đăng nhập...";
-
-        message.style.color =
-            "#193f9e";
-
-
-        /* ==============================
-           CHUYỂN TRANG
-        ============================== */
-
-        showPageTransition();
-
-setTimeout(() => {
-    window.location.href = "dangnhap.html";
-}, 1000);
-
+        const objectPath = `${data.user.id}/${crypto.randomUUID()}.${cardExtensions[file.type]}`;
+        const { error: uploadError } = await supabaseClient.storage.from("student-cards")
+            .upload(objectPath, file, { upsert: false, contentType: file.type });
+        if (uploadError) throw uploadError;
+        const { data: profile, error: profileError } = await supabaseClient.from("users").update({
+            student_card_url: objectPath,
+            verification_status: "pending",
+            is_graduated: isGraduated
+        }).eq("user_id", data.user.id).select("user_id").single();
+        // A zero-row update must not be reported as a successful registration.
+        if (profileError || !profile) throw profileError || new Error("Chưa lưu được thông tin thẻ.");
+        show("Đăng ký thành công! Thẻ sinh viên đang chờ quản trị viên duyệt.", false);
+        window.location.href = "taikhoan.html";
+    } catch (error) {
+        console.error("Lỗi đăng ký:", error);
+        if (accountCreated) {
+            show("Tài khoản đã tạo nhưng chưa gửi được thẻ. Không cần đăng ký lại. " +
+                (hasSession ? "Vào mục Tài khoản → Xác thực sinh viên để gửi lại thẻ."
+                    : "Vui lòng đăng nhập rồi vào mục Tài khoản → Xác thực sinh viên để gửi lại thẻ."));
+            const link = document.createElement("a");
+            link.href = hasSession ? "taikhoan.html?verify=1" : "dangnhap.html";
+            link.textContent = hasSession ? " Tiếp tục xác thực sinh viên" : " Đăng nhập";
+            message.appendChild(link);
+        } else {
+            show(error.message || "Không thể kết nối. Vui lòng thử lại.");
+        }
+    } finally {
+        registering = false;
+        button.disabled = accountCreated;
+        button.textContent = accountCreated ? "ĐÃ TẠO TÀI KHOẢN" : "ĐĂNG KÝ";
     }
-);
-
-function showPageTransition() {
-
-    const transition =
-        document.createElement("div");
-
-    transition.className =
-        "page-transition";
-
-
-    transition.innerHTML = `
-        <div class="transition-content">
-
-            <img
-                src="../Images/logo-trang.png"
-                alt="IUH SHOP"
-                class="transition-logo"
-            >
-
-            <div class="transition-spinner"></div>
-
-            <div class="transition-text">
-                Đang chuyển đến trang đăng nhập...
-            </div>
-
-        </div>
-    `;
-
-
-    document.body.appendChild(transition);
-
-
-    requestAnimationFrame(() => {
-
-        transition.classList.add("active");
-
-    });
-
-}
+});
