@@ -1,0 +1,91 @@
+/* Shared PASSIT lockup: compact lettering with the symbol as the visual anchor. */
+.site-header .brand,
+.site-footer .footer-brand-row {
+    --passit-mark-size: 78px;
+    --passit-name-size: 32px;
+    --passit-slogan-size: 6.5px;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 4px;
+    min-width: 0;
+    width: max-content;
+    max-width: 100%;
+    margin: 0;
+    flex-shrink: 0;
+}
+.site-header .brand-logo,
+.site-footer .footer-logo img {
+    width: var(--passit-mark-size) !important;
+    height: var(--passit-mark-size);
+    flex: 0 0 var(--passit-mark-size);
+    object-fit: contain;
+    display: block;
+    margin: 0;
+}
+.site-footer .footer-logo {
+    flex: 0 0 var(--passit-mark-size);
+    margin: 0;
+}
+.site-header .brand-text,
+.site-footer .footer-brand-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-width: 0;
+    text-align: left;
+    transform: translateY(5px);
+}
+.site-header .brand-name,
+.site-footer .footer-brand-name {
+    font-family: 'Be Vietnam Pro', Arial, sans-serif;
+    font-size: var(--passit-name-size);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    white-space: nowrap;
+    margin: 0;
+}
+.site-header .brand-slogan,
+.site-footer .footer-brand-slogan {
+    display: block;
+    font-family: 'Be Vietnam Pro', Arial, sans-serif;
+    font-size: var(--passit-slogan-size);
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: -0.15px;
+    white-space: nowrap;
+    overflow-wrap: normal;
+    margin: 3px 0 0;
+}
+@media (max-width: 1100px) {
+    .site-header .brand {
+        --passit-mark-size: 64px;
+        --passit-name-size: 28px;
+        --passit-slogan-size: 6px;
+        gap: 5px;
+    }
+}
+@media (max-width: 760px) {
+    .site-header .brand {
+        --passit-mark-size: 58px;
+        --passit-name-size: 26px;
+        --passit-slogan-size: 5.8px;
+        gap: 4px;
+    }
+    .site-footer .footer-brand-row {
+        --passit-mark-size: 66px;
+        --passit-name-size: 28px;
+        --passit-slogan-size: 6px;
+        gap: 6px;
+        margin-inline: auto;
+    }
+}
+@media (max-width: 360px) {
+    .site-header .brand {
+        --passit-mark-size: 50px;
+        --passit-name-size: 24px;
+        --passit-slogan-size: 5.4px;
+    }
+}

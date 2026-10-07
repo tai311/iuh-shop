@@ -576,7 +576,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   IUH SHOP - KIỂM TRA ĐƠN HÀNG
+   PASSIT - KIỂM TRA ĐƠN HÀNG
    DATABASE VERSION
 ========================================================= */
 
@@ -984,7 +984,7 @@ async function loadOrdersFromDatabase() {
         }
 
         console.log(
-            "IUH SHOP: Đang tải đơn hàng từ Database..."
+            "PASSIT: Đang tải đơn hàng từ Database..."
         );
 
         const {
@@ -1013,7 +1013,7 @@ async function loadOrdersFromDatabase() {
 
 
         console.log(
-            "IUH SHOP: Đã tải đơn hàng:",
+            "PASSIT: Đã tải đơn hàng:",
             data
         );
 
@@ -1150,7 +1150,7 @@ function classifyOrders() {
 
 
     console.log(
-        "IUH SHOP: classifyOrders:",
+        "PASSIT: classifyOrders:",
         {
             userId,
             total: allOrders.length,
@@ -2390,7 +2390,7 @@ async function cancelOrder(orderId) {
                 formatMoney(
                     data.refund_amount
                 ) +
-                " đã được hoàn vào IUH Wallet."
+                " đã được hoàn vào Ví PASSIT."
             );
 
         }
@@ -2484,13 +2484,13 @@ async function updateOrderStatus(orderId) {
 
 async function refreshPageData() {
     try {
-        console.log("IUH SHOP: ===== BẮT ĐẦU TẢI ĐƠN HÀNG =====");
+        console.log("PASSIT: ===== BẮT ĐẦU TẢI ĐƠN HÀNG =====");
 
         /* 1. Lấy user đang đăng nhập */
         currentUser = await getCurrentUser();
 
         console.log(
-            "IUH SHOP: currentUser =",
+            "PASSIT: currentUser =",
             currentUser?.id || null
         );
 
@@ -2506,7 +2506,7 @@ async function refreshPageData() {
             renderHistory();
 
             console.log(
-                "IUH SHOP: Chưa đăng nhập."
+                "PASSIT: Chưa đăng nhập."
             );
 
             return;
@@ -2516,7 +2516,7 @@ async function refreshPageData() {
         allOrders = await loadOrdersFromDatabase();
 
         console.log(
-            "IUH SHOP: Tổng số đơn lấy được =",
+            "PASSIT: Tổng số đơn lấy được =",
             allOrders.length
         );
 
@@ -2524,12 +2524,12 @@ async function refreshPageData() {
         classifyOrders();
 
         console.log(
-            "IUH SHOP: Đơn mua =",
+            "PASSIT: Đơn mua =",
             purchaseOrders.length
         );
 
         console.log(
-            "IUH SHOP: Đơn bán =",
+            "PASSIT: Đơn bán =",
             saleOrders.length
         );
 
@@ -2539,12 +2539,12 @@ async function refreshPageData() {
         renderHistory();
 
         console.log(
-            "IUH SHOP: ===== TẢI ĐƠN HÀNG XONG ====="
+            "PASSIT: ===== TẢI ĐƠN HÀNG XONG ====="
         );
 
     } catch (error) {
         console.error(
-            "IUH SHOP: Lỗi refreshPageData:",
+            "PASSIT: Lỗi refreshPageData:",
             error
         );
     }
@@ -2560,7 +2560,7 @@ document.addEventListener(
     async function () {
 
         console.log(
-            "IUH SHOP: Trang đơn hàng đã sẵn sàng."
+            "PASSIT: Trang đơn hàng đã sẵn sàng."
         );
 
         /* Tab Đơn mua / Đơn bán */
@@ -2616,7 +2616,7 @@ supabaseClient.auth.onAuthStateChange(
     async function (event, session) {
 
         console.log(
-            "IUH SHOP: Auth event =",
+            "PASSIT: Auth event =",
             event
         );
 

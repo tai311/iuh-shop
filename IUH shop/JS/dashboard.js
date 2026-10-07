@@ -565,7 +565,7 @@ document.addEventListener(
 );
 
 /* =====================================================
-   IUH SHOP - DASHBOARD
+   PASSIT - DASHBOARD
    PHẦN TỪ DÒNG 567 TRỞ XUỐNG
 ===================================================== */
 
@@ -3028,7 +3028,7 @@ async function confirmPayment() {
     try {
 
         /*
-            Trừ tiền từ IUH Wallet.
+            Trừ tiền từ Ví PASSIT.
 
             Không dùng localStorage.
         */

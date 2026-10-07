@@ -1,5 +1,5 @@
 /* =========================================================
-   IUH SHOP - TIN NHẮN
+   PASSIT - TIN NHẮN
    SUPABASE + REALTIME + STORAGE
    ========================================================= */
 
@@ -25,7 +25,7 @@ const supabaseClient =
 const CHAT_BUCKET = "chat-images";
 
 const ADMIN_GREETING =
-    "Xin chào! 👋 Chào mừng bạn đến với IUH SHOP. Bạn cần hỗ trợ gì, cứ nhắn cho chúng tôi nhé!";
+    "Xin chào! 👋 Chào mừng bạn đến với PASSIT. Bạn cần hỗ trợ gì, cứ nhắn cho chúng tôi nhé!";
 
 
 /* =========================================================
@@ -221,7 +221,7 @@ async function getAdminUser() {
 
         fullname:
             admin.fullname ||
-            "Admin IUH SHOP",
+            "Admin PASSIT",
 
         avatar_url:
             admin.avatar_url ||
@@ -1788,8 +1788,8 @@ function renderActiveChatHeader(
 
     userStatus.textContent =
         user?.role === "admin"
-            ? "Hỗ trợ khách hàng · IUH SHOP"
-            : "Thành viên IUH SHOP";
+            ? "Hỗ trợ khách hàng · PASSIT"
+            : "Thành viên PASSIT";
 }
 }
 
@@ -2214,7 +2214,7 @@ async function getProductById(productId) {
     if (error) {
 
         console.error(
-            "IUH SHOP - Lỗi lấy sản phẩm chat:",
+            "PASSIT - Lỗi lấy sản phẩm chat:",
             error
         );
 
@@ -4315,7 +4315,7 @@ async function initChat() {
         if (sellerId) {
 
             console.log(
-                "IUH SHOP - Mở chat người bán:",
+                "PASSIT - Mở chat người bán:",
                 {
                     sellerId,
                     productId,
@@ -4358,7 +4358,7 @@ async function initChat() {
             if (!conversationId) {
 
                 console.log(
-                    "IUH SHOP - Chưa có chat, đang tạo..."
+                    "PASSIT - Chưa có chat, đang tạo..."
                 );
 
 
@@ -4385,7 +4385,7 @@ async function initChat() {
 
 
                 console.log(
-                    "IUH SHOP - Đã tạo conversation:",
+                    "PASSIT - Đã tạo conversation:",
                     conversationId
                 );
 
@@ -4499,7 +4499,7 @@ return;
            ================================================= */
 
         console.log(
-            "IUH SHOP - Không có chat được chọn."
+            "PASSIT - Không có chat được chọn."
         );
 
 

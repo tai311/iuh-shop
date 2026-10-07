@@ -1,5 +1,5 @@
 /* =========================================================
-   IUH SHOP - GLOBAL CHAT NOTIFICATION
+   PASSIT - GLOBAL CHAT NOTIFICATION
    Bóng chat + thông báo web + browser notification
 
    Chức năng:
@@ -36,7 +36,7 @@
     if (!window.supabase) {
 
         console.error(
-            "IUH SHOP Chat Notification: chưa load Supabase."
+            "PASSIT Chat Notification: chưa load Supabase."
         );
 
         return;
@@ -2930,7 +2930,7 @@ else {
         if (error) {
 
             console.error(
-                "IUH SHOP notification auth:",
+                "PASSIT notification auth:",
                 error
             );
 
@@ -2982,7 +2982,7 @@ else {
         if (error) {
 
             console.error(
-                "IUH SHOP notification profile:",
+                "PASSIT notification profile:",
                 error
             );
 
@@ -3066,7 +3066,7 @@ return {
         if (error) {
 
             console.error(
-                "IUH SHOP notification memberships:",
+                "PASSIT notification memberships:",
                 error
             );
 
@@ -3144,7 +3144,7 @@ return {
         if (error) {
 
             console.error(
-                "IUH SHOP notification unread:",
+                "PASSIT notification unread:",
                 error
             );
 
@@ -3731,7 +3731,7 @@ return {
                     status => {
 
                         console.log(
-                            "IUH SHOP Global Chat Notification:",
+                            "PASSIT Global Chat Notification:",
                             status
                         );
 
@@ -3821,7 +3821,7 @@ return {
          * ↓
          * is_read = false
          * ↓
-         * mở lại IUH SHOP
+         * mở lại PASSIT
          * ↓
          * bóng xuất hiện
          */
@@ -4084,7 +4084,7 @@ return {
 
 
 /* =========================================================
-   IUH SHOP - GLOBAL SEARCH
+   PASSIT - GLOBAL SEARCH
    Tìm kiếm:
    1. Sản phẩm
    2. Người dùng
@@ -5826,7 +5826,7 @@ function createUserSearchHTML(
 
                     ${escapeHTML(
                         user.fullname ||
-                        "Người dùng IUH"
+                        "Người dùng PASSIT"
                     )}
 
                 </div>

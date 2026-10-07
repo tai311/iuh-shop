@@ -1540,7 +1540,7 @@ body {
 
 
 /* =========================================================
-   IUH SHOP - TRANG SẢN PHẨM
+   PASSIT - TRANG SẢN PHẨM
    ========================================================= */
 
 :root {
@@ -1825,6 +1825,7 @@ body {
 }
 
 .category-option {
+    position: relative;
     min-height: 40px;
 
     display: grid;
@@ -1847,6 +1848,10 @@ body {
 
 .category-option input {
     position: absolute;
+    left: 0;
+    top: 0;
+    width: 1px;
+    height: 1px;
     opacity: 0;
     pointer-events: none;
 }

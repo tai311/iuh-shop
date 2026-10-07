@@ -1,5 +1,5 @@
 /* =========================================================
-   IUH SHOP - DANG TIN
+   PASSIT - DANG TIN
    PHÍ SÀN 5% + ĐIỀU KHOẢN + XÁC NHẬN
 ========================================================= */
 
@@ -1335,7 +1335,7 @@ async function processBoostPayment() {
         if (error) throw error;
         boostPaymentStatus.textContent = data === true
             ? 'Xác nhận để đăng tin nổi bật. Không cần chuyển khoản hoặc nạp ví.'
-            : 'Phí 3.000đ được trừ từ Ví IUH khi đăng thành công; miễn phí nếu có gói dịch vụ còn hạn.';
+            : 'Phí 3.000đ được trừ từ Ví PASSIT khi đăng thành công; miễn phí nếu có gói dịch vụ còn hạn.';
         confirmBoost.disabled = false;
     } catch (error) {
         boostPaymentStatus.textContent = error.message || 'Không kiểm tra được thanh toán. Vui lòng mở lại.';

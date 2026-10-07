@@ -566,7 +566,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   IUH SHOP - GIỎ HÀNG DATABASE
+   PASSIT - GIỎ HÀNG DATABASE
    =========================================================
    
    NGUỒN DỮ LIỆU:
@@ -918,7 +918,7 @@ async function loadCart() {
     catch (error) {
 
         console.error(
-            "IUH SHOP - Lỗi tải giỏ hàng:",
+            "PASSIT - Lỗi tải giỏ hàng:",
             error
         );
 
@@ -1148,7 +1148,7 @@ const itemTotal =
      */
 
     let imageUrl =
-        "../Images/default-product.png";
+        "../Images/default-product.svg";
 
 
     if (
@@ -1205,7 +1205,7 @@ const itemTotal =
                         "Sản phẩm"
                     )}"
                     onerror="
-                        this.src='../Images/default-product.png'
+                        this.onerror=null; this.src='../Images/default-product.svg'
                     "
                 >
 
@@ -1333,13 +1333,10 @@ const itemTotal =
                     class="cart-item-delete"
                     data-index="${index}"
                     title="Xóa sản phẩm"
+                    aria-label="Xóa ${escapeHTML(item.name || 'sản phẩm')} khỏi giỏ hàng"
                 >
 
-                    <i
-                        class="fa-regular fa-trash-can"
-                    ></i>
-
-                    Xóa
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg> Xóa
 
                 </button>
 
@@ -1653,50 +1650,35 @@ async function decreaseQuantity(
    REMOVE ITEM
    ========================================================= */
 
-async function removeCartItem(
-    index
-) {
-
-    const item =
-        cartItems[index];
-
-    if (!item) {
-        return;
-    }
-
-
+let cartRemovalBusy = false;
+async function removeCartItems(items) {
+    if (cartRemovalBusy || !items.length) return;
+    cartRemovalBusy = true;
+    const container = document.querySelector('.cart-container');
+    let removed = 0;
+    let confirmed = false;
     try {
-
-        await deleteCartItem(
-            item.cartId
-        );
-
-
-        cartItems.splice(
-            index,
-            1
-        );
-
-
-        renderCart();
-
-
-        showCartMessage(
-            "Đã xóa sản phẩm khỏi giỏ hàng."
-        );
-
+        confirmed = await window.PassitCartUI.confirmRemoval(items.map(item => item.name || 'Sản phẩm'));
+        if (!confirmed) return;
+        if (container) { container.inert = true; container.setAttribute('aria-busy', 'true'); }
+        for (const item of items) {
+            await deleteCartItem(item.cartId);
+            cartItems = cartItems.filter(row => row.cartId !== item.cartId);
+            removed++;
+        }
+        window.PassitCartUI.notify({ title: 'Đã xóa khỏi giỏ hàng', name: removed + ' sản phẩm đã được bỏ khỏi giỏ.' });
+    } catch (error) {
+        window.PassitCartUI.notify({ title: 'Chưa xóa được hết sản phẩm', name: removed ? 'Đã xóa ' + removed + ' sản phẩm. Các sản phẩm còn lại vẫn trong giỏ; bạn có thể thử lại.' : 'Không thể xóa sản phẩm. Vui lòng thử lại.', error: true });
+    } finally {
+        if (container) { container.inert = false; container.removeAttribute('aria-busy'); }
+        cartRemovalBusy = false;
+        if (confirmed) renderCart();
     }
-
-    catch (error) {
-
-        showCartMessage(
-            "Không thể xóa sản phẩm."
-        );
-
-    }
-
 }
-
+async function removeCartItem(index) {
+    const item = cartItems[index];
+    if (item) await removeCartItems([item]);
+}
 
 /* =========================================================
    SELECT ALL
@@ -1818,83 +1800,15 @@ function updateSelectAllState() {
    ========================================================= */
 
 if (removeSelectedCart) {
-
-    removeSelectedCart.addEventListener(
-        "click",
-        async function () {
-
-            const selectedItems =
-                cartItems.filter(
-                    item =>
-                        isItemSelected(item)
-                );
-
-
-            if (!selectedItems.length) {
-
-                showCartMessage(
-                    "Bạn chưa chọn sản phẩm nào."
-                );
-
-                return;
-            }
-
-
-            try {
-
-                /*
-                 * Xóa từng dòng trong database
-                 */
-
-                for (
-                    const item
-                    of selectedItems
-                ) {
-
-                    await deleteCartItem(
-                        item.cartId
-                    );
-
-                }
-
-
-                /*
-                 * Xóa khỏi state
-                 */
-
-                cartItems =
-                    cartItems.filter(
-                        item =>
-                            !isItemSelected(item)
-                    );
-
-
-                renderCart();
-
-
-                showCartMessage(
-                    `Đã xóa ${selectedItems.length} sản phẩm.`
-                );
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    error
-                );
-
-                showCartMessage(
-                    "Không thể xóa sản phẩm."
-                );
-
-            }
-
+    removeSelectedCart.addEventListener('click', async () => {
+        const selected = cartItems.filter(isItemSelected);
+        if (!selected.length) {
+            window.PassitCartUI.notify({ title: 'Chưa chọn sản phẩm', name: 'Chọn sản phẩm bạn muốn xóa khỏi giỏ hàng.', error: true });
+            return;
         }
-    );
-
+        await removeCartItems(selected);
+    });
 }
-
 
 /* =========================================================
    UPDATE SUMMARY

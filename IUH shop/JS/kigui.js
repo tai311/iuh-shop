@@ -970,7 +970,7 @@ for (let i = 0; i < files.length; i++) {
 
         alert(
             "Gửi yêu cầu ký gửi thành công!\n\n" +
-            "IUH SHOP sẽ kiểm tra sản phẩm của bạn."
+            "PASSIT sẽ kiểm tra sản phẩm của bạn."
         );
 
 
@@ -1733,7 +1733,7 @@ async function showConsignmentDetail(id) {
                         <div class="admin-note">
 
                             <span>
-                                PHẢN HỒI TỪ IUH SHOP
+                                PHẢN HỒI TỪ PASSIT
                             </span>
 
                             <p>

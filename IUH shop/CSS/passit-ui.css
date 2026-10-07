@@ -1,0 +1,253 @@
+/* PASSIT shared visual system: compact spacing, readable content, clear hierarchy. */
+body.passit-ui {
+    --passit-ink: #17243d;
+    --passit-muted: #52627b;
+    --passit-border: #dfe6f0;
+    --passit-surface: #f5f7fb;
+    --passit-gutter: clamp(14px, 3vw, 42px);
+    font-family: "Be Vietnam Pro", "Segoe UI", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--passit-ink);
+    background-color: var(--passit-surface);
+}
+/* Navigation remains independent of page content and mobile menu state. */
+body.passit-ui .site-header { box-shadow: 0 2px 12px #17243d0a; }
+body.passit-ui :is(.top-link, .welcome-text1, .header-user-name) { font-size: 14px; }
+body.passit-ui :is(.nav-item, .footer-links a) { font-size: 15px; }
+body.passit-ui .global-search-input { font-size: 14px; }
+body.passit-ui :is(a, button, input, select, textarea):focus-visible {
+    outline: 3px solid #e7b900;
+    outline-offset: 3px;
+}
+/* Page-level whitespace; horizontal layout remains specific to each page. */
+body.passit-ui :is(.products-page, .detail-page, .post-page, .dashboard-page,
+.checkout-page, .orders-page, .cart-page, .management-page, .account-page,
+.wallet-page, .profile-page, .consignment-page, .chat-page, .policy-page,
+.terms-page, .contact-page, .forum-page) {
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+body.passit-ui .page-shell { margin-top: 20px; margin-bottom: 40px; }
+body.passit-ui :is(.products-heading, .post-heading, .dashboard-heading,
+.wallet-heading, .chat-heading, .page-heading, .section-heading-row) {
+    margin-bottom: 20px;
+    gap: 16px;
+}
+body.passit-ui :is(.products-heading, .post-heading, .dashboard-heading,
+.wallet-heading, .chat-heading, .page-heading, .orders-hero, .cart-hero) h1 {
+    font-size: clamp(28px, 2.6vw, 36px);
+    line-height: 1.2;
+    letter-spacing: -0.8px;
+    margin-block: 4px 8px;
+}
+body.passit-ui :is(.products-heading, .post-heading, .dashboard-heading,
+.wallet-heading, .chat-heading, .page-heading, .verification-heading) p {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--passit-muted);
+}
+body.passit-ui :is(.section-kicker, .filter-kicker, .hero-kicker) {
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+/* Catalog: more room for products, quieter filters, stronger text. */
+body.passit-ui :is(.products-heading, .products-layout) {
+    width: min(1440px, calc(100% - var(--passit-gutter) * 2));
+}
+body.passit-ui .products-layout { gap: 20px; }
+body.passit-ui .products-heading { align-items: center; }
+body.passit-ui .products-toolbar { margin-bottom: 12px; gap: 12px; }
+body.passit-ui .products-toolbar h2 { font-size: 22px; line-height: 1.35; }
+body.passit-ui .products-toolbar p { font-size: 14px; color: var(--passit-muted); }
+body.passit-ui .filter-block { padding-block: 16px; }
+body.passit-ui :is(.filter-block > label, .filter-label-row label, .category-name) { font-size: 14px; }
+body.passit-ui .category-option { min-height: 42px; }
+body.passit-ui :is(.product-card, .featured-product-card, .recommended-product-card,
+.profile-product-card) { border-radius: 12px; box-shadow: 0 3px 12px #17243d06; }
+body.passit-ui :is(.product-name, .featured-product-name, .recommended-product-name) {
+    font-size: 16px;
+    line-height: 1.45;
+}
+body.passit-ui .product-description { font-size: 14px; line-height: 1.6; color: var(--passit-muted); }
+body.passit-ui :is(.product-category-text, .product-quantity, .seller-name) { font-size: 13px; }
+body.passit-ui :is(.product-category-badge, .seller-type, .seller-role) { font-size: 12px; }
+body.passit-ui .chat-product-button { font-size: 14px; min-height: 42px; }
+/* Home: consistent section rhythm and an introduction that stays in flow. */
+body.passit-ui .hero-slider { padding-block: 16px 8px; }
+body.passit-ui :is(.popular-categories, .featured-products, .recommended-products,
+.why-iuh-section, .reviews-section, .post-cta-section) {
+    width: min(1440px, calc(100% - var(--passit-gutter) * 2));
+    max-width: 1440px;
+    padding-block: 20px;
+}
+body.passit-ui :is(.welcome-section, .stats-section, .advertisement-section) { padding-block: 20px; }
+body.passit-ui :is(.featured-header, .recommended-header, .categories-header, .reviews-header) { margin-bottom: 18px; }
+body.passit-ui :is(.featured-header, .recommended-header, .categories-header, .reviews-header) h2 {
+    font-size: clamp(22px, 2.2vw, 28px);
+    line-height: 1.35;
+}
+body.passit-ui :is(.featured-header, .recommended-header, .reviews-header) p { font-size: 15px; }
+body.passit-ui .welcome-container {
+    width: min(1440px, calc(100% - var(--passit-gutter) * 2));
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+    min-height: 0;
+    padding: 28px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: none;
+}
+body.passit-ui .welcome-content { width: auto; margin: 0; padding: 0; text-align: left; }
+body.passit-ui .welcome-content h2 { font-size: 32px; margin-block: 6px 12px; }
+body.passit-ui .welcome-text { font-size: 16px; line-height: 1.7; }
+body.passit-ui .welcome-image-wrapper {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 280px;
+    margin: 0;
+    transform: none;
+    opacity: 1;
+}
+body.passit-ui .welcome-image-frame { transform: none; padding: 0; border-radius: 12px; overflow: hidden; box-shadow: none; }
+body.passit-ui .stat-item { padding: 20px 16px; }
+body.passit-ui .stat-label { font-size: 14px; }
+/* Reading and help pages retain comfortable line spacing with smaller hero gaps. */
+body.passit-ui :is(.terms-hero, .policy-hero, .forum-hero, .cart-hero, .orders-hero,
+.guide-hero, .contact-hero, .posting-hero, .dispute-hero) {
+    min-height: 0;
+    margin-bottom: 24px;
+    border-radius: 16px;
+}
+body.passit-ui :is(.policy-hero-content, .terms-hero-content, .forum-hero-content,
+.cart-hero-content) { min-height: 0; padding: 28px; }
+body.passit-ui :is(.terms-section, .faq-answer, .guide-layout, .policy-card) :is(p, li) {
+    font-size: 16px;
+    line-height: 1.75;
+}
+body.passit-ui .terms-section { margin-bottom: 20px; }
+body.passit-ui .about-page-intro { padding-block: 20px; margin-bottom: 16px; }
+body.passit-ui :is(.founders-section, .mission-section, .promise-section, .value-section, .thankyou-section) {
+    padding-top: 32px;
+    padding-bottom: 32px;
+}
+/* Forms, account pages and operational screens. */
+body.passit-ui :is(.form-group, .form-field, .input-group) > label { font-size: 14px; line-height: 1.5; }
+body.passit-ui :is(.auth-form, .post-page, .checkout-page, .account-page,
+.consignment-page, .contact-page, .wallet-page) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]), select, textarea) {
+    font-size: 16px;
+}
+body.passit-ui :is(.form-hint, .field-hint, .form-note, .auth-subtitle, .verification-heading p) {
+    font-size: 14px;
+    line-height: 1.6;
+}
+body.passit-ui .site-review-section { margin-top: 24px; padding: 24px; }
+body.passit-ui .auth-page { padding: 24px 16px; }
+body.passit-ui .auth-form { padding: 32px; }
+body.passit-ui .auth-logo { margin-bottom: 32px; }
+body.passit-ui .admin-page :is(td, th, label, input, select) { font-size: 14px; }
+body.passit-ui .admin-page .page-header { margin-bottom: 20px; }
+body.passit-ui .footer-container { padding-block: 32px; gap: 32px; }
+body.passit-ui .footer-description { font-size: 14px; line-height: 1.7; }
+body.passit-ui .footer-title { font-size: 16px; }
+@media (min-width: 1101px) {
+    body.passit-ui .site-header .nav-container { min-height: 80px; }
+    body.passit-ui .site-header .navigation { height: 80px; }
+    body.passit-ui .products-layout { grid-template-columns: 240px minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+    body.passit-ui :is(.products-page, .detail-page, .post-page, .dashboard-page,
+    .checkout-page, .orders-page, .cart-page, .management-page, .account-page,
+    .wallet-page, .profile-page, .consignment-page, .chat-page, .policy-page,
+    .terms-page, .contact-page, .forum-page) { padding-top: 14px; padding-bottom: 28px; }
+    body.passit-ui .products-heading { align-items: stretch; gap: 12px; margin-bottom: 16px; }
+    body.passit-ui .products-layout { gap: 16px; }
+    body.passit-ui .products-heading p { font-size: 15px; }
+    body.passit-ui .products-toolbar h2 { font-size: 19px; }
+    body.passit-ui :is(.product-name, .featured-product-name, .recommended-product-name) { font-size: 14px; }
+    body.passit-ui :is(.product-description, .product-category-text, .seller-name) { font-size: 12px; }
+    body.passit-ui .chat-product-button { font-size: 13px; }
+    body.passit-ui :is(.popular-categories, .featured-products, .recommended-products,
+    .why-iuh-section, .reviews-section, .post-cta-section, .welcome-section, .stats-section) { padding-block: 16px; }
+    body.passit-ui .welcome-container { grid-template-columns: minmax(0, 1fr); padding: 20px; gap: 16px; }
+    body.passit-ui .welcome-image-wrapper { height: 200px; }
+    body.passit-ui :is(.policy-hero-content, .terms-hero-content, .forum-hero-content, .cart-hero-content) { padding: 20px; }
+    body.passit-ui .auth-form { padding: 24px 18px; }
+    body.passit-ui .footer-container { padding-block: 28px; gap: 24px; }
+}
+
+/* Keep filter headings and operational charts within their columns. */
+body.passit-ui .filter-heading { flex-wrap: wrap; gap: 8px; padding-bottom: 12px; }
+body.passit-ui .filter-heading h2 { font-size: 18px; }
+body.passit-ui .clear-filter { white-space: nowrap; font-size: 13px; }
+body.passit-ui :is(.admin-chart-card, .admin-chart-box) { min-width: 0; max-width: 100%; }
+body.passit-ui .admin-chart-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 1000px) {
+    body.passit-ui .admin-chart-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+    body.passit-ui .product-sidebar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 12px;
+        padding: 16px;
+        min-width: 0;
+    }
+    body.passit-ui .filter-heading { grid-column: 1 / -1; align-items: center; }
+    body.passit-ui .product-sidebar .filter-block { padding: 0; border: 0; min-width: 0; }
+    body.passit-ui .filter-search-block { grid-column: 1; grid-row: 2; }
+    body.passit-ui .filter-sort-block { grid-column: 2; grid-row: 2; }
+    body.passit-ui .filter-category-block { grid-column: 1 / -1; }
+    body.passit-ui .category-list {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+    }
+    body.passit-ui .category-option {
+        flex: 0 0 auto;
+        border: 1px solid var(--passit-border);
+        border-radius: 8px;
+        padding: 0 10px;
+        white-space: nowrap;
+    }
+    body.passit-ui .category-option:focus-within { outline: 2px solid #193f9e; outline-offset: -2px; }
+    body.passit-ui .product-sidebar .sidebar-tip { display: none; }
+    body.passit-ui :is(.sidebar-search input, .sort-select) { font-size: 14px; }
+}
+
+/* Keep category navigation readable without oversized landing sections. */
+body.passit-ui .category-item { font-size: 14px; }
+body.passit-ui .category-item :is(p, span:last-child) { font-size: 14px; }
+body.passit-ui .slider-container { aspect-ratio: 2.75 / 1; }
+
+/* Featured sorting must occupy its own row before buttons can be squeezed. */
+body.passit-ui .featured-tabs { min-width:0; gap:16px; }
+body.passit-ui .featured-tab { flex:0 0 auto; white-space:nowrap; min-height:40px; }
+@media(max-width:1000px){
+body.passit-ui .featured-header { display:flex; flex-wrap:wrap; gap:10px; }
+body.passit-ui .featured-header h2 { white-space:normal; flex:1 1 auto; font-size:clamp(16px,4.5vw,22px); }
+body.passit-ui .featured-see-all { flex:none; margin-left:auto; }
+body.passit-ui .featured-tabs { order:3; flex:0 0 100%; width:100%; overflow-x:auto; padding-bottom:10px; gap:18px; }
+}
+
+/* Page headings use one spacing source instead of stacked margin and padding. */
+body.passit-ui .about-page-intro { margin:0 auto 20px; padding:20px 0 0; }
+body.passit-ui .page-shell { margin-top:20px; padding-top:0; }
+body.passit-ui .about-hero { min-height:0; margin-top:0; margin-bottom:0; padding:32px 40px; }
+body.passit-ui .about-title-line { margin:14px 0 20px; }
+body.passit-ui .about-hero-bottom { margin-top:24px; padding-top:16px; }
+body.passit-ui .founders-section { margin-top:40px !important; }
+body.passit-ui :is(.mission-section,.promise-section,.value-section) { margin-top:40px !important; margin-bottom:40px !important; }
+@media(max-width:760px){
+body.passit-ui .about-page-intro { padding-top:14px; margin-top:0; margin-bottom:16px; }
+body.passit-ui .page-shell { margin-top:14px; padding-top:0; }
+body.passit-ui .about-hero { padding:24px 20px; margin-top:0; margin-bottom:0; }
+body.passit-ui .founders-section { margin-top:28px !important; }
+body.passit-ui :is(.mission-section,.promise-section,.value-section) { margin-top:28px !important; margin-bottom:28px !important; }
+}

@@ -2,7 +2,7 @@
   "name": "iuh-shop",
   "version": "1.0.0",
   "private": true,
-  "description": "IUH Shop static web application and regression checks",
+  "description": "PASSIT static web application and regression checks",
   "scripts": {
     "test": "node --test tests/*.test.cjs",
     "check": "node scripts/check-source.cjs",

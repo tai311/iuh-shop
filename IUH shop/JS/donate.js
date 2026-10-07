@@ -61,7 +61,7 @@
                         ['p_donor_name', 'p_bank_name', 'p_transfer_content'].every(key => typeof parsed[key] === 'string')) attempt = parsed;
                 }
                 if (attempt) { restore(); preview(); }
-                else if (!$('donateTransferContentInput').value.trim()) $('donateTransferContentInput').value = 'DONATE IUH SHOP - ' + crypto.randomUUID().slice(0, 8).toUpperCase();
+                else if (!$('donateTransferContentInput').value.trim()) $('donateTransferContentInput').value = 'DONATE PASSIT - ' + crypto.randomUUID().slice(0, 8).toUpperCase();
                 $('startDonateTransfer').disabled = false;
             } catch (error) { $('donateMessage').textContent = error.message || 'Không tải được thông tin Donate. Vui lòng thử lại.'; }
         }
@@ -111,7 +111,7 @@
                 $('donateSuccessAmount').textContent = money(attempt.p_amount);
                 $('donateSuccessCode').textContent = data.transfer_code;
                 $('donateSuccessView').querySelector('h3').textContent = data.status === 'completed' ? 'DONATE THÀNH CÔNG' : 'ĐÃ GỬI YÊU CẦU DONATE';
-                $('donateSuccessView').querySelector('p').textContent = data.status === 'completed' ? 'Cảm ơn bạn đã ủng hộ IUH SHOP.' : 'Đang chờ quản trị viên đối soát thanh toán.';
+                $('donateSuccessView').querySelector('p').textContent = data.status === 'completed' ? 'Cảm ơn bạn đã ủng hộ PASSIT.' : 'Đang chờ quản trị viên đối soát thanh toán.';
                 sessionStorage.removeItem(storageKey(userId)); attempt = null; completed = true; view('success');
             } catch (error) { $('donateTransferMessage').textContent = error.message || 'Chưa nhận được kết quả. Bấm xác nhận lại để kiểm tra giao dịch.'; }
             finally { busy = false; $('confirmDonateTransfer').disabled = false; $('confirmDonateTransfer').textContent = 'XÁC NHẬN DONATE'; }

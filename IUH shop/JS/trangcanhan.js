@@ -1640,7 +1640,7 @@ async function loadProfileProducts(userId) {
     try {
 
         console.log(
-            "IUH SHOP - Đang tải tin của user:",
+            "PASSIT - Đang tải tin của user:",
             userId
         );
 
@@ -1698,7 +1698,7 @@ async function loadProfileProducts(userId) {
         if (error) {
 
             console.error(
-                "IUH SHOP - Lỗi lấy tin đăng:",
+                "PASSIT - Lỗi lấy tin đăng:",
                 error
             );
 
@@ -1996,7 +1996,7 @@ async function loadProfileProducts(userId) {
 
 
         console.log(
-            "IUH SHOP - Đã tải",
+            "PASSIT - Đã tải",
             products.length,
             "tin đăng"
         );
@@ -2006,7 +2006,7 @@ async function loadProfileProducts(userId) {
     catch (error) {
 
         console.error(
-            "IUH SHOP - Lỗi tải tin đăng:",
+            "PASSIT - Lỗi tải tin đăng:",
             error
         );
 
@@ -2192,7 +2192,7 @@ async function loadProfilePosts(userId) {
     catch (error) {
 
         console.error(
-            "IUH SHOP - Lỗi tải bài viết:",
+            "PASSIT - Lỗi tải bài viết:",
             error
         );
 
@@ -2228,7 +2228,7 @@ function createProfilePostCard(
 
     const fullname =
         author?.fullname ||
-        "Người dùng IUH";
+        "Người dùng PASSIT";
 
 
     const avatar =

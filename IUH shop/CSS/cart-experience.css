@@ -1,0 +1,68 @@
+/* Shared add-to-cart feedback */
+.passit-cart-flight{position:fixed;z-index:10050;object-fit:cover;border-radius:16px;box-shadow:0 12px 32px #193f9e40;pointer-events:none;will-change:transform,opacity}
+.passit-cart-toast{position:fixed;z-index:10040;display:flex;align-items:flex-start;gap:12px;box-sizing:border-box;padding:16px;background:#fff;color:#17243d;border:1px solid #c8dcf3;border-top:4px solid #193f9e;border-radius:16px;box-shadow:0 16px 48px #142b5930;font:14px/1.5 'Be Vietnam Pro','Segoe UI',Arial,sans-serif}
+.passit-cart-toast[hidden]{display:none}
+.passit-cart-toast.is-error{border-top-color:#c52e3a}
+.passit-toast-image{width:58px;height:66px;object-fit:cover;border-radius:9px;flex:none;background:#f3f6fa}
+.passit-toast-content{flex:1;min-width:0}
+.passit-toast-content strong{display:block;font-size:15px}
+.passit-toast-content p{margin:4px 0 8px;color:#52627b;overflow-wrap:anywhere;font-size:13px}
+.passit-toast-content a{color:#193f9e;font-weight:700;text-decoration:none}
+.passit-toast-close{border:0;background:#f2f5fa;color:#52627b;border-radius:50%;width:28px;height:28px;flex:none;font-size:22px;line-height:1;cursor:pointer}
+.passit-cart-confirm{margin:auto;width:min(440px,calc(100% - 32px));box-sizing:border-box;padding:28px;border:1px solid #e2e8f1;border-radius:20px;color:#17243d;background:#fff;box-shadow:0 20px 70px #142b5933;font:16px/1.6 'Be Vietnam Pro','Segoe UI',Arial,sans-serif}
+.passit-cart-confirm::backdrop{background:#14213d80;backdrop-filter:blur(3px)}
+.passit-cart-confirm h2{font-size:23px;line-height:1.35;margin:0 0 12px}
+.passit-cart-confirm p{margin:0;color:#52627b;overflow-wrap:anywhere}
+.passit-confirm-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;flex-wrap:wrap}
+.passit-confirm-actions button{padding:11px 16px;min-height:44px;border:1px solid #dce4ef;border-radius:10px;background:#f6f8fc;color:#26344d;font-family:inherit;font-size:14px;font-weight:600;line-height:1.4;cursor:pointer}
+.passit-confirm-actions .danger{background:#c92b3d;color:white;border-color:#c92b3d}
+.passit-cart-confirm button:focus-visible,.passit-cart-toast :is(button,a):focus-visible{outline:3px solid #e7b900;outline-offset:3px}
+/* Cart redesign */
+body.passit-ui .cart-layout{gap:24px;grid-template-columns:minmax(0,1fr) 340px}
+body.passit-ui .cart-products{padding:24px;border-radius:18px;box-shadow:0 6px 24px #17243d06}
+body.passit-ui :is(.cart-section-heading h2,.cart-summary h2){font-size:25px;line-height:1.35}
+body.passit-ui .cart-section-heading>div>span{font-size:12px;letter-spacing:1.2px}
+body.passit-ui .cart-count{font-size:13px;padding:8px 12px}
+body.passit-ui .cart-items{gap:14px}
+body.passit-ui .cart-item{grid-template-columns:22px 100px minmax(0,1fr) 144px;padding:18px;gap:16px;border-radius:14px;background:#fff;opacity:1}
+body.passit-ui .cart-item.selected{background:#f7faff;border-color:#b7cdf2;box-shadow:inset 3px 0 #193f9e}
+body.passit-ui .cart-item-image{width:100px;height:112px;border-radius:10px}
+body.passit-ui .cart-item-info h3{font-size:17px;line-height:1.5;white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+body.passit-ui .cart-item-category{font-size:13px;color:#65748b}
+body.passit-ui .cart-item-price{font-size:20px;line-height:1.35}
+body.passit-ui :is(.cart-stock-info,.cart-stock-warning){font-size:13px;line-height:1.5}
+body.passit-ui .cart-item-right{min-width:0;gap:12px}
+body.passit-ui .cart-item-total{font-size:19px;overflow-wrap:anywhere}
+body.passit-ui .quantity-control button{width:38px;height:38px;font-size:15px}
+body.passit-ui .quantity-control span{min-width:36px;font-size:15px}
+body.passit-ui .cart-item-checkbox{width:20px;height:20px}
+body.passit-ui :is(.cart-item-delete,.remove-selected-btn){display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:8px 12px;border:1px solid #f0c9cf;border-radius:9px;background:#fff2f3;color:#b52235;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s}
+body.passit-ui :is(.cart-item-delete,.remove-selected-btn):hover{background:#ffe1e6;border-color:#d96777}
+body.passit-ui .cart-item-delete svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+body.passit-ui .cart-toolbar{gap:14px;flex-wrap:wrap}
+body.passit-ui .cart-toolbar label{font-size:15px}
+body.passit-ui .cart-summary{padding:24px;border-radius:18px;top:145px}
+body.passit-ui :is(.summary-row,.summary-total>div span){font-size:15px}
+body.passit-ui .summary-total>strong{font-size:26px;overflow-wrap:anywhere}
+body.passit-ui :is(.summary-total small,.summary-note,.cart-security){font-size:12px;line-height:1.6}
+body.passit-ui .checkout-cart-btn{min-height:48px;font-size:16px;border-radius:12px}
+body.passit-ui .cart-container[aria-busy=true]{opacity:.65}
+@media(max-width:1100px){body.passit-ui .cart-layout{grid-template-columns:minmax(0,1fr)}body.passit-ui .cart-summary{position:static}}
+@media(max-width:600px){
+body.passit-ui .cart-products{padding:14px}
+body.passit-ui :is(.cart-section-heading h2,.cart-summary h2){font-size:21px}
+body.passit-ui .cart-section-heading{gap:10px;flex-wrap:wrap}
+body.passit-ui .cart-item{grid-template-columns:20px 72px minmax(0,1fr);gap:10px;padding:12px}
+body.passit-ui .cart-item-image{width:72px;height:88px}
+body.passit-ui .cart-item-info h3{font-size:15px}
+body.passit-ui .cart-item-price{font-size:18px}
+body.passit-ui .cart-item-right{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;width:100%;gap:10px;align-items:center;padding-top:10px;border-top:1px solid #e0e7f2}
+body.passit-ui .quantity-control{justify-self:start}
+body.passit-ui .cart-item-total{font-size:18px;text-align:right}
+body.passit-ui .cart-item-delete{grid-column:2;justify-self:end}
+body.passit-ui .cart-summary{padding:20px}
+body.passit-ui .summary-total{flex-wrap:wrap}
+}
+@media(prefers-reduced-motion:reduce){.passit-cart-flight{display:none}body.passit-ui :is(.cart-item-delete,.remove-selected-btn){transition:none}}
+
+body.passit-ui .cart-container :is(h2,h3,button){font-family:"Be Vietnam Pro","Segoe UI",Arial,sans-serif}

@@ -1,0 +1,113 @@
+/* Product browsing: four columns on desktop, two on smaller screens. */
+body .product-grid,
+body .featured-product-list,
+body .recommended-product-list,
+body .profile-products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+body :is(.product-card, .featured-product-card, .recommended-product-card, .profile-product-card) {
+    min-width: 0;
+}
+body :is(.product-card, .featured-product-card, .recommended-product-card, .profile-product-card)
+:is(.product-price, .featured-product-price, .recommended-product-price, .profile-product-price) {
+    color: #193f9e;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+    margin-block: 8px 14px;
+    transition: color 180ms ease;
+}
+body :is(.product-card, .featured-product-card, .recommended-product-card, .profile-product-card):focus-within
+:is(.product-price, .featured-product-price, .recommended-product-price, .profile-product-price) {
+    color: #d92332;
+}
+@media (hover: hover) {
+    body :is(.product-card, .featured-product-card, .recommended-product-card, .profile-product-card):hover
+    :is(.product-price, .featured-product-price, .recommended-product-price, .profile-product-price) {
+        color: #d92332;
+    }
+}
+@media (max-width: 1023px) {
+    body .product-grid,
+    body .featured-product-list,
+    body .recommended-product-list,
+    body .profile-products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 600px) {
+    body .product-grid,
+    body .featured-product-list,
+    body .recommended-product-list,
+    body .profile-products-grid { gap: 10px; }
+    body :is(.product-card-body, .featured-product-content, .recommended-product-content) {
+        padding: 10px;
+        min-width: 0;
+    }
+    body :is(.featured-product-image, .recommended-product-image, .profile-product-image) {
+        height: auto;
+        aspect-ratio: 1 / 1;
+    }
+    body :is(.featured-product-image, .recommended-product-image) img {
+        position: absolute;
+        inset: 0;
+    }
+    body :is(.product-card, .featured-product-card, .recommended-product-card, .profile-product-card)
+    :is(.product-price, .featured-product-price, .recommended-product-price, .profile-product-price) {
+        font-size: clamp(18px, 5vw, 23px);
+        letter-spacing: -0.6px;
+        margin-block: 8px 12px;
+    }
+    body :is(.product-name, .featured-product-name, .recommended-product-name) {
+        font-size: 13px;
+        line-height: 1.45;
+    }
+    body .product-meta { flex-wrap: wrap; gap: 5px; }
+    body .product-seller > div { min-width: 0; overflow-wrap: anywhere; }
+    body .product-actions { grid-template-columns: minmax(0, 1fr) 36px; gap: 5px; }
+    body .chat-product-button { min-width: 0; padding-inline: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    body :is(.product-price, .featured-product-price, .recommended-product-price, .profile-product-price) {
+        transition: none;
+    }
+}
+
+/* Compact catalog actions: a real cart button with inline, accessible feedback. */
+body.passit-ui .product-card .add-cart-button {
+    height: auto;
+    min-height: 42px;
+    padding: 9px 8px;
+    line-height: 1.35;
+    white-space: normal;
+}
+body.passit-ui .product-card .add-cart-button:disabled { opacity: .65; cursor: not-allowed; }
+body.passit-ui .product-card .cart-feedback {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #193f9e;
+    margin-top: 8px;
+    overflow-wrap: anywhere;
+}
+body.passit-ui .product-card .cart-feedback:empty { display: none; }
+body.passit-ui .product-card .cart-feedback a { color: inherit; font-weight: 700; text-decoration: underline; }
+body.passit-ui .product-card .product-seller { margin-bottom: 10px; padding-top: 10px; }
+
+/* One-line titles keep browsing cards compact and aligned. */
+body.passit-ui :is(.product-name, .featured-product-name, .recommended-product-name, .profile-product-name) {
+    display: block;
+    min-width: 0;
+    min-height: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: unset;
+    margin-bottom: 8px;
+}
+body.passit-ui .product-card .product-seller { margin-top: 0; }
+body.passit-ui .product-card .product-price { margin-bottom: 10px; }

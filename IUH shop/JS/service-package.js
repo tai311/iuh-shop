@@ -162,7 +162,7 @@
 
         function renderMembers() {
             byId("servicePackageMemberCount").textContent = (members.length + 1) + "/3";
-            memberList.innerHTML = members.map((member, index) => '<div class="service-package-member"><img class="service-package-member-avatar" src="' + service.escapeHTML(window.IUHSecurity.safeURL(member.avatar_url, "../Images/default-avatar.svg")) + '" alt=""><span class="service-package-member-info"><strong>' + service.escapeHTML(member.fullname || "Thành viên") + '</strong><span>' + service.escapeHTML(member.email || "Tài khoản IUH SHOP") + '</span></span><button type="button" class="service-package-member-remove" data-member-index="' + index + '" aria-label="Xóa thành viên"><i class="fa-solid fa-xmark"></i></button></div>').join("");
+            memberList.innerHTML = members.map((member, index) => '<div class="service-package-member"><img class="service-package-member-avatar" src="' + service.escapeHTML(window.IUHSecurity.safeURL(member.avatar_url, "../Images/default-avatar.svg")) + '" alt=""><span class="service-package-member-info"><strong>' + service.escapeHTML(member.fullname || "Thành viên") + '</strong><span>' + service.escapeHTML(member.email || "Tài khoản PASSIT") + '</span></span><button type="button" class="service-package-member-remove" data-member-index="' + index + '" aria-label="Xóa thành viên"><i class="fa-solid fa-xmark"></i></button></div>').join("");
             memberList.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => {
                 if (busy || findingMember || attempt || memberOnly()) return;
                 members.splice(Number(button.dataset.memberIndex), 1); renderMembers();
@@ -200,7 +200,7 @@
             if (payosPending) {
                 byId("upgradeSuccessText").textContent = "Mở link PayOS để thanh toán. Gói chỉ được kích hoạt khi webhook xác minh đã nhận đủ tiền.";
             } else if (pending && receipt.payment_method === "wallet") {
-                byId("upgradeSuccessText").textContent = "Tiền đã được giữ từ Ví IUH và chờ admin duyệt. Gói chưa được kích hoạt; nếu bị từ chối, số tiền sẽ được hoàn lại ví.";
+                byId("upgradeSuccessText").textContent = "Tiền đã được giữ từ Ví PASSIT và chờ admin duyệt. Gói chưa được kích hoạt; nếu bị từ chối, số tiền sẽ được hoàn lại ví.";
             } else if (pending) {
                 byId("upgradeSuccessText").textContent = "Xác nhận thanh toán thành công. Yêu cầu đã được gửi đến admin. Vui lòng chờ admin duyệt để kích hoạt gói; admin có thể duyệt hoặc hủy yêu cầu.";
             } else if (cancelled) {

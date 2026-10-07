@@ -1,7 +1,7 @@
 /* =========================================================
-   IUH SHOP - DATHANG.JS
+   PASSIT - DATHANG.JS
    CHECKOUT
-   Supabase Cart + QR + Ví IUH + Tiền mặt
+   Supabase Cart + QR + Ví PASSIT + Tiền mặt
    ========================================================= */
 
 
@@ -47,6 +47,7 @@ let trialModeAvailable = false;
 let walletBalance = 0;
 
 let isSubmitting = false;
+let checkoutCommitted = false;
 
 
 /* =========================================================
@@ -1449,7 +1450,7 @@ function getShippingFee() {
 
     /*
      * ĐƠN KÝ GỬI:
-     * IUH SHOP chịu trách nhiệm vận chuyển
+     * PASSIT chịu trách nhiệm vận chuyển
      * và không thu phí vận chuyển.
      */
 
@@ -1638,7 +1639,7 @@ function updateOptionUI() {
 
 
 /* =========================================================
-   24. VÍ IUH
+   24. VÍ PASSIT
    ========================================================= */
 
 async function loadWallet() {
@@ -1695,7 +1696,7 @@ async function loadWallet() {
             if (walletStatusEl) {
 
                 walletStatusEl.textContent =
-                    "Ví IUH chưa được thiết lập cho tài khoản.";
+                    "Ví PASSIT chưa được thiết lập cho tài khoản.";
 
                 walletStatusEl.className =
                     "wallet-status error";
@@ -1721,7 +1722,7 @@ async function loadWallet() {
     } catch (error) {
 
         console.error(
-            "Lỗi tải Ví IUH:",
+            "Lỗi tải Ví PASSIT:",
             error
         );
 
@@ -1737,7 +1738,7 @@ async function loadWallet() {
 
             walletStatusEl.textContent =
                 error.message ||
-                "Không thể kiểm tra số dư Ví IUH.";
+                "Không thể kiểm tra số dư Ví PASSIT.";
 
             walletStatusEl.className =
                 "wallet-status error";
@@ -1801,7 +1802,7 @@ function updateWalletPreview() {
         ) {
 
             walletStatusEl.textContent =
-                "✓ Số dư Ví IUH đủ để thanh toán.";
+                "✓ Số dư Ví PASSIT đủ để thanh toán.";
 
             walletStatusEl.className =
                 "wallet-status success";
@@ -1809,7 +1810,7 @@ function updateWalletPreview() {
         } else {
 
             walletStatusEl.textContent =
-                "⚠ Số dư Ví IUH không đủ để thanh toán.";
+                "⚠ Số dư Ví PASSIT không đủ để thanh toán.";
 
             walletStatusEl.className =
                 "wallet-status error";
@@ -1887,7 +1888,7 @@ async function updatePaymentUI() {
 
 
     /*
-     * VÍ IUH
+     * VÍ PASSIT
      */
     if (
         payment === "iuh_wallet"
@@ -2128,7 +2129,7 @@ async function payWallet() {
     if (!wallet) {
 
         throw new Error(
-            "Ví IUH chưa được thiết lập."
+            "Ví PASSIT chưa được thiết lập."
         );
     }
 
@@ -2145,7 +2146,7 @@ async function payWallet() {
     ) {
 
         throw new Error(
-            "Số dư Ví IUH không đủ."
+            "Số dư Ví PASSIT không đủ."
         );
     }
 
@@ -2492,7 +2493,7 @@ function saveLatestOrder(
 
 async function submitOrder() {
 
-    if (isSubmitting)
+    if (isSubmitting || checkoutCommitted)
         return;
 
     if (!currentUser) {
@@ -2528,23 +2529,7 @@ async function submitOrder() {
         return;
     }
 
-    /* Kiểm tra ví */
-    if (paymentMethod === "iuh_wallet") {
-
-        const walletOK =
-            await loadWallet();
-
-        if (
-            !walletOK ||
-            walletBalance < getTotal()
-        ) {
-            showToast(
-                "Số dư Ví IUH không đủ."
-            );
-            return;
-        }
-    }
-
+    if (isSubmitting || checkoutCommitted) return;
     isSubmitting = true;
 
     if (checkoutButton) {
@@ -2567,7 +2552,8 @@ async function submitOrder() {
            1. KIỂM TRA TỒN KHO
         ========================================= */
 
-        await checkStock();
+        // The RPC checks stock and wallet atomically, after checking its saved receipt.
+        // A retry after a lost response must still reach that receipt even if stock is now zero.
 
 
         /* =========================================
@@ -2730,7 +2716,8 @@ async function submitOrder() {
             );
         }
 
-        sessionStorage.removeItem(storageKey);
+        checkoutCommitted = true;
+        try { sessionStorage.removeItem(storageKey); } catch (_) { /* Keep the receipt key if storage is unavailable. */ }
 
         /* =========================================
            6. THÀNH CÔNG
@@ -2769,7 +2756,7 @@ async function submitOrder() {
 
 
         console.log(
-            "IUH SHOP: Đã tạo đơn:",
+            "PASSIT: Đã tạo đơn:",
             data
         );
 
@@ -2799,6 +2786,11 @@ async function submitOrder() {
 
 
     } catch (error) {
+        if (checkoutCommitted) {
+            showToast("Đơn đã được tạo. Mở Đơn hàng để xem trạng thái; không cần đặt lại.");
+            window.location.href = "donhang.html";
+            return;
+        }
 
         console.error(
             "Lỗi đặt hàng:",
@@ -2939,7 +2931,7 @@ db.auth.onAuthStateChange(
 async function initCheckout() {
 
     console.log(
-        "IUH SHOP: Đang khởi tạo checkout..."
+        "PASSIT: Đang khởi tạo checkout..."
     );
 
 
@@ -2956,7 +2948,7 @@ async function initCheckout() {
     if (!session) {
 
         console.error(
-            "IUH SHOP: Không có session."
+            "PASSIT: Không có session."
         );
 
 
@@ -2981,7 +2973,7 @@ async function initCheckout() {
 
 
     console.log(
-        "IUH SHOP: User =",
+        "PASSIT: User =",
         currentUser.id
     );
 
@@ -3029,7 +3021,7 @@ async function initCheckout() {
 
 /* =========================================================
    ĐƠN KÝ GỬI
-   IUH SHOP TỰ VẬN CHUYỂN + MIỄN PHÍ
+   PASSIT TỰ VẬN CHUYỂN + MIỄN PHÍ
 ========================================================= */
 
 const isConsignmentCheckout =
@@ -3043,7 +3035,7 @@ const isConsignmentCheckout =
 if (isConsignmentCheckout) {
 
     console.log(
-        "IUH SHOP: Đây là đơn ký gửi."
+        "PASSIT: Đây là đơn ký gửi."
     );
 
     const shippingContainer =
@@ -3056,7 +3048,7 @@ if (isConsignmentCheckout) {
         /* Xóa các lựa chọn giao hàng cũ */
         shippingContainer.innerHTML = "";
 
-        /* Chỉ hiển thị IUH SHOP vận chuyển */
+        /* Chỉ hiển thị PASSIT vận chuyển */
         const notice =
             document.createElement("div");
 
@@ -3070,11 +3062,11 @@ if (isConsignmentCheckout) {
 
             <div class="option-content">
                 <strong>
-                    🚚 IUH SHOP vận chuyển
+                    🚚 PASSIT vận chuyển
                 </strong>
 
                 <small>
-                    IUH SHOP chịu trách nhiệm vận chuyển sản phẩm ký gửi.
+                    PASSIT chịu trách nhiệm vận chuyển sản phẩm ký gửi.
                 </small>
             </div>
 
@@ -3096,7 +3088,7 @@ updateSummary();
 
 
     /*
-     * Tải Ví IUH ngay khi vào trang.
+     * Tải Ví PASSIT ngay khi vào trang.
      */
     if (!trialMode) await loadWallet();
 
@@ -3126,7 +3118,7 @@ updateSummary();
 
 
     console.log(
-        "IUH SHOP: Checkout đã sẵn sàng."
+        "PASSIT: Checkout đã sẵn sàng."
     );
 }
 

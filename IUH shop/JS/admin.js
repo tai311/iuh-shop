@@ -1,5 +1,5 @@
 /* =========================================================
-   IUH SHOP ADMIN
+   PASSIT ADMIN
 ========================================================= */
 
 const SUPABASE_URL =
@@ -158,7 +158,7 @@ function paymentText(method) {
 
         qr: "QR",
 
-        iuh_wallet: "IUH Wallet",
+        iuh_wallet: "Ví PASSIT",
 
         cod: "COD"
 
@@ -4647,7 +4647,7 @@ function createForumCard(
 
                         ${escapeHTML(
                             post.author?.fullname ||
-                            "Người dùng IUH"
+                            "Người dùng PASSIT"
                         )}
 
                     </div>
@@ -8314,7 +8314,7 @@ async function updateConsignmentStatus(
                             new Date().toISOString(),
 
                         admin_note:
-                            "Yêu cầu ký gửi chưa được IUH SHOP chấp nhận."
+                            "Yêu cầu ký gửi chưa được PASSIT chấp nhận."
                     })
                     .eq(
                         "id",
@@ -8441,7 +8441,7 @@ async function updateConsignmentStatus(
                             new Date().toISOString(),
 
                         admin_note:
-                            "Đã duyệt. Sản phẩm đã được đưa lên IUH SHOP."
+                            "Đã duyệt. Sản phẩm đã được đưa lên PASSIT."
                     })
                     .eq(
                         "id",
@@ -8964,7 +8964,7 @@ document.addEventListener(
     async function () {
 
         console.log(
-            "🚀 IUH SHOP ADMIN START"
+            "🚀 PASSIT ADMIN START"
         );
 
 

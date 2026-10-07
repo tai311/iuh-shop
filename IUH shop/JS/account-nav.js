@@ -1,5 +1,5 @@
 /* =========================================================
-   IUH SHOP - SHARED ACCOUNT NAVIGATION
+   PASSIT - SHARED ACCOUNT NAVIGATION
 ========================================================= */
 
 (function () {

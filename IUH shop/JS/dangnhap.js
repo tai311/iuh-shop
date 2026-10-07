@@ -43,196 +43,31 @@ function togglePassword(inputId, button) {
    ĐĂNG NHẬP
 ========================================= */
 
-const loginForm =
-    document.getElementById("loginForm");
-
-
-loginForm.addEventListener(
-    "submit",
-    async function (event) {
-
-        event.preventDefault();
-
-
-        /* ==============================
-           LẤY DỮ LIỆU
-        ============================== */
-
-        const account =
-            document
-                .getElementById("loginAccount")
-                .value
-                .trim();
-
-        const password =
-            document
-                .getElementById("loginPassword")
-                .value;
-
-
-        const button =
-            loginForm.querySelector(
-                ".auth-button"
-            );
-
-
-        /* ==============================
-           KIỂM TRA
-        ============================== */
-
-        if (!account || !password) {
-
-            alert(
-                "Vui lòng nhập đầy đủ email và mật khẩu."
-            );
-
-            return;
-        }
-
-
-        /* ==============================
-           KHÓA BUTTON
-        ============================== */
-
-        button.disabled = true;
-
-        button.textContent =
-            "ĐANG ĐĂNG NHẬP...";
-
-
-        /* ==============================
-           XÁC ĐỊNH EMAIL
-        ============================== */
-
+const loginForm = document.getElementById('loginForm');
+let loginBusy = false;
+loginForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (loginBusy || !loginForm.reportValidity()) return;
+    const account = document.getElementById('loginAccount').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const button = loginForm.querySelector('.auth-button');
+    if (!account || !password) return;
+    loginBusy = true; button.disabled = true; button.textContent = 'Đang đăng nhập…';
+    let success = false;
+    try {
         let email = account;
-
-
-        /*
-         Nếu người dùng nhập MSSV
-         thì tìm email tương ứng
-         trong bảng users.
-        */
-
-        if (!account.includes("@")) {
-
-            const {
-                data: userProfile,
-                error: profileError
-            } = await supabaseClient
-
-                .from("users")
-
-                .select("email")
-
-                .eq("student_id", account)
-
-                .maybeSingle();
-
-
-            if (profileError) {
-
-                console.error(
-                    "Lỗi tìm tài khoản:",
-                    profileError
-                );
-
-                alert(
-                    "Không thể tìm thông tin tài khoản."
-                );
-
-                button.disabled = false;
-
-                button.textContent =
-                    "Đăng nhập";
-
-                return;
-            }
-
-
-            if (!userProfile) {
-
-                alert(
-                    "Không tìm thấy mã sinh viên này."
-                );
-
-                button.disabled = false;
-
-                button.textContent =
-                    "Đăng nhập";
-
-                return;
-            }
-
-
-            email =
-                userProfile.email;
+        if (!account.includes('@')) {
+            const { data, error } = await supabaseClient.from('users').select('email').eq('student_id', account).maybeSingle();
+            if (error || !data?.email) { alert('Vui lòng đăng nhập bằng email đã đăng ký. Nếu quên mật khẩu, chọn “Quên mật khẩu?”.'); return; }
+            email = data.email;
         }
-
-
-        /* ==============================
-           ĐĂNG NHẬP SUPABASE
-        ============================== */
-
-        const {
-            data,
-            error
-        } = await supabaseClient.auth.signInWithPassword({
-
-            email: email,
-
-            password: password
-
-        });
-
-
-        /* ==============================
-           XỬ LÝ LỖI
-        ============================== */
-
-        if (error) {
-
-            console.error(
-                "Lỗi đăng nhập:",
-                error
-            );
-
-            alert(
-                "Email hoặc mật khẩu không chính xác."
-            );
-
-            button.disabled = false;
-
-            button.textContent =
-                "Đăng nhập";
-
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error || !data?.user) {
+            alert(error?.code === 'email_not_confirmed' ? 'Vui lòng xác nhận email đăng ký trước khi đăng nhập.' : error?.status === 429 ? 'Bạn thử đăng nhập quá nhiều lần. Vui lòng chờ rồi thử lại.' : 'Email hoặc mật khẩu không chính xác.');
             return;
         }
-
-
-        /* ==============================
-           ĐĂNG NHẬP THÀNH CÔNG
-        ============================== */
-
-        console.log(
-            "Đăng nhập thành công:",
-            data.user
-        );
-
-
-        button.textContent =
-            "ĐĂNG NHẬP THÀNH CÔNG";
-
-
-        /* ==============================
-           CHUYỂN VỀ TRANG CHỦ
-        ============================== */
-
-        setTimeout(function () {
-
-            window.location.href =
-                "../HTML/trangchu.html";
-
-        }, 700);
-
-    }
-);
+        success = true; button.textContent = 'Đăng nhập thành công';
+        setTimeout(() => { window.location.href = '../HTML/trangchu.html'; }, 700);
+    } catch { alert('Không thể kết nối. Kiểm tra mạng rồi thử đăng nhập lại.'); }
+    finally { if (!success) { loginBusy = false; button.disabled = false; button.textContent = 'Đăng nhập'; } }
+});

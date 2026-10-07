@@ -1198,7 +1198,7 @@ function updateEmptyState() {
             "Bạn chưa có tin đang bán";
 
         description.textContent =
-            "Hãy đăng sản phẩm để bắt đầu bán trên IUH SHOP.";
+            "Hãy đăng sản phẩm để bắt đầu bán trên PASSIT.";
 
     }
 

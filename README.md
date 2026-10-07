@@ -1,4 +1,4 @@
-# IUH Shop
+# PASSIT
 
 Web HTML/CSS/JavaScript, dùng Supabase cho tài khoản, dữ liệu và lưu ảnh.
 

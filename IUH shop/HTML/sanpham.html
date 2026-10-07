@@ -1,7 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="vi">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IUH Market</title>
+    <title>PASSIT</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
@@ -11,11 +13,16 @@
         rel="stylesheet"
     >
     <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
-    <link rel="stylesheet" href="../CSS/sanpham.css">
-    <link rel="stylesheet" href="../CSS/mobile-navigation.css">
+    <link rel="stylesheet" href="../CSS/sanpham.css?v=20261008-2">
+    <link rel="stylesheet" href="../CSS/mobile-navigation.css?v=20261008-2">
+    <link rel="stylesheet" href="../CSS/passit-brand.css">
+    <link rel="stylesheet" href="../CSS/product-cards.css">
+    <link rel="stylesheet" href="../CSS/passit-ui.css">
+    <link rel="stylesheet" href="../CSS/cart-experience.css">
+<link rel="stylesheet" href="../CSS/catalog-filters.css?v=20261008">
 </head>
 
-<body>
+<body class="passit-ui">
 
     <header class="site-header">
 
@@ -25,7 +32,7 @@
 
                 <!-- Lời chào -->
                 <div class="welcome-text1">
-                    Chào mừng bạn đến với IUH SHOP
+                    Chào mừng bạn đến với PASSIT
                 </div>
 
                 <!-- Khu vực bên phải -->
@@ -212,17 +219,17 @@
 
                     <img
                        src="../Images/logo.png"
-                       alt="IUH Shop"
+                       alt="PASSIT"
                        class="brand-logo"
                     >
 
                     <div class="brand-text">
                         <div class="brand-name">
-                            <span>IUH</span> SHOP
+                            <span>PASS</span>IT
                         </div>
 
                         <div class="brand-slogan">
-                            Kết nối sinh viên – Mua bán dễ dàng
+                            MUA BÁN – CHIA SẺ – CÙNG SINH VIÊN IUH
                         </div>
                     </div>
 
@@ -314,25 +321,15 @@
 
      <main class="products-page">
   <section class="products-heading">
-    <div><span class="section-kicker">IUH MARKETPLACE</span><h1>Sản phẩm</h1><p>Khám phá các sản phẩm được sinh viên IUH đăng bán, trao đổi và chia sẻ.</p></div>
+    <div><span class="section-kicker">PASSIT</span><h1>Sản phẩm</h1><p>Khám phá các sản phẩm được sinh viên IUH đăng bán, trao đổi và chia sẻ.</p></div>
     <a href="dangtin.html" class="post-product-button"><span>＋</span>Đăng sản phẩm</a>
   </section>
 
   <section class="products-layout">
-    <aside class="product-sidebar">
-      <div class="filter-heading"><div><span class="filter-kicker">BỘ LỌC</span><h2>Tìm sản phẩm</h2></div><button type="button" id="clearFilters" class="clear-filter">Xóa lọc</button></div>
-      <div class="filter-block"><label for="productSearch">Tìm kiếm</label><div class="sidebar-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><line x1="16.2" y1="16.2" x2="21" y2="21"></line></svg><input id="productSearch" type="search" placeholder="Tên sản phẩm..."></div></div>
-      <div class="filter-block"><label>Danh mục</label><div class="category-list">
-        <label class="category-option"><input type="radio" name="category" value="all" checked><span class="custom-radio"></span><span class="category-name">Tất cả sản phẩm</span><span class="category-count" id="countAll">0</span></label>
-        <label class="category-option"><input type="radio" name="category" value="Sách"><span class="custom-radio"></span><span class="category-name">Sách</span><span class="category-count" data-count="Sách">0</span></label>
-        <label class="category-option"><input type="radio" name="category" value="Tài liệu"><span class="custom-radio"></span><span class="category-name">Tài liệu</span><span class="category-count" data-count="Tài liệu">0</span></label>
-        <label class="category-option"><input type="radio" name="category" value="Đồ dùng học tập"><span class="custom-radio"></span><span class="category-name">Đồ dùng học tập</span><span class="category-count" data-count="Đồ dùng học tập">0</span></label>
-        <label class="category-option"><input type="radio" name="category" value="Dụng cụ thực hành"><span class="custom-radio"></span><span class="category-name">Dụng cụ thực hành</span><span class="category-count" data-count="Dụng cụ thực hành">0</span></label>
-        <label class="category-option"><input type="radio" name="category" value="Đồng phục"><span class="custom-radio"></span><span class="category-name">Đồng phục</span><span class="category-count" data-count="Đồng phục">0</span></label>
-        <label class="category-option"><input type="radio" name="category" value="Khác"><span class="custom-radio"></span><span class="category-name">Khác</span><span class="category-count" data-count="Khác">0</span></label>
-      </div></div>
-      <div class="filter-block"><label for="sortProducts">Sắp xếp</label><select id="sortProducts" class="sort-select"><option value="newest">Mới đăng gần đây</option><option value="oldest">Đăng lâu nhất</option><option value="nameAZ">Tên A → Z</option><option value="quantityHigh">Số lượng cao → thấp</option><option value="quantityLow">Số lượng thấp → cao</option></select></div>
-      <div class="sidebar-tip"><div class="tip-icon">i</div><div><strong>Mẹo tìm kiếm</strong><p>Có thể tìm theo tên sản phẩm hoặc lọc nhanh theo danh mục.</p></div></div>
+    <aside class="product-sidebar compact-filters" aria-label="Lọc sản phẩm">
+      <div class="filter-category-block"><label for="categoryFilter">Danh mục</label><select id="categoryFilter" class="sort-select"><option value="all">Tất cả danh mục</option><option value="Sách">Sách</option><option value="Tài liệu">Tài liệu</option><option value="Đồ dùng học tập">Đồ dùng học tập</option><option value="Dụng cụ thực hành">Dụng cụ thực hành</option><option value="Đồng phục">Đồng phục</option><option value="Khác">Khác</option></select></div>
+      <div class="filter-sort-block"><label for="sortProducts">Sắp xếp</label><select id="sortProducts" class="sort-select"><option value="newest">Mới nhất</option><option value="oldest">Cũ nhất</option><option value="nameAZ">Tên A → Z</option><option value="quantityHigh">Số lượng giảm dần</option><option value="quantityLow">Số lượng tăng dần</option></select></div>
+      <button type="button" id="clearFilters" class="clear-filter">Xóa lọc</button>
     </aside>
 
     <section class="products-content">
@@ -363,18 +360,18 @@
         <a href="../HTML/trangchu.html" class="footer-logo">
             <img
                 src="../Images/logo-trang.png"
-                alt="IUH Shop"
+                alt="PASSIT"
             >
         </a>
 
         <div class="footer-brand-text">
 
             <div class="footer-brand-name">
-                <span>IUH</span> SHOP
+                <span>PASS</span>IT
             </div>
 
             <div class="footer-brand-slogan">
-                Kết nối sinh viên – Mua bán dễ dàng
+                MUA BÁN – CHIA SẺ – CÙNG SINH VIÊN IUH
             </div>
 
         </div>
@@ -382,14 +379,14 @@
     </div>
 
        <p class="footer-description">
-          Nền tảng mua bán và trao đổi dành cho sinh viên,
-          giúp kết nối người mua và người bán một cách thuận tiện.
+          Cùng PASSIT trao món đồ bạn có, tìm món đồ bạn cần
+          và tiếp nối giá trị trong cộng đồng sinh viên.
        </p>
 
     </div>
 
 
-        <!-- CỘT 2: VỀ IUH SHOP -->
+        <!-- CỘT 2: VỀ PASSIT -->
         <div class="footer-column">
 
             <h3 class="footer-title">
@@ -469,16 +466,18 @@
     <div class="footer-bottom">
 
         <p>
-            © 2026 IUH SHOP
+            © 2026 PASSIT
         </p>
 
     </div>
 
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../JS/mobile-navigation.js"></script>
+<script src="../JS/mobile-navigation.js?v=20261008-2"></script>
 <script src="../JS/iuh-chat-notification.js"></script>
-<script src="../JS/sanpham.js"></script>
+<script src="../JS/cart-actions.js"></script>
+    <script src="../JS/cart-ui.js"></script>
+<script src="../JS/sanpham.js?v=20261008-filters"></script>
 <script src="../JS/vedau.js"></script>
 <!-- NÚT VỀ ĐẦU TRANG -->
 <button

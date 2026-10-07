@@ -70,7 +70,7 @@ test('Donate UI confirms free payment with the entered amount and no simulation 
         await f.start();
         assert.equal(f.d.getElementById('donateTransferView').hidden, false);
         assert.equal(f.d.getElementById('donateTransferAmount').textContent, '50.000đ');
-        assert.match(f.d.getElementById('donateTransferContent').textContent, /DONATE IUH SHOP/);
+        assert.match(f.d.getElementById('donateTransferContent').textContent, /DONATE PASSIT/);
         f.d.getElementById('confirmDonateTransfer').click(); f.d.getElementById('confirmDonateTransfer').click();
         await f.tick();
         assert.equal(f.calls.length, 1);

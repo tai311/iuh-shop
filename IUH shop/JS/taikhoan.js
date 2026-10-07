@@ -1,5 +1,5 @@
 /* =====================================================
-   IUH SHOP - TÀI KHOẢN / SUPABASE
+   PASSIT - TÀI KHOẢN / SUPABASE
 ===================================================== */
 
 const SUPABASE_URL =
@@ -170,7 +170,7 @@ function renderGuestPage() {
     if (accountEmail) {
 
         accountEmail.textContent =
-            "Đăng nhập để sử dụng đầy đủ các chức năng của IUH SHOP.";
+            "Đăng nhập để sử dụng đầy đủ các chức năng của PASSIT.";
     }
 
 
@@ -775,7 +775,7 @@ document.addEventListener(
         await loadAccount();
 
         /*
-            TẢI ĐÁNH GIÁ IUH SHOP
+            TẢI ĐÁNH GIÁ PASSIT
         */
 
         setupReviewStars();
@@ -901,7 +901,7 @@ document.addEventListener("DOMContentLoaded", function () {
         addMemberButton.disabled = true;
         try {
             const { data: member, error } = await supabaseClient.from("users").select("user_id, fullname, email, avatar_url").eq("email", email).maybeSingle();
-            if (error || !member) { memberMessage.textContent = "Không tìm thấy tài khoản IUH SHOP với email này."; return; }
+            if (error || !member) { memberMessage.textContent = "Không tìm thấy tài khoản PASSIT với email này."; return; }
             if (member.user_id === currentAuthUserId) { memberMessage.textContent = "Bạn đã là chủ gói của nhóm."; return; }
             selectedGroupMembers.push(member); memberEmail.value = ""; renderGroupMembers();
         } catch (error) { memberMessage.textContent = "Không thể tìm thành viên lúc này."; }
@@ -995,7 +995,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         /* ==========================================
-           THANH TOÁN VÍ IUH
+           THANH TOÁN VÍ PASSIT
         ========================================== */
 
         if (selectedMethod === "wallet") {
@@ -2828,7 +2828,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 /* =====================================================
-   ĐÁNH GIÁ IUH SHOP
+   ĐÁNH GIÁ PASSIT
 ===================================================== */
 
 let currentAuthUserId = null;
@@ -3404,7 +3404,7 @@ async function loadSiteReviews() {
                 } else {
 
                     role.textContent =
-                        "Người dùng IUH SHOP";
+                        "Người dùng PASSIT";
 
                 }
 
@@ -4004,7 +4004,7 @@ loadSiteReviews();
 
 
 /* =========================================
-   POPUP ĐÁNH GIÁ IUH SHOP
+   POPUP ĐÁNH GIÁ PASSIT
 ========================================= */
 
 document.addEventListener(

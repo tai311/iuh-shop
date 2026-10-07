@@ -1,5 +1,5 @@
 /* =========================================================
-   IUH SHOP - CHI TIẾT SẢN PHẨM
+   PASSIT - CHI TIẾT SẢN PHẨM
    ========================================================= */
 
 
@@ -375,7 +375,7 @@ function renderProductImages(product) {
 function renderProduct(product) {
 
     document.title =
-        `${product.name || "Sản phẩm"} - IUH SHOP`;
+        `${product.name || "Sản phẩm"} - PASSIT`;
 
 
     /* Danh mục */
@@ -542,7 +542,7 @@ async function loadSeller(sellerId) {
     if (!sellerId) {
 
         console.warn(
-            "IUH SHOP - Sản phẩm chưa có seller_id."
+            "PASSIT - Sản phẩm chưa có seller_id."
         );
 
         resetSeller();
@@ -554,7 +554,7 @@ async function loadSeller(sellerId) {
     try {
 
         console.log(
-            "IUH SHOP - Seller ID:",
+            "PASSIT - Seller ID:",
             sellerId
         );
 
@@ -583,7 +583,7 @@ async function loadSeller(sellerId) {
         if (error) {
 
             console.error(
-                "IUH SHOP - Lỗi lấy người đăng:",
+                "PASSIT - Lỗi lấy người đăng:",
                 error
             );
 
@@ -598,7 +598,7 @@ async function loadSeller(sellerId) {
         if (!seller) {
 
             console.warn(
-                "IUH SHOP - Không tìm thấy users.user_id:",
+                "PASSIT - Không tìm thấy users.user_id:",
                 sellerId
             );
 
@@ -694,7 +694,7 @@ if (sellerVerifiedBadge) {
 
 
         console.log(
-            "IUH SHOP - Người đăng:",
+            "PASSIT - Người đăng:",
             {
                 user_id:
                     seller.user_id,
@@ -711,7 +711,7 @@ if (sellerVerifiedBadge) {
     catch (error) {
 
         console.error(
-            "IUH SHOP - Lỗi tải người đăng:",
+            "PASSIT - Lỗi tải người đăng:",
             error
         );
 
@@ -731,7 +731,7 @@ async function loadProduct() {
 
 
     console.log(
-        "IUH SHOP - Product ID:",
+        "PASSIT - Product ID:",
         productId
     );
 
@@ -772,7 +772,7 @@ async function loadProduct() {
 
 
         console.log(
-            "IUH SHOP - Product:",
+            "PASSIT - Product:",
             product
         );
 
@@ -782,7 +782,7 @@ async function loadProduct() {
         if (error) {
 
             console.error(
-                "IUH SHOP - Lỗi lấy sản phẩm:",
+                "PASSIT - Lỗi lấy sản phẩm:",
                 error
             );
 
@@ -852,7 +852,7 @@ async function loadProduct() {
     catch (error) {
 
         console.error(
-            "IUH SHOP - Lỗi chi tiết sản phẩm:",
+            "PASSIT - Lỗi chi tiết sản phẩm:",
             error
         );
 
@@ -975,7 +975,7 @@ function setupBuyNow() {
             if (error) {
 
                 console.error(
-                    "IUH SHOP - Lỗi kiểm tra đăng nhập:",
+                    "PASSIT - Lỗi kiểm tra đăng nhập:",
                     error
                 );
 
@@ -1039,587 +1039,28 @@ function setupBuyNow() {
    ========================================================= */
 
 function setupAddToCart() {
-
-    if (!addToCartBtn) {
-        return;
-    }
-
-
-    /* =====================================================
-       CSS CHO HIỆU ỨNG
-       Không cần sửa file CSS
-       ===================================================== */
-
-    if (!document.getElementById("addToCartAnimationStyle")) {
-
-        const style = document.createElement("style");
-
-        style.id = "addToCartAnimationStyle";
-
-        style.textContent = `
-            @keyframes cartButtonBounce {
-
-                0% {
-                    transform: scale(1);
-                }
-
-                30% {
-                    transform: scale(1.08) rotate(-2deg);
-                }
-
-                60% {
-                    transform: scale(0.96) rotate(2deg);
-                }
-
-                100% {
-                    transform: scale(1);
-                }
-
-            }
-
-
-            @keyframes cartFly {
-
-                0% {
-                    opacity: 1;
-                    transform:
-                        translate(0, 0)
-                        scale(1);
-                }
-
-                25% {
-                    opacity: 1;
-                    transform:
-                        translate(
-                            var(--fly-x1),
-                            var(--fly-y1)
-                        )
-                        scale(0.85);
-                }
-
-                100% {
-                    opacity: 0;
-                    transform:
-                        translate(
-                            var(--fly-x2),
-                            var(--fly-y2)
-                        )
-                        scale(0.15);
-                }
-
-            }
-
-
-            .cart-button.cart-success-animation {
-                animation:
-                    cartButtonBounce
-                    0.55s
-                    ease;
-            }
-
-
-            .flying-cart-image {
-
-                position: fixed;
-
-                z-index: 99999;
-
-                pointer-events: none;
-
-                object-fit: cover;
-
-                border-radius: 12px;
-
-                box-shadow:
-                    0 8px 25px rgba(0, 0, 0, 0.25);
-
-                animation:
-                    cartFly
-                    0.75s
-                    cubic-bezier(.4, 0, .2, 1)
-                    forwards;
-
-            }
-
-
-            .cart-button.cart-loading {
-                opacity: 0.7;
-                pointer-events: none;
-            }
-
-        `;
-
-        document.head.appendChild(style);
-    }
-
-
-    /* =====================================================
-       HIỆU ỨNG ẢNH BAY VÀO NÚT GIỎ HÀNG
-       ===================================================== */
-
-    function playAddToCartAnimation() {
-
-        if (!mainProductImage) {
-            return;
+    if (!addToCartBtn) return;
+    addToCartBtn.addEventListener('click', async function () {
+        if (addToCartBtn.disabled) return;
+        if (!currentProduct) { showToast('Chưa tải được thông tin sản phẩm.'); return; }
+        const original = addToCartBtn.innerHTML;
+        addToCartBtn.disabled = true;
+        addToCartBtn.classList.add('cart-loading');
+        addToCartBtn.setAttribute('aria-busy', 'true');
+        try {
+            await window.PassitCart.add(supabaseClient, currentProduct.id);
+            window.PassitCartUI.added(document.querySelector('#mainProductImage, #mainImage, .main-product-image img, .product-main-image img'), currentProduct.name);
+        } catch (error) {
+            const known = ['LOGIN_REQUIRED', 'AUTH_ERROR', 'OWN_PRODUCT', 'STOCK_LIMIT', 'UNAVAILABLE', 'INVALID_CART', 'CONFLICT', 'INVALID_PRODUCT'];
+            showToast(known.includes(error.code) ? error.message : 'Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.');
+            if (error.code === 'LOGIN_REQUIRED') window.location.href = 'dangnhap.html';
+        } finally {
+            addToCartBtn.innerHTML = original;
+            addToCartBtn.classList.remove('cart-loading');
+            addToCartBtn.removeAttribute('aria-busy');
+            addToCartBtn.disabled = false;
         }
-
-
-        const imageRect =
-            mainProductImage.getBoundingClientRect();
-
-        const buttonRect =
-            addToCartBtn.getBoundingClientRect();
-
-
-        /* Tạo ảnh bay */
-
-        const flyingImage =
-            document.createElement("img");
-
-        flyingImage.className =
-            "flying-cart-image";
-
-
-        flyingImage.src =
-            mainProductImage.currentSrc ||
-            mainProductImage.src;
-
-
-        flyingImage.alt = "";
-
-
-        /* Kích thước ban đầu */
-
-        const size =
-            Math.min(
-                imageRect.width,
-                imageRect.height,
-                120
-            );
-
-
-        flyingImage.style.width =
-            `${size}px`;
-
-        flyingImage.style.height =
-            `${size}px`;
-
-
-        /* Vị trí bắt đầu */
-
-        const startX =
-            imageRect.left +
-            imageRect.width / 2 -
-            size / 2;
-
-        const startY =
-            imageRect.top +
-            imageRect.height / 2 -
-            size / 2;
-
-
-        flyingImage.style.left =
-            `${startX}px`;
-
-        flyingImage.style.top =
-            `${startY}px`;
-
-
-        /* Điểm giữa */
-
-        const middleX =
-            buttonRect.left +
-            buttonRect.width / 2 -
-            size / 2;
-
-        const middleY =
-            buttonRect.top +
-            buttonRect.height / 2 -
-            size / 2;
-
-
-        /* Điểm cuối */
-
-        const endX =
-            buttonRect.left +
-            buttonRect.width / 2 -
-            size * 0.075;
-
-        const endY =
-            buttonRect.top +
-            buttonRect.height / 2 -
-            size * 0.075;
-
-
-        flyingImage.style.setProperty(
-            "--fly-x1",
-            `${middleX - startX}px`
-        );
-
-        flyingImage.style.setProperty(
-            "--fly-y1",
-            `${middleY - startY}px`
-        );
-
-        flyingImage.style.setProperty(
-            "--fly-x2",
-            `${endX - startX}px`
-        );
-
-        flyingImage.style.setProperty(
-            "--fly-y2",
-            `${endY - startY}px`
-        );
-
-
-        document.body.appendChild(
-            flyingImage
-        );
-
-
-        /* Nút giỏ hàng nhún */
-
-        addToCartBtn.classList.add(
-            "cart-success-animation"
-        );
-
-
-        setTimeout(
-            function () {
-
-                addToCartBtn.classList.remove(
-                    "cart-success-animation"
-                );
-
-            },
-            600
-        );
-
-
-        /* Xóa ảnh bay */
-
-        setTimeout(
-            function () {
-
-                flyingImage.remove();
-
-            },
-            800
-        );
-
-    }
-
-
-    /* =====================================================
-       CLICK THÊM VÀO GIỎ
-       ===================================================== */
-
-    addToCartBtn.addEventListener(
-        "click",
-        async function () {
-
-            if (!currentProduct) {
-
-                showToast(
-                    "Chưa tải được thông tin sản phẩm."
-                );
-
-                return;
-            }
-
-
-            const productQuantity =
-                Number(
-                    currentProduct.quantity
-                ) || 0;
-
-
-            /* Hết hàng */
-
-            if (
-                currentProduct.status !== "active" ||
-                productQuantity <= 0
-            ) {
-
-                showToast(
-                    "Sản phẩm đã hết hàng."
-                );
-
-                return;
-            }
-
-
-            /* =================================================
-               LẤY USER ĐANG ĐĂNG NHẬP
-               ================================================= */
-
-            const {
-                data: {
-                    user
-                },
-                error: userError
-            } =
-                await supabaseClient
-                    .auth
-                    .getUser();
-
-
-            if (userError) {
-
-                console.error(
-                    "IUH SHOP - Lỗi lấy tài khoản:",
-                    userError
-                );
-
-                showToast(
-                    "Không thể xác định tài khoản."
-                );
-
-                return;
-            }
-
-
-            if (!user) {
-
-                showToast(
-                    "Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng."
-                );
-
-
-                setTimeout(
-                    function () {
-
-                        window.location.href =
-                            "dangnhap.html";
-
-                    },
-                    1200
-                );
-
-
-                return;
-            }
-
-
-            /* =================================================
-               KHÓA NÚT TRONG LÚC LƯU
-               ================================================= */
-
-            addToCartBtn.classList.add(
-                "cart-loading"
-            );
-
-            addToCartBtn.disabled = true;
-
-
-            try {
-
-                /* =================================================
-                   KIỂM TRA SẢN PHẨM ĐÃ CÓ TRONG GIỎ CHƯA
-                   ================================================= */
-
-                const {
-                    data: existingCartItem,
-                    error: cartSelectError
-                } =
-                    await supabaseClient
-                        .from("cart_items")
-                        .select(`
-                            id,
-                            quantity,
-                            selected
-                        `)
-                        .eq(
-                            "user_id",
-                            user.id
-                        )
-                        .eq(
-                            "product_id",
-                            currentProduct.id
-                        )
-                        .maybeSingle();
-
-
-                if (cartSelectError) {
-
-                    console.error(
-                        "IUH SHOP - Lỗi kiểm tra giỏ hàng:",
-                        cartSelectError
-                    );
-
-                    throw cartSelectError;
-                }
-
-
-                /* =================================================
-                   ĐÃ CÓ → TĂNG SỐ LƯỢNG
-                   ================================================= */
-
-                if (existingCartItem) {
-
-                    const oldQuantity =
-                        Number(
-                            existingCartItem.quantity
-                        ) || 0;
-
-
-                    const newQuantity =
-                        oldQuantity + 1;
-
-
-                    /* Đã đạt tối đa */
-
-                    if (
-                        oldQuantity >=
-                        productQuantity
-                    ) {
-
-                        showToast(
-                            "Bạn đã thêm tối đa số lượng sản phẩm hiện có."
-                        );
-
-                        return;
-                    }
-
-
-                    const {
-                        error: updateError
-                    } =
-                        await supabaseClient
-                            .from("cart_items")
-                            .update({
-
-                                quantity:
-                                    newQuantity,
-
-                                updated_at:
-                                    new Date().toISOString()
-
-                            })
-                            .eq(
-                                "id",
-                                existingCartItem.id
-                            )
-                            .eq(
-                                "user_id",
-                                user.id
-                            );
-
-
-                    if (updateError) {
-                        throw updateError;
-                    }
-
-                }
-
-
-                /* =================================================
-                   CHƯA CÓ → TẠO DÒNG MỚI
-                   ================================================= */
-
-                else {
-
-                    const {
-                        error: insertError
-                    } =
-                        await supabaseClient
-                            .from("cart_items")
-                            .insert({
-
-                                user_id:
-                                    user.id,
-
-                                product_id:
-                                    currentProduct.id,
-
-                                quantity:
-                                    1,
-
-                                selected:
-                                    true,
-
-                                updated_at:
-                                    new Date().toISOString()
-
-                            });
-
-
-                    if (insertError) {
-                        throw insertError;
-                    }
-
-                }
-
-
-                /* =================================================
-                   THÀNH CÔNG
-                   ================================================= */
-
-                showToast(
-                    "🛒 Đã thêm sản phẩm vào giỏ hàng."
-                );
-
-
-                /* Hiệu ứng bay */
-
-                playAddToCartAnimation();
-
-
-                /* Đổi chữ nút */
-
-                const oldText =
-                    addToCartBtn.innerHTML;
-
-
-                addToCartBtn.innerHTML =
-                    "✓ Đã thêm vào giỏ hàng";
-
-
-                addToCartBtn.classList.remove(
-                    "cart-loading"
-                );
-
-
-                setTimeout(
-                    function () {
-
-                        addToCartBtn.innerHTML =
-                            oldText;
-
-                        addToCartBtn.disabled =
-                            false;
-
-                    },
-                    1500
-                );
-
-            }
-
-
-            catch (error) {
-
-                console.error(
-                    "IUH SHOP - Lỗi thêm vào giỏ hàng:",
-                    error
-                );
-
-
-                showToast(
-                    "Không thể thêm sản phẩm vào giỏ hàng."
-                );
-
-
-                addToCartBtn.classList.remove(
-                    "cart-loading"
-                );
-
-
-                addToCartBtn.disabled =
-                    false;
-            }
-
-        }
-    );
+    });
 }
 
 
@@ -1726,7 +1167,7 @@ async function updateUserMenu() {
         if (userError) {
 
             console.error(
-                "IUH SHOP - Không lấy được tài khoản:",
+                "PASSIT - Không lấy được tài khoản:",
                 userError
             );
 
@@ -1813,7 +1254,7 @@ async function updateUserMenu() {
         if (error) {
 
             console.error(
-                "IUH SHOP - Lỗi lấy profile:",
+                "PASSIT - Lỗi lấy profile:",
                 error
             );
         }
@@ -1894,7 +1335,7 @@ async function updateUserMenu() {
     catch (error) {
 
         console.error(
-            "IUH SHOP - Lỗi cập nhật tài khoản:",
+            "PASSIT - Lỗi cập nhật tài khoản:",
             error
         );
     }
@@ -2053,7 +1494,7 @@ function setupLogout() {
                 if (error) {
 
                     console.error(
-                        "IUH SHOP - Lỗi đăng xuất:",
+                        "PASSIT - Lỗi đăng xuất:",
                         error
                     );
 
@@ -2071,7 +1512,7 @@ function setupLogout() {
             catch (error) {
 
                 console.error(
-                    "IUH SHOP - Lỗi đăng xuất:",
+                    "PASSIT - Lỗi đăng xuất:",
                     error
                 );
 
@@ -2168,7 +1609,7 @@ document.addEventListener(
                 function (error) {
 
                     console.error(
-                        "IUH SHOP - Lỗi cập nhật tài khoản:",
+                        "PASSIT - Lỗi cập nhật tài khoản:",
                         error
                     );
                 }

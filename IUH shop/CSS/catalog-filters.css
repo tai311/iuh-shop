@@ -1,0 +1,13 @@
+/* A compact, non-sticky filter row leaves the full width for products. */
+body.passit-ui .products-layout { display:flex; flex-direction:column; gap:20px; }
+body.passit-ui .products-content { width:100%; min-width:0; }
+body.passit-ui .product-sidebar.compact-filters { position:static; top:auto; width:100%; min-width:0; max-height:none; display:grid; grid-template-columns:minmax(0,260px) minmax(0,260px) auto; align-items:end; gap:16px; padding:16px; border-radius:12px; }
+body.passit-ui .compact-filters > div { min-width:0; grid-column:auto; grid-row:auto; }
+body.passit-ui .compact-filters label { display:block; margin:0 0 6px; color:#52627b; font-size:13px; font-weight:600; }
+body.passit-ui .compact-filters select { width:100%; max-width:100%; min-width:0; height:44px; font-size:15px; padding:0 32px 0 12px; text-overflow:ellipsis; }
+body.passit-ui .compact-filters .clear-filter { justify-self:end; min-height:44px; padding:8px 12px; white-space:nowrap; }
+@media(max-width:760px){
+body.passit-ui .product-sidebar.compact-filters { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; padding:12px; }
+body.passit-ui .compact-filters select {font-size:14px; padding-left:8px; padding-right:22px;}
+body.passit-ui .compact-filters .clear-filter {grid-column:1/-1; min-height:32px; padding:4px 6px;}
+}

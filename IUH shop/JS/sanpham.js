@@ -62,7 +62,7 @@ document.addEventListener(
 );
 
 /* =====================================================
-   IUH SHOP - TRANG SẢN PHẨM
+   PASSIT - TRANG SẢN PHẨM
    DỮ LIỆU LẤY TRỰC TIẾP TỪ SUPABASE
 ===================================================== */
 
@@ -620,7 +620,7 @@ function renderProductCard(product) {
     const firstImage =
         images.length > 0
             ? images[0]
-            : "../Images/default-product.png";
+            : "../Images/default-product.svg";
 
 
     const verified =
@@ -657,7 +657,7 @@ function renderProductCard(product) {
         alt="${esc(product.name)}"
         loading="lazy"
         onerror="
-            this.src='../Images/default-product.png'
+            this.onerror=null; this.src='../Images/default-product.svg'
         "
     >
 
@@ -673,6 +673,7 @@ function renderProductCard(product) {
 
                 <h3
                     class="product-name"
+                    title="${esc(product.name)}"
                     data-detail-id="${product.id}"
                 >
 
@@ -696,16 +697,6 @@ function renderProductCard(product) {
 <div class="product-price">
     ${formatCurrency(getBuyerPrice(product.price))}
 </div>
-
-
-                <p class="product-description">
-
-                    ${esc(
-                        product.description ||
-                        "Chưa có mô tả."
-                    )}
-
-                </p>
 
 
                 <div class="product-seller">
@@ -768,12 +759,11 @@ function renderProductCard(product) {
 
                     <button
                         type="button"
-                        class="chat-product-button"
-                        data-chat-id="${product.id}"
+                        class="chat-product-button add-cart-button"
+                        data-add-cart-id="${product.id}"
+                        ${Number(product.quantity) <= 0 || product.status !== "active" ? "disabled" : ""}
                     >
-
-                        Chat
-
+                        Thêm vào giỏ hàng
                     </button>
 
 
@@ -893,6 +883,27 @@ function updateCategoryCounts() {
    CLICK SẢN PHẨM
 ===================================================== */
 
+async function addCardToCart(button) {
+    if (button.disabled) return;
+    const card = button.closest('.product-card');
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.textContent = 'Đang thêm…';
+    let unavailable = false;
+    try {
+        await window.PassitCart.add(supabaseClient, button.dataset.addCartId);
+        window.PassitCartUI.added(card.querySelector('.product-image'), card.querySelector('.product-name')?.textContent.trim());
+    } catch (error) {
+        unavailable = error.code === 'UNAVAILABLE';
+        const known = ['LOGIN_REQUIRED', 'AUTH_ERROR', 'OWN_PRODUCT', 'STOCK_LIMIT', 'UNAVAILABLE', 'INVALID_CART', 'CONFLICT', 'INVALID_PRODUCT'];
+        window.PassitCartUI.notify({ title: 'Chưa thể thêm vào giỏ', name: known.includes(error.code) ? error.message : 'Vui lòng thử lại sau.', error: true, login: error.code === 'LOGIN_REQUIRED' });
+    } finally {
+        button.disabled = unavailable;
+        button.removeAttribute('aria-busy');
+        button.textContent = unavailable ? 'Hết hàng' : 'Thêm vào giỏ hàng';
+    }
+}
+
 function bindProductEvents() {
 
 
@@ -923,61 +934,12 @@ function bindProductEvents() {
         });
 
 
-    document
-        .querySelectorAll(
-            "[data-chat-id]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
-
-
-                    const product =
-                        products.find(
-                            item =>
-                                String(item.id) ===
-                                String(
-                                    button.dataset.chatId
-                                )
-                        );
-
-
-                    if (!product) {
-                        return;
-                    }
-
-
-                    const seller =
-                        product.users || {};
-
-
-                    const params =
-                        new URLSearchParams({
-
-                            product:
-                                product.id,
-
-                            seller:
-                                product.seller_id,
-
-                            productName:
-                                product.name
-
-                        });
-
-
-                    window.location.href =
-                        `tinnhan.html?${params.toString()}`;
-
-                }
-            );
-
+    document.querySelectorAll('[data-add-cart-id]').forEach(button => {
+        button.addEventListener('click', event => {
+            event.stopPropagation();
+            addCardToCart(button);
         });
-
+    });
 
     document
         .querySelectorAll(
@@ -1314,7 +1276,7 @@ async function submitReport(event) {
         ====================== */
 
         alert(
-            "Đã gửi báo cáo sản phẩm. Cảm ơn bạn đã góp phần xây dựng IUH SHOP."
+            "Đã gửi báo cáo sản phẩm. Cảm ơn bạn đã góp phần xây dựng PASSIT."
         );
 
 
@@ -1437,7 +1399,7 @@ function initReportModal() {
    SEARCH
 ===================================================== */
 
-$("productSearch")?.addEventListener(
+$("globalSearchInput")?.addEventListener(
     "input",
     event => {
 
@@ -1454,26 +1416,14 @@ $("productSearch")?.addEventListener(
    CATEGORY
 ===================================================== */
 
-document
-    .querySelectorAll(
-        'input[name="category"]'
-    )
-    .forEach(input => {
-
-        input.addEventListener(
-            "change",
-            event => {
-
-                state.category =
-                    event.target.value;
-
-                renderProducts();
-
-            }
-        );
-
-    });
-
+$("categoryFilter")?.addEventListener("change", event => {
+    state.category = event.target.value;
+    renderProducts();
+});
+$("globalSearchClear")?.addEventListener("click", () => {
+    state.search = "";
+    renderProducts();
+});
 
 /* =====================================================
    SORT
@@ -1509,7 +1459,9 @@ function resetFilters() {
     };
 
 
-    $("productSearch").value = "";
+    $("globalSearchInput").value = "";
+    $("globalSearchInput").dispatchEvent(new Event("input", { bubbles: true }));
+    $("categoryFilter").value = "all";
 
     $("sortProducts").value =
         "newest";

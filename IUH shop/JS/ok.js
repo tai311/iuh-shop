@@ -863,7 +863,7 @@ document.addEventListener(
 );
 
 /* =====================================================
-   IUH SHOP - SẢN PHẨM ĐỀ XUẤT
+   PASSIT - SẢN PHẨM ĐỀ XUẤT
 ===================================================== */
 
 let recommendedProducts = [];
@@ -1750,7 +1750,7 @@ function renderRecommendedProducts() {
 
 
 /* =====================================================
-   IUH SHOP - SẢN PHẨM NỔI BẬT TRANG CHỦ
+   PASSIT - SẢN PHẨM NỔI BẬT TRANG CHỦ
 ===================================================== */
 
 let featuredProducts = [];
@@ -2247,9 +2247,9 @@ function renderFeaturedProducts() {
     }
 
 
-    // Chỉ lấy 5 sản phẩm trên trang chủ
+    // Tối đa 8 sản phẩm: 2 hàng desktop, 4 hàng trên điện thoại.
     result =
-        result.slice(0, 5);
+        result.slice(0, 8);
 
 
     if (result.length === 0) {

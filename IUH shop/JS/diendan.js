@@ -1,5 +1,5 @@
 /* =========================================================
-   IUH SHOP FORUM
+   PASSIT FORUM
 ========================================================= */
 
 
@@ -1460,7 +1460,7 @@ function createPostHTML(
 
     const authorName =
         author.fullname ||
-        "Người dùng IUH";
+        "Người dùng PASSIT";
 
 
     const avatar =
@@ -1975,7 +1975,7 @@ function createForumAdvertisementHTML(
 
     const partner =
         ad.partner ||
-        "Đối tác IUH SHOP";
+        "Đối tác PASSIT";
 
 
     const targetUrl =
@@ -2165,7 +2165,7 @@ function renderForumPosts() {
                 </h3>
 
                 <p>
-                    Hãy là người đầu tiên chia sẻ với cộng đồng IUH SHOP.
+                    Hãy là người đầu tiên chia sẻ với cộng đồng PASSIT.
                 </p>
 
             </div>
@@ -2693,7 +2693,7 @@ function createCommentHTML(
 
     const name =
         author.fullname ||
-        "Người dùng IUH";
+        "Người dùng PASSIT";
 
 
     const avatar =
@@ -3700,7 +3700,7 @@ async function sharePost(
             await navigator.share({
 
                 title:
-                    "IUH SHOP - Diễn đàn",
+                    "PASSIT - Diễn đàn",
 
                 text:
                     cleanText.substring(
@@ -5917,7 +5917,7 @@ function createArticleCard(
 
     const name =
         author.fullname ||
-        "IUH SHOP";
+        "PASSIT";
 
 
     const avatar =
@@ -6276,7 +6276,7 @@ function openArticleViewer(
             <div>
 
                 <span class="article-modal-eyebrow">
-                    IUH SHOP INFORMATION
+                    PASSIT INFORMATION
                 </span>
 
                 <h2>

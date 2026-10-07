@@ -565,7 +565,7 @@ document.addEventListener(
 );
 
 /* =========================================================
-   IUH SHOP - PHẦN XỬ LÝ VÍ IUH
+   PASSIT - PHẦN XỬ LÝ VÍ PASSIT
    ---------------------------------------------------------
    LƯU TRỮ:
    - Số dư ví       -> Supabase: iuh_wallets
@@ -655,12 +655,12 @@ async function loadWallet() {
         if (error) {
 
             console.error(
-                "Lỗi tải Ví IUH:",
+                "Lỗi tải Ví PASSIT:",
                 error
             );
 
             alert(
-                "Không thể tải Ví IUH.\n\n" +
+                "Không thể tải Ví PASSIT.\n\n" +
                 error.message
             );
 
@@ -1787,7 +1787,7 @@ document.addEventListener(
         if (!currentUser) {
 
             console.warn(
-                "Ví IUH: chưa đăng nhập."
+                "Ví PASSIT: chưa đăng nhập."
             );
 
             return;
