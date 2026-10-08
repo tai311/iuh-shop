@@ -1,0 +1,29 @@
+<svg width="200" height="200" viewBox="0 0 200 200"
+     xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Nền xám nhạt -->
+    <rect
+        width="200"
+        height="200"
+        fill="#e1e2e7"
+    />
+
+    <!-- Đầu -->
+    <ellipse
+        cx="100"
+        cy="78"
+        rx="32"
+        ry="40"
+        fill="#74777c"
+    />
+
+    <!-- Thân -->
+    <path
+        d="M38 200
+           C39 153 63 128 100 128
+           C137 128 161 153 162 200
+           Z"
+        fill="#74777c"
+    />
+
+</svg>
