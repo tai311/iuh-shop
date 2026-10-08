@@ -1524,9 +1524,10 @@ function createPostHTML(
     return `
 
         <article
-            class="discussion-post"
-            data-post-id="${post.id}"
-        >
+    class="discussion-post"
+    data-post-id="${post.id}"
+    style="text-align:left !important;"
+>
 
 
             <!-- HEADER -->
@@ -1631,7 +1632,10 @@ function createPostHTML(
 
             <!-- CONTENT -->
 
-            <div class="post-content">
+            <div
+    class="post-content"
+    style="width:100%; display:block; text-align:left !important; margin:0 !important;"
+>
 
                 <div class="post-type-badge">
 
@@ -1647,9 +1651,12 @@ function createPostHTML(
                 </div>
 
 
-                <p class="post-content-text">
-                    ${renderMentions(post.content)}
-                </p>
+                <p
+    class="post-content-text"
+    style="width:100%; display:block; margin:0 !important; padding:0 !important; text-align:left !important; text-indent:0 !important;"
+>
+    ${renderMentions(post.content)}
+</p>
 
             </div>
 
@@ -2765,7 +2772,10 @@ const reactionIcons =
             <div class="comment-main">
 
 
-                <div class="comment-box">
+                <div
+    class="comment-box"
+    style="text-align:left !important;"
+>
 
 
                     <div class="comment-name-row">
@@ -2782,9 +2792,11 @@ const reactionIcons =
                     </div>
 
 
-                    <p>
-                        ${renderMentions(comment.content)}
-                    </p>
+                   <p
+    style="margin:0 !important; padding:0 !important; text-align:left !important; text-indent:0 !important;"
+>
+    ${renderMentions(comment.content)}
+</p>
 
                 </div>
 
