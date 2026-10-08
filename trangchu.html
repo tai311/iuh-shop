@@ -1,0 +1,1819 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PASSIT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="../CSS/trangchu.css">
+    <link rel="stylesheet" href="../CSS/iuh-chat-notification.css">
+    <link rel="stylesheet" href="../CSS/mobile-navigation.css">
+    <link rel="stylesheet" href="../CSS/passit-brand.css">
+    <link rel="stylesheet" href="../CSS/product-cards.css">
+    <link rel="stylesheet" href="../CSS/passit-ui.css">
+</head>
+
+<body class="passit-ui">
+
+    <header class="site-header">
+
+        <!-- ===== TẦNG 1 ===== -->
+        <div class="top-bar">
+            <div class="top-bar-container">
+
+                <!-- Lời chào -->
+                <div class="welcome-text1">
+                    Chào mừng bạn đến với PASSIT
+                </div>
+
+                <!-- Khu vực bên phải -->
+                <div class="top-actions">
+
+                    <!-- =========================================================
+     GLOBAL SEARCH
+========================================================= -->
+<div class="global-search" id="globalSearch">
+
+    <div class="global-search-input-wrap">
+
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+        <input
+            type="text"
+            id="globalSearchInput"
+            class="global-search-input"
+            placeholder="Tìm sản phẩm, người dùng, bài viết..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="globalSearchClear"
+            class="global-search-clear"
+            title="Xóa"
+            style="display:none;"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+    </div>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="global-search-dropdown"
+        id="globalSearchDropdown"
+    >
+
+        <!-- Nội dung sẽ được JS render -->
+        <div
+            id="globalSearchContent"
+            class="global-search-content"
+        ></div>
+
+    </div>
+
+</div>
+
+                    <!-- ICON TIN NHẮN -->
+<a href="tinnhan.html"
+   class="top-message-icon"
+   aria-label="Tin nhắn"
+   title="Tin nhắn">
+
+    <i class="fa-solid fa-comment-dots"></i>
+
+    <span class="message-unread-dot"></span>
+
+</a>
+
+<!-- ICON GIỎ HÀNG -->
+<a href="giohang.html"
+   class="top-cart-icon"
+   aria-label="Giỏ hàng"
+   title="Giỏ hàng">
+
+    <i class="fa-solid fa-cart-shopping"></i>
+
+</a>
+
+                    <!-- KHU VỰC TÀI KHOẢN -->
+
+<div class="account-area">
+
+    <!-- CHƯA ĐĂNG NHẬP -->
+    <div id="guestAccount" class="guest-account">
+
+        <!-- Đăng nhập -->
+        <a href="dangnhap.html" class="top-link login-link">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"></path>
+                <path d="M11 8l4 4-4 4"></path>
+                <path d="M15 12H4"></path>
+            </svg>
+
+            <span>Đăng nhập</span>
+
+        </a>
+
+
+        <!-- Đường ngăn cách -->
+        <span class="top-divider"></span>
+
+
+        <!-- Đăng ký -->
+        <a href="dangky.html" class="top-link register-link">
+            Đăng ký
+        </a>
+
+    </div>
+
+<!-- ĐÃ ĐĂNG NHẬP -->
+<div
+    class="user-account-wrapper"
+    id="userAccount"
+    style="display: none;"
+>
+
+    <!-- Nút tài khoản -->
+    <button
+        type="button"
+        id="userAccountButton"
+        class="user-account"
+    >
+
+        <img
+            id="headerAvatar"
+            src="../Images/default-avatar.svg"
+            alt="Ảnh đại diện"
+            class="header-avatar"
+        >
+
+        <span
+            id="headerUserName"
+            class="header-user-name"
+        >
+            Tài khoản
+        </span>
+
+
+    </button>
+
+
+    <!-- MENU TÀI KHOẢN -->
+    <div
+    id="accountDropdown"
+    class="account-dropdown"
+>
+
+    <!-- Tài khoản -->
+    <a href="taikhoan.html">
+        Tài khoản
+    </a>
+
+    <!-- Quản trị - chỉ Admin mới thấy -->
+    <a
+        href="admin.html"
+        id="adminLink"
+        style="display: none;"
+    >
+        Quản trị
+    </a>
+
+    <!-- Đăng xuất -->
+    <button
+        type="button"
+        id="logoutButton"
+    >
+        Đăng xuất
+    </button>
+
+</div>
+
+</div>
+
+
+</div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ===== TẦNG 2 ===== -->
+        <div class="main-nav">
+            <div class="nav-container">
+
+                <!-- Logo -->
+                <a href="../HTML/trangchu.html" class="brand">
+
+                    <img
+                       src="../Images/logo.png"
+                       alt="PASSIT"
+                       class="brand-logo"
+                    >
+
+                    <div class="brand-text">
+                        <div class="brand-name">
+                            <span>PASS</span>IT
+                        </div>
+
+                        <div class="brand-slogan">
+                            MUA BÁN – CHIA SẺ – CÙNG SINH VIÊN IUH
+                        </div>
+                    </div>
+
+                </a>
+
+
+                <!-- Menu -->
+                <nav class="navigation">
+
+                    <a href="trangchu.html" class="nav-item">
+                        TRANG CHỦ
+                    </a>
+
+                    <a href="gioithieu.html" class="nav-item">
+                        GIỚI THIỆU
+                    </a>
+
+                    <a href="sanpham.html" class="nav-item">
+                        SẢN PHẨM
+                    </a>
+
+                    <a href="chinhsach.html" class="nav-item">
+                        CHÍNH SÁCH
+                    </a>
+
+                    <a href="diendan.html" class="nav-item">
+                        DIỄN ĐÀN
+                    </a>
+
+                    <div class="account-nav-wrapper">
+
+    <!-- Bấm chữ TÀI KHOẢN vẫn đi tới trang tài khoản -->
+    <a
+        href="taikhoan.html"
+        class="nav-item account-nav"
+    >
+        TÀI KHOẢN
+    </a>
+
+    <!-- Chỉ mũi tên dùng để mở menu -->
+    <button
+        type="button"
+        class="account-arrow-button"
+        id="accountNavArrow"
+        aria-label="Mở menu tài khoản"
+    >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9L12 15L18 9"></path>
+        </svg>
+    </button>
+
+
+    <!-- DROPDOWN -->
+    <div
+        class="account-shortcuts"
+        id="accountShortcuts"
+    >
+
+        <a href="giohang.html">
+            <span class="shortcut-icon">🛒</span>
+            <span>Giỏ hàng</span>
+        </a>
+
+        <a href="donhang.html">
+            <span class="shortcut-icon">📦</span>
+            <span>Kiểm tra đơn hàng</span>
+        </a>
+
+        <a href="dangtin.html">
+            <span class="shortcut-icon">＋</span>
+            <span>Đăng tin</span>
+        </a>
+
+        <a href="quanlytin.html">
+            <span class="shortcut-icon">📋</span>
+            <span>Quản lý tin</span>
+        </a>
+
+    </div>
+
+</div>
+                </nav>
+
+            </div>
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+     SLIDER BANNER
+========================= -->
+<section class="hero-slider">
+
+    <div class="slider-container">
+
+        <!-- Banner 1 -->
+        <div class="slide active">
+            <img
+                src="../Images/banner1-3.jpg"
+                alt="Banner PASSIT 1"
+            >
+        </div>
+
+        <!-- Banner 2 -->
+        <div class="slide">
+            <img
+                src="../Images/banner2-2.jpg"
+                alt="Banner PASSIT 2"
+            >
+        </div>
+
+        <!-- Banner 3 -->
+        <div class="slide">
+            <img
+                src="../Images/banner3-2.jpg"
+                alt="Banner PASSIT 3"
+            >
+        </div>
+
+
+        <!-- Nút chuyển trái -->
+         <button class="slider-button slider-prev" type="button" aria-label="Banner trước">
+              <svg viewBox="0 0 24 24">
+                 <path d="M15 4 L7 12 L15 20"></path>
+              </svg>
+         </button>
+
+         <button class="slider-button slider-next" type="button" aria-label="Banner tiếp theo">
+              <svg viewBox="0 0 24 24">
+                 <path d="M9 4 L17 12 L9 20"></path>
+              </svg>
+         </button>
+
+
+        <!-- Dấu chấm -->
+        <div class="slider-dots">
+
+            <button class="slider-dot active" type="button"></button>
+
+            <button class="slider-dot" type="button"></button>
+
+            <button class="slider-dot" type="button"></button>
+
+        </div>
+
+     </div>
+
+</section>
+
+<!-- =========================
+     PHẦN CHÀO MỪNG
+========================= -->
+
+
+
+
+<!-- ================================
+     DANH MỤC PHỔ BIẾN
+================================ -->
+
+<section class="popular-categories">
+
+    <div class="categories-header">
+        <h2>DANH MỤC PHỔ BIẾN</h2>
+
+        <a href="../HTML/sanpham.html">
+            Xem tất cả <span>›</span>
+        </a>
+    </div>
+
+
+    <div class="categories-list">
+
+        <!-- Sách giáo trình -->
+        <a href="../HTML/sanpham.html?category=sach-giao-trinh"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <path d="M8 8h13c5 0 9 3 9 8v25c-2-2-5-3-9-3H8V8z"/>
+                    <path d="M40 8H27c-5 0-9 3-9 8v25c2-2 5-3 9-3h13V8z"/>
+                    <path d="M24 16v25"/>
+                </svg>
+            </div>
+
+            <span>Sách giáo trình</span>
+        </a>
+
+
+        <!-- Tài liệu môn học -->
+        <a href="../HTML/sanpham.html?category=tai-lieu"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <rect x="11" y="6" width="26" height="36" rx="3"/>
+                    <path d="M17 14h14"/>
+                    <path d="M17 21h14"/>
+                    <path d="M17 28h9"/>
+                    <path d="M17 35h6"/>
+                    <path d="M29 28l2 2 4-5"/>
+                </svg>
+            </div>
+
+            <span>Tài liệu môn học</span>
+        </a>
+
+
+        <!-- Tìm đồ thất lạc -->
+        <a href="../HTML/sanpham.html?category=de-thi"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <rect x="9" y="6" width="30" height="36" rx="3"/>
+                    <path d="M17 14h14"/>
+                    <path d="M17 21h8"/>
+                    <path d="M17 29l3 3 6-7"/>
+                    <path d="M17 37h14"/>
+                </svg>
+            </div>
+
+            <span>Thiết bị</span>
+        </a>
+
+
+        <!-- Đồng phục -->
+        <a href="../HTML/sanpham.html?category=dong-phuc"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <path d="M18 8l6 5 6-5 10 7-5 9-5-3v19H18V21l-5 3-5-9 10-7z"/>
+                    <path d="M24 13v22"/>
+                    <path d="M21 18h6"/>
+                </svg>
+            </div>
+
+            <span>Đồng phục</span>
+        </a>
+
+
+        <!-- Dụng cụ thực hành -->
+        <a href="../HTML/sanpham.html?category=dung-cu-thuc-hanh"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <rect x="7" y="17" width="34" height="25" rx="3"/>
+                    <path d="M16 17v-4h16v4"/>
+                    <path d="M7 25h34"/>
+                    <path d="M20 25v5h8v-5"/>
+                    <path d="M15 34h5"/>
+                    <path d="M28 34h5"/>
+                </svg>
+            </div>
+
+            <span>Dụng cụ thực hành</span>
+        </a>
+
+
+        <!-- Đồ dùng học tập -->
+        <a href="../HTML/sanpham.html?category=do-dung-hoc-tap"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <path d="M10 38l3-10L31 10l7 7-18 18-10 3z"/>
+                    <path d="M27 14l7 7"/>
+                    <path d="M13 28l7 7"/>
+                    <path d="M36 8l4 4"/>
+                </svg>
+            </div>
+
+            <span>Đồ dùng học tập</span>
+        </a>
+
+
+        <!-- Khác -->
+        <a href="../HTML/sanpham.html?category=khac"
+           class="category-item">
+
+            <div class="category-icon">
+                <svg viewBox="0 0 48 48">
+                    <circle cx="24" cy="24" r="16"/>
+                    <circle cx="16" cy="24" r="2"/>
+                    <circle cx="24" cy="24" r="2"/>
+                    <circle cx="32" cy="24" r="2"/>
+                </svg>
+            </div>
+
+            <span>Khác</span>
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     SẢN PHẨM ĐỀ XUẤT
+========================================= -->
+
+<section
+    class="recommended-products"
+    id="recommendedSection"
+    style="display: none;"
+>
+
+    <div class="recommended-header">
+
+        <div>
+            <span class="recommended-label">
+                GỢI Ý DÀNH CHO BẠN
+            </span>
+
+            <h2>
+                SẢN PHẨM ĐỀ XUẤT
+            </h2>
+
+            <p>
+                Những sản phẩm đang được ưu tiên hiển thị trên PASSIT
+            </p>
+        </div>
+
+    </div>
+
+
+    <div
+        id="recommendedProductList"
+        class="recommended-product-list">
+    </div>
+
+</section>
+
+    <!-- ================================
+     SẢN PHẨM NỔI BẬT
+================================ -->
+<section class="featured-products">
+
+    <div class="featured-header">
+
+        <h2>SẢN PHẨM MỚI ĐĂNG</h2>
+
+        <div class="featured-tabs">
+
+            <button
+                type="button"
+                class="featured-tab active"
+                data-featured-sort="newest">
+                Mới nhất
+            </button>
+
+            <button
+                type="button"
+                class="featured-tab"
+                data-featured-sort="price-low">
+                Giá thấp đến cao
+            </button>
+
+            <button
+                type="button"
+                class="featured-tab"
+                data-featured-sort="price-high">
+                Giá cao đến thấp
+            </button>
+
+        </div>
+
+        <a
+            href="../HTML/sanpham.html"
+            class="featured-see-all">
+            Xem tất cả <span>›</span>
+        </a>
+
+    </div>
+
+
+    <!-- Danh sách sản phẩm -->
+    <div
+        id="featuredProductList"
+        class="featured-product-list">
+
+        <div class="featured-loading">
+            Đang tải sản phẩm...
+        </div>
+
+    </div>
+
+</section>
+
+<section class="welcome-section">
+
+    <div class="welcome-container">
+
+        <!-- Nội dung -->
+        <div class="welcome-content">
+
+            <span class="welcome-label">
+                CHÀO MỪNG BẠN ĐẾN VỚI
+            </span>
+
+            <h2>
+                PASS<span>IT</span>
+            </h2>
+
+            <div class="welcome-line"></div>
+
+            <p class="welcome-text">
+                PASSIT kết nối những món đồ còn hữu ích với người đang cần.
+                Từ sách học đến đồ dùng hằng ngày, bạn có thể tìm món đồ
+                hợp túi tiền, đăng bán món đồ ít dùng và trao đổi trực tiếp
+                cùng cộng đồng sinh viên.
+            </p>
+
+            <p class="welcome-text">
+                Chúng tôi hướng đến một cộng đồng mua bán
+                <strong>tiện lợi – minh bạch – thân thiện</strong>,
+                giúp mỗi món đồ tìm được người cần và mỗi sinh viên
+                có thêm một nơi để kết nối, chia sẻ và trao đổi.
+            </p>
+
+            <a href="sanpham.html" class="welcome-button">
+                KHÁM PHÁ NGAY
+                <span>→</span>
+            </a>
+
+        </div>
+
+
+        <!-- Ảnh trang trí -->
+        <div class="welcome-image-wrapper">
+
+            <div class="welcome-image-frame">
+
+                <img
+                    src="../Images/a.jpg"
+                    alt="Sinh viên IUH"
+                    class="welcome-image"
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="stats-section">
+
+    <div class="stats-container">
+
+        <!-- Sản phẩm -->
+        <div class="stat-item">
+
+            <div class="stat-icon">
+                ♧
+            </div>
+
+            <div class="stat-content">
+                <div class="stat-number">
+                    <span class="counter" data-target="1250">0</span>+
+                </div>
+
+                <div class="stat-label">
+                    Sản phẩm đang bán
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Sinh viên -->
+        <div class="stat-item">
+
+            <div class="stat-icon">
+                ♙
+            </div>
+
+            <div class="stat-content">
+                <div class="stat-number">
+                    <span class="counter" data-target="980">0</span>+
+                </div>
+
+                <div class="stat-label">
+                    Sinh viên tham gia
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Giao dịch -->
+        <div class="stat-item">
+
+            <div class="stat-icon">
+                ✓
+            </div>
+
+            <div class="stat-content">
+                <div class="stat-number">
+                    <span class="counter" data-target="680">0</span>+
+                </div>
+
+                <div class="stat-label">
+                    Giao dịch thành công
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Cộng đồng -->
+        <div class="stat-item">
+
+            <div class="stat-icon">
+                ♧
+            </div>
+
+            <div class="stat-content">
+                <div class="stat-number">
+                    <span class="counter" data-target="50">0</span>+
+                </div>
+
+                <div class="stat-label">
+                    Nhóm & cộng đồng
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================
+     QUẢNG CÁO ĐỐI TÁC
+========================================= -->
+<section
+    class="advertisement-section"
+    id="advertisementSection"
+    style="display: none;"
+>
+
+    <div class="advertisement-container">
+
+        <div class="advertisement-header">
+
+            <div>
+                <span class="advertisement-label">
+                    ĐỐI TÁC CỦA PASSIT
+                </span>
+
+                <h2>
+                    QUẢNG CÁO
+                </h2>
+            </div>
+
+        </div>
+
+
+        <div
+            class="advertisement-slider"
+            id="advertisementSlider"
+        >
+
+            <!-- JS sẽ render quảng cáo tại đây -->
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================
+     VÌ SAO CHỌN PASSIT
+========================================= -->
+<section class="why-iuh-section">
+
+    <div class="why-iuh-container">
+
+        <!-- =========================
+             BÊN TRÁI
+        ========================== -->
+        <div class="why-iuh-banner">
+
+            <div class="why-iuh-banner-content">
+
+                <span class="why-iuh-label">
+                    CỘNG ĐỒNG SINH VIÊN IUH
+                </span>
+
+                <h2>
+                    Mua bán dễ dàng
+                    <br>
+                    Đúng người – đúng nhu cầu
+                </h2>
+
+                <a
+                    href="diendan.html"
+                    class="why-iuh-button">
+                    THAM GIA NGAY
+                    <span>›</span>
+                </a>
+
+            </div>
+
+            <div class="why-iuh-decoration">
+                <div class="student-circle student-1"></div>
+                <div class="student-circle student-2"></div>
+                <div class="student-circle student-3"></div>
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             BÊN PHẢI
+        ========================== -->
+        <div class="why-iuh-reasons">
+
+            <!-- Lý do 1 -->
+            <div class="why-iuh-reason">
+
+                <div class="why-iuh-icon">
+                    ✓
+                </div>
+
+                <div class="why-iuh-reason-content">
+
+                    <h3>
+                        An tâm khi giao dịch
+                    </h3>
+
+                    <p>
+                        Xác minh sinh viên IUH,
+                        tăng độ tin cậy khi mua bán.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Lý do 2 -->
+            <div class="why-iuh-reason">
+
+                <div class="why-iuh-icon">
+                    ₫
+                </div>
+
+                <div class="why-iuh-reason-content">
+
+                    <h3>
+                        Giá phù hợp sinh viên
+                    </h3>
+
+                    <p>
+                        Tìm sản phẩm với mức giá
+                        tiết kiệm, phù hợp với sinh viên.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Lý do 3 -->
+            <div class="why-iuh-reason">
+
+                <div class="why-iuh-icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3v3l4-3h9a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z"/>
+        <path d="M7 10h10"/>
+        <path d="M7 14h7"/>
+    </svg>
+</div>
+
+                <div class="why-iuh-reason-content">
+
+                    <h3>
+                        Kết nối trực tiếp
+                    </h3>
+
+                    <p>
+                        Chat nhanh với người bán,
+                        trao đổi trước khi mua.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Lý do 4 -->
+            <div class="why-iuh-reason">
+
+                <div class="why-iuh-icon">
+                    <span>▤</span>
+                </div>
+
+                <div class="why-iuh-reason-content">
+
+                    <h3>
+                        Đúng nhu cầu sinh viên
+                    </h3>
+
+                    <p>
+                        Sách, tài liệu, đồ dùng học tập
+                        và nhiều sản phẩm thiết thực.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================
+     ĐÁNH GIÁ TỪ SINH VIÊN
+========================================= -->
+<section class="reviews-section">
+
+    <div class="reviews-container">
+
+        <div class="reviews-header">
+            <span class="reviews-label">
+                TRẢI NGHIỆM THỰC TẾ
+            </span>
+
+            <h2>
+                Sinh viên nói gì về PASSIT?
+            </h2>
+
+            <p>
+                Những trải nghiệm thực tế giúp bạn yên tâm hơn khi mua bán
+                trong cộng đồng sinh viên.
+            </p>
+        </div>
+
+
+        <div class="reviews-list">
+
+    <!-- Đánh giá 1 -->
+    <div class="review-card">
+
+        <div class="review-stars">★★★★★</div>
+
+        <p class="review-content">
+            “Mình thích nhất là có thể xem thông tin người bán
+            trước khi giao dịch. Cảm giác yên tâm hơn nhiều.”
+        </p>
+
+        <div class="review-user">
+            <div class="review-avatar">A</div>
+
+            <div class="review-user-info">
+                <strong>Nguyễn Minh Anh</strong>
+                <span>Người dùng PASSIT</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Đánh giá 2 -->
+    <div class="review-card">
+
+        <div class="review-stars">★★★★★</div>
+
+        <p class="review-content">
+            “Mình mua giáo trình và nhận đúng như mô tả.
+            Giá cũng hợp lý hơn mua mới.”
+        </p>
+
+        <div class="review-user">
+            <div class="review-avatar">T</div>
+
+            <div class="review-user-info">
+                <strong>Trần Hoàng Nam</strong>
+                <span>Người dùng PASSIT</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Đánh giá 3 -->
+    <div class="review-card">
+
+        <div class="review-stars">★★★★★</div>
+
+        <p class="review-content">
+            “Có thể chat trực tiếp với người bán nên mình hỏi kỹ
+            tình trạng sản phẩm trước khi mua.”
+        </p>
+
+        <div class="review-user">
+            <div class="review-avatar">L</div>
+
+            <div class="review-user-info">
+                <strong>Lê Thảo Vy</strong>
+                <span>Người dùng PASSIT</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Đánh giá 4 -->
+    <div class="review-card">
+
+        <div class="review-stars">★★★★★</div>
+
+        <p class="review-content">
+            “Mình thấy việc có tích xác thực giúp dễ nhận biết
+            những tài khoản đáng tin cậy hơn khi tìm người bán.”
+        </p>
+
+        <div class="review-user">
+            <div class="review-avatar">P</div>
+
+            <div class="review-user-info">
+                <strong>Phạm Gia Huy</strong>
+                <span>Người dùng PASSIT</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Đánh giá 5 -->
+    <div class="review-card">
+
+        <div class="review-stars">★★★★★</div>
+
+        <p class="review-content">
+            “Mình thường hỏi kỹ sản phẩm và xem thông tin người bán
+            trước khi chốt. Cách này giúp mình tự tin hơn khi giao dịch.”
+        </p>
+
+        <div class="review-user">
+            <div class="review-avatar">N</div>
+
+            <div class="review-user-info">
+                <strong>Nguyễn Khánh Ngân</strong>
+                <span>Người dùng PASSIT</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Đánh giá 6 -->
+    <div class="review-card">
+
+        <div class="review-stars">★★★★★</div>
+
+        <p class="review-content">
+            “Mình từng mua đồ cũ online khá lo về chất lượng.
+            Ở đây có thông tin rõ ràng nên việc lựa chọn dễ hơn.”
+        </p>
+
+        <div class="review-user">
+            <div class="review-avatar">Đ</div>
+
+            <div class="review-user-info">
+                <strong>Đặng Quốc Bảo</strong>
+                <span>Người dùng PASSIT</span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+    </div>
+
+</section>
+
+<!-- =========================================
+     CTA ĐĂNG TIN
+========================================= -->
+<section class="post-cta-section">
+
+    <div class="post-cta">
+
+        <div class="post-cta-content">
+
+            <span class="post-cta-label">
+                ĐỒ CŨ CỦA BẠN – KHỞI ĐẦU MỚI CHO AI ĐÓ
+            </span>
+
+            <h2>
+                Bạn có sách hay tài liệu<br>
+                không dùng đến?
+            </h2>
+
+            <p>
+                Đăng tin ngay để kết nối với sinh viên IUH
+                và tìm người đang cần chúng!
+            </p>
+
+            <a href="dangtin.html" class="post-cta-button">
+                ĐĂNG TIN NGAY
+                <span>›</span>
+            </a>
+
+        </div>
+
+
+        <div class="post-cta-visual">
+
+            <div class="post-cta-circle circle-1"></div>
+            <div class="post-cta-circle circle-2"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+    <!-- =========================
+     FOOTER
+========================= -->
+<footer class="site-footer">
+
+    <div class="footer-container">
+
+        <!-- CỘT 1: LOGO -->
+         <div class="footer-column footer-brand">
+
+    <div class="footer-brand-row">
+
+        <a href="../HTML/trangchu.html" class="footer-logo">
+            <img
+                src="../Images/logo-trang.png"
+                alt="PASSIT"
+            >
+        </a>
+
+        <div class="footer-brand-text">
+
+            <div class="footer-brand-name">
+                <span>PASS</span>IT
+            </div>
+
+            <div class="footer-brand-slogan">
+                MUA BÁN – CHIA SẺ – CÙNG SINH VIÊN IUH
+            </div>
+
+        </div>
+
+    </div>
+
+       <p class="footer-description">
+          Cùng PASSIT trao món đồ bạn có, tìm món đồ bạn cần
+          và tiếp nối giá trị trong cộng đồng sinh viên.
+       </p>
+
+    </div>
+
+
+        <!-- CỘT 2: VỀ PASSIT -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+              LIÊN KẾT
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="gioithieu.html">
+                        Giới thiệu
+                    </a>
+                </li>
+
+                <li>
+                    <a href="chinhsach.html">
+                        Chính sách
+                    </a>
+                </li>
+
+                <li>
+                    <a href="sanpham.html">
+                        Sản phẩm
+                    </a>
+                </li>
+
+                <li>
+                    <a href="taikhoan.html">
+                        Tài khoản
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- CỘT 3: HỖ TRỢ -->
+        <div class="footer-column">
+
+            <h3 class="footer-title">
+                HỖ TRỢ
+            </h3>
+
+            <ul class="footer-links">
+
+                <li>
+                    <a href="diendan.html">
+                        Diễn đàn
+                    </a>
+                </li>
+
+                <li>
+                    <a href="cauhoi.html">
+                        Câu hỏi thường gặp
+                    </a>
+                </li>
+
+                <li>
+                    <a href="huongdan.html">
+                        Hướng dẫn đăng sản phẩm
+                    </a>
+                </li>
+
+            </ul>
+
+            <a href="lienhe.html" class="footer-contact-button">
+               LIÊN HỆ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 PASSIT
+        </p>
+
+    </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/mobile-navigation.js"></script>
+<script src="../JS/iuh-chat-notification.js"></script>
+<script src="../JS/iuh-core.js"></script>
+<script src="../JS/ok.js"></script>
+<script src="../JS/vedau.js"></script>
+<!-- NÚT VỀ ĐẦU TRANG -->
+<button
+    id="backToTop"
+    class="back-to-top"
+    type="button"
+    aria-label="Về đầu trang"
+>
+    <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path d="M12 19V5"></path>
+        <path d="M6 11l6-6 6 6"></path>
+    </svg>
+</button>
+<!-- =====================================================
+     NÚT DONATE
+===================================================== -->
+
+<button
+    id="donateFloatingButton"
+    class="donate-floating-button"
+    type="button"
+    aria-label="Donate cho PASSIT"
+>
+
+    <span class="donate-glass-shine"></span>
+
+    <span class="donate-money-stack">
+
+        <span class="money-bill bill-back"></span>
+        <span class="money-bill bill-middle"></span>
+        <span class="money-bill bill-front">
+            ₫
+        </span>
+
+    </span>
+
+    <!-- TIỀN BAY -->
+    <span class="money-rain rain-1">₫</span>
+    <span class="money-rain rain-2">₫</span>
+    <span class="money-rain rain-3">₫</span>
+    <span class="money-rain rain-4">₫</span>
+    <span class="money-rain rain-5">₫</span>
+
+    <span class="donate-mini-text">
+        DONATE
+    </span>
+
+</button>
+<!-- =====================================================
+     POPUP DONATE
+===================================================== -->
+
+<div
+    id="donateModal"
+    class="donate-modal"
+    aria-hidden="true"
+>
+
+    <div
+        id="donateModalOverlay"
+        class="donate-modal-overlay"
+    ></div>
+
+
+    <div
+        class="donate-modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="donateModalTitle"
+    >
+
+        <!-- NÚT ĐÓNG -->
+
+        <button
+            id="closeDonateModal"
+            class="donate-close"
+            type="button"
+            aria-label="Đóng"
+        >
+            ×
+        </button>
+
+
+        <!-- =================================================
+             BƯỚC 1
+        ================================================== -->
+
+        <div
+            id="donatePaymentView"
+            class="donate-view"
+        >
+
+            <div class="donate-popup-icon">
+                ₫
+            </div>
+
+
+            <h2 id="donateModalTitle">
+                DONATE CHO PASSIT
+            </h2>
+
+
+            <p class="donate-thankyou">
+                Cảm ơn bạn đã đồng hành và ủng hộ
+                PASSIT.
+            </p>
+
+
+            <p class="donate-description">
+                Sự đóng góp của bạn giúp PASSIT
+                duy trì và phát triển cộng đồng
+                sinh viên.
+            </p>
+
+
+            <!-- =========================================
+                 QR
+            ========================================== -->
+
+
+
+
+            <div id="donateModeNote" class="donate-qr-note">
+                Chọn số tiền và xác nhận Donate.
+            </div>
+
+
+            <!-- =========================================
+                 HỌ VÀ TÊN
+            ========================================== -->
+
+            <label
+                for="donateDonorName"
+                class="donate-input-label"
+            >
+                Họ và tên
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <input
+                    id="donateDonorName"
+                    type="text"
+                    maxlength="100"
+                    placeholder="Nhập họ và tên"
+                >
+
+            </div>
+
+
+            <!-- =========================================
+                 NGÂN HÀNG
+            ========================================== -->
+
+            <label
+                for="donateBankName"
+                class="donate-input-label"
+            >
+                Ngân hàng
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <select
+                    id="donateBankName"
+                >
+
+                    <option value="">
+                        Chọn ngân hàng
+                    </option>
+
+                    <option value="Vietcombank">
+                        Vietcombank
+                    </option>
+
+                    <option value="BIDV">
+                        BIDV
+                    </option>
+
+                    <option value="VietinBank">
+                        VietinBank
+                    </option>
+
+                    <option value="MB Bank">
+                        MB Bank
+                    </option>
+
+                    <option value="ACB">
+                        ACB
+                    </option>
+
+                    <option value="Techcombank">
+                        Techcombank
+                    </option>
+
+                    <option value="VPBank">
+                        VPBank
+                    </option>
+
+                    <option value="Sacombank">
+                        Sacombank
+                    </option>
+
+                    <option value="TPBank">
+                        TPBank
+                    </option>
+
+                    <option value="HDBank">
+                        HDBank
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- =========================================
+                 SỐ TIỀN
+            ========================================== -->
+
+            <label
+                for="donateAmount"
+                class="donate-input-label"
+            >
+                Số tiền Donate
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <input
+                    id="donateAmount"
+                    type="number"
+                    min="1000"
+                    step="1000"
+                    placeholder="Nhập số tiền"
+                >
+
+                <span>đ</span>
+
+            </div>
+
+
+            <!-- =========================================
+                 SỐ TIỀN NHANH
+            ========================================== -->
+
+            <div class="donate-quick-amounts">
+
+                <button
+                    type="button"
+                    data-donate-amount="10000"
+                >
+                    10.000đ
+                </button>
+
+                <button
+                    type="button"
+                    data-donate-amount="20000"
+                >
+                    20.000đ
+                </button>
+
+                <button
+                    type="button"
+                    data-donate-amount="50000"
+                >
+                    50.000đ
+                </button>
+
+                <button
+                    type="button"
+                    data-donate-amount="100000"
+                >
+                    100.000đ
+                </button>
+
+            </div>
+
+
+            <!-- =========================================
+                 NỘI DUNG
+            ========================================== -->
+
+            <label
+                for="donateTransferContentInput"
+                class="donate-input-label"
+            >
+                Nội dung chuyển khoản
+            </label>
+
+
+            <div class="donate-input-wrap">
+
+                <input
+                    id="donateTransferContentInput"
+                    type="text"
+                    maxlength="150"
+                    placeholder="Nội dung chuyển khoản"
+                >
+
+            </div>
+
+
+            <div class="donate-content-note">
+                Hệ thống tự điền nội dung, bạn có thể chỉnh sửa.
+            </div>
+
+
+            <p
+                id="donateMessage"
+                class="donate-message"
+            ></p>
+
+
+            <button
+                id="startDonateTransfer"
+                class="donate-main-button"
+                type="button"
+            >
+                TIẾP TỤC
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             BƯỚC 2
+        ================================================== -->
+
+        <div
+            id="donateTransferView"
+            class="donate-view"
+            hidden
+        >
+
+            <div class="donate-step-title">
+
+                <span class="donate-step-number">
+                    2
+                </span>
+
+                <div>
+
+                    <h3>
+                        Xác nhận Donate
+                    </h3>
+
+                    <p id="donateConfirmNote">Kiểm tra thông tin Donate trước khi xác nhận.</p>
+
+                </div>
+
+            </div>
+
+
+            <div class="donate-bank-card">
+
+                <div class="donate-bank-header">
+
+                    <span>
+                        THÔNG TIN DONATE
+                    </span>
+
+                    <span class="donate-bank-badge">
+                        Donate
+                    </span>
+
+                </div>
+
+
+                <div class="donate-bank-row">
+
+                    <span>
+                        Ngân hàng
+                    </span>
+
+                    <strong id="donateTransferBank">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="donate-bank-row">
+
+                    <span>
+                        Người chuyển
+                    </span>
+
+                    <strong id="donateTransferDonor">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="donate-bank-row highlight">
+
+                    <span>
+                        Số tiền
+                    </span>
+
+                    <strong id="donateTransferAmount">
+                        0đ
+                    </strong>
+
+                </div>
+
+
+                <div class="donate-bank-row">
+
+                    <span>
+                        Nội dung
+                    </span>
+
+                    <strong
+                        id="donateTransferContent"
+                        class="transfer-code"
+                    >
+                        —
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <p
+                id="donateTransferMessage"
+                class="donate-message"
+            ></p>
+
+
+            <div class="donate-transfer-actions">
+
+                <button
+                    id="backToDonateAmount"
+                    class="donate-back-button"
+                    type="button"
+                >
+                    QUAY LẠI
+                </button>
+
+
+                <button
+                    id="confirmDonateTransfer"
+                    class="donate-main-button"
+                    type="button"
+                >
+                    XÁC NHẬN DONATE
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             BƯỚC 3
+        ================================================== -->
+
+        <div
+            id="donateSuccessView"
+            class="donate-view donate-success-view"
+            hidden
+        >
+
+            <div class="donate-success-icon">
+                ✓
+            </div>
+
+
+            <h3>
+                DONATE THÀNH CÔNG
+            </h3>
+
+
+            <p>
+                Cảm ơn bạn đã ủng hộ PASSIT.
+            </p>
+
+
+            <div class="donate-success-info">
+
+                <span>
+                    Số tiền
+                </span>
+
+                <strong id="donateSuccessAmount">
+                    0đ
+                </strong>
+
+            </div>
+
+
+            <div class="donate-success-info">
+
+                <span>
+                    Mã giao dịch
+                </span>
+
+                <strong id="donateSuccessCode">
+                    —
+                </strong>
+
+            </div>
+
+
+            <button
+                id="finishDonate"
+                class="donate-main-button"
+                type="button"
+            >
+                HOÀN TẤT
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<script src="../JS/order-notifications.js"></script>
+<script src="../JS/donate.js"></script>
+</body>
+</html>
