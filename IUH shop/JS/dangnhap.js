@@ -48,19 +48,23 @@ loginForm.addEventListener('submit', async event => {
     loginBusy = true; button.disabled = true; button.textContent = 'Đang đăng nhập…';
     let success = false;
     try {
+        if (!window.IUHCaptcha) { alert('Chưa tải được xác thực. Vui lòng tải lại trang.'); return; }
+        let captchaToken;
+        try { captchaToken = window.IUHCaptcha.takeToken(); }
+        catch (error) { alert(error.message); return; }
         let email = account;
         if (!account.includes('@')) {
             const { data, error } = await supabaseClient.from('users').select('email').eq('student_id', account).maybeSingle();
             if (error || !data?.email) { alert('Vui lòng đăng nhập bằng email đã đăng ký. Nếu quên mật khẩu, chọn “Quên mật khẩu?”.'); return; }
             email = data.email;
         }
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password, options: { captchaToken } });
         if (error || !data?.user) {
-            alert(error?.code === 'email_not_confirmed' ? 'Vui lòng xác nhận email đăng ký trước khi đăng nhập.' : error?.status === 429 ? 'Bạn thử đăng nhập quá nhiều lần. Vui lòng chờ rồi thử lại.' : 'Email hoặc mật khẩu không chính xác.');
+            alert(error?.code === 'captcha_failed' ? 'Xác thực chưa hợp lệ. Vui lòng xác thực lại rồi thử tiếp.' : error?.code === 'email_not_confirmed' ? 'Vui lòng xác nhận email đăng ký trước khi đăng nhập.' : error?.status === 429 ? 'Bạn thử đăng nhập quá nhiều lần. Vui lòng chờ rồi thử lại.' : 'Email hoặc mật khẩu không chính xác.');
             return;
         }
         success = true; button.textContent = 'Đăng nhập thành công';
         setTimeout(() => { window.location.href = '../HTML/trangchu.html'; }, 700);
     } catch { alert('Không thể kết nối. Kiểm tra mạng rồi thử đăng nhập lại.'); }
-    finally { if (!success) { loginBusy = false; button.disabled = false; button.textContent = 'Đăng nhập'; } }
+    finally { window.IUHCaptcha?.reset(); if (!success) { loginBusy = false; button.disabled = false; button.textContent = 'Đăng nhập'; } }
 });

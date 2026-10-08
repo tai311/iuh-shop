@@ -9,7 +9,7 @@ function fixture(options = {}) {
  const calls={send:0,update:0,set:0,signout:0}; let config;
  const auth={resetPasswordForEmail:async(email,args)=>{calls.send++;calls.email=email;calls.redirect=args.redirectTo;if(options.sendThrow)throw Error('offline');return {error:options.sendError};},setSession:async()=>{calls.set++;return {error:options.invalid?{status:401}:null};},getUser:async()=>({data:{user:options.invalid?null:{id:'user'}},error:null}),updateUser:async args=>{calls.update++;if(options.updateThrow)throw Error('offline');return {error:options.updateError};},signOut:async()=>{calls.signout++;if(options.logoutThrow)throw Error('offline');return {error:null};}};
  const location={hash:options.hash||'',search:'',pathname:'/IUH%20shop/HTML/quenmatkhau.html',href:'https://passit.example/IUH%20shop/HTML/quenmatkhau.html',protocol:options.protocol||'https:'};
- const ctx={URL,URLSearchParams,Date,document:{getElementById:element},location,history:{replaceState(a,b,url){calls.clean=url;}},setInterval:()=>1,clearInterval(){},window:{addEventListener(){},supabase:{createClient(u,k,c){config=c;return {auth};}}}};
+ const ctx={URL,URLSearchParams,Date,document:{getElementById:element},location,history:{replaceState(a,b,url){calls.clean=url;}},setInterval:()=>1,clearInterval(){},window:{IUHCaptcha:{takeToken:()=> 'test-token',reset(){}},addEventListener(){},supabase:{createClient(u,k,c){config=c;return {auth};}}}};
  vm.createContext(ctx);vm.runInContext(source,ctx);
  return {elements,element,calls,auth,options,config,flush:()=>new Promise(resolve=>setImmediate(resolve)),submit:async id=>element(id).submit({preventDefault(){}})};
 }

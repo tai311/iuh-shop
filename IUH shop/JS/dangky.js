@@ -127,6 +127,9 @@ registerForm.addEventListener("submit", async event => {
 
     try {
 
+        if (!window.IUHCaptcha) throw new Error('Chưa tải được xác thực. Vui lòng tải lại trang.');
+        const captchaToken = window.IUHCaptcha.takeToken();
+
         const isGraduated =
             document.getElementById("isGraduated").checked;
 
@@ -138,6 +141,7 @@ registerForm.addEventListener("submit", async event => {
                 password,
 
                 options: {
+                    captchaToken,
                     data: {
                         fullname: value("fullName"),
                         student_id: value("studentId"),
@@ -226,12 +230,14 @@ registerForm.addEventListener("submit", async event => {
         } else {
 
             show(
-                error.message ||
+                (error.code === 'captcha_failed' ? 'Xác thực chưa hợp lệ. Vui lòng xác thực lại rồi thử tiếp.' : error.message) ||
                 "Không thể kết nối. Vui lòng thử lại."
             );
         }
 
     } finally {
+
+        window.IUHCaptcha?.reset();
 
         registering = false;
 

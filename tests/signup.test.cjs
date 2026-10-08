@@ -30,6 +30,7 @@ async function scenario(options = {}) {
         if (options.rejected) return { error: { message: 'Signup rejected' } };
         return { data: { user: options.emptyUser ? null : { id: 'user-1' }, session: options.confirmEmail ? null : {} } };
     } }, storage: { from() { assert.fail('Signup must not upload a card'); } }, from() { assert.fail('Profile is created by the database'); } }) };
+    w.IUHCaptcha = { takeToken: () => 'test-token', reset() {} };
     w.eval(source);
     for (const [id, value] of Object.entries({ fullName: 'Test User', studentId: '12345678', email: 'a@example.com', phone: '0901234567', password: 'password123', confirmPassword: 'password123' })) d.getElementById(id).value = value;
     d.getElementById('faculty').selectedIndex = 1;

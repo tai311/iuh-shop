@@ -44,9 +44,13 @@
         }
         sending = true; refreshButton();
         try {
+            if (!window.IUHCaptcha) { show('Chưa tải được xác thực. Vui lòng tải lại trang.', true); return; }
+            let captchaToken;
+            try { captchaToken = window.IUHCaptcha.takeToken(); }
+            catch (error) { show(error.message, true); return; }
             const redirect = new URL('quenmatkhau.html', location.href);
             redirect.search = ''; redirect.hash = '';
-            const { error } = await client.auth.resetPasswordForEmail(document.getElementById('recoveryEmail').value.trim(), { redirectTo: redirect.href });
+            const { error } = await client.auth.resetPasswordForEmail(document.getElementById('recoveryEmail').value.trim(), { redirectTo: redirect.href, captchaToken });
             if (error) throw error;
             cooldownUntil = Date.now() + 60000;
             show('Nếu email này đã đăng ký, bạn sẽ nhận được liên kết đặt lại mật khẩu. Hãy kiểm tra hộp thư và thư rác.');
@@ -54,8 +58,9 @@
             if (error.status === 429 || error.code === 'over_email_send_rate_limit' || error.code === 'over_request_rate_limit') {
                 cooldownUntil = Date.now() + 60000;
                 show('Bạn gửi yêu cầu hơi nhanh. Vui lòng chờ một phút rồi thử lại.', true);
-            } else show('Chưa gửi được yêu cầu. Kiểm tra kết nối và thử lại sau.', true);
-        } finally { sending = false; refreshButton(); }
+            } else if (error.code === 'captcha_failed') show('Xác thực chưa hợp lệ. Vui lòng xác thực lại rồi thử tiếp.', true);
+            else show('Chưa gửi được yêu cầu. Kiểm tra kết nối và thử lại sau.', true);
+        } finally { window.IUHCaptcha?.reset(); sending = false; refreshButton(); }
     });
     const interval = setInterval(refreshButton, 1000);
     window.addEventListener('pagehide', () => clearInterval(interval), { once: true });

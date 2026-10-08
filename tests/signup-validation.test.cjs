@@ -6,7 +6,8 @@ function fixture(){
  const dom=new JSDOM(fs.readFileSync('IUH shop/HTML/dangky.html','utf8'),{url:'https://shop.invalid/HTML/dangky.html',runScripts:'outside-only'});
  const w=dom.window,d=w.document,calls=[];
  w.IUHCore={getClient:()=>({auth:{signUp:async body=>{calls.push(body);return {data:{user:{id:'new-user'},session:null}};}}})};
- w.eval(fs.readFileSync('IUH shop/JS/dangky.js','utf8'));
+ w.IUHCaptcha = { takeToken: () => 'test-token', reset() {} };
+    w.eval(fs.readFileSync('IUH shop/JS/dangky.js','utf8'));
  const submit=()=>d.getElementById('registerForm').dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
  const fill=()=>{for(const [id,value] of Object.entries({fullName:'Nguyễn Văn A',studentId:'12345678',email:'a@example.com',phone:'0901234567',password:'password123',confirmPassword:'password123'}))d.getElementById(id).value=value;d.getElementById('faculty').selectedIndex=1;d.getElementById('agreeTerms').checked=true;};
  return {w,d,calls,submit,fill};
