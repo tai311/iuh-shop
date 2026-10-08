@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {createDatabase}=require('./helpers/database.cjs');
 test('payOS orders separate 5% fee, shipping and bank payouts without crediting seller wallets twice',async()=>{
- const db=await createDatabase(),admin='00000000-0000-4000-8000-000000000041',buyer='00000000-0000-4000-8000-000000000042',seller='00000000-0000-4000-8000-000000000043',other='00000000-0000-4000-8000-000000000044';
+ const db=await createDatabase({ legacyCommerce: true }),admin='00000000-0000-4000-8000-000000000041',buyer='00000000-0000-4000-8000-000000000042',seller='00000000-0000-4000-8000-000000000043',other='00000000-0000-4000-8000-000000000044';
  const q=async(s,a=[])=>(await db.query(s,a)).rows,scalar=async(s,a=[])=>Object.values((await q(s,a))[0])[0];
  const as=async(id,role='authenticated')=>{await db.exec('reset role');await q("select set_config('request.jwt.claim.sub',$1,false)",[id||'']);await db.exec('set role '+role);};
  const order=async(key,ship='meet')=>{await as(buyer);return scalar("select public.create_order('An','0901234567','IUH','',$1,0,'qr',1,$2,'[{\"product_id\":1,\"quantity\":1}]','{}',$3)",[ship,ship==='mid'?110000:105000,key]);};

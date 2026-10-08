@@ -62,10 +62,10 @@ test('Buyer acknowledgement calls the server, persists across sessions and does 
 test('Persisted notification renders safely and can be marked read by its owner', async () => {
     const dom = new JSDOM('<html><head></head><body></body></html>', { url: 'https://shop.invalid/HTML/donhang.html', runScripts: 'outside-only', pretendToBeVisual: true });
     const w = dom.window, changes = [];
-    w.IUHCore = { getClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: 'buyer' } } }), onAuthStateChange() {} }, from: () => {
+    w.IUHCore = { getClient: () => ({ auth: { getUser: async () => ({ data: { user: { id: 'buyer' } } }), onAuthStateChange() {} }, from: table => {
         const query = { select() { return query; }, eq() { return query; }, order() { return query; },
             update(value) { changes.push(value); return query; },
-            limit: async () => ({ data: [{ id: 1, event: 'completed', order_id: 7, message: '<img onerror=alert(1)> Đơn đã hoàn thành' }] }),
+            limit: async () => ({ data: table === 'connection_notifications' ? [] : [{ id: 1, event: 'completed', order_id: 7, message: '<img onerror=alert(1)> Đơn đã hoàn thành' }] }),
             then(resolve) { resolve({ error: null }); } };
         return query;
     } }) };

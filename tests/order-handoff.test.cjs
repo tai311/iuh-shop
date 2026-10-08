@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const { createDatabase } = require('./helpers/database.cjs');
 
 test('Trial orders follow admin payment → seller acceptance/delivery → admin completion → buyer acknowledgement', async () => {
-    const db = await createDatabase();
+    const db = await createDatabase({ legacyCommerce: true });
     const ids = ['101', '102', '103', '104'].map(n => '00000000-0000-4000-8000-000000000' + n);
     const [admin, buyer, seller, outsider] = ids;
     const q = async (sql, args = []) => (await db.query(sql, args)).rows;
@@ -17,6 +17,9 @@ test('Trial orders follow admin payment → seller acceptance/delivery → admin
         const order = await scalar("select public.create_order('Buyer','0901234567','Cơ sở chính Nguyễn Văn Bảo','','mid',5000,'trial',105000,110000,'[{\"product_id\":900,\"quantity\":1}]','{}','handoff-order-0001')");
         const id = order.order_id;
         assert.equal(order.payment_status, 'unpaid');
+        // Migrate with an existing unpaid order and verify that its lifecycle still works.
+        await db.exec('reset role');
+        await db.exec(require('node:fs').readFileSync('IUH shop/supabase/migrations/20261008105343_seller_connection_workflow.sql','utf8'));
         await as(seller);
         assert.equal((await scalar('select public.get_my_orders()')).length, 0);
         assert.equal((await q('select id from public.orders where id=$1', [id])).length, 0);
@@ -58,6 +61,7 @@ test('Trial orders follow admin payment → seller acceptance/delivery → admin
         assert.equal(detail.finance.payout_status, 'trial_recorded');
         await as(seller);
         assert.equal((await q('select * from public.trial_financial_entries')).length, 1);
+        assert.equal(await scalar('select public.can_contact_seller($1)',[buyer]),true);
         await assert.rejects(q("update public.trial_financial_entries set amount=1"));
         await assert.rejects(q('select public.confirm_order_received($1)', [id]));
         await as(buyer);

@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
 const {createDatabase}=require('./helpers/database.cjs');
 test('Admin operations: role boundary, private detail, filters and pagination',async()=>{
- const db=await createDatabase(),admin='00000000-0000-4000-8000-000000000011',buyer='00000000-0000-4000-8000-000000000012',seller='00000000-0000-4000-8000-000000000013';
+ const db=await createDatabase({ legacyCommerce: true }),admin='00000000-0000-4000-8000-000000000011',buyer='00000000-0000-4000-8000-000000000012',seller='00000000-0000-4000-8000-000000000013';
  const q=async(s,a=[])=>(await db.query(s,a)).rows;
  const scalar=async(s,a=[])=>Object.values((await q(s,a))[0])[0];
  const as=async id=>{await db.exec('reset role');await q("select set_config('request.jwt.claim.sub',$1,false)",[id]);await db.exec('set role authenticated');};

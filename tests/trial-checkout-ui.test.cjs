@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {JSDOM}=require('jsdom');
 test('Checkout prioritizes the four campus pickup locations',()=>{
- const dom=new JSDOM(fs.readFileSync('IUH shop/HTML/dathang.html','utf8'));
+ const dom=new JSDOM(fs.readFileSync('tests/fixtures/legacy-checkout.html','utf8'));
  const d=dom.window.document, select=d.querySelector('#recipientAddress');
  assert.equal(d.querySelector('.checkout-form select, .checkout-form input'),select);
  assert.equal(select.required,true);
@@ -11,7 +11,7 @@ test('Checkout prioritizes the four campus pickup locations',()=>{
  dom.window.close();
 });
 test('QR is the visible choice and trial checkout records a safe order without opening PayOS',()=>{
- const dom=new JSDOM(fs.readFileSync('IUH shop/HTML/dathang.html','utf8'),{runScripts:'outside-only'}),w=dom.window,d=w.document;
+ const dom=new JSDOM(fs.readFileSync('tests/fixtures/legacy-checkout.html','utf8'),{runScripts:'outside-only'}),w=dom.window,d=w.document;
  try{
   assert.equal(d.querySelector('input[name="paymentMethod"]:checked').value,'qr');
   assert.equal(d.querySelector('[data-payment-method="qr"]').hidden,false);

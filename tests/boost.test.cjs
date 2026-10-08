@@ -5,7 +5,7 @@ const { JSDOM } = require('jsdom');
 const { createDatabase } = require('./helpers/database.cjs');
 
 test('Boost publishes for 24 hours and records 3000 once without charging a wallet', async () => {
-    const db = await createDatabase();
+    const db = await createDatabase({ legacyCommerce: true });
     const [admin, seller, other] = ['301','302','303'].map(n => '00000000-0000-4000-8000-000000000' + n);
     const q = async (sql, args = []) => (await db.query(sql,args)).rows;
     const scalar = async (sql,args=[]) => Object.values((await q(sql,args))[0])[0];
@@ -59,10 +59,12 @@ test('Posting UI uses the atomic RPC and reuses the uploaded request after a los
     d.getElementById('productName').value='Book';
     const category=d.getElementById('productCategory'); category.value=category.options[1].value;
     d.getElementById('productQuantity').value=1;
+    d.getElementById('productCondition').value='Mới';
+    d.getElementById('productPickupArea').value='Cơ sở chính Nguyễn Văn Bảo';
     w.productPriceInput={value:'10000'}; w.description={value:'Book description'};
     w.selectedFiles=[{}]; w.uploadImages=async()=>{uploads++;return ['https://image.invalid/test.jpg'];};
     w.calculatePlatformFee=()=>500;w.formatVND=String;
-    w.supabaseClient={rpc:async(name,args)=>{assert.equal(name,'create_product_with_boost');calls.push({...args});if(calls.length===1)throw Error('Lost response');return {data:{success:true,id:41}};}};
+    w.supabaseClient={rpc:async(name,args)=>{assert.equal(name,'create_free_product');calls.push({...args});if(calls.length===1)throw Error('Lost response');return {data:{success:true,id:41}};}};
     const fn=source.slice(source.indexOf('async function createProduct()'),source.indexOf('async function submitProductForReal()'));
     // End the comment separating the two declarations.
     w.eval(fn);
@@ -70,7 +72,7 @@ test('Posting UI uses the atomic RPC and reuses the uploaded request after a los
         await assert.rejects(w.createProduct(),/Lost response/);
         assert.equal((await w.createProduct()).id,41);
         assert.equal(uploads,1);assert.equal(JSON.stringify(calls[0]),JSON.stringify(calls[1]));
-        assert.equal(calls[0].p_boost,true);assert.equal(w.sessionStorage.length,0);
+        assert.equal(calls[0].p_boost,undefined);assert.equal(calls[0].p_condition,'Mới');assert.equal(w.sessionStorage.length,0);
         assert.doesNotMatch(source,/rpc\("(?:record_boost_qr_payment|pay_boost_fee)"/);
         assert.doesNotMatch(d.getElementById('boostPaymentModal').textContent,/mô phỏng|chạy thử/i);
         assert.equal(d.querySelector('.fake-qr'),null);

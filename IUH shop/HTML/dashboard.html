@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="../CSS/mobile-navigation.css">
     <link rel="stylesheet" href="../CSS/passit-brand.css">
     <link rel="stylesheet" href="../CSS/passit-ui.css">
+<link rel="stylesheet" href="../CSS/connection-commerce.css">
 </head>
 
 <body class="passit-ui">
@@ -315,6 +316,8 @@
 
 
     <main class="dashboard-page">
+<section id="connectionRequests" class="connection-page" data-mode="seller"></section>
+<p class="connection-note">Các số liệu bên dưới thuộc quy trình đơn hàng cũ. Yêu cầu kết nối và phí người bán mới được theo dõi ở mục phía trên.</p>
 
         <!-- =================================================
              HEADER DASHBOARD
@@ -818,7 +821,9 @@
 
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/vendor/supabase.min.js"></script>
+<script src="../JS/vendor/purify.min.js"></script>
+<script src="../JS/iuh-core.js"></script>
 <script src="../JS/mobile-navigation.js"></script>
 <script src="../JS/iuh-chat-notification.js"></script>
 <script src="../JS/dashboard.js"></script>
@@ -979,5 +984,7 @@
 
 </div>
 <script src="../JS/order-notifications.js"></script>
+<script src="../JS/connection-commerce.js"></script>
+<script src="../JS/connection-orders.js"></script>
 </body>
 </html>

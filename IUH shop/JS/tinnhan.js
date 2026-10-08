@@ -1621,6 +1621,8 @@ async function openConversation(
     currentConversationId =
         conversationId;
 
+    document.dispatchEvent(new CustomEvent('passit:conversation-open', { detail: { conversationId } }));
+
 
     currentOtherUser =
         conversation.otherUser;
@@ -4390,6 +4392,11 @@ async function initChat() {
             await openConversation(requestedConversation);
             return;
         }
+        if (!sellerId && requestedConversation) {
+            const empty = document.getElementById('chatEmpty');
+            if (empty) empty.innerHTML = '<div><h2>Chưa thể mở cuộc trò chuyện</h2><p>Chat mua bán chỉ mở khi có đơn được người bán xác nhận phí sàn.</p><a href="donhang.html">Kiểm tra đơn hàng</a></div>';
+            return;
+        }
 
 
         /* =================================================
@@ -4397,6 +4404,14 @@ async function initChat() {
            ================================================= */
 
         if (sellerId) {
+
+            const access = await supabaseClient.rpc('can_contact_seller', { p_other_user_id: sellerId });
+            if (access.error) throw access.error;
+            if (!access.data) {
+                const empty = document.getElementById('chatEmpty');
+                if (empty) empty.innerHTML = '<div><h2>Cuộc trò chuyện đang khóa</h2><p>Hãy đặt sản phẩm và chờ người bán xác nhận phí sàn để mở chat. Quy định này áp dụng cả cuộc trò chuyện cũ.</p><a href="donhang.html">Theo dõi đơn hàng</a> · <a href="sanpham.html">Xem sản phẩm</a></div>';
+                return;
+            }
 
             console.log(
                 "PASSIT - Mở chat người bán:",

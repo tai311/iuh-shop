@@ -167,17 +167,14 @@ function formatPrice(value) {
 
 /* =========================================================
    GIÁ NGƯỜI MUA
-   Giá trong products.price là giá người bán muốn nhận.
-   Người mua trả thêm 5% phí sàn.
+   Hiển thị giá sản phẩm. Phí kết nối do người bán trả riêng theo đơn.
 ========================================================= */
-
-const PLATFORM_FEE_RATE = 0.05;
 
 function getBuyerPrice(sellerPrice) {
     const price = Number(sellerPrice) || 0;
 
     return Math.round(
-        price * (1 + PLATFORM_FEE_RATE)
+        price
     );
 }
 
@@ -876,7 +873,7 @@ function setupContactSeller() {
 
     contactSellerBtn.addEventListener(
         "click",
-        function () {
+        async function () {
 
             if (
                 !currentProduct ||
@@ -891,6 +888,17 @@ function setupContactSeller() {
             }
 
 
+            try {
+                const { data, error } = await supabaseClient.rpc('can_contact_seller', { p_other_user_id: currentProduct.seller_id });
+                if (error) throw error;
+                if (!data) {
+                    showToast('Hãy đặt hàng và chờ người bán xác nhận phí sàn để mở chat. Theo dõi tại Đơn hàng.');
+                    return;
+                }
+            } catch (error) {
+                showToast(error.message || 'Vui lòng đăng nhập và kiểm tra yêu cầu mua hàng.');
+                return;
+            }
             const params =
                 new URLSearchParams({
 

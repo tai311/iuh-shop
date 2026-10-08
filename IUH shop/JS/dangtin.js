@@ -710,23 +710,9 @@ function formatVND(value) {
    TÍNH PHÍ SÀN
 ========================================================= */
 
-function calculatePlatformFee(
-    price
-) {
-
-    return Math.round(
-        (
-            Number(price) || 0
-        ) *
-        PLATFORM_FEE_RATE
-    );
-
+function calculatePlatformFee(price) {
+    return Math.max(2000, Math.round((Number(price) || 0) * PLATFORM_FEE_RATE));
 }
-
-
-/* =========================================================
-   HIỂN THỊ GIÁ
-========================================================= */
 
 function updatePricePreview() {
 
@@ -743,8 +729,7 @@ function updatePricePreview() {
 
 
     const buyerPrice =
-        sellerPrice +
-        platformFee;
+        sellerPrice;
 
 
     if (sellerPricePreview) {
@@ -1346,10 +1331,10 @@ confirmBoost.addEventListener('click', () => submitProductForReal());
 
 async function createProduct() {
     if (!currentUser) throw new Error('Bạn chưa đăng nhập.');
-    const storageKey = 'iuh_product_request_' + currentUser.id;
+    const storageKey = 'passit_free_listing_request_' + currentUser.id;
     async function sendProduct(payload) {
         sessionStorage.setItem(storageKey, JSON.stringify(payload));
-        const { data, error } = await supabaseClient.rpc('create_product_with_boost', payload);
+        const { data, error } = await supabaseClient.rpc('create_free_product', payload);
         if (error) {
             if (/^(22|23|42|P0)/.test(error.code || '')) sessionStorage.removeItem(storageKey);
             throw error;
@@ -1450,7 +1435,7 @@ async function createProduct() {
         !Number.isFinite(
             price
         ) ||
-        price < 0
+        price < 1000 || !Number.isInteger(price)
     ) {
 
         throw new Error(
@@ -1484,6 +1469,9 @@ async function createProduct() {
        UPLOAD ẢNH
     ----------------------------------------- */
 
+    if (!document.getElementById("productCondition").value || !document.getElementById("productPickupArea").value || productDescription.length < 10 || productDescription.length > 1800) {
+        throw new Error("Vui lòng chọn tình trạng, khu vực và nhập mô tả từ 10 đến 1.800 ký tự.");
+    }
     const imageUrls =
         await uploadImages(
             currentUser.id
@@ -1501,8 +1489,7 @@ async function createProduct() {
 
 
     const buyerPrice =
-        price +
-        platformFee;
+        price;
 
 
     /* -----------------------------------------
@@ -1511,7 +1498,8 @@ async function createProduct() {
     const product = await sendProduct({
         p_name: name, p_category: category, p_quantity: quantity, p_price: price,
         p_description: productDescription, p_image_urls: imageUrls,
-        p_boost: !!boostProductEl?.checked, p_idempotency_key: crypto.randomUUID()
+        p_condition: document.getElementById("productCondition").value,
+        p_pickup_area: document.getElementById("productPickupArea").value, p_idempotency_key: crypto.randomUUID()
     });
 
 
@@ -2150,8 +2138,7 @@ function openFinalConfirmation() {
 
 
     const buyerPrice =
-        sellerPrice +
-        platformFee;
+        sellerPrice;
 
 
     const confirmProductName =

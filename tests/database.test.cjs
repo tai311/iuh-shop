@@ -6,7 +6,7 @@ test('Migration builds against the captured schema and policies',async()=>{
  finally{await db.close();}
 });
 test('Payments, packages, orders and permissions preserve money and ownership',async t=>{
- const db=await createDatabase();
+ const db=await createDatabase({ legacyCommerce: true });
  const admin='00000000-0000-4000-8000-000000000001',buyer='00000000-0000-4000-8000-000000000002',seller='00000000-0000-4000-8000-000000000003',poor='00000000-0000-4000-8000-000000000004';
  const q=async(sql,args=[]) => (await db.query(sql,args)).rows;
  const as=async id=>{await db.exec('reset role');await q("select set_config('request.jwt.claim.sub',$1,false)",[id]);await db.exec('set role authenticated');};

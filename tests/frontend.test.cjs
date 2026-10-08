@@ -20,16 +20,12 @@ test('Security helpers escape markup and remove active HTML',()=>{
   assert.equal(f.w.IUHSecurity.escapeHTML('<img>'),'&lt;img&gt;');
  }finally{f.dom.window.close();}
 });
-test('Order checkout has no fake QR confirmation and opens the created PayOS order',()=>{
- const html=read('HTML/dathang.html'),script=read('JS/dathang.js');
- assert.doesNotMatch(html,/confirmPaymentBtn|qrtt\.png/);
- assert.doesNotMatch(html,/value="trial"/);
- assert.match(html,/value="qr"\s+checked/);
- assert.match(script,/get_iuh_trial_mode/);
- assert.match(script,/trialMode && paymentMethod !== "qr"/);
- assert.doesNotMatch(script,/qrPaymentConfirmed|pay_order_to_admin|function updateQR/);
- assert.match(script,/donhang\.html\?payos_order=/);
- assert.match(script,/sessionStorage\.removeItem\(storageKey\)/);
+test('Active checkout collects recipient information without buyer payment or shipping selection',()=>{
+ const html=read('HTML/dathang.html'),script=read('JS/connection-checkout.js');
+ assert.doesNotMatch(html,/confirmPaymentBtn|qrtt\.png|value="qr"|name="paymentMethod"|name="shippingMethod"|src="\.\.\/JS\/dathang.js"/);
+ assert.match(html,/connection-checkout.js/);
+ for(const id of ['recipientName','recipientPhone','recipientAddress','orderNote']) assert.match(html,new RegExp('id="'+id+'"'));
+ assert.match(script,/request_connection_orders/);
 });
 test('Package modal creates a PayOS link for the pending package request',async()=>{
  let calls=0,release;

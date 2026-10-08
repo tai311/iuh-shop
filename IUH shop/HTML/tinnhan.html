@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="../CSS/mobile-navigation.css">
     <link rel="stylesheet" href="../CSS/passit-brand.css">
     <link rel="stylesheet" href="../CSS/passit-ui.css">
+<link rel="stylesheet" href="../CSS/connection-commerce.css">
 </head>
 
 <body class="passit-ui">
@@ -440,6 +441,7 @@
                 id="activeChat"
                 style="display:none;"
             >
+<section id="connectionRequests" class="connection-chat-panel" data-mode="chat" hidden></section>
 
 
                 <!-- CHAT TOP -->
@@ -705,7 +707,9 @@
     </div>
 
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../JS/vendor/supabase.min.js"></script>
+<script src="../JS/vendor/purify.min.js"></script>
+<script src="../JS/iuh-core.js"></script>
 <script src="../JS/mobile-navigation.js"></script>
 <script src="../JS/iuh-chat-notification.js"></script>
 <script src="../JS/tinnhan.js"></script>
@@ -725,5 +729,8 @@
         <path d="M6 11l6-6 6 6"></path>
     </svg>
 </button>
+<script src="../JS/connection-commerce.js"></script>
+<script src="../JS/connection-orders.js"></script>
+<script src="../JS/order-notifications.js"></script>
 </body>
 </html>

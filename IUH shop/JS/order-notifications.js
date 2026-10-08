@@ -3,7 +3,7 @@
     'use strict';
     if (window.IUHOrderNotifications) return;
     window.IUHOrderNotifications = true;
-    const client = window.IUHCore?.getClient() || window.supabase?.createClient(
+    const client = window.IUH_SUPABASE || window.IUHCore?.getClient() || window.supabase?.createClient(
         'https://xecxofmogvqysejjpxvl.supabase.co', 'sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC');
     if (!client) return;
     let panel, loading = false, stopped = false, sessionVersion = 0;
@@ -14,10 +14,13 @@
         try {
             const { data: { user }, error: authError } = await client.auth.getUser();
             if (authError || !user) { panel?.remove(); panel = null; return; }
-            const { data, error } = await client.from('order_notifications')
-                .select('id,message,event,order_id').eq('user_id', user.id).eq('is_read', false)
-                .order('created_at', { ascending: false }).limit(5);
-            if (error || stopped || version !== sessionVersion) return;
+            const results = await Promise.all(['order_notifications', 'connection_notifications'].map(async table => {
+                const result = await client.from(table).select('*').eq('user_id', user.id).eq('is_read', false)
+                    .order('created_at', { ascending: false }).limit(5);
+                return result.error ? [] : (result.data || []).map(row => ({ ...row, table }));
+            }));
+            const data = results.flat().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5);
+            if (stopped || version !== sessionVersion) return;
             if (!data?.length) { panel?.remove(); panel = null; return; }
             if (!panel) {
                 panel = document.createElement('aside');
@@ -33,13 +36,15 @@
                 const article = document.createElement('div');
                 const link = document.createElement('a');
                 link.textContent = item.message;
-                link.href = ['delivered', 'payment_requested'].includes(item.event) ? 'admin.html#orders' : item.event === 'payment_approved' ? 'donhang.html#sale' : 'donhang.html';
+                link.href = item.table === 'connection_notifications'
+                    ? item.event === 'delivery_requested' ? 'admin.html#orders' : item.event === 'seller_fee_due' ? 'donhang.html#sale' : 'donhang.html?watch=' + encodeURIComponent(item.request_id)
+                    : ['delivered', 'payment_requested'].includes(item.event) ? 'admin.html#orders' : item.event === 'payment_approved' ? 'donhang.html#sale' : 'donhang.html';
                 const dismiss = document.createElement('button');
                 dismiss.type = 'button'; dismiss.textContent = 'Đã đọc';
                 dismiss.addEventListener('click', async () => {
                     dismiss.disabled = true;
                     try {
-                        const result = await client.from('order_notifications').update({ is_read: true }).eq('id', item.id).eq('user_id', user.id);
+                        const result = await client.from(item.table).update({ is_read: true }).eq('id', item.id).eq('user_id', user.id);
                         if (result.error) throw result.error;
                         article.remove();
                         if (!panel?.querySelector('a')) { panel?.remove(); panel = null; }

@@ -1476,7 +1476,7 @@ function renderRecommendedCard(
                         product.is_consignment
                             ? Number(product.price || 0)
                             : Math.round(
-                                Number(product.price || 0) * 1.05
+                                Number(product.price || 0)
                             )
                     )}
                 </div>

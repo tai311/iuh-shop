@@ -5,7 +5,7 @@ const {JSDOM}=require('jsdom');
 const {createDatabase}=require('./helpers/database.cjs');
 
 test('One checkout splits sellers atomically and each order follows its own handoff and accounting',async()=>{
- const db=await createDatabase();
+ const db=await createDatabase({ legacyCommerce: true });
  const [admin,buyer,a,b]=['501','502','503','504'].map(n=>'00000000-0000-4000-8000-000000000'+n);
  const q=async(sql,args=[]) => (await db.query(sql,args)).rows;
  const scalar=async(sql,args=[])=>Object.values((await q(sql,args))[0])[0];
@@ -56,7 +56,7 @@ test('One checkout splits sellers atomically and each order follows its own hand
 });
 
 test('Checkout summary counts seller shipments and uses server-compatible item rounding',()=>{
- const dom=new JSDOM(fs.readFileSync('IUH shop/HTML/dathang.html','utf8'),{runScripts:'outside-only'}),w=dom.window,d=w.document;
+ const dom=new JSDOM(fs.readFileSync('tests/fixtures/legacy-checkout.html','utf8'),{runScripts:'outside-only'}),w=dom.window,d=w.document;
  try{
   const listen=d.addEventListener.bind(d);d.addEventListener=(type,...args)=>{if(type!=='DOMContentLoaded')listen(type,...args);};
   w.supabase={createClient:()=>({auth:{onAuthStateChange(){}}})};

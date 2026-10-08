@@ -1133,7 +1133,7 @@ function createCartItemHTML(
 
     const price =
     Math.round(
-        (Number(item.price) || 0) * 1.05
+        (Number(item.price) || 0)
     );
 
 const itemTotal =
@@ -1882,7 +1882,7 @@ function updateSummary() {
 
             const price =
                 Math.round(
-                    (Number(item.price) || 0) * 1.05
+                    (Number(item.price) || 0)
                 );
 
             return (

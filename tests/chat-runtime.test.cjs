@@ -98,6 +98,7 @@ test('Chat database allows participants to send/read but blocks outsiders', asyn
     const as = async id => { await db.exec('reset role'); await db.query("select set_config('request.jwt.claim.sub',$1,false)", [id]); await db.exec('set role authenticated'); };
     try {
         for (const id of ids) await db.query('insert into auth.users(id,email) values($1,$2)', [id, id + '@test.invalid']);
+        await db.query("insert into public.connection_requests(buyer_id,seller_id,recipient_name,recipient_phone,recipient_address,subtotal,platform_fee,status,fee_confirmed_at) values($1,$2,'Buyer','0901234567','Campus',10000,2000,'connected',now())", [ids[0],ids[1]]);
         await as(ids[0]);
         const create = async () => (await db.query('select public.get_or_create_direct_conversation($1) as chat', [ids[1]])).rows[0].chat.id;
         const id = await create();

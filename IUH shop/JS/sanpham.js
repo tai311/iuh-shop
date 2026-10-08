@@ -578,11 +578,10 @@ function getFilteredProducts() {
 
 }
 
-const PLATFORM_FEE_RATE = 0.05;
 
 function getBuyerPrice(sellerPrice) {
     const price = Number(sellerPrice) || 0;
-    return Math.round(price * (1 + PLATFORM_FEE_RATE));
+    return Math.round(price);
 }
 
 function formatCurrency(value) {
