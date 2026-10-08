@@ -5971,42 +5971,92 @@ body {
 }
 
 /* =========================================================
-   FIX CHUẨN - BÀI ĐĂNG & BÌNH LUẬN
-   ========================================================= */
-
-/* =========================================================
-   FIX CHUẨN - NỘI DUNG BÀI ĐĂNG
+   FIX CUỐI - POST CONTENT
 ========================================================= */
 
 .discussion-post .post-content {
-    padding: 6px 20px 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+
+    padding: 4px 20px 10px !important;
     margin: 0 !important;
+
+    display: block !important;
+    text-align: left !important;
 }
 
+
+/* NÚT THẢO LUẬN / ĐẶT CÂU HỎI */
 .discussion-post .post-type-badge {
-    margin: 0 0 8px !important;
+    display: inline-flex !important;
+
+    width: fit-content !important;
+    height: auto !important;
+
+    margin: 0 0 3px 0 !important;
+    padding: 5px 9px !important;
+
+    vertical-align: top !important;
+
+    line-height: 1 !important;
 }
 
+
+/* NỘI DUNG BÀI VIẾT */
 .discussion-post .post-content-text {
+    display: block !important;
+
+    width: 100% !important;
+    box-sizing: border-box !important;
+
     margin: 0 !important;
     padding: 0 !important;
 
     min-height: 0 !important;
     height: auto !important;
 
-    display: block !important;
-
     text-align: left !important;
     text-indent: 0 !important;
 
+    color: #394459 !important;
+
     font-size: 14px !important;
-    line-height: 1.55 !important;
+    font-weight: 400 !important;
+    line-height: 1.65 !important;
 
-    /* Giữ nguyên xuống hàng */
     white-space: pre-wrap !important;
-
     word-break: break-word !important;
     overflow-wrap: anywhere !important;
+}
+
+
+/* CHẶN CÁC THẺ BÊN TRONG NỘI DUNG TỰ THỤT */
+.discussion-post .post-content-text p,
+.discussion-post .post-content-text div,
+.discussion-post .post-content-text span {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    text-align: left !important;
+    text-indent: 0 !important;
+}
+
+
+/* MOBILE */
+@media (max-width: 650px) {
+
+    .discussion-post .post-content {
+        padding: 4px 15px 10px !important;
+    }
+
+    .discussion-post .post-type-badge {
+        margin-bottom: 3px !important;
+    }
+
+    .discussion-post .post-content-text {
+        font-size: 14px !important;
+        line-height: 1.65 !important;
+    }
 }
 
 /* Reaction */
