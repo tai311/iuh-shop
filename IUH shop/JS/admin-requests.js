@@ -18,6 +18,9 @@
  <form class="ops-filters" id="opsFilters"><label>Tìm hồ sơ<input id="opsSearch" maxlength="120" placeholder="Mã hồ sơ, tên hoặc ID người tạo"></label><label>Trạng thái xử lý<select id="opsState"></select></label><label id="opsPaymentLabel">Thanh toán<select id="opsPayment"><option value="">Tất cả thanh toán</option><option value="unpaid">Chưa thanh toán</option><option value="paid">Đã thanh toán</option><option value="refund_pending">Chờ hoàn tiền</option><option value="refunded">Đã hoàn tiền</option></select></label><label class="ops-check"><input type="checkbox" id="opsAttention">Chỉ cần theo dõi</label><button type="submit">Tìm / lọc</button></form>
  <div class="ops-list-heading"><h3 id="opsTitle">Đơn hàng</h3><span id="opsStatus" role="status" aria-live="polite"></span></div><div id="opsList"></div><div class="ops-pagination"><button type="button" id="opsPrev">← Trước</button><span id="opsPage"></span><button type="button" id="opsNext">Sau →</button></div>`;
  main.append(page);
+ // The orders navigation opens page-requests, so mount connection orders here too.
+ const connectionOrders=document.getElementById('connectionRequests');
+ if(connectionOrders)page.prepend(connectionOrders);
  const dialog=document.createElement('dialog');dialog.className='ops-dialog';dialog.setAttribute('aria-labelledby','opsDetailTitle');dialog.innerHTML='<div class="ops-detail-top"><h2 id="opsDetailTitle">Chi tiết hồ sơ</h2><button type="button" id="opsClose" aria-label="Đóng chi tiết">Đóng ×</button></div><div id="opsDetail"></div>';document.body.append(dialog);
  const $=id=>document.getElementById(id);
  let kind='orders',pageNumber=1,total=0,request=0,detailRequest=0,selected=null,busy=false,authorized=false;
@@ -26,7 +29,9 @@
  function clearPrivate(){request++;detailRequest++;authorized=false;selected=null;$('opsList').replaceChildren();$('opsDetail').replaceChildren();$('opsStatus').textContent='Phiên quản trị đã kết thúc.';if(dialog.open)dialog.close();}
  db.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'||event==='USER_DELETED')clearPrivate();});
  function controls(){
+  if(connectionOrders)connectionOrders.hidden=kind!=='orders';
   $('opsTitle').textContent=kinds[kind];page.querySelectorAll('[data-kind]').forEach(b=>{b.classList.toggle('selected',b.dataset.kind===kind);b.setAttribute('aria-pressed',String(b.dataset.kind===kind));});
+  if(kind==='orders')$('opsTitle').textContent='Lịch sử đơn thanh toán cũ';
   $('opsState').innerHTML='<option value="">Tất cả trạng thái</option>'+states[kind].map(s=>`<option value="${s}">${label(s)}</option>`).join('');$('opsState').value=filters.status;$('opsPayment').value=filters.payment;$('opsPaymentLabel').hidden=!['orders','packages'].includes(kind);
  }
  async function load(){
