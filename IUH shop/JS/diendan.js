@@ -683,7 +683,7 @@ async function searchMentionUsers(
 
     let query =
         supabaseClient
-            .from("users")
+            .from("public_profiles")
             .select(
                 `
                 user_id,
@@ -1082,7 +1082,7 @@ async function loadForumPosts() {
             error: profileError
         } =
             await supabaseClient
-                .from("users")
+                .from("public_profiles")
                 .select(
                     `
                     user_id,
@@ -2560,7 +2560,7 @@ if (commentIds.length) {
             data: profileData
         } =
             await supabaseClient
-                .from("users")
+                .from("public_profiles")
                 .select(
                     `
                     user_id,
@@ -5861,7 +5861,7 @@ async function loadOfficialArticles() {
             data
         } =
             await supabaseClient
-                .from("users")
+                .from("public_profiles")
                 .select(`
                     user_id,
                     fullname,

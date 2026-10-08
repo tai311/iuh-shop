@@ -14,11 +14,8 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+const supabaseClient = window.IUH_SUPABASE || (window.IUH_SUPABASE =
+    window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY));
 
 
 /* =========================================================
@@ -101,7 +98,39 @@ function escapeHTML(value) {
    LẤY PROFILE NGƯỜI DÙNG
    ========================================================= */
 
-async function getUserProfile(userId) {
+const chatProfileCache = new Map();
+function getUserProfile(userId) {
+    if (!userId) return Promise.resolve(null);
+    const cached = chatProfileCache.get(userId);
+    if (cached && cached.expires > Date.now()) return cached.promise;
+    const entry = { expires: Date.now() + 60000 };
+    entry.promise = fetchUserProfile(userId).then(profile => {
+        if (!profile && chatProfileCache.get(userId) === entry) chatProfileCache.delete(userId);
+        return profile;
+    }).catch(error => {
+        if (chatProfileCache.get(userId) === entry) chatProfileCache.delete(userId);
+        throw error;
+    });
+    chatProfileCache.set(userId, entry);
+    return entry.promise;
+}
+async function preloadChatProfiles(userIds) {
+    const ids = [...new Set(userIds.filter(Boolean))];
+    if (!ids.length) return;
+    const { data, error } = await supabaseClient.from("public_profiles")
+        .select("user_id, fullname, avatar_url, role, student_verified").in("user_id", ids);
+    if (error) throw error;
+    for (const row of data || []) {
+        const role = row.role || "user";
+        chatProfileCache.set(row.user_id, { expires: Date.now() + 60000, promise: Promise.resolve({
+            id: row.user_id, fullname: row.fullname || "PASSIT", avatar_url: row.avatar_url || "",
+            role, student_verified: row.student_verified === true,
+            hasVerifiedBadge: role === "admin" || role === "moderator" || row.student_verified === true
+        }) });
+    }
+}
+
+async function fetchUserProfile(userId) {
 
     if (!userId) {
         return null;
@@ -111,7 +140,7 @@ async function getUserProfile(userId) {
         data,
         error
     } = await supabaseClient
-        .from("users")
+        .from("public_profiles")
         .select(
     "user_id, fullname, avatar_url, role, student_verified"
 )
@@ -171,17 +200,13 @@ return {
 }
 
 
-/* =========================================================
-   LẤY ADMIN
-   ========================================================= */
-
 async function getAdminUser() {
 
     const {
         data,
         error
     } = await supabaseClient
-        .from("users")
+        .from("public_profiles")
         .select(
          "user_id, fullname, avatar_url, role, student_verified"
         )
@@ -711,151 +736,18 @@ async function findConversationWithUser(
    TẠO CONVERSATION
    ========================================================= */
 
-async function createConversation(
-    otherUserId,
-    isAdminChat = false
-) {
-
-    if (!currentUser) {
-
-        throw new Error(
-            "Chưa đăng nhập."
-        );
+async function createConversation(otherUserId) {
+    if (!currentUser || !otherUserId || otherUserId === currentUser.id) {
+        throw new Error("Cuộc trò chuyện không hợp lệ.");
     }
-
-    if (!otherUserId) {
-
-        throw new Error(
-            "Không xác định được người dùng."
-        );
-    }
-
-
-    /* KIỂM TRA LẠI TRƯỚC KHI TẠO */
-
-    const existing =
-        await findConversationWithUser(
-            otherUserId
-        );
-
-    if (existing) {
-
-        return {
-            id: existing
-        };
-    }
-
-
-    const conversationId =
-        crypto.randomUUID();
-
-
-    /* TẠO CONVERSATION */
-
-    const {
-        error: conversationError
-    } =
-        await supabaseClient
-            .from("conversations")
-            .insert({
-                id:
-                    conversationId,
-
-                is_admin_chat:
-                    isAdminChat
-            });
-
-
-    if (conversationError) {
-
-        console.error(
-            "Lỗi tạo conversation:",
-            conversationError
-        );
-
-        throw conversationError;
-    }
-
-
-    /* THÊM USER HIỆN TẠI */
-
-    const {
-        error: selfError
-    } =
-        await supabaseClient
-            .from("conversation_members")
-            .insert({
-                conversation_id:
-                    conversationId,
-
-                user_id:
-                    currentUser.id
-            });
-
-
-    if (selfError) {
-
-        console.error(
-            "Lỗi thêm thành viên hiện tại:",
-            selfError
-        );
-
-        throw selfError;
-    }
-
-
-    /* THÊM USER CÒN LẠI */
-
-    const {
-        error: otherError
-    } =
-        await supabaseClient
-            .from("conversation_members")
-            .insert({
-                conversation_id:
-                    conversationId,
-
-                user_id:
-                    otherUserId
-            });
-
-
-    if (otherError) {
-
-        console.error(
-            "Lỗi thêm thành viên còn lại:",
-            otherError
-        );
-
-        throw otherError;
-    }
-
-
-    return {
-        id:
-            conversationId,
-
-        is_admin_chat:
-            isAdminChat,
-
-        created_at:
-            new Date().toISOString(),
-
-        updated_at:
-            new Date().toISOString(),
-
-        last_message:
-            null,
-
-        last_message_at:
-            null
-    };
+    const { data, error } = await supabaseClient.rpc("get_or_create_direct_conversation", {
+        p_other_user_id: otherUserId
+    });
+    if (error) throw error;
+    if (!data?.id) throw new Error("Không thể mở cuộc trò chuyện.");
+    return data;
 }
 
-
-/* =========================================================
-   ĐẢM BẢO ADMIN LUÔN CÓ
-   ========================================================= */
 
 async function ensureAdminChat() {
 
@@ -1143,31 +1035,18 @@ async function loadConversations() {
         }
 
 
-        for (
-            const conversation
-            of conversationData || []
-        ) {
-
-            const {
-                data: members
-            } =
-                await supabaseClient
-                    .from(
-                        "conversation_members"
-                    )
-                    .select("user_id")
-                    .eq(
-                        "conversation_id",
-                        conversation.id
-                    )
-                    .neq(
-                        "user_id",
-                        currentUser.id
-                    );
-
-
+        const { data: allMembers, error: membersError } = await supabaseClient
+            .from("conversation_members").select("conversation_id,user_id")
+            .in("conversation_id", ids).neq("user_id", currentUser.id);
+        if (membersError) throw membersError;
+        await preloadChatProfiles((allMembers || []).map(member => member.user_id));
+        const rows = conversationData || [];
+        // Bound concurrency while avoiding a network waterfall for every chat.
+        for (let offset = 0; offset < rows.length; offset += 6) {
+        await Promise.all(rows.slice(offset, offset + 6).map(async conversation => {
+            const members = (allMembers || []).filter(member => member.conversation_id === conversation.id);
             if (!members?.length) {
-                continue;
+                return;
             }
 
 
@@ -1182,20 +1061,13 @@ async function loadConversations() {
 
 
             if (!profile) {
-                continue;
+                return;
             }
 
 
-            const unreadCount =
-                await getUnreadCount(
-                    conversation.id
-                );
-
-            const latestMessage =
-    await getLatestMessage(
-        conversation.id
-    );
-
+            const [unreadCount, latestMessage] = await Promise.all([
+                getUnreadCount(conversation.id), getLatestMessage(conversation.id)
+            ]);
 
             const isAdmin =
     profile.role === "admin";
@@ -1269,6 +1141,7 @@ if (
         currentUser.id
 
 });
+        }));
         }
     }
 
@@ -1277,8 +1150,8 @@ if (
        ADMIN LUÔN CÓ
        ========================================= */
 
-    const adminChat =
-        await ensureAdminChat();
+    const adminChat = conversations.some(item => item.otherUser?.role === "admin")
+        ? null : await ensureAdminChat();
 
 
     if (adminChat) {
@@ -1813,6 +1686,7 @@ async function openConversation(
     );
 
 
+    if (currentConversationId !== conversationId) return;
     await markMessagesAsRead(
         conversationId
     );
@@ -2048,6 +1922,8 @@ async function loadMessages(
             );
 
 
+    if (currentConversationId !== conversationId) return;
+
     if (error) {
 
         console.error(
@@ -2150,6 +2026,7 @@ async function loadMessages(
        RENDER MESSAGES
        ========================================= */
 
+    if (currentConversationId !== conversationId) return;
     await renderMessages(
         messages
     );
@@ -2626,6 +2503,8 @@ async function renderSingleMessage(
     }
 
 
+    if (message.conversation_id && message.conversation_id !== currentConversationId) return;
+    const renderConversationId = currentConversationId;
     const existing =
         document.querySelector(
             `[data-message-id="${message.id}"]`
@@ -2738,6 +2617,7 @@ if (
         /* IMAGE */
 
         if (message.image_url) {
+            const signedImageUrl = await window.IUHChatMedia.signedURL(supabaseClient, message.image_url);
 
             const image =
                 document.createElement(
@@ -2747,11 +2627,8 @@ if (
             image.className =
                 "message-image";
 
-            image.src =
-                message.image_url;
-
-            image.alt =
-                "Hình ảnh";
+            if (signedImageUrl) image.src = signedImageUrl;
+            image.alt = signedImageUrl ? "Hình ảnh" : "Không tải được ảnh chat";
 
             image.loading =
                 "lazy";
@@ -2760,8 +2637,9 @@ if (
                 "click",
                 function() {
 
+                    if (!signedImageUrl) return;
                     window.open(
-                        message.image_url,
+                        signedImageUrl,
                         "_blank"
                     );
                 }
@@ -2908,6 +2786,8 @@ if (
     }
 
 
+    if (renderConversationId !== currentConversationId ||
+        document.querySelector(`[data-message-id="${message.id}"]`)) return;
     messagesArea.appendChild(
         row
     );
@@ -3594,341 +3474,88 @@ if (
    GỬI MESSAGE
    ========================================================= */
 
+let chatSendInFlight = false;
 async function sendMessage() {
-
-    if (
-        !currentUser ||
-        !currentConversationId
-    ) {
-        return;
-    }
-
-
-    const content =
-        messageInput?.value
-            ?.trim() ||
-        "";
-
-
-    if (
-        !content &&
-        !selectedImage
-    ) {
-        return;
-    }
-
-
-    if (sendButton) {
-        sendButton.disabled =
-            true;
-    }
-
-
+    if (chatSendInFlight || !currentUser || !currentConversationId) return;
+    const conversationId = currentConversationId;
+    const senderId = currentUser.id;
+    const draft = messageInput?.value || "";
+    const content = draft.trim();
+    const image = selectedImage;
+    const productId = pendingProductId || null;
+    if (!content && !image) return;
+    chatSendInFlight = true;
+    if (sendButton) sendButton.disabled = true;
+    let committed = false;
     try {
-
-        let imageUrl =
-            null;
-
-
-        /* UPLOAD IMAGE */
-
-        if (selectedImage) {
-
-            imageUrl =
-                await uploadChatImage(
-                    selectedImage
-                );
+        const imagePath = image ? await uploadChatImage(image, conversationId, senderId) : null;
+        const { data, error } = await supabaseClient.from("messages").insert({
+            conversation_id: conversationId, sender_id: senderId,
+            product_id: productId, content: content || null,
+            message_type: imagePath ? "image" : "text", image_url: imagePath, is_read: false
+        }).select().single();
+        if (error) throw error;
+        committed = true;
+        if (currentConversationId === conversationId) {
+            if (messageInput?.value === draft) messageInput.value = "";
+            if (selectedImage === image) removeSelectedImage();
+            if (pendingProductId === productId) pendingProductId = null;
         }
-
-
-        /* INSERT MESSAGE */
-        const productIdForMessage =
-    pendingProductId || null;
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from("messages")
-                .insert({
-
-            conversation_id:
-                currentConversationId,
-
-            sender_id:
-                currentUser.id,
-
-            product_id:
-                productIdForMessage,
-
-            content:
-                content ||
-                null,
-
-            message_type:
-                imageUrl
-                    ? "image"
-                    : "text",
-
-            image_url:
-                imageUrl,
-
-            is_read:
-                false
-
-        })
-                .select()
-                .single();
-
-
-        if (error) {
-            throw error;
+        const preview = content || "[Hình ảnh]";
+        void updateConversationLastMessage(conversationId, preview).catch(console.error);
+        const conversation = conversations.find(item => item.id === conversationId);
+        if (conversation) {
+            conversation.last_message = preview;
+            conversation.last_message_at = data?.created_at || new Date().toISOString();
+            conversation.updated_at = conversation.last_message_at;
         }
-
-        /*
- * Chỉ tin nhắn đầu tiên được gửi
- * từ trang sản phẩm mang product_id.
- */
-if (productIdForMessage) {
-    pendingProductId = null;
-}
-
-
-        /* UPDATE CONVERSATION */
-
-        const preview =
-            content ||
-            "[Hình ảnh]";
-
-
-        await updateConversationLastMessage(
-            currentConversationId,
-            preview
-        );
-
-
-        /* CLEAR INPUT */
-
-        if (messageInput) {
-            messageInput.value = "";
-        }
-
-
-        removeSelectedImage();
-
-
-        /*
-           Hiển thị ngay.
-
-           Realtime cũng nhận được message
-           nhưng renderSingleMessage sẽ kiểm tra
-           data-message-id nên không bị trùng.
-        */
-
-        if (data) {
-
-            await renderSingleMessage(
-                data
-            );
-
+        if (data && currentConversationId === conversationId) {
+            await renderSingleMessage(data);
             scrollToBottom();
         }
-
-
-        /* UPDATE LOCAL */
-
-        const conversation =
-            conversations.find(
-                item =>
-                    item.id ===
-                    currentConversationId
-            );
-
-
-        if (conversation) {
-
-            conversation.last_message =
-                preview;
-
-            conversation.last_message_at =
-                new Date().toISOString();
-
-            conversation.updated_at =
-                new Date().toISOString();
-        }
-
-
-        /*
-           ADMIN vẫn ghim đầu.
-        */
-
-        conversations.sort(
-            (
-                a,
-                b
-            ) => {
-
-                if (
-                    a.isPinned &&
-                    !b.isPinned
-                ) {
-                    return -1;
-                }
-
-                if (
-                    !a.isPinned &&
-                    b.isPinned
-                ) {
-                    return 1;
-                }
-
-                return (
-                    new Date(
-                        b.updated_at || 0
-                    ) -
-                    new Date(
-                        a.updated_at || 0
-                    )
-                );
-            }
-        );
-
-
-        renderConversationList(
-            conversations
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            "Lỗi gửi tin nhắn:",
-            error
-        );
-
-        alert(
-            error?.message ||
-            "Không thể gửi tin nhắn."
-        );
-
-    }
-    finally {
-
-        if (sendButton) {
-            sendButton.disabled =
-                false;
-        }
-
-        if (messageInput) {
-            messageInput.focus();
-        }
+        conversations.sort((a, b) => Number(!!b.isPinned) - Number(!!a.isPinned) ||
+            new Date(b.updated_at || 0) - new Date(a.updated_at || 0));
+        renderConversationList(conversations);
+    } catch (error) {
+        console.error("Lỗi gửi tin nhắn:", error);
+        alert(committed ? "Tin đã gửi nhưng chưa cập nhật được giao diện. Hãy mở lại cuộc trò chuyện." :
+            (error?.message || "Không thể gửi tin nhắn."));
+    } finally {
+        chatSendInFlight = false;
+        if (sendButton) sendButton.disabled = false;
+        if (currentConversationId === conversationId) messageInput?.focus();
     }
 }
 
 
-/* =========================================================
-   UPLOAD ẢNH
-   ========================================================= */
-
-async function uploadChatImage(
-    file
-) {
-
-    if (!file) {
-        return null;
-    }
-
-
-    if (
-        !file.type.startsWith(
-            "image/"
-        )
-    ) {
-
-        throw new Error(
-            "File được chọn không phải hình ảnh."
-        );
-    }
-
-
-    if (
-        file.size >
-        10 * 1024 * 1024
-    ) {
-
-        throw new Error(
-            "Ảnh không được vượt quá 10MB."
-        );
-    }
-
-
-    const extension =
-        file.name
-            .split(".")
-            .pop()
-            .toLowerCase();
-
-
-    const safeExtension =
-        extension ||
-        "jpg";
-
-
-    const filename =
-        `${Date.now()}_${crypto.randomUUID()}.${safeExtension}`;
-
-
-    const path =
-        `${currentUser.id}/${currentConversationId}/${filename}`;
-
-
-    const {
-        error
-    } =
-        await supabaseClient.storage
-            .from(
-                CHAT_BUCKET
-            )
-            .upload(
-                path,
-                file,
-                {
-                    cacheControl:
-                        "3600",
-
-                    upsert:
-                        false
-                }
-            );
-
-
-    if (error) {
-        throw error;
-    }
-
-
-    const {
-        data
-    } =
-        supabaseClient.storage
-            .from(
-                CHAT_BUCKET
-            )
-            .getPublicUrl(
-                path
-            );
-
-
-    return data.publicUrl;
+async function uploadChatImage(file, conversationId = currentConversationId, senderId = currentUser?.id) {
+    if (!file) return null;
+    const extensions = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" };
+    if (!extensions[file.type]) throw new Error("Chỉ hỗ trợ ảnh JPG, PNG, WebP hoặc GIF.");
+    if (file.size > 10 * 1024 * 1024) throw new Error("Ảnh không được vượt quá 10MB.");
+    if (!senderId || !conversationId) throw new Error("Chưa chọn cuộc trò chuyện.");
+    const path = `${senderId}/${conversationId}/${crypto.randomUUID()}.${extensions[file.type]}`;
+    const { error } = await supabaseClient.storage.from(CHAT_BUCKET).upload(path, file, {
+        cacheControl: "3600", upsert: false, contentType: file.type
+    });
+    if (error) throw error;
+    return path;
 }
 
 
-/* =========================================================
-   UPDATE LAST MESSAGE
-   ========================================================= */
+const conversationPreviewWrites = new Map();
+function updateConversationLastMessage(conversationId, message) {
+    const previous = conversationPreviewWrites.get(conversationId) || Promise.resolve();
+    const next = previous.catch(() => {}).then(() => persistConversationLastMessage(conversationId, message));
+    conversationPreviewWrites.set(conversationId, next);
+    const cleanup = () => {
+        if (conversationPreviewWrites.get(conversationId) === next) conversationPreviewWrites.delete(conversationId);
+    };
+    next.then(cleanup, cleanup);
+    return next;
+}
 
-async function updateConversationLastMessage(
+async function persistConversationLastMessage(
     conversationId,
     message
 ) {
@@ -3974,57 +3601,14 @@ async function updateConversationLastMessage(
    MARK AS READ
    ========================================================= */
 
-async function markMessagesAsRead(
-    conversationId
-) {
-
-    if (!conversationId) {
-        return;
-    }
-
-
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("messages")
-            .update({
-
-                is_read:
-                    true
-
-            })
-            .eq(
-                "conversation_id",
-                conversationId
-            )
-            .neq(
-                "sender_id",
-                currentUser.id
-            )
-            .eq(
-                "is_read",
-                false
-            );
-
-
-    if (error) {
-
-        console.error(
-            "Lỗi đánh dấu đã đọc:",
-            error
-        );
-    }
+async function markMessagesAsRead(conversationId) {
+    if (!currentUser || !conversationId) return;
+    const { error } = await supabaseClient.rpc("mark_conversation_read", {
+        p_conversation_id: conversationId
+    });
+    if (error) console.error("Không thể đánh dấu đã đọc:", error);
 }
 
-
-/* =========================================================
-   REALTIME
-   ========================================================= */
-
-/* =========================================================
-   REALTIME - NHẬN TIN NHẮN MỚI
-========================================================= */
 
 function subscribeToMessages() {
 
@@ -4147,9 +3731,7 @@ conversation.lastMessageIsMine =
                             message.conversation_id
                         ) {
 
-                            await markMessagesAsRead(
-                                message.conversation_id
-                            );
+                            void markMessagesAsRead(message.conversation_id).catch(console.error);
 
                             conversation.unreadCount =
                                 0;
@@ -4245,9 +3827,25 @@ conversation.lastMessageIsMine =
                     );
                 }
             )
+            .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages" }, async payload => {
+                const message = payload.new;
+                if (!message.edited_at && !message.recalled_at) return;
+                if (payload.old?.edited_at === message.edited_at &&
+                    payload.old?.recalled_at === message.recalled_at) return;
+                if (message.conversation_id === currentConversationId) {
+                    await loadMessages(currentConversationId);
+                }
+                const conversation = conversations.find(item => item.id === message.conversation_id);
+                if (conversation && message.created_at === conversation.last_message_at) {
+                    void loadConversations().catch(console.error);
+                }
+            })
             .subscribe(
                 status => {
 
+                    if (status === "SUBSCRIBED" && currentConversationId) {
+                        loadMessages(currentConversationId).catch(console.error);
+                    }
                     console.log(
                         "Realtime chat:",
                         status
@@ -4720,7 +4318,7 @@ supabaseClient.auth.onAuthStateChange(
         ) {
 
             window.location.href =
-                "dang-nhap.html";
+                "dangnhap.html";
         }
     }
 );
@@ -4785,7 +4383,13 @@ async function initChat() {
            LOAD DANH SÁCH CHAT
            ========================================= */
 
+        subscribeToMessages();
         await loadConversations();
+        const requestedConversation = params.get("conversation");
+        if (!sellerId && requestedConversation && conversations.some(item => String(item.id) === requestedConversation)) {
+            await openConversation(requestedConversation);
+            return;
+        }
 
 
         /* =================================================

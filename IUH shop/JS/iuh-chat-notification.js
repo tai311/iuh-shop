@@ -1,3 +1,36 @@
+// Private chat media: store object paths, resolve access only for the current session.
+(() => {
+    const origin = "https://xecxofmogvqysejjpxvl.supabase.co";
+    function objectPath(value) {
+        if (typeof value !== "string" || !value.trim()) return "";
+        let path = value.trim();
+        if (/^[a-z][a-z\d+.-]*:/i.test(path) || path.startsWith("//")) {
+            try {
+                const url = new URL(path);
+                if (url.origin !== origin) return "";
+                const match = url.pathname.match(/^\/storage\/v1\/object\/(?:public|sign|authenticated)\/chat-images\/(.+)$/);
+                if (!match) return "";
+                path = decodeURIComponent(match[1]);
+            } catch (_) { return ""; }
+        }
+        if (path.startsWith("/") || path.includes("\\") || path.split("/").some(p => !p || p === "." || p === "..")) return "";
+        return path;
+    }
+    async function signedURL(client, value) {
+        const path = objectPath(value);
+        if (!path) return "";
+        try {
+            const { data, error } = await client.storage.from("chat-images").createSignedUrl(path, 3600);
+            if (error) { console.error("Không tải được ảnh chat:", error); return ""; }
+            return data?.signedUrl || "";
+        } catch (error) {
+            console.error("Không tải được ảnh chat:", error);
+            return "";
+        }
+    }
+    window.IUHChatMedia = Object.freeze({ objectPath, signedURL });
+})();
+
 /* =========================================================
    PASSIT - GLOBAL CHAT NOTIFICATION
    Bóng chat + thông báo web + browser notification
@@ -758,6 +791,7 @@ async function renderMiniMessage(
         if (
             message.image_url
         ) {
+            const signedImageUrl = await window.IUHChatMedia.signedURL(supabaseClient, message.image_url);
 
             const image =
                 document.createElement(
@@ -767,11 +801,8 @@ async function renderMiniMessage(
             image.className =
                 "iuh-mini-message-image";
 
-            image.src =
-                message.image_url;
-
-            image.alt =
-                "Hình ảnh";
+            if (signedImageUrl) image.src = signedImageUrl;
+            image.alt = signedImageUrl ? "Hình ảnh" : "Không tải được ảnh chat";
 
             image.loading =
                 "lazy";
@@ -781,8 +812,9 @@ async function renderMiniMessage(
                 "click",
                 () => {
 
+                    if (!signedImageUrl) return;
                     window.open(
-                        message.image_url,
+                        signedImageUrl,
                         "_blank"
                     );
 
@@ -2086,50 +2118,14 @@ function closeMiniChat() {
    MARK READ
    ========================================================= */
 
-async function markMiniChatAsRead(
-    conversationId
-) {
-
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("messages")
-            .update({
-
-                is_read:
-                    true
-
-            })
-            .eq(
-                "conversation_id",
-                conversationId
-            )
-            .neq(
-                "sender_id",
-                currentUser.id
-            )
-            .eq(
-                "is_read",
-                false
-            );
-
-
-    if (error) {
-
-        console.error(
-            "Lỗi mark read:",
-            error
-        );
-
-    }
-
+async function markMiniChatAsRead(conversationId) {
+    if (!currentUser || !conversationId) return;
+    const { error } = await supabaseClient.rpc("mark_conversation_read", {
+        p_conversation_id: conversationId
+    });
+    if (error) console.error("Không thể đánh dấu đã đọc:", error);
 }
 
-
-/* =========================================================
-   GỬI TIN
-   ========================================================= */
 
 async function sendMiniChatMessage(
     conversationId,
@@ -2137,6 +2133,7 @@ async function sendMiniChatMessage(
     container
 ) {
 
+    if (!currentUser || input.disabled) return;
     const content =
         input.value.trim();
 
@@ -2210,15 +2207,13 @@ async function sendMiniChatMessage(
          * Không phải chờ Realtime.
          */
 
-        await loadMiniChatMessages(
-            conversationId,
-            container
-        );
+        container.querySelector(".iuh-mini-empty")?.remove();
+        if (data && !container.querySelector(`[data-message-id="${data.id}"]`)) {
+            await renderMiniMessage(data, container);
+        }
 
 
-        await syncMiniConversationPreview(
-            conversationId
-        );
+        void syncMiniConversationPreview(conversationId).catch(console.error);
 
 
         container.scrollTop =
@@ -2226,6 +2221,10 @@ async function sendMiniChatMessage(
 
     }
 
+    catch (error) {
+        console.error("Lỗi gửi mini chat:", error);
+        alert("Không thể hoàn tất thao tác. Vui lòng kiểm tra lại cuộc trò chuyện.");
+    }
     finally {
 
         input.disabled =
@@ -2968,7 +2967,7 @@ else {
 
         } =
             await supabaseClient
-                .from("users")
+                .from("public_profiles")
                 .select(
     "user_id, fullname, avatar_url, role, student_verified"
 )
@@ -3656,9 +3655,11 @@ return {
                                 );
 
 
-                        const unreadList =
-                            unreadMessages ||
-                            [message];
+                        const unreadList = unreadMessages || [message];
+                        if (!unreadList.length) {
+                            removeBubble(message.conversation_id);
+                            return;
+                        }
 
 
                         const latest =
@@ -3727,6 +3728,16 @@ return {
                 )
 
 
+                .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages" }, async payload => {
+                    const message = payload.new;
+                    if (!message.edited_at && !message.recalled_at) return;
+                    if (payload.old?.edited_at === message.edited_at &&
+                        payload.old?.recalled_at === message.recalled_at) return;
+                    const chat = activeMiniChat;
+                    if (chat && chat.conversationId === message.conversation_id) {
+                        await loadMiniChatMessages(chat.conversationId, chat.messages);
+                    }
+                })
                 .subscribe(
                     status => {
 
@@ -4699,8 +4710,7 @@ async function loadFeaturedSearchProducts() {
                 .eq(
                     "status",
                     "active"
-                )
-                .limit(100);
+                );
 
 
         if (productError) {
@@ -4740,163 +4750,23 @@ async function loadFeaturedSearchProducts() {
         ];
 
 
-        /* =====================================================
-           3. LẤY THÀNH VIÊN GÓI
-           
-           service_package_members:
-           user_id → package_id
-        ===================================================== */
-
-        let memberships = [];
-
-
-        if (
-            sellerIds.length > 0
-        ) {
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .from(
-                        "service_package_members"
-                    )
-                    .select(`
-                        id,
-                        package_id,
-                        user_id,
-                        member_role,
-                        joined_at
-                    `)
-                    .in(
-                        "user_id",
-                        sellerIds
-                    );
-
-
+        // Read only public promotion badges, never private package memberships.
+        let badges = [];
+        if (sellerIds.length) {
+            const { data, error } = await supabaseClient
+                .from("service_package_badges")
+                .select("user_id, status, starts_at, expires_at")
+                .in("user_id", sellerIds);
             if (error) {
-                throw error;
+                // Boosted products remain visible when package data is unavailable.
+                console.error("Unable to load public package badges:", error);
+            } else {
+                badges = data || [];
             }
-
-
-            memberships =
-                data || [];
         }
-
-
-        /* =====================================================
-           4. LẤY GÓI DỊCH VỤ
-        ===================================================== */
-
-        const packageIds = [
-            ...new Set(
-                memberships
-                    .map(
-                        member =>
-                            member.package_id
-                    )
-                    .filter(Boolean)
-            )
-        ];
-
-
-        let packages = [];
-
-
-        if (
-            packageIds.length > 0
-        ) {
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .from(
-                        "service_packages"
-                    )
-                    .select(`
-                        id,
-                        owner_id,
-                        plan_type,
-                        status,
-                        starts_at,
-                        expires_at
-                    `)
-                    .in(
-                        "id",
-                        packageIds
-                    );
-
-
-            if (error) {
-                throw error;
-            }
-
-
-            packages =
-                data || [];
-        }
-
-
-        /* =====================================================
-           5. XÁC ĐỊNH GÓI ĐANG HOẠT ĐỘNG
-        ===================================================== */
-
-        const activePackageIds =
-            new Set(
-
-                packages
-                    .filter(
-                        pkg =>
-                            isSearchPackageActive(
-                                pkg
-                            )
-                    )
-                    .map(
-                        pkg =>
-                            String(
-                                pkg.id
-                            )
-                    )
-
-            );
-
-
-        /* =====================================================
-           6. SELLER CÓ GÓI ĐANG HOẠT ĐỘNG
-        ===================================================== */
-
-        const packageSellerIds =
-            new Set(
-
-                memberships
-                    .filter(
-                        member =>
-                            activePackageIds.has(
-                                String(
-                                    member.package_id
-                                )
-                            )
-                    )
-                    .map(
-                        member =>
-                            String(
-                                member.user_id
-                            )
-                    )
-
-            );
-
-
-        /* =====================================================
-           7. LỌC SẢN PHẨM
-
-           CHỈ:
-           - Đẩy tin
-           - Hoặc người bán có gói
-        ===================================================== */
+        const packageSellerIds = new Set(
+            badges.filter(isSearchPackageActive).map(badge => String(badge.user_id))
+        );
 
         let featuredProducts =
             products
@@ -5334,7 +5204,7 @@ async function searchUsers(
         error
     } =
         await supabaseClient
-            .from("users")
+            .from("public_profiles")
             .select(`
                 user_id,
                 fullname,

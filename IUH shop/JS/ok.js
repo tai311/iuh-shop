@@ -1093,173 +1093,23 @@ async function loadRecommendedProducts() {
 
 
 
-        /* =====================================
-           3. LẤY MEMBERSHIP GÓI
-           
-           user_id → package_id
-        ===================================== */
-
-        let memberships = [];
-
-
-        if (
-            sellerIds.length > 0
-        ) {
-
-            const {
-                data,
-                error
-            } = await supabaseClient
-
-                .from(
-                    "service_package_members"
-                )
-
-                .select(`
-                    id,
-                    package_id,
-                    user_id,
-                    member_role,
-                    joined_at
-                `)
-
-                .in(
-                    "user_id",
-                    sellerIds
-                );
-
-
+        // Read only public promotion badges, never private package memberships.
+        let badges = [];
+        if (sellerIds.length) {
+            const { data, error } = await supabaseClient
+                .from("service_package_badges")
+                .select("user_id, status, starts_at, expires_at")
+                .in("user_id", sellerIds);
             if (error) {
-
-                console.error(
-                    "Lỗi tải thành viên gói dịch vụ:",
-                    error
-                );
-
+                // Boosted products remain visible when package data is unavailable.
+                console.error("Unable to load public package badges:", error);
             } else {
-
-                memberships =
-                    data || [];
-
+                badges = data || [];
             }
         }
-
-
-
-        /* =====================================
-           4. LẤY THÔNG TIN GÓI
-        ===================================== */
-
-        let packages = [];
-
-
-        const packageIds = [
-            ...new Set(
-                memberships
-                    .map(
-                        member =>
-                            member.package_id
-                    )
-                    .filter(Boolean)
-            )
-        ];
-
-
-        if (
-            packageIds.length > 0
-        ) {
-
-            const {
-                data,
-                error
-            } = await supabaseClient
-
-                .from(
-                    "service_packages"
-                )
-
-                .select(`
-                    id,
-                    owner_id,
-                    plan_type,
-                    status,
-                    starts_at,
-                    expires_at
-                `)
-
-                .in(
-                    "id",
-                    packageIds
-                );
-
-
-            if (error) {
-
-                console.error(
-                    "Lỗi tải gói dịch vụ:",
-                    error
-                );
-
-            } else {
-
-                packages =
-                    data || [];
-
-            }
-        }
-
-
-
-        /* =====================================
-           5. XÁC ĐỊNH SELLER CÓ GÓI ĐANG HOẠT ĐỘNG
-        ===================================== */
-
-        const activePackageIds =
-            new Set(
-                packages
-
-                    .filter(
-                        pkg =>
-                            isRecommendedPackageActive(
-                                pkg
-                            )
-                    )
-
-                    .map(
-                        pkg =>
-                            String(
-                                pkg.id
-                            )
-                    )
-            );
-
-
-        const packageSellerIds =
-            new Set(
-                memberships
-
-                    .filter(
-                        member =>
-                            activePackageIds.has(
-                                String(
-                                    member.package_id
-                                )
-                            )
-                    )
-
-                    .map(
-                        member =>
-                            String(
-                                member.user_id
-                            )
-                    )
-            );
-
-
-
-        /* =====================================
-           6. LẤY THÔNG TIN SELLER
-        ===================================== */
+        const packageSellerIds = new Set(
+            badges.filter(isRecommendedPackageActive).map(badge => String(badge.user_id))
+        );
 
         let sellers = [];
 
@@ -1273,7 +1123,7 @@ async function loadRecommendedProducts() {
                 error
             } = await supabaseClient
 
-                .from("users")
+                .from("public_profiles")
 
                 .select(`
                     user_id,
@@ -1957,7 +1807,7 @@ async function loadFeaturedProducts() {
                 error: userError
             } = await supabaseClient
 
-                .from("users")
+                .from("public_profiles")
 
                 .select(`
                     user_id,

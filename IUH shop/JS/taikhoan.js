@@ -3110,7 +3110,7 @@ async function loadSiteReviews() {
                 error: usersError
             } =
                 await supabaseClient
-                    .from("users")
+                    .from("public_profiles")
                     .select(`
                         user_id,
                         fullname,
