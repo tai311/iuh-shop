@@ -15,69 +15,59 @@ test('Account recovery page includes the verification form and its runtime', () 
 });
 
 async function scenario(options = {}) {
-    const nodes = {}, calls = { signup: 0, upload: 0, profile: 0 };
-    let submit;
-    const element = id => nodes[id] ||= { value: 'value', checked: true, style: {},
-        appendChild(link) { this.link = link; }, addEventListener() {} };
-    element('password').value = element('confirmPassword').value = 'valid-password-1';
-    element('studentCard').files = [{ type: options.type || 'image/jpeg', size: 100, name: 'card.jpg' }];
-    element('registerForm').querySelector = () => element('button');
-    element('registerForm').addEventListener = (_, fn) => submit = fn;
-    const client = {
-        auth: { signUp: async () => {
-            calls.signup++;
-            if (options.network) throw new Error('Network interrupted');
-            return { data: { user: { id: 'user-1' }, session: options.confirmEmail ? null : {} } };
-        } },
-        storage: { from: () => ({ upload: async path => {
-            calls.upload++; assert.equal(path, 'user-1/card-id.jpg');
-            return { error: options.uploadError ? new Error('Upload failed') : null };
-        } }) },
-        from: () => ({ update: values => {
-            calls.profile++;
-            assert.equal(values.student_card_url, 'user-1/card-id.jpg');
-            assert.equal(values.verification_status, 'pending');
-            return { eq: () => ({ select: () => ({ single: async () => ({
-                data: options.emptyProfile ? null : { user_id: 'user-1' },
-                error: options.profileError ? new Error('Permission denied') : null
-            }) }) }) };
-        } })
-    };
-    const context = { window: { supabase: { createClient: () => client }, location: {} },
-        document: { getElementById: element, createElement: () => ({}) },
-        crypto: { randomUUID: () => 'card-id' }, console: { error() {} } };
-    vm.runInNewContext(source, context);
-    await Promise.all([submit({ preventDefault() {} }), submit({ preventDefault() {} })]);
-    return { calls, nodes, context, submit };
+    const { JSDOM } = require('jsdom');
+    const dom = new JSDOM(fs.readFileSync('IUH shop/HTML/dangky.html', 'utf8'), { url: 'https://shop.invalid/HTML/dangky.html', runScripts: 'outside-only' });
+    const w = dom.window, d = w.document, calls = [];
+    let submit, redirectDelay;
+    const form = d.getElementById('registerForm');
+    const listen = form.addEventListener.bind(form);
+    form.addEventListener = (event, callback, ...rest) => event === 'submit' ? submit = callback : listen(event, callback, ...rest);
+    w.setTimeout = (_, delay) => { redirectDelay = delay; };
+    w.console.error = () => {};
+    w.IUHCore = { getClient: () => ({ auth: { signUp: async body => {
+        calls.push(body);
+        if (options.network) throw Error('Network interrupted');
+        if (options.rejected) return { error: { message: 'Signup rejected' } };
+        return { data: { user: options.emptyUser ? null : { id: 'user-1' }, session: options.confirmEmail ? null : {} } };
+    } }, storage: { from() { assert.fail('Signup must not upload a card'); } }, from() { assert.fail('Profile is created by the database'); } }) };
+    w.eval(source);
+    for (const [id, value] of Object.entries({ fullName: 'Test User', studentId: '12345678', email: 'a@example.com', phone: '0901234567', password: 'password123', confirmPassword: 'password123' })) d.getElementById(id).value = value;
+    d.getElementById('faculty').selectedIndex = 1;
+    d.getElementById('agreeTerms').checked = true;
+    const send = () => submit({ preventDefault() {} });
+    await Promise.all([send(), send()]);
+    return { w, d, calls, send, redirectDelay, button: form.querySelector('button[type="submit"]') };
 }
-
-test('Signup saves a private card path and pending status, preventing double submission', async () => {
+test('Signup sends validated metadata once, without a role or client profile write', async () => {
     const f = await scenario();
-    assert.deepEqual(f.calls, { signup: 1, upload: 1, profile: 1 });
-    assert.equal(f.context.window.location.href, 'taikhoan.html');
+    try {
+        assert.equal(f.calls.length, 1);
+        assert.equal(f.calls[0].options.data.role, undefined);
+        assert.equal(f.redirectDelay, 800);
+        await f.send(); assert.equal(f.calls.length, 1);
+    } finally { f.w.close(); }
 });
-test('Email confirmation stops authenticated upload until login', async () => {
+test('Email confirmation keeps the new account locked against duplicate signup', async () => {
     const f = await scenario({ confirmEmail: true });
-    assert.deepEqual(f.calls, { signup: 1, upload: 0, profile: 0 });
-    assert.match(f.nodes.formMessage.textContent, /email/);
-    assert.equal(f.nodes.button.disabled, true);
+    try {
+        assert.equal(f.redirectDelay, undefined);
+        assert.match(f.d.getElementById('formMessage').textContent, /email/);
+        assert.equal(f.button.disabled, true);
+        await f.send(); assert.equal(f.calls.length, 1);
+    } finally { f.w.close(); }
 });
-for (const failure of ['uploadError', 'profileError', 'emptyProfile']) {
-    test(`Signup ${failure} offers recovery without creating another account`, async () => {
+for (const failure of ['network', 'rejected', 'emptyUser']) {
+    test(`Signup ${failure} displays an error and permits retry`, async () => {
         const f = await scenario({ [failure]: true });
-        assert.equal(f.context.window.location.href, undefined);
-        assert.equal(f.nodes.formMessage.link.href, 'taikhoan.html?verify=1');
-        assert.equal(f.nodes.button.disabled, true);
-        await f.submit({ preventDefault() {} });
-        assert.equal(f.calls.signup, 1);
+        try {
+            assert.equal(f.button.disabled, false);
+            assert.ok(f.d.getElementById('formMessage').textContent);
+            assert.equal(f.redirectDelay, undefined);
+            await f.send(); assert.equal(f.calls.length, 2);
+        } finally { f.w.close(); }
     });
 }
-test('Network failure unlocks signup; unsupported card types never create an account', async () => {
-    const f = await scenario({ network: true });
-    assert.equal(f.nodes.button.disabled, false);
-    const invalid = await scenario({ type: 'image/svg+xml' });
-    assert.equal(invalid.calls.signup, 0);
-});
+
 test('Database rejects old public URL and accepts private card path as the authenticated owner', async () => {
     const db = await createDatabase();
     const id = '00000000-0000-4000-8000-000000000091';

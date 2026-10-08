@@ -7,17 +7,10 @@
    1. SUPABASE
    ========================================================= */
 
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 
 /* =========================================================
@@ -550,10 +543,6 @@ async function loadSeller(sellerId) {
 
     try {
 
-        console.log(
-            "PASSIT - Seller ID:",
-            sellerId
-        );
 
 
         const {
@@ -690,19 +679,6 @@ if (sellerVerifiedBadge) {
         }
 
 
-        console.log(
-            "PASSIT - Người đăng:",
-            {
-                user_id:
-                    seller.user_id,
-
-                fullname:
-                    seller.fullname,
-
-                student_verified:
-                    seller.student_verified
-            }
-        );
 
     }
     catch (error) {
@@ -727,10 +703,6 @@ async function loadProduct() {
         getProductId();
 
 
-    console.log(
-        "PASSIT - Product ID:",
-        productId
-    );
 
 
     if (!productId) {
@@ -768,10 +740,6 @@ async function loadProduct() {
             .maybeSingle();
 
 
-        console.log(
-            "PASSIT - Product:",
-            product
-        );
 
 
         /* Lỗi */
@@ -1589,13 +1557,9 @@ function setupActiveMenu() {
    24. THEO DÕI AUTH
    ========================================================= */
 
-supabaseClient.auth.onAuthStateChange(
+window.IUHCore.onAuthStateChange(
     function (event, session) {
 
-        console.log(
-            "Auth event:",
-            event
-        );
 
         updateUserMenu();
     }
@@ -1720,15 +1684,6 @@ function setupReportListing() {
             const description =
                 $("reportDescription")?.value.trim() || "";
 
-            console.log(
-                "Báo cáo tin đăng:",
-                {
-                    product_id: currentProduct?.id,
-                    seller_id: currentProduct?.seller_id,
-                    reason: selectedReason.value,
-                    description: description
-                }
-            );
 
             closeReportModalFunc();
 

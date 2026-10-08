@@ -3,8 +3,7 @@
     'use strict';
     if (window.IUHOrderNotifications) return;
     window.IUHOrderNotifications = true;
-    const client = window.IUH_SUPABASE || window.IUHCore?.getClient() || window.supabase?.createClient(
-        'https://xecxofmogvqysejjpxvl.supabase.co', 'sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC');
+    const client = window.IUHCore.getClient();
     if (!client) return;
     let panel, loading = false, stopped = false, sessionVersion = 0;
     async function refresh() {
@@ -12,7 +11,7 @@
         loading = true;
         const version = sessionVersion;
         try {
-            const { data: { user }, error: authError } = await client.auth.getUser();
+            const { data: { user }, error: authError } = await window.IUHCore.getUser();
             if (authError || !user) { panel?.remove(); panel = null; return; }
             const results = await Promise.all(['order_notifications', 'connection_notifications'].map(async table => {
                 const result = await client.from(table).select('*').eq('user_id', user.id).eq('is_read', false)
@@ -61,6 +60,6 @@
     const timer = setInterval(refresh, 30000);
     window.addEventListener('pagehide', () => { stopped = true; clearInterval(timer); });
     document.addEventListener('visibilitychange', refresh);
-    client.auth.onAuthStateChange?.(() => { sessionVersion++; panel?.remove(); panel = null; setTimeout(refresh, 0); });
+    client.auth.onAuthStateChange(() => { sessionVersion++; panel?.remove(); panel = null; setTimeout(refresh, 0); });
     void refresh();
 })();

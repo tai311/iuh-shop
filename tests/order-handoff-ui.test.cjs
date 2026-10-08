@@ -12,6 +12,7 @@ function fixture() {
     w.supabase = { createClient: () => ({ auth: { onAuthStateChange() {} }, rpc: async (name, args) => {
         calls.push({ name, args }); return { data: { success: true } };
     } }) };
+    w.eval(read('JS/iuh-core.js'));
     w.eval(read('JS/donhang.js') + `
         refreshPageData = async () => {};
         window.setSellerFixture = () => { currentUser={id:'seller'}; allOrders=[normalizeOrder(window.rawOrder)]; classifyOrders(); renderSaleOrders(); };
@@ -70,6 +71,7 @@ test('Persisted notification renders safely and can be marked read by its owner'
         return query;
     } }) };
     try {
+        w.IUHCore.getUser = () => w.IUHCore.getClient().auth.getUser();
         w.eval(read('JS/order-notifications.js'));
         await new Promise(r => setTimeout(r, 10));
         const panel = w.document.querySelector('.order-notification-panel');

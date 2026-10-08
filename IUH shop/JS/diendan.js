@@ -3,18 +3,11 @@
 ========================================================= */
 
 
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 
 const DEFAULT_AVATAR =
@@ -5296,10 +5289,6 @@ function setupForumRealtime() {
                     status
                 ) {
 
-                    console.log(
-                        "Forum realtime:",
-                        status
-                    );
 
                 }
             );
@@ -5438,9 +5427,7 @@ function setupActiveNavigation() {
    AUTH LISTENER
 ========================================================= */
 
-supabaseClient
-    .auth
-    .onAuthStateChange(
+window.IUHCore.onAuthStateChange(
         async function () {
 
             await loadCurrentUser();

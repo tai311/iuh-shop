@@ -61,7 +61,7 @@ test('A lost payment response preserves its transaction key for a safe retry',as
  });
  try{f.el('openUpgradeModalButton').click();await flush();f.el('confirmUpgradeButton').click();await flush();f.el('confirmUpgradeButton').click();await flush();assert.equal(keys.length,2);assert.equal(keys[0],keys[1]);assert.equal(f.w.localStorage.length,1);}finally{f.dom.window.close();}
 });
-test('Signup and chat regression scenarios',()=>{
+test('Private chat media and chat regression scenarios',()=>{
  const {execFileSync}=require('node:child_process');
  for(const file of ['test-social.cjs','test-chat.cjs'])execFileSync(process.execPath,[path.resolve(__dirname,'../audit',file)],{stdio:'pipe'});
 });

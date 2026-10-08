@@ -8,17 +8,10 @@
    SUPABASE
 ========================================================= */
 
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 
 /* =========================================================
@@ -544,13 +537,9 @@ function setupActiveNavigation() {
    AUTH STATE
 ========================================================= */
 
-supabaseClient.auth.onAuthStateChange(
+window.IUHCore.onAuthStateChange(
     function (event) {
 
-        console.log(
-            "Auth event:",
-            event
-        );
 
         updateUserMenu();
 
@@ -1505,20 +1494,8 @@ async function createProduct() {
 
 
 
-    console.log(
-        "Giá người bán:",
-        formatVND(price)
-    );
 
-    console.log(
-        "Phí sàn 5%:",
-        formatVND(platformFee)
-    );
 
-    console.log(
-        "Giá người mua:",
-        formatVND(buyerPrice)
-    );
 
 
     return product;
@@ -2384,16 +2361,9 @@ document.addEventListener(
                 await refreshCurrentProfile();
 
 
-                console.log(
-                    "Đã đăng nhập:",
-                    currentUser.email
-                );
 
             } else {
 
-                console.log(
-                    "Chưa có tài khoản đăng nhập."
-                );
 
             }
 

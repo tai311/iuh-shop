@@ -60,6 +60,7 @@ test('Checkout summary counts seller shipments and uses server-compatible item r
  try{
   const listen=d.addEventListener.bind(d);d.addEventListener=(type,...args)=>{if(type!=='DOMContentLoaded')listen(type,...args);};
   w.supabase={createClient:()=>({auth:{onAuthStateChange(){}}})};
+  w.eval(fs.readFileSync('IUH shop/JS/iuh-core.js','utf8'));
   const source=fs.readFileSync('IUH shop/JS/dathang.js','utf8');
   w.eval(source+`\ninitDOM();checkoutItems=[{id:1,seller_id:'a',price:10010,quantityInCart:2},{id:2,seller_id:'a',price:10000,quantityInCart:1},{id:3,seller_id:'b',price:20000,quantityInCart:1}];`);
   d.querySelector('input[name="shippingMethod"][value="mid"]').checked=true;

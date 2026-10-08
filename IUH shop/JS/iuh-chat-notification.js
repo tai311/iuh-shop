@@ -59,11 +59,7 @@
        1. SUPABASE
        ========================================================= */
 
-    const SUPABASE_URL =
-        "https://xecxofmogvqysejjpxvl.supabase.co";
 
-    const SUPABASE_PUBLISHABLE_KEY =
-        "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 
     if (!window.supabase) {
@@ -76,15 +72,7 @@
     }
 
 
-    const supabaseClient =
-    window.IUH_SUPABASE ||
-    (
-        window.IUH_SUPABASE =
-            window.supabase.createClient(
-                SUPABASE_URL,
-                SUPABASE_PUBLISHABLE_KEY
-            )
-    );
+    const supabaseClient = window.IUHCore.getClient();
 
 
     /* =========================================================
@@ -2923,7 +2911,7 @@ else {
             error
 
         } =
-            await supabaseClient.auth.getUser();
+            await window.IUHCore.getUser();
 
 
         if (error) {
@@ -3741,10 +3729,6 @@ return {
                 .subscribe(
                     status => {
 
-                        console.log(
-                            "PASSIT Global Chat Notification:",
-                            status
-                        );
 
                     }
                 );

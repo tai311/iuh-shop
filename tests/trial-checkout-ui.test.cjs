@@ -19,6 +19,7 @@ test('QR is the visible choice and trial checkout records a safe order without o
   assert.equal(d.getElementById('trialPaymentBox'),null);
   const listen=d.addEventListener.bind(d);d.addEventListener=(type,...args)=>{if(type!=='DOMContentLoaded')listen(type,...args);};
   w.supabase={createClient:()=>({auth:{onAuthStateChange(){}}})};
+  w.eval(fs.readFileSync('IUH shop/JS/iuh-core.js','utf8'));
   const source=fs.readFileSync('IUH shop/JS/dathang.js','utf8');
   w.eval(source+'\ncurrentUser={id:"buyer"}; initDOM(); window.testOrder=buildOrder(); updatePaymentUI();');
   assert.equal(w.testOrder.payment_method,'trial');

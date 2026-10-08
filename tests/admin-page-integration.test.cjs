@@ -15,7 +15,7 @@ test('Real admin page loads approval module and routes orders/packages without l
  w.HTMLDialogElement.prototype.close=function(){this.open=false;};
  try{
   for(const script of d.querySelectorAll('script[src]')){
-   const src=script.getAttribute('src');if(!src.startsWith('../JS/'))continue;
+   const src=script.getAttribute('src');if(!src.startsWith('../JS/') || src.includes('vendor/supabase.min.js'))continue;
    w.eval(fs.readFileSync(path.resolve('IUH shop/HTML',src.split('?')[0]),'utf8'));
   }
   assert.ok(w.IUHAdminRequests,'HTML must load the approval module');

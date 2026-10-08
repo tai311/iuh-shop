@@ -9,11 +9,7 @@
    1. SUPABASE
    ========================================================= */
 
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVNSuvbzUReIB3oA41w_0aqdUJqC";
 
 /*
  * Dùng 1 Supabase client chung trên toàn trang.
@@ -21,10 +17,7 @@ const SUPABASE_PUBLISHABLE_KEY =
  */
 window.IUH_SUPABASE =
     window.IUH_SUPABASE ||
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 const db = window.IUH_SUPABASE;
 
@@ -168,7 +161,6 @@ function showToast(message) {
 
     if (!toast) {
 
-        console.log(message);
 
         return;
     }
@@ -2755,10 +2747,6 @@ async function submitOrder() {
             : successMessage);
 
 
-        console.log(
-            "PASSIT: Đã tạo đơn:",
-            data
-        );
 
 
         /* Nếu thanh toán bằng ví thì cập nhật số dư */
@@ -2901,7 +2889,7 @@ function setupContinueShopping() {
    38. AUTH STATE
    ========================================================= */
 
-db.auth.onAuthStateChange(
+window.IUHCore.onAuthStateChange(
     function(
         event,
         session
@@ -2930,9 +2918,6 @@ db.auth.onAuthStateChange(
 
 async function initCheckout() {
 
-    console.log(
-        "PASSIT: Đang khởi tạo checkout..."
-    );
 
 
     initDOM();
@@ -2972,10 +2957,6 @@ async function initCheckout() {
     }
 
 
-    console.log(
-        "PASSIT: User =",
-        currentUser.id
-    );
 
 
     /*
@@ -3034,9 +3015,6 @@ const isConsignmentCheckout =
 
 if (isConsignmentCheckout) {
 
-    console.log(
-        "PASSIT: Đây là đơn ký gửi."
-    );
 
     const shippingContainer =
         document.getElementById(
@@ -3117,9 +3095,6 @@ updateSummary();
 }
 
 
-    console.log(
-        "PASSIT: Checkout đã sẵn sàng."
-    );
 }
 
 

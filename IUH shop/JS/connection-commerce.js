@@ -1,8 +1,7 @@
 /* Shared contract for connection-only commerce. Amounts are recalculated by SQL. */
 (() => {
     'use strict';
-    const getClient = () => window.IUH_SUPABASE || (window.IUH_SUPABASE = window.IUHCore?.getClient() ||
-        window.supabase.createClient('https://xecxofmogvqysejjpxvl.supabase.co', 'sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC'));
+    const getClient = () => window.IUHCore.getClient();
     const money = value => new Intl.NumberFormat('vi-VN').format(Number(value) || 0) + 'đ';
     const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const fee = subtotal => Math.max(2000, Math.round(Number(subtotal) * 0.05));

@@ -2,17 +2,10 @@
    PASSIT - TÀI KHOẢN / SUPABASE
 ===================================================== */
 
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 const DEFAULT_AVATAR =
     "../Images/default-avatar.svg";
@@ -404,9 +397,6 @@ async function loadAccount() {
 
             currentAuthUserId = null;
 
-            console.log(
-                "Người dùng chưa đăng nhập"
-            );
 
 
             setBodyState(
@@ -428,10 +418,6 @@ async function loadAccount() {
 
         currentAuthUserId = user.id;
 
-        console.log(
-            "Đã đăng nhập:",
-            user.email
-        );
 
 
         setBodyState(
@@ -1571,10 +1557,6 @@ document.addEventListener(
                 }
 
 
-                console.log(
-                    "Đã chọn ảnh:",
-                    file.name
-                );
 
 
                 /* =================================
@@ -1910,10 +1892,6 @@ document.addEventListener(
                 }
 
 
-                console.log(
-                    "Đã chọn ảnh:",
-                    file.name
-                );
 
 
                 /* =================================

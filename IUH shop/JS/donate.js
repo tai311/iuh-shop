@@ -6,8 +6,7 @@
         const modal = $('donateModal');
         if (!modal || modal.dataset.ready) return;
         modal.dataset.ready = 'true';
-        const client = window.IUHCore?.getClient() || window.IUH_SUPABASE || window.supabase.createClient(
-            'https://xecxofmogvqysejjpxvl.supabase.co', 'sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC');
+        const client = window.IUHCore.getClient();
         let busy = false, userId = null, attempt = null, mode = null, completed = false;
         const money = value => Number(value).toLocaleString('vi-VN') + 'đ';
         const storageKey = id => 'iuh_donate_attempt_' + id;

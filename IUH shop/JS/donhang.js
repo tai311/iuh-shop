@@ -2,19 +2,12 @@
    SUPABASE
 ========================================================= */
 
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 
 window.IUH_SUPABASE =
     window.IUH_SUPABASE ||
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 const supabaseClient =
     window.IUH_SUPABASE;
@@ -379,13 +372,9 @@ function setupLogout() {
    THEO DÕI TRẠNG THÁI ĐĂNG NHẬP
 ========================================================= */
 
-supabaseClient.auth.onAuthStateChange(
+window.IUHCore.onAuthStateChange(
     function (event, session) {
 
-        console.log(
-            "Auth event:",
-            event
-        );
 
         updateUserMenu();
 
@@ -983,9 +972,6 @@ async function loadOrdersFromDatabase() {
             trialMode = true;
         }
 
-        console.log(
-            "PASSIT: Đang tải đơn hàng từ Database..."
-        );
 
         const {
             data,
@@ -1012,10 +998,6 @@ async function loadOrdersFromDatabase() {
         }
 
 
-        console.log(
-            "PASSIT: Đã tải đơn hàng:",
-            data
-        );
 
 
         let orders = data || [];
@@ -1149,15 +1131,6 @@ function classifyOrders() {
     });
 
 
-    console.log(
-        "PASSIT: classifyOrders:",
-        {
-            userId,
-            total: allOrders.length,
-            purchase: purchaseOrders.length,
-            sale: saleOrders.length
-        }
-    );
 }
 
 
@@ -2484,15 +2457,10 @@ async function updateOrderStatus(orderId) {
 
 async function refreshPageData() {
     try {
-        console.log("PASSIT: ===== BẮT ĐẦU TẢI ĐƠN HÀNG =====");
 
         /* 1. Lấy user đang đăng nhập */
         currentUser = await getCurrentUser();
 
-        console.log(
-            "PASSIT: currentUser =",
-            currentUser?.id || null
-        );
 
         /* Nếu chưa đăng nhập */
         if (!currentUser) {
@@ -2505,9 +2473,6 @@ async function refreshPageData() {
             renderSaleOrders();
             renderHistory();
 
-            console.log(
-                "PASSIT: Chưa đăng nhập."
-            );
 
             return;
         }
@@ -2515,32 +2480,17 @@ async function refreshPageData() {
         /* 2. Lấy đơn từ Database */
         allOrders = await loadOrdersFromDatabase();
 
-        console.log(
-            "PASSIT: Tổng số đơn lấy được =",
-            allOrders.length
-        );
 
         /* 3. Phân loại Đơn mua / Đơn bán */
         classifyOrders();
 
-        console.log(
-            "PASSIT: Đơn mua =",
-            purchaseOrders.length
-        );
 
-        console.log(
-            "PASSIT: Đơn bán =",
-            saleOrders.length
-        );
 
         /* 4. Render giao diện */
         renderPurchaseOrders();
         renderSaleOrders();
         renderHistory();
 
-        console.log(
-            "PASSIT: ===== TẢI ĐƠN HÀNG XONG ====="
-        );
 
     } catch (error) {
         console.error(
@@ -2559,9 +2509,6 @@ document.addEventListener(
     "DOMContentLoaded",
     async function () {
 
-        console.log(
-            "PASSIT: Trang đơn hàng đã sẵn sàng."
-        );
 
         /* Tab Đơn mua / Đơn bán */
         setupTabs();
@@ -2612,13 +2559,9 @@ window.addEventListener('pagehide', () => clearInterval(orderRefreshTimer));
    TỰ ĐỘNG TẢI LẠI KHI ĐĂNG NHẬP / ĐĂNG XUẤT
 ========================================================= */
 
-supabaseClient.auth.onAuthStateChange(
+window.IUHCore.onAuthStateChange(
     async function (event, session) {
 
-        console.log(
-            "PASSIT: Auth event =",
-            event
-        );
 
         if (
             event === "SIGNED_IN" ||

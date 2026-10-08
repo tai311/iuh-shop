@@ -300,18 +300,11 @@ document.addEventListener(
    SUPABASE
 ========================================================= */
 
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 
 const supabaseClient =
-    window.IUHCore?.getClient() || window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 
 
@@ -333,7 +326,7 @@ async function updateUserMenu() {
             },
             error: userError
         } =
-            await supabaseClient.auth.getUser();
+            await window.IUHCore.getUser();
 
 
         if (userError) {
@@ -671,13 +664,9 @@ function setupLogout() {
    THEO DÕI TRẠNG THÁI ĐĂNG NHẬP
 ========================================================= */
 
-supabaseClient.auth.onAuthStateChange(
+window.IUHCore.onAuthStateChange(
     function (event, session) {
 
-        console.log(
-            "Auth event:",
-            event
-        );
 
         updateUserMenu();
 

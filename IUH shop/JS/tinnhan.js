@@ -8,14 +8,9 @@
    SUPABASE
    ========================================================= */
 
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
-const supabaseClient = window.IUH_SUPABASE || (window.IUH_SUPABASE =
-    window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY));
+const supabaseClient = window.IUHCore.getClient();
 
 
 /* =========================================================
@@ -3848,10 +3843,6 @@ conversation.lastMessageIsMine =
                     if (status === "SUBSCRIBED" && currentConversationId) {
                         loadMessages(currentConversationId).catch(console.error);
                     }
-                    console.log(
-                        "Realtime chat:",
-                        status
-                    );
 
                 }
             );
@@ -4302,16 +4293,12 @@ function formatMessageTime(
    AUTH STATE
    ========================================================= */
 
-supabaseClient.auth.onAuthStateChange(
+window.IUHCore.onAuthStateChange(
     function(
         event,
         session
     ) {
 
-        console.log(
-            "Auth event:",
-            event
-        );
 
 
         if (
@@ -4413,14 +4400,6 @@ async function initChat() {
                 return;
             }
 
-            console.log(
-                "PASSIT - Mở chat người bán:",
-                {
-                    sellerId,
-                    productId,
-                    productName
-                }
-            );
 
 
             /* -----------------------------------------
@@ -4456,9 +4435,6 @@ async function initChat() {
 
             if (!conversationId) {
 
-                console.log(
-                    "PASSIT - Chưa có chat, đang tạo..."
-                );
 
 
                 const newConversation =
@@ -4483,10 +4459,6 @@ async function initChat() {
                     newConversation.id;
 
 
-                console.log(
-                    "PASSIT - Đã tạo conversation:",
-                    conversationId
-                );
 
 
                 /*
@@ -4597,9 +4569,6 @@ return;
            Đây chính là hành vi bạn yêu cầu trước đó.
            ================================================= */
 
-        console.log(
-            "PASSIT - Không có chat được chọn."
-        );
 
 
     }

@@ -2,17 +2,10 @@
    SUPABASE
 ===================================================== */
 
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-    );
+    window.IUHCore.getClient();
 
 /* =====================================================
    MENU ACTIVE
@@ -270,10 +263,6 @@ async function loadProducts() {
            5. HIỂN THỊ
         ========================================= */
 
-        console.log(
-            "Danh sách sản phẩm:",
-            products
-        );
 
 
         renderProducts();
@@ -320,7 +309,7 @@ async function updateHeaderAccount() {
             data: {
                 user
             }
-        } = await supabaseClient.auth.getUser();
+        } = await window.IUHCore.getUser();
 
 
         /* =========================================
@@ -446,13 +435,9 @@ async function updateHeaderAccount() {
    THEO DÕI ĐĂNG NHẬP / ĐĂNG XUẤT
 ===================================================== */
 
-supabaseClient.auth.onAuthStateChange(
+window.IUHCore.onAuthStateChange(
     function (event, session) {
 
-        console.log(
-            "Auth event:",
-            event
-        );
 
         updateHeaderAccount();
 

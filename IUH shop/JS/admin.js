@@ -2,11 +2,7 @@
    PASSIT ADMIN
 ========================================================= */
 
-const SUPABASE_URL =
-    "https://xecxofmogvqysejjpxvl.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC";
 
 const supabaseClient = window.IUHCore.getClient();
 
@@ -172,7 +168,6 @@ function paymentText(method) {
 
 async function checkAdmin() {
 
-    console.log("========== CHECK ADMIN ==========");
 
     try {
 
@@ -185,10 +180,6 @@ async function checkAdmin() {
             await supabaseClient.auth.getUser();
 
 
-        console.log(
-            "Auth user:",
-            user
-        );
 
 
         /* =========================================
@@ -231,20 +222,8 @@ async function checkAdmin() {
                 .maybeSingle();
 
 
-        console.log(
-            "User ID:",
-            user.id
-        );
 
-        console.log(
-            "Profile:",
-            profile
-        );
 
-        console.log(
-            "Profile error:",
-            profileError
-        );
 
 
         /* =========================================
@@ -298,10 +277,6 @@ async function checkAdmin() {
             .toLowerCase();
 
 
-        console.log(
-            "ROLE THỰC TẾ:",
-            profile.role
-        );
 
 
         if (
@@ -325,9 +300,6 @@ async function checkAdmin() {
            XÁC NHẬN ADMIN
         ========================================= */
 
-        console.log(
-            "✅ ADMIN ACCESS GRANTED"
-        );
 
 
         const adminName =
@@ -8963,9 +8935,6 @@ document.addEventListener(
     "DOMContentLoaded",
     async function () {
 
-        console.log(
-            "🚀 PASSIT ADMIN START"
-        );
 
 
         const admin =
@@ -8982,9 +8951,6 @@ document.addEventListener(
         }
 
 
-        console.log(
-            "✅ ADMIN PAGE READY"
-        );
 
 
         await loadDashboard();

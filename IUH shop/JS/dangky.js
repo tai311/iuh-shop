@@ -1,7 +1,4 @@
-const supabaseClient = window.IUHCore?.getClient() || window.supabase.createClient(
-    "https://xecxofmogvqysejjpxvl.supabase.co",
-    "sb_publishable_3cUVsNUvhbzUReIB3oA41w_0aqdUJqC"
-);
+const supabaseClient = window.IUHCore.getClient();
 
 const registerForm = document.getElementById("registerForm");
 

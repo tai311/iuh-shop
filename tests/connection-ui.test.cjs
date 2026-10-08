@@ -18,7 +18,7 @@ test('New checkout retries the same request, prevents double submit, and restore
  }};
  w.IUH_SUPABASE=db;
  try {
-  w.eval(read('JS/connection-commerce.js'));w.eval(read('JS/connection-checkout.js'));await flush();
+  w.eval(read('JS/iuh-core.js'));w.eval(read('JS/connection-commerce.js'));w.eval(read('JS/connection-checkout.js'));await flush();
   assert.match(d.getElementById('connectionSubtotal').textContent,/20.000/);
   assert.equal(d.querySelector('#connectionCheckoutItems img[onerror]'),null);
   assert.equal(d.querySelector('#connectionCheckoutForm [required]'),null);
@@ -53,7 +53,7 @@ for(const mode of ['orders','chat'])test('Seller sees fee/delivery controls in '
   return {data:{success:true}};
  }};
  try{
-  w.eval(read('JS/connection-commerce.js'));w.eval(read('JS/connection-orders.js'));await flush();
+  w.eval(read('JS/iuh-core.js'));w.eval(read('JS/connection-commerce.js'));w.eval(read('JS/connection-orders.js'));await flush();
   if(mode==='chat'){d.dispatchEvent(new w.CustomEvent('passit:conversation-open',{detail:{conversationId:'chat-1'}}));assert.equal(d.getElementById('connectionRequests').hidden,false);}
   assert.equal(d.querySelector('script'),null);
   assert.match(d.body.textContent,/Không cần chuyển tiền thật/);
@@ -79,7 +79,7 @@ async function deliveryFixture(mode,userId,row){
   if(name==='admin_update_connection_delivery')row.delivery_status=args.p_status;
   return {data:{success:true}};
  }};
- w.eval(read('JS/connection-commerce.js'));w.eval(read('JS/connection-orders.js'));await flush();
+ w.eval(read('JS/iuh-core.js'));w.eval(read('JS/connection-commerce.js'));w.eval(read('JS/connection-orders.js'));await flush();
  return {dom,w,d,calls,row};
 }
 
@@ -139,7 +139,7 @@ test('Reload after lost checkout response recovers receipt before querying exhau
   assert.equal(name,'get_connection_requests');return {data:{requests:[{id:71,status:'awaiting_seller'}]}};
  }};
  try{
-  w.eval(read('JS/connection-commerce.js'));w.eval(read('JS/connection-checkout.js'));await flush();
+  w.eval(read('JS/iuh-core.js'));w.eval(read('JS/connection-commerce.js'));w.eval(read('JS/connection-checkout.js'));await flush();
   assert.equal(w.document.getElementById('connectionWaiting').hidden,false);
   assert.deepEqual(calls,['get_connection_receipt','get_connection_requests']);
  }finally{w.close();}
