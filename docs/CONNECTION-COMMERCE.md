@@ -4,7 +4,7 @@
 
 - Người bán đăng miễn phí, cung cấp tên, danh mục, số lượng, giá, ảnh, tình trạng, khu vực và mô tả từ 10–1.800 ký tự. Không mua đẩy tin trong bước đăng mới.
 - Giá sản phẩm trên trang chủ, danh sách, chi tiết và giỏ hàng không cộng thêm 5% cho người mua.
-- Người mua nhập họ tên, điện thoại, địa điểm dự kiến và ghi chú. Bỏ thanh toán và lựa chọn vận chuyển ở bước đặt hàng.
+- Người mua không cần nhập họ tên, điện thoại hoặc địa điểm nhận hàng khi đặt yêu cầu. Có thể để lại ghi chú không bắt buộc; hai bên thống nhất thông tin và cách giao dịch trong chat sau khi người bán xác nhận. Bỏ thanh toán và lựa chọn vận chuyển ở bước đặt hàng.
 - Giỏ nhiều người bán được tách thành từng yêu cầu. Phí mỗi yêu cầu = `max(2.000, round(tổng tiền sản phẩm × 5%))`, do người bán chịu. Giá và phí được tính lại ở SQL; không tin số phí gửi từ trình duyệt.
 - Giữ tồn kho khi tạo yêu cầu. Người bán nhận thông báo và có 24 giờ để xác nhận phí. Hủy/hết hạn trả tồn kho đúng một lần, không khôi phục trạng thái đăng của sản phẩm đã bị xóa/ẩn.
 - Xác nhận phí mới mở chat. Người mua ở trang chờ được chuyển sang chat; giỏ nhiều người bán có nút chat riêng từng yêu cầu. Trang đơn hàng và thông báo cũng có đường vào chat.
@@ -19,7 +19,7 @@ Theo yêu cầu, `private.connection_settings.auto_confirm=true`: người bán 
 
 ## Dữ liệu, bảo vệ và triển khai
 
-Migration: `IUH shop/supabase/migrations/20261008105343_seller_connection_workflow.sql`.
+Migrations: `IUH shop/supabase/migrations/20261008105343_seller_connection_workflow.sql` and `IUH shop/supabase/migrations/20261008190000_optional_connection_recipient_details.sql`.
 
 Migration tạo các bảng `connection_requests`, `connection_items`, `connection_fee_entries`, `connection_notifications`, cùng cấu hình và biên nhận idempotency trong schema `private`. Người dùng không được ghi trực tiếp vào trạng thái, số phí hoặc biên nhận. RPC xác nhận phí/giao hàng kiểm tra đúng người bán; cập nhật giao hộ kiểm tra admin. RLS giới hạn đọc theo bên tham gia.
 
@@ -27,7 +27,7 @@ Migration thay điều kiện thành viên chat, đồng thời thu hồi quyề
 
 Nếu có `pg_cron`, migration tạo lịch `passit-expire-connections` mỗi phút. Điều kiện xác nhận phí luôn kiểm tra hạn 24 giờ; truy vấn danh sách và tạo yêu cầu cũng dọn yêu cầu hết hạn. Sau khi triển khai cần kiểm tra lịch cron đang hoạt động để tồn kho được trả khi không có ai truy cập.
 
-**Bản thay đổi này được kiểm tra cục bộ; chưa áp dụng migration vào Supabase, chưa push/deploy giao diện lên Vercel.** Khi triển khai, áp dụng migration cùng đợt phát hành các trang/JS mới: giao diện cũ không tạo được đơn sau khi RPC cũ bị thu hồi. Sau đó kiểm tra bằng tài khoản thử người mua, người bán và admin trên bản triển khai. Không rollback riêng giao diện về checkout cũ khi database đã chuyển luồng.
+**Bản thay đổi này được kiểm tra cục bộ; chưa áp dụng migration vào Supabase, chưa push/deploy giao diện lên Vercel.** Khi triển khai, áp dụng cả hai migration cùng đợt phát hành các trang/JS mới: giao diện cũ không tạo được đơn sau khi RPC cũ bị thu hồi. Sau đó kiểm tra bằng tài khoản thử người mua, người bán và admin trên bản triển khai. Không rollback riêng giao diện về checkout cũ khi database đã chuyển luồng.
 
 ## Kiểm tra
 
@@ -35,7 +35,7 @@ Nếu có `pg_cron`, migration tạo lịch `passit-expire-connections` mỗi ph
 - `npm test`: toàn bộ bộ hồi quy, gồm luồng database mới trên PGlite và tương tác DOM trên jsdom.
 - Kết quả kiểm tra cục bộ: 121/121 test qua; 42 script và 34 trang qua kiểm tra mã nguồn.
 - `tests/connection-commerce.test.cjs`: phí tối thiểu/tách người bán, idempotency, hồi phục biên nhận, quyền truy cập, chat cũ/mới, giao hộ, hết hạn/hủy và tồn kho, đăng miễn phí, không phát sinh tiền hàng hoặc giao dịch ví.
-- `tests/connection-ui.test.cjs`: biểu mẫu mới, bốn địa điểm, không cộng phí người mua, retry/mất phản hồi, chặn bấm lặp, thao tác phí/giao hộ và mở bảng giao dịch khi đổi cuộc chat.
+- `tests/connection-ui.test.cjs`: đặt hàng không yêu cầu họ tên, số điện thoại hoặc địa điểm, không cộng phí người mua, retry/mất phản hồi, chặn bấm lặp, thao tác phí/giao hộ và mở bảng giao dịch khi đổi cuộc chat.
 - `tests/order-handoff.test.cjs` tạo đơn lịch sử trước migration rồi kiểm tra tiếp toàn bộ vòng đời sau migration.
 - Các bộ kiểm tra hợp đồng checkout/boost cũ dùng `legacyCommerce` và fixture HTML tại commit `eb0fd17`; chúng kiểm tra hợp đồng lịch sử, không phải giao diện checkout đang chạy.
 

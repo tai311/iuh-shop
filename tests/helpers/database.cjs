@@ -34,9 +34,8 @@ async function createDatabase({ legacyCommerce = false } = {}){
  for(const t of JSON.parse(read('audit/db-4.json'))[0].json_build_object.triggers)await db.exec(t.definition);
  await db.exec('grant all on all tables in schema public,storage to authenticated;grant select on all tables in schema public to anon;grant usage,select on all sequences in schema public to authenticated;');
  // Historical payment suites exercise the old workflow before its public creation RPCs were retired.
- try {for(const file of fs.readdirSync(path.join(base,'IUH shop/supabase/migrations')).filter(n=>n.endsWith('.sql') && !(legacyCommerce && n.endsWith('_seller_connection_workflow.sql'))).sort())await db.exec(read('IUH shop/supabase/migrations/'+file));}
+ try {for(const file of fs.readdirSync(path.join(base,'IUH shop/supabase/migrations')).filter(n=>n.endsWith('.sql') && !(legacyCommerce && (n.endsWith('_seller_connection_workflow.sql') || n.endsWith('_optional_connection_recipient_details.sql')))).sort())await db.exec(read('IUH shop/supabase/migrations/'+file));}
  catch(err){await db.close();throw new Error('Migration: '+err.message+' '+(err.detail||'')+' at '+(err.position||''));}
  return db;
 }
 module.exports={createDatabase};
-

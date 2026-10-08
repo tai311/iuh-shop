@@ -8,7 +8,7 @@ test('Connection commerce enforces seller fees, chat access, inventory and deliv
  const q = async (sql,args=[]) => (await db.query(sql,args)).rows;
  const scalar = async (sql,args=[]) => Object.values((await q(sql,args))[0])[0];
  const as = async id => { await db.exec('reset role'); await q("select set_config('request.jwt.claim.sub',$1,false)",[id]); await db.exec('set role authenticated'); };
- const place = (key,items=[{product_id:960,quantity:1}],total=10000) => scalar("select public.request_connection_orders('Buyer','0901234567','Cơ sở chính Nguyễn Văn Bảo','',$1::jsonb,$2,'{}',$3)",[JSON.stringify(items),total,key]);
+ const place = (key,items=[{product_id:960,quantity:1}],total=10000,recipient=['Buyer','0901234567','Cơ sở chính Nguyễn Văn Bảo']) => scalar("select public.request_connection_orders($1,$2,$3,'',$4::jsonb,$5,'{}',$6)",[...recipient,JSON.stringify(items),total,key]);
  try {
   for (const id of [admin,buyer,a,b,outsider]) await q('insert into auth.users(id,email) values($1,$2)',[id,id+'@test.invalid']);
   await q("update public.users set role='admin' where user_id=$1",[admin]);
@@ -97,6 +97,11 @@ test('Connection commerce enforces seller fees, chat access, inventory and deliv
   assert.equal(free.listing_fee,0);assert.equal(free.boost_fee,0);
   assert.equal(await scalar('select item_condition from public.products where id=$1',[free.id]),'Mới');
   await assert.rejects(q("select public.create_free_product('Bad','books',1,10000,'short',$1::jsonb,'Mới','Cơ sở chính Nguyễn Văn Bảo','bad')",[image]));
+  await as(buyer);
+  const noDetails=await place('no-recipient-details',undefined,10000,['','','']);
+  const noDetailsRow=(await q('select recipient_name,recipient_phone,recipient_address from public.connection_requests where id=$1',[noDetails.request_ids[0]]))[0];
+  assert.deepEqual(Object.values(noDetailsRow),['','','']);
+  await assert.rejects(place('invalid-optional-phone',undefined,10000,['','1','']));
   await db.exec('reset role');
   assert.equal(Number(await scalar('select count(*) from public.orders')),0);
   assert.equal(Number(await scalar('select count(*) from public.wallet_transactions')),0);

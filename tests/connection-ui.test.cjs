@@ -21,10 +21,14 @@ test('New checkout retries the same request, prevents double submit, and restore
   w.eval(read('JS/connection-commerce.js'));w.eval(read('JS/connection-checkout.js'));await flush();
   assert.match(d.getElementById('connectionSubtotal').textContent,/20.000/);
   assert.equal(d.querySelector('#connectionCheckoutItems img[onerror]'),null);
-  assert.deepEqual([...d.getElementById('recipientAddress').options].slice(1).map(o=>o.value),['Cơ sở chính Nguyễn Văn Bảo','Cơ sở Nguyễn Văn Dung','Cơ sở Phạm Văn Chiêu','Sân vận động Đạt Đức']);
-  d.getElementById('recipientAddress').selectedIndex=1;
+  assert.equal(d.querySelector('#connectionCheckoutForm [required]'),null);
+  assert.equal(d.getElementById('recipientName'),null);
+  assert.equal(d.getElementById('recipientPhone'),null);
+  assert.equal(d.getElementById('recipientAddress'),null);
+  assert.match(d.querySelector('.connection-card').textContent,/chưa cần nhập họ tên, số điện thoại hay địa điểm nhận hàng/i);
   const submit=()=>d.getElementById('connectionCheckoutForm').dispatchEvent(new w.Event('submit',{cancelable:true}));
   submit();await flush();assert.match(d.getElementById('connectionCheckoutStatus').textContent,/Mất kết nối/);
+  assert.equal(calls[0].p_recipient_name,'');assert.equal(calls[0].p_recipient_phone,'');assert.equal(calls[0].p_recipient_address,'');
   submit();submit();await flush();
   assert.equal(calls.length,2);assert.equal(calls[0].p_request_key,calls[1].p_request_key);
   assert.equal(calls[1].p_expected_subtotal,20000);

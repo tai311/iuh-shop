@@ -65,9 +65,7 @@
     async function submit(event) {
         event.preventDefault();
         if (busy || receipt || !items.length) return;
-        const name = $('recipientName').value.trim(), phone = $('recipientPhone').value.replace(/\s/g, ''), address = $('recipientAddress').value;
-        if (!name || !/^0\d{9}$/.test(phone) || !address) { show('Vui lòng nhập họ tên, số điện thoại 10 số và địa điểm nhận hàng.'); return; }
-        const payload = { p_recipient_name: name, p_recipient_phone: phone, p_recipient_address: address, p_note: $('orderNote').value.trim(),
+        const payload = { p_recipient_name: '', p_recipient_phone: '', p_recipient_address: '', p_note: $('orderNote').value.trim(),
             p_items: items.map(i => ({ product_id: i.id, quantity: i.requestQuantity })), p_expected_subtotal: total(), p_cart_ids: cartIds };
         const signature = JSON.stringify(payload), key = 'passitConnectionAttempt:' + user.id;
         try {
@@ -93,8 +91,7 @@
         try {
             const auth = await db.auth.getUser(); if (auth.error || !auth.data?.user) { location.assign('dangnhap.html'); return; }
             user = auth.data.user;
-            const profile = await db.from('users').select('fullname,phone').eq('user_id', user.id).maybeSingle();
-            $('recipientName').value = profile.data?.fullname || ''; $('recipientPhone').value = profile.data?.phone || '';
+            const profile = await db.from('users').select('fullname').eq('user_id', user.id).maybeSingle();
             if ($('headerUserName')) $('headerUserName').textContent = profile.data?.fullname || 'Tài khoản';
             if ($('userAccount')) $('userAccount').style.display = 'block';
             if ($('guestAccount')) $('guestAccount').style.display = 'none';
@@ -108,7 +105,7 @@
                 if (attempt?.route === location.search) receipt = await C.rpc('get_connection_receipt', { p_request_key: attempt.key });
             }
             if (receipt) { await waitForSeller(); return; }
-            await loadItems(); show('Kiểm tra thông tin rồi gửi yêu cầu. Phí sàn do người bán chịu.');
+            await loadItems(); show('Kiểm tra sản phẩm rồi gửi yêu cầu. Phí sàn do người bán chịu.');
         } catch (error) { show(error.message || 'Không thể tải yêu cầu đặt hàng.'); }
     }
     window.addEventListener('pagehide', () => clearInterval(timer));

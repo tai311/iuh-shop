@@ -320,15 +320,13 @@
     <main class="connection-page">
 <p class="connection-eyebrow">Đăng miễn phí · Kết nối mua bán</p><h1>Gửi yêu cầu đặt hàng</h1>
 <p class="connection-lead">Bạn không thanh toán tại PASSIT. Người bán xác nhận phí sàn trong 24 giờ, sau đó hai bên trao đổi trong chat để thống nhất giao dịch.</p>
-<ol class="connection-steps"><li>1. Gửi thông tin người nhận</li><li>2. Người bán xác nhận phí</li><li>3. Mở chat & hẹn giao dịch</li></ol>
+<ol class="connection-steps"><li>1. Gửi yêu cầu mua</li><li>2. Người bán xác nhận phí</li><li>3. Mở chat & hẹn giao dịch</li></ol>
 <p id="connectionCheckoutStatus" class="connection-status" role="status" aria-live="polite">Đang tải sản phẩm…</p>
 <form id="connectionCheckoutForm" class="connection-grid">
-<section class="connection-card"><h2>Thông tin người nhận</h2><div class="connection-fields">
-<div class="connection-field"><label for="recipientName">Họ và tên *</label><input id="recipientName" required maxlength="120" autocomplete="name"></div>
-<div class="connection-field"><label for="recipientPhone">Số điện thoại *</label><input id="recipientPhone" required type="tel" inputmode="tel" maxlength="15" autocomplete="tel" placeholder="0909 123 456"></div>
-<div class="connection-field full"><label for="recipientAddress">Địa điểm nhận hàng dự kiến *</label><select id="recipientAddress" required><option value="">Chọn địa điểm</option><option>Cơ sở chính Nguyễn Văn Bảo</option><option>Cơ sở Nguyễn Văn Dung</option><option>Cơ sở Phạm Văn Chiêu</option><option>Sân vận động Đạt Đức</option></select></div>
-<div class="connection-field full"><label for="orderNote">Ghi chú cho người bán</label><textarea id="orderNote" maxlength="2000" placeholder="Điều bạn muốn người bán biết trước khi xác nhận…"></textarea></div>
-</div><p class="connection-note">Địa điểm và thời gian chính thức sẽ được hai bên thống nhất trong chat. Người bán chọn giao trực tiếp hoặc PASSIT giao hộ sau khi chat được mở.</p></section>
+<section class="connection-card"><h2>Thống nhất sau trong chat</h2>
+<p class="connection-note">Bạn chưa cần nhập họ tên, số điện thoại hay địa điểm nhận hàng. Sau khi người bán xác nhận phí và chat được mở, hai bên có thể trao đổi trực tiếp để thống nhất cách giao dịch.</p>
+<div class="connection-fields"><div class="connection-field full"><label for="orderNote">Ghi chú cho người bán (không bắt buộc)</label><textarea id="orderNote" maxlength="2000" placeholder="Nếu muốn, để lại lời nhắn cho người bán…"></textarea></div></div>
+<p class="connection-note">Người bán chọn giao trực tiếp hoặc PASSIT giao hộ sau khi hai bên thống nhất trong chat.</p></section>
 <aside class="connection-card"><h2>Sản phẩm bạn muốn mua</h2><div id="connectionCheckoutItems"></div><p id="connectionOrderCount"></p><div class="connection-total"><span>Tiền sản phẩm dự kiến</span><strong id="connectionSubtotal">0đ</strong></div>
 <p class="connection-note">Phí sàn: <strong>người bán chịu</strong>, 5% tổng tiền mỗi đơn, tối thiểu 2.000đ. Nếu chọn PASSIT giao hộ, người bán chịu thêm 5.000đ.</p>
 <button id="connectionSubmit" class="connection-button" type="submit" disabled>Xác nhận đặt hàng</button><p class="connection-lead">PASSIT kết nối hai bên, không thu tiền hàng của người mua hoặc đảm bảo việc thực hiện giao dịch giữa hai bên.</p></aside>

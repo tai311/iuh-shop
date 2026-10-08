@@ -20,11 +20,16 @@ test('Security helpers escape markup and remove active HTML',()=>{
   assert.equal(f.w.IUHSecurity.escapeHTML('<img>'),'&lt;img&gt;');
  }finally{f.dom.window.close();}
 });
-test('Active checkout collects recipient information without buyer payment or shipping selection',()=>{
+test('Active checkout requires no recipient details and has no buyer payment or shipping selection',()=>{
  const html=read('HTML/dathang.html'),script=read('JS/connection-checkout.js');
  assert.doesNotMatch(html,/confirmPaymentBtn|qrtt\.png|value="qr"|name="paymentMethod"|name="shippingMethod"|src="\.\.\/JS\/dathang.js"/);
  assert.match(html,/connection-checkout.js/);
- for(const id of ['recipientName','recipientPhone','recipientAddress','orderNote']) assert.match(html,new RegExp('id="'+id+'"'));
+ for(const id of ['recipientName','recipientPhone','recipientAddress']) assert.doesNotMatch(html,new RegExp('id="'+id+'"'));
+ assert.match(html,/id="orderNote"/);
+ assert.match(html,/chưa cần nhập họ tên, số điện thoại hay địa điểm nhận hàng/i);
+ assert.match(script,/p_recipient_name: ''/);
+ assert.match(script,/p_recipient_phone: ''/);
+ assert.match(script,/p_recipient_address: ''/);
  assert.match(script,/request_connection_orders/);
 });
 test('Package modal creates a PayOS link for the pending package request',async()=>{
