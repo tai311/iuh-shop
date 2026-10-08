@@ -7541,3 +7541,243 @@ body {
     }
 
 }
+
+/* =========================================================
+   FIX CUỐI - NỘI DUNG BÀI ĐĂNG & BÌNH LUẬN
+   KHÔNG CHO BỊ CĂN GIỮA / LỆCH
+========================================================= */
+
+/* BÀI ĐĂNG */
+.discussion-post .post-content {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 6px 20px 10px !important;
+
+    display: block !important;
+    text-align: left !important;
+}
+
+
+.discussion-post .post-content-text {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: block !important;
+
+    text-align: left !important;
+    text-indent: 0 !important;
+
+    color: #394459 !important;
+
+    font-family: "Be Vietnam Pro", sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+
+    line-height: 1.65 !important;
+
+    white-space: pre-wrap !important;
+
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+}
+
+
+/* Nếu JS tạo thêm thẻ bên trong nội dung */
+.discussion-post .post-content-text p,
+.discussion-post .post-content-text div,
+.discussion-post .post-content-text span {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    text-align: left !important;
+    text-indent: 0 !important;
+}
+
+
+/* Không cho nội dung tự căn giữa bằng inline style */
+.discussion-post .post-content-text[style] {
+    text-align: left !important;
+}
+
+
+/* BADGE */
+.discussion-post .post-type-badge {
+    display: inline-flex !important;
+
+    width: fit-content !important;
+
+    margin: 0 0 8px !important;
+
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   BÌNH LUẬN
+========================================================= */
+
+.discussion-post .post-comments {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 8px 18px 14px !important;
+
+    display: block !important;
+
+    text-align: left !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+}
+
+
+.discussion-post .comments-list {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: block !important;
+
+    text-align: left !important;
+}
+
+
+.discussion-post .comment-item {
+    width: 100% !important;
+
+    margin-top: 8px !important;
+
+    display: flex !important;
+
+    align-items: flex-start !important;
+
+    text-align: left !important;
+}
+
+
+/* Nội dung trong comment */
+.discussion-post .comment-main {
+    min-width: 0 !important;
+
+    text-align: left !important;
+}
+
+
+.discussion-post .comment-box {
+    width: fit-content !important;
+    max-width: 100% !important;
+
+    margin: 0 !important;
+    padding: 8px 12px !important;
+
+    display: block !important;
+
+    text-align: left !important;
+}
+
+
+.discussion-post .comment-box p {
+    width: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: block !important;
+
+    text-align: left !important;
+    text-indent: 0 !important;
+
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+
+    min-height: 0 !important;
+}
+
+
+/* Tên người bình luận */
+.discussion-post .comment-name-row,
+.discussion-post .comment-name {
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   INPUT BÌNH LUẬN
+========================================================= */
+
+.discussion-post .comment-input-row {
+    width: 100% !important;
+
+    display: flex !important;
+
+    align-items: flex-end !important;
+
+    text-align: left !important;
+}
+
+
+.discussion-post .comment-editor-wrapper {
+    text-align: left !important;
+}
+
+
+.discussion-post .comment-textarea {
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   REACTION
+========================================================= */
+
+.discussion-post .comment-reaction-area {
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: flex-start !important;
+
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .discussion-post .post-content {
+        padding: 5px 15px 10px !important;
+    }
+
+    .discussion-post .post-content-text {
+        font-size: 14px !important;
+
+        line-height: 1.65 !important;
+
+        text-align: left !important;
+    }
+
+    .discussion-post .post-comments {
+        padding: 8px 14px 14px !important;
+    }
+
+    .discussion-post .comment-box {
+        max-width: calc(100vw - 90px) !important;
+    }
+
+    .discussion-post .comment-box p {
+        text-align: left !important;
+    }
+}
