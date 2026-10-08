@@ -4710,7 +4710,7 @@ async function loadFeaturedSearchProducts() {
                 .eq(
                     "status",
                     "active"
-                );
+                ).gt("quantity", 0);
 
 
         if (productError) {
@@ -5173,7 +5173,7 @@ async function searchProducts(
             .eq(
                 "status",
                 "active"
-            )
+            ).gt("quantity", 0)
             .ilike(
                 "name",
                 `%${keyword}%`

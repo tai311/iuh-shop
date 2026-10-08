@@ -1053,7 +1053,7 @@ async function loadRecommendedProducts() {
             .eq(
                 "status",
                 "active"
-            );
+            ).gt("quantity", 0);
 
 
         if (productError) {
@@ -1743,7 +1743,7 @@ async function loadFeaturedProducts() {
             .eq(
                 "status",
                 "active"
-            )
+            ).gt("quantity", 0)
 
             .order(
                 "created_at",

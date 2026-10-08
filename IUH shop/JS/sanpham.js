@@ -133,7 +133,7 @@ async function loadProducts() {
             .eq(
                 "status",
                 "active"
-            )
+            ).gt("quantity", 0)
 
             .order(
                 "created_at",
