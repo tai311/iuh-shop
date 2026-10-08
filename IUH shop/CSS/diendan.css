@@ -5974,6 +5974,10 @@ body {
    FIX CHUẨN - BÀI ĐĂNG & BÌNH LUẬN
    ========================================================= */
 
+/* =========================================================
+   FIX CHUẨN - NỘI DUNG BÀI ĐĂNG
+========================================================= */
+
 .discussion-post .post-content {
     padding: 6px 20px 10px !important;
     margin: 0 !important;
@@ -5983,7 +5987,6 @@ body {
     margin: 0 0 8px !important;
 }
 
-/* Nội dung bài viết */
 .discussion-post .post-content-text {
     margin: 0 !important;
     padding: 0 !important;
@@ -5991,18 +5994,20 @@ body {
     min-height: 0 !important;
     height: auto !important;
 
+    display: block !important;
+
     text-align: left !important;
+    text-indent: 0 !important;
 
     font-size: 14px !important;
     line-height: 1.55 !important;
 
-    /* GIỮ NGUYÊN XUỐNG DÒNG KHI ĐĂNG BÀI */
+    /* Giữ nguyên xuống hàng */
     white-space: pre-wrap !important;
 
     word-break: break-word !important;
     overflow-wrap: anywhere !important;
 }
-
 
 /* Reaction */
 .discussion-post .post-stats {
