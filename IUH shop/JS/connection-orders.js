@@ -23,21 +23,35 @@
         const seller = r.seller_id === user.id, pending = r.status === 'awaiting_seller', connected = r.status === 'connected';
         const expired = new Date(r.expires_at).getTime() <= Date.now() + clockOffset;
         const delivery = r.delivery_method === 'passit' ? 'PASSIT giao hộ · 5.000đ do người bán chịu' : r.delivery_method === 'direct' ? 'Người bán giao trực tiếp' : 'Chưa chọn cách giao hàng';
+        const deliveryStatus = {
+            requested: 'Đã ghi nhận mô phỏng phí giao hộ; admin sẽ liên hệ với bạn. Vui lòng chờ.',
+            arranging: 'Admin đang liên hệ và sắp xếp giao hộ.',
+            delivered: 'PASSIT đã báo giao hàng; chờ người mua xác nhận đã nhận.',
+            seller_delivered: 'Người bán đã báo giao hàng; chờ người mua xác nhận đã nhận.',
+            completed: 'Người mua đã xác nhận nhận hàng · Hoàn tất'
+        }[r.delivery_status];
+        const adminContacts = mode === 'admin' ? `<div class="connection-admin-contacts"><span>Người mua: ${C.escape(r.buyer_contact?.fullname || r.recipient_name || 'Chưa có tên')}</span>
+            <span>${r.buyer_contact?.phone ? `<a href="tel:${C.escape(r.buyer_contact.phone)}">${C.escape(r.buyer_contact.phone)}</a>` : 'Chưa có số điện thoại'}</span>
+            <span>Người bán: ${C.escape(r.seller_contact?.fullname || 'Chưa có tên')}</span>
+            <span>${r.seller_contact?.phone ? `<a href="tel:${C.escape(r.seller_contact.phone)}">${C.escape(r.seller_contact.phone)}</a>` : 'Chưa có số điện thoại'}</span></div>` : '';
         return `<article class="connection-card" data-request="${r.id}">
             <div class="connection-card-head"><strong>Yêu cầu #${r.id}</strong><span class="connection-badge ${r.status}">${stateNames[r.status]}</span></div>
             ${(r.items || []).map(i => `<div class="connection-product"><img src="${C.escape(C.image(i.image_urls))}" alt="" loading="lazy"><div><strong>${C.escape(i.name)}</strong><p>${i.quantity} × ${C.money(i.unit_price)}</p></div></div>`).join('')}
             <div class="connection-meta"><div><span>Tiền sản phẩm</span><p class="connection-price">${C.money(r.subtotal)}</p></div><div><span>Phí sàn người bán chịu (5%, tối thiểu 2.000đ)</span><p class="connection-price">${C.money(r.platform_fee)}</p></div>
             <div><span>Người nhận</span><p>${r.recipient_name || r.recipient_phone ? `${C.escape(r.recipient_name || 'Chưa cung cấp tên')} · ${C.escape(r.recipient_phone || 'Chưa cung cấp số điện thoại')}` : 'Thống nhất trong chat'}</p></div><div><span>Địa điểm dự kiến</span><p>${C.escape(r.recipient_address || 'Thống nhất trong chat')}</p></div></div>
+            ${adminContacts}
             ${r.note ? `<p>Ghi chú: ${C.escape(r.note)}</p>` : ''}
             ${pending ? `<p class="connection-note">${seller ? `Bạn có một giao dịch đang chờ xác nhận. Phí sàn là ${C.money(r.platform_fee)}. Vui lòng thanh toán để tiếp tục giao dịch trong 24 giờ.` : 'Người bán đang xác nhận phí sàn. Bạn không thanh toán tại PASSIT; chat sẽ mở khi người bán xác nhận.'}<br><strong>${remaining(r)}</strong></p>` : ''}
-            ${connected ? `<p class="connection-note">${delivery}${r.delivery_status ? ' · ' + ({ requested: 'Chờ PASSIT sắp xếp', arranging: 'PASSIT đang sắp xếp giao', delivered: 'PASSIT đã giao' }[r.delivery_status]) : ''}</p>` : ''}
+            ${connected ? `<p class="connection-note">${delivery}${deliveryStatus ? ' · ' + deliveryStatus : ''}</p>` : ''}
             ${r.delivery_note ? `<p>Thỏa thuận giao: ${C.escape(r.delivery_note)}</p>` : ''}
             <div class="connection-actions">
                 ${pending && seller ? `<button class="connection-button" data-action="fee" data-id="${r.id}" ${expired || !automatic ? 'disabled' : ''}>Xác nhận phí ${C.money(r.platform_fee)} & mở chat</button>` : ''}
                 ${pending && (seller || r.buyer_id === user.id) ? `<button class="connection-button danger" data-action="cancel" data-id="${r.id}">${seller ? 'Từ chối yêu cầu' : 'Hủy yêu cầu'}</button>` : ''}
                 ${connected && r.conversation_id && mode !== 'chat' && (seller || r.buyer_id === user.id) ? `<a class="connection-button" href="${C.chatURL(r.conversation_id)}">Mở chat ${seller ? 'người mua' : 'người bán'}</a>` : ''}
-                ${mode === 'admin' && r.delivery_status === 'requested' ? `<button class="connection-button" data-action="arranging" data-id="${r.id}">Nhận giao hộ</button>` : ''}
-                ${mode === 'admin' && r.delivery_status === 'arranging' ? `<button class="connection-button" data-action="delivered" data-id="${r.id}">Đã giao hộ</button>` : ''}
+                ${connected && r.delivery_method === 'direct' && !r.delivery_status && seller ? `<button class="connection-button" data-action="seller-delivered" data-id="${r.id}">Xác nhận đã giao</button>` : ''}
+                ${connected && ((r.delivery_method === 'direct' && r.delivery_status === 'seller_delivered') || (r.delivery_method === 'passit' && r.delivery_status === 'delivered')) && r.buyer_id === user.id ? `<button class="connection-button" data-action="buyer-received" data-id="${r.id}">Xác nhận đã nhận hàng</button>` : ''}
+                ${mode === 'admin' && r.delivery_method === 'passit' && r.delivery_status === 'requested' ? `<button class="connection-button" data-action="arranging" data-id="${r.id}">Đã liên hệ · bắt đầu sắp xếp</button>` : ''}
+                ${mode === 'admin' && r.delivery_method === 'passit' && r.delivery_status === 'arranging' ? `<button class="connection-button" data-action="delivered" data-id="${r.id}">Xác nhận PASSIT đã giao</button>` : ''}
             </div>
             ${connected && seller && !r.delivery_method ? `<section><h3>Người bán chọn cách giao hàng</h3><p>Thống nhất trong chat trước khi xác nhận. Phí giao hộ không tính cho người mua.</p>
                 <label class="connection-field">Ghi chú thời gian, điểm nhận và giao đã thống nhất<textarea maxlength="2000" data-delivery-note="${r.id}" placeholder="Ví dụ: nhận tại cổng trường lúc 15:00…"></textarea></label>
@@ -67,8 +81,19 @@
         const r = rows.find(r => String(r.id) === String(id)); if (!r || busy) return;
         pendingAction = { action, id: r.id, note: root.querySelector(`[data-delivery-note="${r.id}"]`)?.value || '' };
         const amount = action === 'fee' ? r.platform_fee : action === 'passit' ? 5000 : 0;
-        root.querySelector('[data-dialog-title]').textContent = action === 'fee' ? 'Xác nhận phí sàn & mở chat' : action === 'passit' ? 'Đăng ký PASSIT giao hộ' : action === 'cancel' ? 'Hủy yêu cầu giao dịch?' : 'Xác nhận cách giao hàng';
-        root.querySelector('[data-dialog-text]').textContent = amount ? `Phí do người bán chịu: ${C.money(amount)}. ${action === 'fee' ? 'Xác nhận xong sẽ mở chat cho cả hai bên.' : 'Yêu cầu giao hộ sẽ được chuyển đến PASSIT.'}` : action === 'cancel' ? 'Tồn kho sẽ được trả lại. Hai bên chưa được mở chat từ yêu cầu này.' : 'Xác nhận lựa chọn để hai bên cùng theo dõi.';
+        const titles = { fee: 'Xác nhận phí sàn & mở chat', passit: 'Đăng ký PASSIT giao hộ', cancel: 'Hủy yêu cầu giao dịch?', 'seller-delivered': 'Xác nhận đã giao hàng?', 'buyer-received': 'Xác nhận đã nhận hàng?', direct: 'Xác nhận giao trực tiếp', arranging: 'Xác nhận đã liên hệ và bắt đầu sắp xếp?', delivered: 'Xác nhận PASSIT đã giao hàng?' };
+        const messages = {
+            fee: `Phí do người bán chịu: ${C.money(amount)}. Xác nhận xong sẽ mở chat cho cả hai bên.`,
+            passit: `Phí giao hộ ${C.money(amount)} do người bán chịu. Đây chỉ là xác nhận mô phỏng, chưa thu tiền thật. Yêu cầu sẽ chuyển đến admin để liên hệ sắp xếp giao hàng.`,
+            cancel: 'Tồn kho sẽ được trả lại. Hai bên chưa được mở chat từ yêu cầu này.',
+            'seller-delivered': 'Đánh dấu người bán đã giao trực tiếp. Người mua sẽ xác nhận khi nhận được hàng.',
+            'buyer-received': 'Xác nhận bạn đã nhận hàng. Thao tác này sẽ hoàn tất yêu cầu.',
+            direct: 'Xác nhận lựa chọn để hai bên cùng theo dõi.',
+            arranging: 'Chỉ xác nhận sau khi admin đã liên hệ và bắt đầu sắp xếp giao hộ.',
+            delivered: 'Xác nhận PASSIT đã giao hàng. Người mua sẽ được yêu cầu xác nhận đã nhận.'
+        };
+        root.querySelector('[data-dialog-title]').textContent = titles[action] || 'Xác nhận thao tác';
+        root.querySelector('[data-dialog-text]').textContent = messages[action] || 'Xác nhận lựa chọn để hai bên cùng theo dõi.';
         const modeNote = root.querySelector('[data-dialog-mode]'); modeNote.hidden = !amount;
         modeNote.textContent = 'Chế độ thử nghiệm: hệ thống tự xác nhận phí. Không chuyển tiền thật.';
         dialog.showModal();
@@ -89,6 +114,8 @@
             if (action === 'fee') result = await C.rpc('confirm_connection_fee', { p_request_id: id });
             else if (action === 'cancel') await C.rpc('cancel_connection_request', { p_request_id: id });
             else if (['direct', 'passit'].includes(action)) await C.rpc('choose_connection_delivery', { p_request_id: id, p_method: action, p_note: note });
+            else if (action === 'seller-delivered') await C.rpc('seller_mark_connection_delivered', { p_request_id: id });
+            else if (action === 'buyer-received') await C.rpc('buyer_confirm_connection_received', { p_request_id: id });
             else await C.rpc('admin_update_connection_delivery', { p_request_id: id, p_status: action });
             dialog.close();
             if (result?.conversation_id) { location.assign(C.chatURL(result.conversation_id)); return; }

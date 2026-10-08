@@ -67,6 +67,64 @@ for(const mode of ['orders','chat'])test('Seller sees fee/delivery controls in '
  }finally{w.close();}
 });
 
+async function deliveryFixture(mode,userId,row){
+ const dom=new JSDOM(`<div id="connectionRequests" data-mode="${mode}"></div>`,{runScripts:'outside-only',url:`https://shop.invalid/HTML/donhang.html#${userId==='buyer'?'buy':'sale'}`,pretendToBeVisual:true});
+ const w=dom.window,d=w.document,calls=[];
+ w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
+ w.IUH_SUPABASE={auth:{getUser:async()=>({data:{user:{id:userId}}})},rpc:async(name,args)=>{
+  if(name==='get_connection_requests')return {data:{requests:[row],auto_confirm:true,server_time:new Date().toISOString()}};
+  calls.push([name,args]);
+  if(name==='seller_mark_connection_delivered')row.delivery_status='seller_delivered';
+  if(name==='buyer_confirm_connection_received')row.delivery_status='completed';
+  if(name==='admin_update_connection_delivery')row.delivery_status=args.p_status;
+  return {data:{success:true}};
+ }};
+ w.eval(read('JS/connection-commerce.js'));w.eval(read('JS/connection-orders.js'));await flush();
+ return {dom,w,d,calls,row};
+}
+
+test('Direct delivery requires seller confirmation then buyer receipt confirmation',async()=>{
+ const row={id:12,buyer_id:'buyer',seller_id:'seller',subtotal:10000,platform_fee:2000,recipient_name:'Buyer',recipient_phone:'',recipient_address:'',status:'connected',delivery_method:'direct',delivery_status:null,conversation_id:'chat-12',items:[]};
+ const seller=await deliveryFixture('orders','seller',row);
+ try{
+  assert.ok(seller.d.querySelector('[data-action="seller-delivered"]'));
+  seller.d.querySelector('[data-action="seller-delivered"]').click();seller.d.querySelector('[data-confirm]').click();await flush();await flush();
+  assert.equal(seller.calls[0][0],'seller_mark_connection_delivered');
+  assert.equal(row.delivery_status,'seller_delivered');
+ }finally{seller.w.close();}
+ const buyer=await deliveryFixture('orders','buyer',row);
+ try{
+  assert.ok(buyer.d.querySelector('[data-action="buyer-received"]'));
+  buyer.d.querySelector('[data-action="buyer-received"]').click();buyer.d.querySelector('[data-confirm]').click();await flush();await flush();
+  assert.equal(buyer.calls[0][0],'buyer_confirm_connection_received');
+  assert.equal(row.delivery_status,'completed');
+  assert.match(buyer.d.body.textContent,/Giao dịch đã hoàn tất|Hoàn tất/);
+ }finally{buyer.w.close();}
+});
+
+test('PASSIT delivery is visible to admin and guides seller, buyer and admin through handoff',async()=>{
+ const row={id:13,buyer_id:'buyer',seller_id:'seller',subtotal:10000,platform_fee:2000,recipient_name:'Buyer',recipient_phone:'0901234567',recipient_address:'Campus',status:'connected',delivery_method:'passit',delivery_status:'requested',conversation_id:'chat-13',buyer_contact:{fullname:'Buyer',phone:'0901234567'},seller_contact:{fullname:'Seller',phone:'0907654321'},items:[]};
+ const admin=await deliveryFixture('admin','admin',row);
+ try{
+  assert.match(admin.d.body.textContent,/admin sẽ liên hệ với bạn/i);
+  assert.match(admin.d.body.textContent,/0901234567/);
+  assert.match(admin.d.body.textContent,/0907654321/);
+  admin.d.querySelector('[data-action="arranging"]').click();admin.d.querySelector('[data-confirm]').click();await flush();await flush();
+  assert.equal(admin.calls[0][0],'admin_update_connection_delivery');
+  assert.equal(admin.calls[0][1].p_status,'arranging');
+  assert.ok(admin.d.querySelector('[data-action="delivered"]'));
+  admin.d.querySelector('[data-action="delivered"]').click();admin.d.querySelector('[data-confirm]').click();await flush();await flush();
+  assert.equal(row.delivery_status,'delivered');
+ }finally{admin.w.close();}
+ const buyer=await deliveryFixture('orders','buyer',row);
+ try{
+  assert.ok(buyer.d.querySelector('[data-action="buyer-received"]'));
+  buyer.d.querySelector('[data-action="buyer-received"]').click();buyer.d.querySelector('[data-confirm]').click();await flush();await flush();
+  assert.equal(buyer.calls[0][0],'buyer_confirm_connection_received');
+  assert.equal(row.delivery_status,'completed');
+ }finally{buyer.w.close();}
+});
+
 test('Reload after lost checkout response recovers receipt before querying exhausted stock',async()=>{
  const url='https://shop.invalid/HTML/dathang.html?buyNow=true&product=960';
  const dom=new JSDOM(read('HTML/dathang.html'),{runScripts:'outside-only',url,pretendToBeVisual:true});
