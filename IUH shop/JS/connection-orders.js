@@ -6,12 +6,12 @@
     const mode = root.dataset.mode || 'orders';
     let user, rows = [], tab = location.hash === '#sale' ? 'sale' : 'buy', automatic = false, currentChat = params.get('conversation'), busy = false, loading = false, clockOffset = 0;
     const stateNames = { awaiting_seller: 'Chờ người bán xác nhận', connected: 'Đã mở chat', expired: 'Hết hạn', cancelled: 'Đã hủy' };
-    root.innerHTML = `<div class="connection-card-head"><div><p class="connection-eyebrow">PASSIT · Kết nối giao dịch</p><h2>${mode === 'admin' ? 'Yêu cầu giao dịch & giao hộ' : mode === 'chat' ? 'Giao dịch trong cuộc trò chuyện' : 'Yêu cầu mua bán'}</h2></div><button type="button" class="connection-button secondary" data-refresh>Làm mới</button></div>
+    root.innerHTML = `${mode === 'chat' ? '' : `<div class="connection-card-head"><div><p class="connection-eyebrow">PASSIT · Kết nối giao dịch</p><h2>${mode === 'admin' ? 'Yêu cầu giao dịch & giao hộ' : 'Yêu cầu mua bán'}</h2></div><button type="button" class="connection-button secondary" data-refresh>Làm mới</button></div>
         <p class="connection-lead">Đăng bán miễn phí. Người bán xác nhận phí sàn để mở chat; hai bên tự thỏa thuận tiền hàng, thời gian và địa điểm giao dịch.</p>
-        <div data-test-note class="connection-test-note" hidden>Xác nhận thanh toán tự động đang bật để thử nghiệm. Không cần chuyển tiền thật; đây không phải xác nhận từ ngân hàng hoặc MoMo.</div>
+        <div data-test-note class="connection-test-note" hidden>Xác nhận thanh toán tự động đang bật để thử nghiệm. Không cần chuyển tiền thật; đây không phải xác nhận từ ngân hàng hoặc MoMo.</div>`}
         ${mode === 'orders' ? `<div class="connection-tabs"><button class="connection-tab" data-tab="buy">Tôi mua</button><button class="connection-tab" data-tab="sale">Tôi bán</button></div>` : ''}
         <p data-status class="connection-status" role="status" aria-live="polite"></p><div data-list></div>
-        <dialog class="connection-dialog"><h2 data-dialog-title></h2><p data-dialog-text></p><p data-dialog-mode class="connection-test-note"></p><div class="connection-actions"><button class="connection-button secondary" data-dismiss>Quay lại</button><button class="connection-button" data-confirm>Xác nhận</button></div></dialog>`;
+        ${mode === 'chat' ? '' : `<dialog class="connection-dialog"><h2 data-dialog-title></h2><p data-dialog-text></p><p data-dialog-mode class="connection-test-note"></p><div class="connection-actions"><button class="connection-button secondary" data-dismiss>Quay lại</button><button class="connection-button" data-confirm>Xác nhận</button></div></dialog>`}`;
     const list = root.querySelector('[data-list]'), status = root.querySelector('[data-status]'), dialog = root.querySelector('dialog');
     let pendingAction;
     function remaining(r) {
@@ -34,6 +34,20 @@
             <span>${r.buyer_contact?.phone ? `<a href="tel:${C.escape(r.buyer_contact.phone)}">${C.escape(r.buyer_contact.phone)}</a>` : 'Chưa có số điện thoại'}</span>
             <span>Người bán: ${C.escape(r.seller_contact?.fullname || 'Chưa có tên')}</span>
             <span>${r.seller_contact?.phone ? `<a href="tel:${C.escape(r.seller_contact.phone)}">${C.escape(r.seller_contact.phone)}</a>` : 'Chưa có số điện thoại'}</span></div>` : '';
+        if (mode === 'chat') {
+            const productNames = (r.items || []).map(i => i.name).filter(Boolean);
+            const title = productNames.length ? productNames.join(', ') : `Yêu cầu #${r.id}`;
+            const note = pending
+                ? seller ? `Người bán chưa xác nhận phí sàn ${C.money(r.platform_fee)} · ${remaining(r)}` : `Đang chờ người bán xác nhận phí sàn ${C.money(r.platform_fee)}`
+                : r.delivery_status === 'completed' ? 'Hai bên đã hoàn tất giao dịch'
+                : r.delivery_status === 'delivered' || r.delivery_status === 'seller_delivered' ? 'Người bán đã báo giao hàng · đang chờ người mua xác nhận'
+                : `Người bán đã xác nhận phí sàn ${C.money(r.platform_fee)} · chat đã mở`;
+            return `<article class="connection-chat-summary ${pending ? 'is-pending' : 'is-connected'}" data-request="${r.id}">
+                <span class="connection-chat-summary-icon" aria-hidden="true">${pending ? '…' : '✓'}</span>
+                <span class="connection-chat-summary-copy"><strong>${C.escape(title)}</strong><small>Đơn #${r.id} · ${C.money(r.subtotal)} · ${C.escape(note)}</small></span>
+                ${pending && seller ? `<button type="button" class="connection-button" data-action="fee" data-id="${r.id}" ${expired || !automatic ? 'disabled' : ''}>Xác nhận phí</button>` : ''}
+            </article>`;
+        }
         return `<article class="connection-card" data-request="${r.id}">
             <div class="connection-card-head"><strong>Yêu cầu #${r.id}</strong><span class="connection-badge ${r.status}">${stateNames[r.status]}</span></div>
             ${(r.items || []).map(i => `<div class="connection-product"><img src="${C.escape(C.image(i.image_urls))}" alt="" loading="lazy"><div><strong>${C.escape(i.name)}</strong><p>${i.quantity} × ${C.money(i.unit_price)}</p></div></div>`).join('')}
@@ -60,13 +74,13 @@
     }
     function render() {
         root.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tab === tab)));
-        root.querySelector('[data-test-note]').hidden = !automatic;
+        const testNote = root.querySelector('[data-test-note]'); if (testNote) testNote.hidden = !automatic;
         const visible = rows.filter(r => mode === 'chat' ? r.conversation_id === currentChat && r.status === 'connected' : mode === 'admin' ? true : mode === 'seller' || tab === 'sale' ? r.seller_id === user.id : r.buyer_id === user.id);
         if (mode === 'chat') root.hidden = visible.length === 0;
         list.innerHTML = visible.length ? visible.map(card).join('') : '<p class="connection-empty">Chưa có yêu cầu giao dịch ở mục này.</p>';
     }
     async function refresh() {
-        if (loading || busy || dialog.open || document.hidden || !user || (root.contains(document.activeElement) && document.activeElement.tagName === 'TEXTAREA')) return;
+        if (loading || busy || dialog?.open || document.hidden || !user || (root.contains(document.activeElement) && document.activeElement.tagName === 'TEXTAREA')) return;
         loading = true;
         try {
             const data = await C.rpc('get_connection_requests'); rows = data.requests || []; automatic = data.auto_confirm === true;
@@ -102,11 +116,11 @@
         const button = event.target.closest('button'); if (!button) return;
         if (button.hasAttribute('data-refresh')) void refresh();
         if (button.dataset.tab) { tab = button.dataset.tab; render(); }
-        if (button.dataset.action) ask(button.dataset.action, button.dataset.id);
-        if (button.hasAttribute('data-dismiss') && !busy) dialog.close();
+        if (button.dataset.action && mode !== 'chat') ask(button.dataset.action, button.dataset.id);
+        if (button.hasAttribute('data-dismiss') && !busy && dialog?.open) dialog.close();
     });
-    dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
-    root.querySelector('[data-confirm]').addEventListener('click', async event => {
+    dialog?.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
+    root.querySelector('[data-confirm]')?.addEventListener('click', async event => {
         if (!pendingAction || busy) return;
         const { action, id, note } = pendingAction; let result;
         busy = true; event.target.disabled = true;
