@@ -69,7 +69,7 @@ body :is(.product-card, .featured-product-card, .recommended-product-card, .prof
     }
     body .product-meta { flex-wrap: wrap; gap: 5px; }
     body .product-seller > div { min-width: 0; overflow-wrap: anywhere; }
-    body .product-actions { grid-template-columns: minmax(0, 1fr) 36px; gap: 5px; }
+    body .product-actions { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px; gap: 5px; align-items: stretch; }
     body .chat-product-button { min-width: 0; padding-inline: 4px; }
 }
 @media (prefers-reduced-motion: reduce) {

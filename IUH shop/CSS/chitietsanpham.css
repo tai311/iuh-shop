@@ -2936,3 +2936,19 @@ body {
 
     display: none;
 }
+/* Trả giá */
+.offer-button { border:1px solid #d97706; background:#fffaf0; color:#9a4b00; padding:14px 22px; border-radius:10px; font:700 15px "Be Vietnam Pro",sans-serif; cursor:pointer; transition:.2s ease; }
+.offer-button:hover { background:#fff1d6; transform:translateY(-2px); box-shadow:0 8px 20px rgba(217,119,6,.14); }
+.offer-modal[hidden] { display:none; } .offer-modal { position:fixed; inset:0; z-index:3000; display:grid; place-items:center; padding:20px; }
+.offer-overlay { position:absolute; inset:0; background:rgba(20,30,55,.58); backdrop-filter:blur(3px); }
+.offer-dialog { position:relative; width:min(100%,470px); padding:30px; border-radius:22px; background:#fff; box-shadow:0 24px 80px rgba(20,30,55,.25); }
+.offer-close { position:absolute; right:16px; top:12px; border:0; background:transparent; font-size:28px; color:#64748b; cursor:pointer; }
+.offer-eyebrow { color:#b45309; font-size:11px; font-weight:800; letter-spacing:.12em; }
+.offer-dialog h2 { margin:8px 32px 4px 0; color:#172554; font-size:23px; } .offer-product-name { margin:0 0 20px; color:#64748b; }
+.offer-price-reference { display:flex; justify-content:space-between; padding:14px 16px; border-radius:12px; background:#f5f7fb; color:#64748b; font-size:13px; } .offer-price-reference strong { color:#172554; font-size:15px; }
+.offer-label { display:block; margin:20px 0 8px; font-size:13px; font-weight:700; color:#334155; }
+.offer-input-wrap { display:flex; align-items:center; border:1px solid #cbd5e1; border-radius:12px; padding:0 14px; } .offer-input-wrap:focus-within { border-color:#29449c; box-shadow:0 0 0 3px rgba(41,68,156,.1); }
+.offer-input-wrap input { width:100%; min-width:0; border:0; outline:0; padding:14px 0; font:700 18px "Be Vietnam Pro",sans-serif; color:#172554; } .offer-input-wrap span { color:#64748b; font-size:12px; font-weight:700; }
+.offer-hint { margin:8px 0 0; color:#64748b; font-size:12px; } .offer-error { margin:12px 0 0; color:#b91c1c; font-size:13px; }
+.offer-actions { display:flex; gap:10px; margin-top:22px; } .offer-actions button { flex:1; border-radius:11px; padding:12px 14px; font:700 14px "Be Vietnam Pro",sans-serif; cursor:pointer; } .offer-cancel { border:1px solid #dbe2ee; color:#475569; background:#fff; } .offer-submit { border:0; color:#fff; background:#b45309; } .offer-submit:disabled { opacity:.6; cursor:wait; }
+@media(max-width:560px) { .offer-dialog { padding:25px 20px; } .offer-dialog h2 { font-size:20px; } .offer-button { padding:13px 16px; } }

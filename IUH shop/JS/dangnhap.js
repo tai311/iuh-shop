@@ -64,7 +64,13 @@ loginForm.addEventListener('submit', async event => {
             return;
         }
         success = true; button.textContent = 'Đăng nhập thành công';
-        setTimeout(() => { window.location.href = '../HTML/trangchu.html'; }, 700);
+        setTimeout(() => {
+            const next = new URLSearchParams(window.location.search).get('next');
+            const safeNext = next && /^chitietsanpham\.html\?id=[0-9]+&offer=true$/.test(next)
+                ? '../HTML/' + next
+                : '../HTML/trangchu.html';
+            window.location.href = safeNext;
+        }, 700);
     } catch { alert('Không thể kết nối. Kiểm tra mạng rồi thử đăng nhập lại.'); }
     finally { window.IUHCaptcha?.reset(); if (!success) { loginBusy = false; button.disabled = false; button.textContent = 'Đăng nhập'; } }
 });

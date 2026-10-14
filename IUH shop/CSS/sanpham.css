@@ -2302,7 +2302,8 @@ body {
 
 .product-actions {
     display: grid;
-    grid-template-columns: 1fr 39px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 39px;
+    align-items: stretch;
     gap: 8px;
 }
 
@@ -2338,6 +2339,29 @@ body {
 .chat-product-button:hover {
     background: var(--product-blue-dark);
 }
+
+.card-offer-button {
+    height: auto;
+    min-height: 42px;
+    padding: 9px 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d97706;
+    border-radius: 7px;
+    background: #fffaf0;
+    color: #9a4b00;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.35;
+    white-space: normal;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+.card-offer-button:hover { background: #fff1d6; transform: translateY(-1px); }
+.card-offer-button:disabled { opacity: .55; cursor: not-allowed; }
+
 
 .chat-product-button svg,
 .report-product-button svg {

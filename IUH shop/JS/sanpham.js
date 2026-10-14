@@ -753,6 +753,15 @@ function renderProductCard(product) {
 
                     <button
                         type="button"
+                        class="card-offer-button"
+                        data-offer-id="${product.id}"
+                        ${Number(product.quantity) <= 0 || product.status !== "active" ? "disabled" : ""}
+                    >
+                        Trả giá
+                    </button>
+
+                    <button
+                        type="button"
                         class="report-product-button"
                         data-report-id="${product.id}"
                         title="Báo cáo"
@@ -922,6 +931,24 @@ function bindProductEvents() {
         button.addEventListener('click', event => {
             event.stopPropagation();
             addCardToCart(button);
+        });
+    });
+
+    document.querySelectorAll('[data-offer-id]').forEach(button => {
+        button.addEventListener('click', async event => {
+            event.stopPropagation();
+            const productId = button.dataset.offerId;
+            try {
+                const { data, error } = await window.IUHCore.getUser();
+                if (error || !data?.user) {
+                    const next = 'chitietsanpham.html?id=' + encodeURIComponent(productId) + '&offer=true';
+                    window.location.href = 'dangnhap.html?next=' + encodeURIComponent(next);
+                    return;
+                }
+                window.location.href = 'chitietsanpham.html?id=' + encodeURIComponent(productId) + '&offer=true';
+            } catch (_) {
+                window.location.href = 'dangnhap.html?next=' + encodeURIComponent('chitietsanpham.html?id=' + encodeURIComponent(productId) + '&offer=true');
+            }
         });
     });
 

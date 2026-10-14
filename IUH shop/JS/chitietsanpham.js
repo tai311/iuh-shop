@@ -75,6 +75,10 @@ const backButton = $("backButton");
 const buyNowBtn = $("buyNowBtn");
 const addToCartBtn = $("addToCartBtn");
 const contactSellerBtn = $("contactSellerBtn");
+const makeOfferBtn = $("makeOfferBtn");
+const offerModal = $("offerModal");
+const offerPriceInput = $("offerPriceInput");
+const submitOfferBtn = $("submitOfferBtn");
 
 
 const toast = $("toast");
@@ -889,6 +893,76 @@ function setupContactSeller() {
 
 
 /* =========================================================
+   TRẢ GIÁ SẢN PHẨM
+   ========================================================= */
+function minimumOfferPrice(price) { return Math.ceil(Math.round(Number(price) || 0) * 0.6); }
+function openOfferModal() {
+    if (!currentProduct || !offerModal) return;
+    const price = Math.round(Number(currentProduct.price) || 0);
+    $("offerProductName").textContent = currentProduct.name || "Sản phẩm";
+    $("offerListedPrice").textContent = formatPrice(price);
+    $("offerMinimumHint").textContent = "Giá thấp nhất được chấp nhận là " + formatPrice(minimumOfferPrice(price)) + " (60% giá niêm yết).";
+    offerPriceInput.min = String(minimumOfferPrice(price));
+    offerPriceInput.max = String(price);
+    offerPriceInput.value = String(minimumOfferPrice(price));
+    $("offerError").hidden = true;
+    offerModal.hidden = false;
+    offerModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    offerPriceInput.focus();
+}
+function closeOfferModal() {
+    if (!offerModal) return;
+    offerModal.hidden = true;
+    offerModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+}
+function setupPriceOffer() {
+    makeOfferBtn?.addEventListener("click", async () => {
+        if (!currentProduct) { showToast("Chưa tải được thông tin sản phẩm."); return; }
+        if (currentProduct.status !== "active" || Number(currentProduct.quantity) < 1) { showToast("Sản phẩm hiện đã hết hàng."); return; }
+        const { data, error } = await supabaseClient.auth.getUser();
+        if (error || !data?.user) {
+            const next = 'chitietsanpham.html?id=' + encodeURIComponent(currentProduct.id) + '&offer=true';
+            window.location.href = 'dangnhap.html?next=' + encodeURIComponent(next);
+            return;
+        }
+        if (data.user.id === currentProduct.seller_id) { showToast("Bạn không thể trả giá sản phẩm của mình."); return; }
+        openOfferModal();
+    });
+    offerModal?.querySelectorAll("[data-close-offer]").forEach(el => el.addEventListener("click", closeOfferModal));
+    document.addEventListener("keydown", event => { if (event.key === "Escape" && offerModal && !offerModal.hidden) closeOfferModal(); });
+    submitOfferBtn?.addEventListener("click", async () => {
+        const price = Math.round(Number(currentProduct?.price) || 0);
+        const offer = Number(offerPriceInput?.value);
+        const min = minimumOfferPrice(price);
+        const errorEl = $("offerError");
+        if (!Number.isSafeInteger(offer) || offer < min || offer > price) {
+            errorEl.textContent = "Vui lòng nhập số tiền từ " + formatPrice(min) + " đến " + formatPrice(price) + ".";
+            errorEl.hidden = false;
+            offerPriceInput.focus();
+            return;
+        }
+        submitOfferBtn.disabled = true;
+        submitOfferBtn.textContent = "Đang gửi…";
+        errorEl.hidden = true;
+        try {
+            const { error } = await supabaseClient.rpc("submit_price_offer", { p_product_id: currentProduct.id, p_offer_price: offer });
+            if (error) throw error;
+            closeOfferModal();
+            showToast("Đề nghị đã gửi người bán. Theo dõi phản hồi trong mục Tin nhắn.");
+        } catch (error) {
+            errorEl.textContent = error.message || "Không thể gửi đề nghị. Vui lòng thử lại.";
+            errorEl.hidden = false;
+        } finally {
+            submitOfferBtn.disabled = false;
+            submitOfferBtn.textContent = "Gửi đề nghị";
+        }
+    });
+}
+
+
+/* =========================================================
    15. MUA NGAY
    ========================================================= */
 
@@ -1607,6 +1681,7 @@ document.addEventListener(
         setupContactSeller();
 
         setupBuyNow();
+        setupPriceOffer();
 
         setupAddToCart();
 
@@ -1621,7 +1696,20 @@ document.addEventListener(
 
         /* Tải sản phẩm */
 
-        loadProduct();
+        loadProduct().then(async () => {
+            if (new URLSearchParams(window.location.search).get("offer") !== "true") return;
+            const { data, error } = await supabaseClient.auth.getUser();
+            if (error || !data?.user) {
+                const next = 'chitietsanpham.html?id=' + encodeURIComponent(currentProduct?.id || getProductId()) + '&offer=true';
+                window.location.href = 'dangnhap.html?next=' + encodeURIComponent(next);
+                return;
+            }
+            if (data.user.id === currentProduct?.seller_id) {
+                showToast('Bạn không thể trả giá sản phẩm của mình.');
+                return;
+            }
+            openOfferModal();
+        });
     }
 );
 

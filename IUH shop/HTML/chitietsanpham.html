@@ -592,6 +592,14 @@
     </button>
 
     <button
+        id="makeOfferBtn"
+        class="offer-button"
+        type="button"
+    >
+        <i class="fa-solid fa-handshake-angle" aria-hidden="true"></i> Trả giá
+    </button>
+
+    <button
         id="addToCartBtn"
         class="cart-button"
         type="button"
@@ -947,6 +955,23 @@
     </div>
 
 </footer>
+
+
+<div id="offerModal" class="offer-modal" hidden aria-hidden="true">
+  <div class="offer-overlay" data-close-offer></div>
+  <section class="offer-dialog" role="dialog" aria-modal="true" aria-labelledby="offerTitle">
+    <button class="offer-close" type="button" aria-label="Đóng" data-close-offer>×</button>
+    <span class="offer-eyebrow">THƯƠNG LƯỢNG CÙNG NGƯỜI BÁN</span>
+    <h2 id="offerTitle">Đề xuất mức giá của bạn</h2>
+    <p id="offerProductName" class="offer-product-name"></p>
+    <div class="offer-price-reference"><span>Giá đang hiển thị</span><strong id="offerListedPrice"></strong></div>
+    <label class="offer-label" for="offerPriceInput">Giá bạn muốn trả</label>
+    <div class="offer-input-wrap"><input id="offerPriceInput" type="number" inputmode="numeric" step="1" min="1" required><span>VNĐ</span></div>
+    <p id="offerMinimumHint" class="offer-hint"></p>
+    <p id="offerError" class="offer-error" role="alert" hidden></p>
+    <div class="offer-actions"><button type="button" class="offer-cancel" data-close-offer>Để sau</button><button id="submitOfferBtn" type="button" class="offer-submit">Gửi đề nghị</button></div>
+  </section>
+</div>
 
 <!-- SUPABASE -->
 
